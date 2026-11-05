@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105r">
+<link rel="stylesheet" href="assets/style.css?v=20261105t">
 </head>
 <body data-active="realestate">
 
@@ -27,19 +27,20 @@
   <div class="re-panel on" id="re-general">
   <div id="pm-banner"></div>
 
-  <div class="re-filters">
-    <div class="re-frow"><span class="re-fl">집 종류</span><div class="filter-bar" id="htype-bar"></div></div>
-    <div class="re-frow"><span class="re-fl">거래 방식</span>
-  <div class="filter-bar" id="deal-bar">
-    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
-    <button class="chip-btn" data-filter="매매" onclick="applyChip(this)">매매</button>
-    <button class="chip-btn" data-filter="연세" onclick="applyChip(this)">연세</button>
-    <button class="chip-btn" data-filter="월세" onclick="applyChip(this)">월세</button>
-    <button class="chip-btn" data-filter="단기" onclick="applyChip(this)">단기·한달살이</button>
-    <button class="chip-btn" data-filter="일년살이" onclick="applyChip(this)">일년살이</button>
-    <span class="spacer"></span>
-    <span class="count">매물 <b id="shown-count">0</b>건</span>
-  </div>
+  <div class="ref">
+    <div class="ref-types" id="htype-bar" role="group" aria-label="집 종류"></div>
+    <div class="shf">
+      <span class="shf-n" id="re-count"><b id="shown-count">0</b>건의 매물</span>
+      <div class="shf-r"><span class="ref-l">거래 방식</span>
+        <div class="seg" id="deal-bar" role="group" aria-label="거래 방식">
+          <button type="button" class="on" data-filter="all" onclick="applyChip(this)">전체</button>
+          <button type="button" data-filter="매매" onclick="applyChip(this)">매매</button>
+          <button type="button" data-filter="연세" onclick="applyChip(this)">연세</button>
+          <button type="button" data-filter="월세" onclick="applyChip(this)">월세</button>
+          <button type="button" data-filter="단기" onclick="applyChip(this)">단기·한달</button>
+          <button type="button" data-filter="일년살이" onclick="applyChip(this)">일년살이</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -48,15 +49,15 @@
 
 </main>
 
-<script src="assets/common.js?v=20261105r"></script>
-<script src="assets/seed-trade.js?v=20261105r"></script>
-<script src="assets/seed-extra.js?v=20261105r"></script>
-<script src="assets/seed-new.js?v=20261105r"></script>
-<script src="assets/seed-comments.js?v=20261105r"></script>
-<script src="assets/photos.js?v=20261105r"></script>
-<script src="assets/cards.js?v=20261105r"></script>
-<script src="assets/admin-data.js?v=20261105r"></script>
-<script src="assets/programs-data.js?v=20261105r"></script>
+<script src="assets/common.js?v=20261105t"></script>
+<script src="assets/seed-trade.js?v=20261105t"></script>
+<script src="assets/seed-extra.js?v=20261105t"></script>
+<script src="assets/seed-new.js?v=20261105t"></script>
+<script src="assets/seed-comments.js?v=20261105t"></script>
+<script src="assets/photos.js?v=20261105t"></script>
+<script src="assets/cards.js?v=20261105t"></script>
+<script src="assets/admin-data.js?v=20261105t"></script>
+<script src="assets/programs-data.js?v=20261105t"></script>
 <script>
 document.getElementById("pm-banner").innerHTML = premiumBanner("매물");
 
@@ -76,14 +77,16 @@ function htypeOf(p){
 }
 function allRe(){ return userPostsOf("부동산").concat(TRADE_SEEDS.filter(function(p){ return p.board === "부동산"; })); }
 function applyHt(el){
-  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.parentElement.querySelectorAll("button").forEach(function(c){ c.classList.remove("on"); });
   el.classList.add("on"); htFilter = el.dataset.ht; render();
 }
 (function(){
   var all = allRe(), cnt = {};
   all.forEach(function(p){ var k = htypeOf(p); cnt[k] = (cnt[k] || 0) + 1; });
-  document.getElementById("htype-bar").innerHTML = '<button class="chip-btn on" data-ht="all" onclick="applyHt(this)">전체 <small>' + all.length + '</small></button>' +
-    HTYPES.map(function(h){ return '<button class="chip-btn" data-ht="' + h + '" onclick="applyHt(this)">' + h + ' <small>' + (cnt[h] || 0) + '</small></button>'; }).join("");
+  var ICO = { "all": "🏘️", "전원·단독주택": "🏡", "아파트": "🏢", "빌라·연립": "🏬", "원룸·투룸·오피스텔": "🛏️", "토지·밭": "🌾", "상가·기타": "🏪" };
+  var SHORT = { "원룸·투룸·오피스텔": "원룸·오피스텔" };
+  document.getElementById("htype-bar").innerHTML = [["all", "전체", all.length]].concat(HTYPES.map(function(h){ return [h, SHORT[h] || h, cnt[h] || 0]; }))
+    .map(function(x, i){ return '<button type="button" class="' + (i === 0 ? "on" : "") + '" data-ht="' + x[0] + '" onclick="applyHt(this)" title="' + x[0].replace("all", "전체") + '"><span class="rt-i">' + ICO[x[0]] + '</span><b>' + x[1] + '</b><small>' + x[2] + '</small></button>'; }).join("");
 })();
 
 function fmtPrice(p){
@@ -96,7 +99,7 @@ function fmtPrice(p){
   return n.toLocaleString() + "원";
 }
 function applyChip(el){
-  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.parentElement.querySelectorAll("button").forEach(function(c){ c.classList.remove("on"); });
   el.classList.add("on");
   typeFilter = el.dataset.filter;
   render();
@@ -122,8 +125,8 @@ function render(){
 }
 /* ?q=한동 처럼 학교·마을 이름으로 매물 거르기 */
 var reQ = (new URLSearchParams(location.search).get("q") || "").trim();
-if (reQ) document.querySelector("#deal-bar .count").insertAdjacentHTML("beforebegin",
-  '<span class="chip-btn on" style="cursor:default">‘' + escHtml(reQ) + '’ 포함 <a href="realestate.html" style="margin-left:6px">✕</a></span>');
+if (reQ) document.getElementById("re-count").insertAdjacentHTML("beforeend",
+  '<span class="chip-btn on" style="cursor:default;margin-left:10px;font-size:13px">‘' + escHtml(reQ) + '’ 포함 <a href="realestate.html" style="margin-left:6px">✕</a></span>');
 render();
 
 /* 예전 주소(학교 연계 집 탭)로 들어오면 새 페이지로 */

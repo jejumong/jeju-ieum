@@ -1475,3 +1475,26 @@ a.ap-next:hover{background:var(--sea-600)}
 .shf .seg button{white-space:nowrap;padding:6px 13px!important;min-height:0!important;line-height:1.3;font-size:13.5px!important}
 .shf .tg{white-space:nowrap;min-height:0!important}
 .shf-n b{margin-right:0}
+
+/* 부동산: 1단계 집 종류(아이콘 막대) · 2단계 거래 방식(작은 묶음) */
+.ref{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px 6px;margin-bottom:18px}
+.ref-types{display:flex;gap:4px;padding:5px;margin-bottom:14px;background:var(--bg-2);border:1px solid var(--line);border-radius:16px;overflow-x:auto;scrollbar-width:none}
+.ref-types::-webkit-scrollbar{display:none}
+.ref-types button{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:84px;padding:10px 8px;border:0;border-radius:12px;background:transparent;color:var(--ink-3);font:inherit;cursor:pointer;transition:background .15s,box-shadow .15s}
+.ref-types button:hover{background:rgba(255,255,255,.7)}
+.ref-types button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(16,40,70,.12)}
+.ref-types .rt-i{font-size:22px;line-height:1}
+.ref-types b{font-size:14px;font-weight:800;letter-spacing:-.03em;white-space:nowrap}
+.ref-types small{font-size:11.5px;font-weight:700;color:var(--ink-4)}
+.ref-types button.on small{color:var(--sea-700)}
+.ref .shf{margin-bottom:10px}
+.ref-l{font-size:13px;font-weight:800;color:var(--ink-4);margin-right:2px}
+@media (max-width:760px){
+  .ref{padding:12px 12px 4px;border-radius:var(--r)}
+  .ref-types{margin-left:-2px;margin-right:-2px}
+  .ref-types button{min-width:76px;padding:9px 6px}
+  .ref-types b{font-size:13px}
+  .ref .seg{max-width:100%;overflow-x:auto;scrollbar-width:none}
+  .ref .seg::-webkit-scrollbar{display:none}
+}
+@media (max-width:760px){.ref .shf-r{width:100%;flex-wrap:nowrap;min-width:0}.ref .seg{flex:1;min-width:0;display:flex}.ref .seg button{flex:none}.ref .shf{align-items:stretch}.ref-l{display:none}}
