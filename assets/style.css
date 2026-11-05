@@ -1564,3 +1564,4 @@ a.act-item:hover{border-color:var(--sea-200)}
 .join-st b{font-size:15px;color:var(--ink)}
 .join-st span{font-size:13px;color:var(--ink-3)}
 .join-st.s-approved{background:#eaf7f0}.join-st.s-pending{background:#fff6e8}
+.hd-bell-n[hidden]{display:none!important}
