@@ -34,9 +34,9 @@ function renderSections(opts) {
 
   if (pmShown.length) {
     html +=
-      '<div class="sec-head"><h2>프리미엄 <span class="pm-badge">PREMIUM</span></h2>' +
+      '<section class="pm-zone"><div class="sec-head"><h2><span class="pm-star">⭐</span>프리미엄 <span class="pm-badge">PREMIUM</span></h2>' +
       '<span class="sec-note">유료 상단 노출</span><span class="line"></span></div>' +
-      '<div class="grid-cards">' + pmShown.map(function (p) { return opts.card(p, true); }).join("") + "</div>";
+      '<div class="grid-cards">' + pmShown.map(function (p) { return opts.card(p, true); }).join("") + "</div></section>";
   }
   if (gnShown.length) {
     html +=

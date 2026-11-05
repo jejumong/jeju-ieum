@@ -96,7 +96,7 @@ function photoCard(p, o) {
   var cm = typeof commentCountOf === "function" ? commentCountOf(p.id) : 0;
   return '<a class="item-card pc' + (o.pm ? " premium" : "") + '" href="view.html?id=' + p.id + '">' +
     '<div class="pc-ph"><img src="' + photoUrl(photoFor(p)) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
-      (o.pm ? '<span class="pm-tag">PREMIUM</span>' : '') +
+      (o.pm ? '<span class="pm-tag">⭐ 프리미엄</span>' : '') +
       (o.badge ? '<span class="pc-badge ' + (o.badge.cls || "") + '">' + e(o.badge.text) + '</span>' : '') +
     '</div>' +
     '<div class="pc-body">' +

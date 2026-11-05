@@ -1498,3 +1498,18 @@ a.ap-next:hover{background:var(--sea-600)}
   .ref .seg::-webkit-scrollbar{display:none}
 }
 @media (max-width:760px){.ref .shf-r{width:100%;flex-wrap:nowrap;min-width:0}.ref .seg{flex:1;min-width:0;display:flex}.ref .seg button{flex:none}.ref .shf{align-items:stretch}.ref-l{display:none}}
+
+/* ── 프리미엄 vs 일반: 따뜻한 귤색으로 구분 ── */
+.pm-zone{background:linear-gradient(180deg,#fff4e3 0%,#fffaf2 60%,#fffdf9 100%);border:1.5px solid #ffd59e;border-radius:22px;padding:18px 18px 22px;margin-bottom:8px}
+.pm-zone .sec-head{margin-top:0}
+.pm-zone .sec-head h2{color:#8a4b00}
+.pm-zone .sec-head .line{background:#ffd59e}
+.pm-zone .sec-note{color:#b06a12}
+.pm-star{margin-right:4px}
+.sec-head .pm-badge,.pm-zone .sec-head .pm-badge{background:linear-gradient(135deg,#ffb347,#ff8a1f);color:#fff;letter-spacing:.1em;box-shadow:0 3px 8px rgba(255,138,31,.3)}
+.item-card.pc.premium{border:2px solid #ffc06b;background:#fff;box-shadow:0 6px 18px -8px rgba(255,138,31,.45)}
+.item-card.pc.premium:hover{border-color:#ff9f2e;box-shadow:0 0 0 3px #ffe4c0,0 14px 30px -12px rgba(255,138,31,.45)}
+.item-card.pc.premium .pm-tag,.item-card.pc .pm-tag{background:linear-gradient(135deg,#ffb347,#ff7a00);color:#fff;font-size:11px;letter-spacing:0;padding:5px 10px;border-radius:999px;box-shadow:0 3px 10px rgba(255,122,0,.35)}
+/* 일반 등록 머리글은 차분하게 */
+.sec-head.sec-gap{margin-top:30px}
+@media (max-width:640px){.pm-zone{padding:12px 10px 14px;border-radius:16px;margin-left:-4px;margin-right:-4px}}
