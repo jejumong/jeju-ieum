@@ -153,6 +153,21 @@ var JIDB = (function () {
     return client.from("club_joins").select("id", { count: "exact", head: true }).eq("club_id", clubId).eq("status", "pending").then(function (r) { return r.count || 0; });
   }
 
+  /* ── 모임 공지 · 회원 목록 ── */
+  function clubNotices(clubId) {
+    if (!client) return Promise.resolve([]);
+    return client.from("club_notices").select("*").eq("club_id", clubId).order("created_at", { ascending: false }).limit(50).then(err);
+  }
+  function addNotice(club, body) {
+    need(); var u = me(); if (!u) return Promise.reject(new Error("로그인이 필요해요"));
+    return client.from("club_notices").insert({ club_id: club.id, club_title: club.title, owner: u.id, body: body }).select().single().then(err);
+  }
+  function deleteNotice(id) { need(); return client.from("club_notices").delete().eq("id", id).then(err); }
+  function clubMembers(clubId) {
+    if (!client) return Promise.resolve([]);
+    return client.from("club_joins").select("id,applicant_nick,status,decided_at,created_at").eq("club_id", clubId).order("created_at").then(err);
+  }
+
   /* ── 알림함 ── */
   function notifications() {
     var u = me(); if (!client || !u) return Promise.resolve([]);
@@ -191,6 +206,7 @@ var JIDB = (function () {
     createPost: createPost, updatePost: updatePost, deletePost: deletePost, getPost: getPost, listPosts: listPosts,
     myJoin: myJoin, requestJoin: requestJoin, cancelJoin: cancelJoin, receivedJoins: receivedJoins, sentJoins: sentJoins,
     decideJoin: decideJoin, joinCount: joinCount,
+    clubNotices: clubNotices, addNotice: addNotice, deleteNotice: deleteNotice, clubMembers: clubMembers,
     notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead
   };
 })();
