@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106d">
+<link rel="stylesheet" href="assets/style.css?v=20261106e">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -59,15 +59,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106d"></script>
-<script src="assets/common.js?v=20261106d"></script>
-<script src="assets/db.js?v=20261106d"></script>
-<script src="assets/notify.js?v=20261106d"></script>
-<script src="assets/seed-trade.js?v=20261106d"></script>
-<script src="assets/seed-extra.js?v=20261106d"></script>
-<script src="assets/seed-new.js?v=20261106d"></script>
-<script src="assets/seed-comments.js?v=20261106d"></script>
-<script src="assets/admin-data.js?v=20261106d"></script>
+<script src="assets/kmap.js?v=20261106e"></script>
+<script src="assets/common.js?v=20261106e"></script>
+<script src="assets/db.js?v=20261106e"></script>
+<script src="assets/notify.js?v=20261106e"></script>
+<script src="assets/seed-trade.js?v=20261106e"></script>
+<script src="assets/seed-extra.js?v=20261106e"></script>
+<script src="assets/seed-new.js?v=20261106e"></script>
+<script src="assets/seed-comments.js?v=20261106e"></script>
+<script src="assets/admin-data.js?v=20261106e"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -145,12 +145,16 @@ if (!post) {
     '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
     extra +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
+    (post.board === "구인구직" && isMyPost(post)
+      ? '<div class="job-status' + (post.head === "채용완료" ? " done" : "") + '"><div><b>' + (post.head === "채용완료" ? "✅ 채용이 끝난 공고예요" : "📢 지금 모집 중인 공고예요") + '</b>' +
+        '<span>' + (post.head === "채용완료" ? "목록에 '채용완료'로 흐리게 표시되고 있어요." : "사람을 구했으면 채용완료로 바꿔 주세요. 목록에 바로 표시돼요.") + '</span></div>' +
+        '<button type="button" class="btn ' + (post.head === "채용완료" ? "ghost" : "primary") + '" onclick="closeJob()">' + (post.head === "채용완료" ? "다시 모집하기" : "✅ 채용완료로 바꾸기") + '</button></div>'
+      : '') +
     (post.board === "부동산" || (post.board === "구인구직" && post.addr) ? '<div class="pv-map"><h3>' + (post.board === "구인구직" ? "근무지 위치" : "매물 위치") + '</h3><div id="pv-map"></div></div>' : '') +
     joinBlock(post) +
     '<div class="pv-actions"><a class="btn ghost" href="' + backHref + '">목록으로</a>' +
     (isMyPost(post)
       ? '<div class="own-actions">' +
-        (post.board === "구인구직" ? '<button class="btn ' + (post.head === "채용완료" ? "ghost" : "primary") + ' job-close" onclick="closeJob()">' + (post.head === "채용완료" ? "채용 다시 열기" : "✅ 채용완료") + '</button>' : '') +
         '<button class="mini-btn" onclick="editPost()">수정</button>' +
         '<button class="mini-btn danger-btn" onclick="removePost()">삭제</button></div>'
       : '') +

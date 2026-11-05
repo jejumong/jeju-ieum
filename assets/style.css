@@ -1606,3 +1606,9 @@ a.act-item:hover{border-color:var(--sea-200)}
 .item-card.pc.closed .pc-title{text-decoration:line-through;text-decoration-thickness:1.5px}
 .closed-tag{display:inline-block;vertical-align:middle;font-size:13px;font-weight:800;color:#fff;background:var(--ink-3);padding:3px 10px;border-radius:999px;margin-right:8px}
 .own-actions .job-close{padding:7px 14px;font-size:13.5px}
+.job-status{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:22px 0 4px;padding:16px 18px;border-radius:14px;background:var(--sea-50);border:1.5px solid var(--sea-200)}
+.job-status b{display:block;font-size:16px;color:var(--ink)}
+.job-status span{font-size:13.5px;color:var(--ink-3)}
+.job-status .btn{flex:none;padding:11px 18px;font-size:15px}
+.job-status.done{background:var(--bg-2);border-color:var(--line)}
+@media (max-width:600px){.job-status{flex-direction:column;align-items:stretch}}
