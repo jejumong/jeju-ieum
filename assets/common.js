@@ -238,8 +238,8 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
   var user = currentUser();
 
   /* 드롭다운 한 묶음: [제목, [[이름, 주소], ...]] */
-  function ddGroup(label, links) {
-    return '<div class="dd-group"><div class="dd-label">' + label + '</div><div class="dd-grid">' +
+  function ddGroup(label, links, cls) {
+    return '<div class="dd-group"><div class="dd-label">' + label + '</div><div class="dd-grid' + (cls ? " " + cls : "") + '">' +
       links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + "</a>"; }).join("") + "</div></div>";
   }
   function boardLinks(names) {
@@ -255,7 +255,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
             ["일·돈", "guide.html?cat=일·돈"], ["마을·관계", "guide.html?cat=마을·관계"]]) },
     { id: "stay", label: "한달살기·이주", href: "stay.html" },
     { id: "realestate", label: "부동산", href: "realestate.html",
-      dd: ddGroup("부동산", [["일반 매물", "realestate.html"], ["학교 연계·체류형 집", "realestate.html?tab=school"], ["매물 등록", "write.html?board=부동산"]]) },
+      dd: ddGroup("부동산", [["일반 매물", "realestate.html"], ["학교 연계·체류형 집", "realestate.html?tab=school"], ["매물 등록", "write.html?board=부동산"]], "auto") },
     { id: "trade", label: "생활·거래", href: "trade.html", match: ["jobs", "market", "shops", "clubs", "deals", "festivals"],
       dd: ddGroup("이웃과 나누기", [["전체 한눈에", "trade.html"], ["구인구직", "jobs.html"], ["중고사고팔기", "market.html"],
             ["제주상점", "shops.html"], ["동호회", "clubs.html"], ["특가공구", "deals.html"], ["축제정보", "festivals.html"]]) },
@@ -336,14 +336,14 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
   document.body.insertAdjacentHTML("beforeend", foot);
 
   /* 생활·거래 묶음 페이지: 헤더 아래 탭으로 서로 이동 */
-  var TRADE_TABS = [["trade", "전체", "trade.html"], ["jobs", "구인구직", "jobs.html"],
-    ["market", "중고사고팔기", "market.html"], ["shops", "제주상점", "shops.html"], ["clubs", "동호회", "clubs.html"],
-    ["deals", "특가공구", "deals.html"], ["festivals", "축제정보", "festivals.html"]];
+  var TRADE_TABS = [["trade", "전체", "trade.html", "🧺"], ["jobs", "구인구직", "jobs.html", "💼"],
+    ["market", "중고사고팔기", "market.html", "📦"], ["shops", "제주상점", "shops.html", "🏪"], ["clubs", "동호회", "clubs.html", "🏄"],
+    ["deals", "특가공구", "deals.html", "🍊"], ["festivals", "축제정보", "festivals.html", "🎉"]];
   var isTrade = TRADE_TABS.some(function (t) { return t[0] === active; });
   if (isTrade) {
     var sub = '<nav class="subnav" aria-label="생활·거래 게시판"><div class="subnav-inner"><span class="subnav-l">생활·거래</span>' +
       TRADE_TABS.map(function (t) {
-        return '<a href="' + t[2] + '"' + (t[0] === active ? ' class="on" aria-current="page"' : "") + ">" + t[1] + "</a>";
+        return '<a href="' + t[2] + '"' + (t[0] === active ? ' class="on" aria-current="page"' : "") + '><span class="sn-i">' + t[3] + "</span>" + t[1] + "</a>";
       }).join("") + "</div></nav>";
     document.querySelector("header.site").insertAdjacentHTML("afterend", sub);
     var on = document.querySelector(".subnav a.on");
