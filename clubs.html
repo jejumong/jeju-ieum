@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106b">
+<link rel="stylesheet" href="assets/style.css?v=20261106c">
 </head>
 <body data-active="clubs">
 
@@ -30,6 +30,8 @@
     <button class="chip-btn" data-filter="문화·취미" onclick="applyChip(this)">문화·취미</button>
     <button class="chip-btn" data-filter="육아·가족" onclick="applyChip(this)">육아·가족</button>
     <button class="chip-btn" data-filter="봉사·마을" onclick="applyChip(this)">봉사·마을</button>
+    <button class="chip-btn" data-filter="공부·자기계발" onclick="applyChip(this)">공부·자기계발</button>
+    <button class="chip-btn" data-filter="기타" onclick="applyChip(this)">기타</button>
     <select id="region-sel" onchange="render()">
       <option value="all">지역 전체</option><option value="제주시내">제주시내</option>
       <option value="동부">동부</option><option value="서부">서부</option>
@@ -42,16 +44,16 @@
   <div class="grid-cards" id="club-grid"></div>
 </main>
 
-<script src="assets/common.js?v=20261106b"></script>
-<script src="assets/db.js?v=20261106b"></script>
-<script src="assets/notify.js?v=20261106b"></script>
-<script src="assets/seed-trade.js?v=20261106b"></script>
-<script src="assets/seed-extra.js?v=20261106b"></script>
-<script src="assets/seed-new.js?v=20261106b"></script>
-<script src="assets/seed-comments.js?v=20261106b"></script>
-<script src="assets/photos.js?v=20261106b"></script>
-<script src="assets/cards.js?v=20261106b"></script>
-<script src="assets/admin-data.js?v=20261106b"></script>
+<script src="assets/common.js?v=20261106c"></script>
+<script src="assets/db.js?v=20261106c"></script>
+<script src="assets/notify.js?v=20261106c"></script>
+<script src="assets/seed-trade.js?v=20261106c"></script>
+<script src="assets/seed-extra.js?v=20261106c"></script>
+<script src="assets/seed-new.js?v=20261106c"></script>
+<script src="assets/seed-comments.js?v=20261106c"></script>
+<script src="assets/photos.js?v=20261106c"></script>
+<script src="assets/cards.js?v=20261106c"></script>
+<script src="assets/admin-data.js?v=20261106c"></script>
 <script>
 var META = {
   "tc1":{e:"🏄"}, "tc2":{e:"⛰️",warm:1}, "tc3":{e:"📖"},

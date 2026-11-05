@@ -1599,3 +1599,4 @@ a.act-item:hover{border-color:var(--sea-200)}
 .cmt-form .btn{padding:12px 20px}
 .pv-actions-bottom{max-width:860px;margin:16px auto 0;display:flex;align-items:center;gap:8px}
 @media (max-width:680px){.cmt-wrap{padding:14px 14px 12px}}
+.board-fixed .bf-v{display:inline-flex;align-items:center;height:44px;padding:0 14px;border-radius:12px;background:var(--bg-2);font-weight:800;color:var(--ink)}

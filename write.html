@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106b">
+<link rel="stylesheet" href="assets/style.css?v=20261106c">
 </head>
 <body data-active="">
 
@@ -25,7 +25,7 @@
 <main class="wrap">
   <div class="form-card">
     <div class="field-row">
-      <div class="field">
+      <div class="field" id="board-field">
         <label for="board">게시판 선택 <span class="req">*</span></label>
         <select id="board">
           <optgroup label="커뮤니티 — 주제">
@@ -46,7 +46,7 @@
         <div class="hint" id="restrict-hint" style="display:none">제주상점·특가공구는 관리자 승인을 받은 회원만 글을 쓸 수 있어요.</div>
       </div>
       <div class="field">
-        <label for="head">말머리</label>
+        <label for="head" id="head-label">말머리</label>
         <select id="head">
           <option>선택 안 함</option><option>질문</option><option>정보</option><option>후기</option><option>나눔</option><option>모집</option>
         </select>
@@ -100,15 +100,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106b"></script>
-<script src="assets/common.js?v=20261106b"></script>
-<script src="assets/db.js?v=20261106b"></script>
-<script src="assets/notify.js?v=20261106b"></script>
-<script src="assets/seed-trade.js?v=20261106b"></script>
-<script src="assets/seed-extra.js?v=20261106b"></script>
-<script src="assets/seed-new.js?v=20261106b"></script>
-<script src="assets/seed-comments.js?v=20261106b"></script>
-<script src="assets/admin-data.js?v=20261106b"></script>
+<script src="assets/kmap.js?v=20261106c"></script>
+<script src="assets/common.js?v=20261106c"></script>
+<script src="assets/db.js?v=20261106c"></script>
+<script src="assets/notify.js?v=20261106c"></script>
+<script src="assets/seed-trade.js?v=20261106c"></script>
+<script src="assets/seed-extra.js?v=20261106c"></script>
+<script src="assets/seed-new.js?v=20261106c"></script>
+<script src="assets/seed-comments.js?v=20261106c"></script>
+<script src="assets/admin-data.js?v=20261106c"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -167,7 +167,7 @@ function fillEdit(editing) {
 if (user && editId && window.JIDB && JIDB.enabled && JIDB.isUuid(editId)) {
   JIDB.getPost(editId).then(function (p) {
     if (!p || !user.id || p.authorId !== user.id) { alert("수정할 수 없는 글입니다."); location.href = "index.html"; return; }
-    editing = p; fillEdit(p);
+    editing = p; fillEdit(p); lockBoard(p.board);
   });
 } else if (user && editId) {
   editing = findPost(editId);
@@ -192,6 +192,25 @@ if (pre && !editing) {
   checkBoardGate(pre);
 }
 
+/* 게시판 페이지의 글쓰기 버튼으로 들어왔으면 게시판 선택은 숨기고 그 게시판으로 고정 */
+function lockBoard(b) {
+  var f = document.getElementById("board-field"); if (!f) return;
+  f.style.display = "none";
+  f.insertAdjacentHTML("afterend", '<div class="field board-fixed"><label>게시판</label><div class="bf-v">' + b + '</div></div>');
+  if (b === "동호회") {
+    if (!editing) { document.getElementById("page-title").textContent = "모임 만들기"; document.title = "모임 만들기 — 제주이음"; }
+    document.getElementById("page-desc").textContent = "만든 모임은 동호회 게시판에 올라가고, 이웃의 가입 신청을 받을 수 있어요";
+    document.getElementById("title").placeholder = "모임 이름 (예: 김녕 아침 바다수영 모임)";
+    document.getElementById("content").placeholder = "어떤 모임인지 소개해 주세요.\n\n· 언제, 어디서, 얼마나 자주 모이나요?\n· 누구와 함께하고 싶나요? (나이·실력·인원)\n· 준비물이나 회비가 있나요?";
+    if (!editing) document.getElementById("submit-btn").textContent = "모임 만들기";
+    document.querySelector('label[for="title"]').innerHTML = '모임 이름 <span class="req">*</span>';
+    document.querySelector('label[for="content"]').innerHTML = '모임 소개 <span class="req">*</span>';
+    var cl = document.getElementById("crumb-last"); if (cl && !editing) cl.textContent = "모임 만들기";
+    document.querySelector(".board-fixed").style.display = "none";
+  }
+}
+if (pre && !editing && !isRestrictedBoard(pre)) lockBoard(pre);
+
 document.getElementById("board").addEventListener("change", function () {
   toggleExtra();
   toggleRestrictHint();
@@ -209,6 +228,7 @@ document.getElementById("addr-check").addEventListener("click", function () {
 function toggleExtra() {
   var HEADS = {
     "부동산": ["선택 안 함", "매매", "연세", "월세", "단기", "일년살이", "학교근처"],
+    "동호회": ["운동·아웃도어", "문화·취미", "육아·가족", "봉사·마을", "공부·자기계발", "기타"],
     "_": ["선택 안 함", "질문", "정보", "후기", "나눔", "모집"]
   };
   var v = document.getElementById("board").value;
@@ -221,6 +241,7 @@ function toggleExtra() {
   toggleExtra.done = true;
   var opts = HEADS[v] || HEADS._;
   hs.innerHTML = opts.map(function (o) { return "<option" + (o === cur ? " selected" : "") + ">" + o + "</option>"; }).join("");
+  document.getElementById("head-label").innerHTML = v === "동호회" ? '모임 분류 <span class="req">*</span>' : "말머리";
   var hint = document.getElementById("head-hint");
   if (hint) hint.style.display = v === "부동산" ? "block" : "none";
 }
