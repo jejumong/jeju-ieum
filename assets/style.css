@@ -1424,3 +1424,54 @@ a.ap-next:hover{background:var(--sea-600)}
   .sh-tabs .st-i{font-size:22px}
   .sh-tabs .st-t b{font-size:15.5px}
 }
+
+/* ── 학교 연계 집 v3: 버튼 위계 정리 ──
+   1단계: 무엇을 볼지(세 칸 막대)  2단계: 목록 걸러보기(작은 도구줄)  3단계: 설명(접어 둠) */
+.sh{padding:22px 24px}
+.sh-tabs{display:flex;gap:4px;padding:5px;margin:0 0 18px;background:var(--bg-2);border:1px solid var(--line);border-radius:16px}
+.sh-tabs button{flex:1 1 0;justify-content:center;gap:8px;padding:12px 10px;border:0;border-radius:12px;background:transparent;box-shadow:none;color:var(--ink-3)}
+.sh-tabs button:hover{background:rgba(255,255,255,.7);box-shadow:none;border:0}
+.sh-tabs button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(16,40,70,.12)}
+.sh-tabs .st-i{font-size:20px}
+.sh-tabs .st-t b{font-size:15.5px}
+.sh-tabs button small,.sh-tabs button.on small{background:var(--sea-50);color:var(--sea-700)}
+
+.shf{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin:0 0 10px}
+.shf-n{font-size:15px;color:var(--ink-3)}
+.shf-n b{font-size:18px;font-weight:800;color:var(--ink);margin-right:2px}
+.shf-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;padding:3px;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-pill)}
+.seg button{font:inherit;font-size:13.5px;font-weight:700;color:var(--ink-3);background:transparent;border:0;padding:6px 13px;border-radius:var(--r-pill);cursor:pointer}
+.seg button small{font-size:11.5px;opacity:.6;margin-left:1px}
+.seg button.on{background:var(--ink);color:#fff}
+.seg button.on small{opacity:.75}
+.tg{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13.5px;font-weight:700;color:var(--ink-3);background:transparent;border:0;padding:6px 4px;cursor:pointer}
+.tg i{width:30px;height:18px;border-radius:9px;background:var(--line);position:relative;transition:background .2s;flex:none}
+.tg i::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .2s}
+.tg.on{color:var(--ink)}
+.tg.on i{background:var(--sea)}
+.tg.on i::after{transform:translateX(12px)}
+
+.sh-about{margin:0 0 14px;font-size:13.5px}
+.sh-about summary{cursor:pointer;color:var(--sea-700);font-weight:700;list-style:none;display:inline-flex;align-items:center;gap:6px}
+.sh-about summary::-webkit-details-marker{display:none}
+.sh-about summary::before{content:"ⓘ";font-size:14px}
+.sh-about[open] summary{margin-bottom:8px}
+.sh-about ol{margin:0;padding:12px 14px 12px 32px;background:var(--bg-2);border-radius:var(--r-sm);display:grid;gap:4px}
+.sh-about li{color:var(--ink-2);line-height:1.55}
+.sh-about li b{font-weight:800;color:var(--ink);margin-right:6px}
+.sh-about li span{color:var(--ink-3)}
+
+@media (max-width:760px){
+  .sh{padding:14px}
+  .sh-tabs{display:flex;flex-direction:row}
+  .sh-tabs button{flex-direction:column;gap:3px;padding:10px 4px}
+  .sh-tabs .st-i{font-size:20px}
+  .sh-tabs .st-t{align-items:center;text-align:center}
+  .sh-tabs .st-t b{font-size:13px;line-height:1.3;word-break:keep-all}
+  .sh-tabs button small{display:none}
+  .shf{flex-direction:column;align-items:flex-start}
+}
+.shf .seg button{white-space:nowrap;padding:6px 13px!important;min-height:0!important;line-height:1.3;font-size:13.5px!important}
+.shf .tg{white-space:nowrap;min-height:0!important}
+.shf-n b{margin-right:0}

@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105p">
+<link rel="stylesheet" href="assets/style.css?v=20261105r">
 <meta name="description" content="제주 작은학교 살리기 마을 공동주택, 학교 연계 주택, 농어촌유학 학교, 체류형 지원을 한곳에 정리했습니다. 주소·입주 조건·비용·문의처와 빈자리 무료 알림.">
 <link rel="canonical" href="https://jeju.hintdaily.com/school.html">
 </head>
@@ -32,20 +32,20 @@
   <!-- 학교 연계·체류형 집 (데이터: assets/school-housing-data.js, programs-data.js) -->
   <section class="sh" id="school-stay">
     <div class="sh-tabs" role="tablist" id="sh-tabs">
-      <button type="button" class="on" data-t="houses"><span class="st-i">🏫</span><span class="st-t"><b>학교 연계 주택 <small id="sh-n1"></small></b><em>마을이 지은 공동주택 목록</em></span></button>
-      <button type="button" data-t="yuhak"><span class="st-i">🔎</span><span class="st-t"><b>농어촌유학 학교 주변 찾기 <small id="sh-n2"></small></b><em>유학 학교 근처 집 찾기</em></span></button>
-      <button type="button" data-t="support"><span class="st-i">🧳</span><span class="st-t"><b>체류형 지원</b><em>집과 관련된 지원 프로그램</em></span></button>
+      <button type="button" class="on" data-t="houses"><span class="st-i">🏫</span><span class="st-t"><b>학교 연계 주택 <small id="sh-n1"></small></b></span></button>
+      <button type="button" data-t="yuhak"><span class="st-i">🔎</span><span class="st-t"><b>농어촌유학 학교 주변 찾기 <small id="sh-n2"></small></b></span></button>
+      <button type="button" data-t="support"><span class="st-i">🧳</span><span class="st-t"><b>체류형 지원</b></span></button>
     </div>
 
     <div class="sh-panel on" id="sh-houses">
       <div id="watch-note"></div>
-      <ol class="sh-how" aria-label="이렇게 운영돼요">
+      <div class="shf" id="sh-filter"></div>
+      <details class="sh-about"><summary>학교 연계 주택은 어떻게 운영되나요?</summary><ol>
         <li><b>마을이 지은 저렴한 집</b><span>학교 살리기로 지은 공동주택·빈집 정비 주택</span></li>
         <li><b>그 학교 전입 가구 대상</b><span>다자녀 우선 등 조건은 마을마다 달라요</span></li>
         <li><b>졸업하면 비워 줘요</b><span>자녀가 학교를 마치면 다음 가족에게 (마을별 상이)</span></li>
         <li><b>🔔 빈자리 알림</b><span>무료 알림을 켜 두면 소식이 확인될 때 자동으로 알려 드려요</span></li>
-      </ol>
-      <div class="filter-bar sh-filter" id="sh-filter"></div>
+      </ol></details>
       <div class="hr-list" id="sh-list"></div>
       <div class="pg-pager" id="sh-pager"></div>
       <p class="sh-note">공식 목록·보도 기준 <b id="sh-total"></b>. 출처: <a id="src-jj" target="_blank" rel="noopener"></a> · <a id="src-sg" target="_blank" rel="noopener"></a>. 입주 조건·임대료는 마을마다 다르고 바뀔 수 있어요 · 마지막 정리 <b id="sh-checked"></b></p>
@@ -63,12 +63,12 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261105p"></script>
-<script src="assets/seed-trade.js?v=20261105p"></script>
-<script src="assets/admin-data.js?v=20261105p"></script>
-<script src="assets/school-housing-data.js?v=20261105p"></script>
-<script src="assets/programs-data.js?v=20261105p"></script>
-<script src="assets/notify.js?v=20261105p"></script>
+<script src="assets/common.js?v=20261105r"></script>
+<script src="assets/seed-trade.js?v=20261105r"></script>
+<script src="assets/admin-data.js?v=20261105r"></script>
+<script src="assets/school-housing-data.js?v=20261105r"></script>
+<script src="assets/programs-data.js?v=20261105r"></script>
+<script src="assets/notify.js?v=20261105r"></script>
 <script>
 /* ── 학교 연계·체류형 집 ── */
 (function(){
@@ -115,7 +115,7 @@
   var ch = JINotify.changes(cur);
   if (ch.length) {
     document.getElementById("watch-note").innerHTML = '<div class="watch-note"><b>🔔 관심 주택 소식</b>' + ch.map(function(c){
-      return '<span>' + esc(c.label) + ' → <em>' + esc(SCHOOL_HOUSE_STATUS[c.to] ? SCHOOL_HOUSE_STATUS[c.to][0] : c.to) + '</em></span>'; }).join("") +
+      return '<span>' + esc(c.label) + ' → </span>'; }).join("") +
       '<button type="button" class="btn soft" id="watch-ok">확인</button></div>';
     document.getElementById("watch-ok").onclick = function(){ JINotify.acknowledge(cur); document.getElementById("watch-note").innerHTML = ""; };
   }
@@ -125,10 +125,12 @@
   function drawFilter(){
     var n = function(fn){ return SCHOOL_HOUSES.filter(fn).length; };
     document.getElementById("sh-filter").innerHTML =
+      '<span class="shf-n" id="sh-count"></span>' +
+      '<div class="shf-r"><div class="seg" role="group" aria-label="지역">' +
       [["", "전체", n(function(){return true;})], ["제주시", "제주시", n(function(h){return h.city==="제주시";})], ["서귀포시", "서귀포시", n(function(h){return h.city==="서귀포시";})]]
-        .map(function(c){ return '<button class="chip-btn' + (fCity === c[0] ? " on" : "") + '" data-city="' + c[0] + '">' + c[1] + ' <small>' + c[2] + '</small></button>'; }).join("") +
-      '<button class="chip-btn' + (fYuhak ? " on" : "") + '" data-yuhak="1">🎒 농어촌유학 학교</button>' +
-      '<button class="chip-btn' + (fWatch ? " on" : "") + '" data-watch="1">🔔 알림 켠 곳</button>';
+        .map(function(c){ return '<button type="button" class="' + (fCity === c[0] ? "on" : "") + '" data-city="' + c[0] + '">' + c[1] + ' <small>' + c[2] + '</small></button>'; }).join("") + '</div>' +
+      '<button type="button" class="tg' + (fYuhak ? " on" : "") + '" data-yuhak="1" aria-pressed="' + fYuhak + '"><i></i>농어촌유학 학교만</button>' +
+      '<button type="button" class="tg' + (fWatch ? " on" : "") + '" data-watch="1" aria-pressed="' + fWatch + '"><i></i>알림 켠 곳만</button></div>';
   }
   document.getElementById("sh-filter").addEventListener("click", function(e){
     var b = e.target.closest("button"); if (!b) return;
@@ -144,6 +146,7 @@
     var list = SCHOOL_HOUSES.filter(function(h){
       return (!fCity || h.city === fCity) && (!fYuhak || isYuhak(h)) && (!fWatch || JINotify.isOn(topic(h)));
     }).sort(function(a,b){ return ORDER[a.status] - ORDER[b.status] || (a.city < b.city ? -1 : a.city > b.city ? 1 : 0); });
+    var cEl = document.getElementById("sh-count"); if (cEl) cEl.innerHTML = "<b>" + list.length + "곳</b>" + (fCity || fYuhak || fWatch ? " 찾았어요" : "의 학교 연계 주택");
     var pages = Math.max(1, Math.ceil(list.length / SH_PER)); if (shPage > pages) shPage = pages;
     var shown = list.slice((shPage - 1) * SH_PER, shPage * SH_PER);
     function row(k, v){ return v ? '<div><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>' : ''; }
