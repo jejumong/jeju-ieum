@@ -273,14 +273,14 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
     var on = active === m.id || (m.match && m.match.indexOf(active) > -1);
     return '<div class="gnb-item' + (on ? " active" : "") + (m.accent ? " accent" : "") + '">' +
       '<a href="' + m.href + '">' + m.label + (m.dd ? ' <span class="caret">▾</span>' : "") + "</a>" +
-      (m.dd ? '<div class="dropdown">' + m.dd + "</div>" : "") + "</div>";
+      (m.dd ? '<div class="dropdown' + (m.dd.indexOf("dd-grid auto") > -1 ? " fit" : "") + '">' + m.dd + "</div>" : "") + "</div>";
   }).join("");
 
   var util = user
     ? '<a href="profile.html" class="me-link" title="내 정보">' + avatarHtml(26) +
       '<span class="me-nick">' + user.nick + '</span><span class="me-region">' + user.region + '</span></a>' +
-      '<a class="btn soft" href="#" onclick="logout();return false">로그아웃</a>' +
-      '<a class="btn primary" href="write.html">글쓰기</a>'
+      '<a class="btn soft hb-out" href="#" onclick="logout();return false">로그아웃</a>' +
+      '<a class="btn primary hb-write" href="write.html"><span class="hb-ico" aria-hidden="true">✏️</span>글쓰기</a>'
     : '<a class="btn soft" href="login.html">로그인</a><a class="btn primary" href="signup.html">회원가입</a>';
 
   var top =
