@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105l">
+<link rel="stylesheet" href="assets/style.css?v=20261105m">
 </head>
 <body data-active="realestate">
 
@@ -100,17 +100,17 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261105l"></script>
-<script src="assets/seed-trade.js?v=20261105l"></script>
-<script src="assets/seed-extra.js?v=20261105l"></script>
-<script src="assets/seed-new.js?v=20261105l"></script>
-<script src="assets/seed-comments.js?v=20261105l"></script>
-<script src="assets/photos.js?v=20261105l"></script>
-<script src="assets/cards.js?v=20261105l"></script>
-<script src="assets/admin-data.js?v=20261105l"></script>
-<script src="assets/school-housing-data.js?v=20261105l"></script>
-<script src="assets/programs-data.js?v=20261105l"></script>
-<script src="assets/notify.js?v=20261105l"></script>
+<script src="assets/common.js?v=20261105m"></script>
+<script src="assets/seed-trade.js?v=20261105m"></script>
+<script src="assets/seed-extra.js?v=20261105m"></script>
+<script src="assets/seed-new.js?v=20261105m"></script>
+<script src="assets/seed-comments.js?v=20261105m"></script>
+<script src="assets/photos.js?v=20261105m"></script>
+<script src="assets/cards.js?v=20261105m"></script>
+<script src="assets/admin-data.js?v=20261105m"></script>
+<script src="assets/school-housing-data.js?v=20261105m"></script>
+<script src="assets/programs-data.js?v=20261105m"></script>
+<script src="assets/notify.js?v=20261105m"></script>
 <script>
 document.getElementById("pm-banner").innerHTML = premiumBanner("매물");
 
@@ -331,6 +331,7 @@ document.querySelector(".re-switch").addEventListener("click", function(e){ var 
       '<div class="hm-head"><div class="hc-sc">🏫 ' + esc(h.school) + ' · ' + esc(h.kind) + '</div><h2>' + esc(h.name) + '</h2>' +
         '<div class="hm-sub">📍 ' + esc(h.city + " " + h.village) + ' <span class="hst ' + st[1] + '">' + st[0] + '</span></div></div>' + ph +
       '<div class="hm-maps"><a class="btn soft" href="' + mapUrl(h) + '" target="_blank" rel="noopener">🗺️ 지도에서 보기</a>' +
+        '<a class="btn soft" href="house/' + h.id + '.html">🔗 이 집 소개 페이지</a>' +
         (roadUrl(h) ? '<a class="btn soft" href="' + roadUrl(h) + '" target="_blank" rel="noopener">🚶 로드뷰로 외관 보기</a>' : '<span class="hm-tip">지도에서 로드뷰(사람 모양) 아이콘을 누르면 건물 외관을 볼 수 있어요</span>') + '</div>' +
       '<dl class="hm-dl">' + rows.map(function(r){ return '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join("") +
         (h.note ? '<dt>메모</dt><dd>' + esc(h.note) + '</dd>' : '') + '</dl>' +

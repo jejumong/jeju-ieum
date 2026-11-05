@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105l">
+<link rel="stylesheet" href="assets/style.css?v=20261105m">
 </head>
 <body data-active="article">
 
@@ -23,15 +23,17 @@
   <section class="related" id="related"></section>
 </main>
 
-<script src="assets/common.js?v=20261105l"></script>
-<script src="assets/guide-data.js?v=20261105l"></script>
+<script src="assets/common.js?v=20261105m"></script>
+<script src="assets/guide-data.js?v=20261105m"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
-  var id = new URLSearchParams(location.search).get("id");
+  var id = window.FORCE_ID || new URLSearchParams(location.search).get("id");
+  // 예전 주소(article.html?id=…)로 들어오면 검색용 개별 페이지로 옮김
+  if (!window.FORCE_ID && id && guideById(id)) { location.replace("guide/" + id + ".html"); return; }
   var g = guideById(id) || GUIDES[0];
   document.title = g.title + " — 제주이음";
-  var md = document.createElement("meta"); md.name = "description"; md.content = g.lead; document.head.appendChild(md);
+  if (!document.querySelector('meta[name="description"]')) { var md = document.createElement("meta"); md.name = "description"; md.content = g.lead; document.head.appendChild(md); }
   document.getElementById("crumb").insertAdjacentHTML("beforeend", ' › <a href="guide.html?cat=' + encodeURIComponent(g.cat) + '">' + esc(g.cat) + '</a>');
 
   // 본문 (가이드 데이터는 운영자가 쓰는 신뢰된 내용이라 목록의 <b> 태그는 그대로 씁니다)
@@ -53,15 +55,15 @@
   if (pi > -1) {
     pathTop = '<nav class="ap-steps" aria-label="처음 읽는 순서"><span class="ap-l">처음 읽는 순서</span>' +
       GUIDE_PATH.map(function(x, i){
-        return '<a href="article.html?id=' + x.id + '&path=1" class="' + (i === pi ? "on" : (i < pi ? "done" : "")) + '"><span>' + (i < pi ? "✓" : i + 1) + '</span>' + esc(x.q) + '</a>';
-      }).join("") + (GUIDE_PATH[pi + 1] ? '<a class="ap-skip" href="article.html?id=' + GUIDE_PATH[pi + 1].id + '&path=1">다음: ' + esc(GUIDE_PATH[pi + 1].q) + ' →</a>' : '') + '</nav>';
+        return '<a href="guide/' + x.id + '.html" class="' + (i === pi ? "on" : (i < pi ? "done" : "")) + '"><span>' + (i < pi ? "✓" : i + 1) + '</span>' + esc(x.q) + '</a>';
+      }).join("") + (GUIDE_PATH[pi + 1] ? '<a class="ap-skip" href="guide/' + GUIDE_PATH[pi + 1].id + '.html">다음: ' + esc(GUIDE_PATH[pi + 1].q) + ' →</a>' : '') + '</nav>';
     var nx = GUIDE_PATH[pi + 1] && guideById(GUIDE_PATH[pi + 1].id), pv = pi > 0 && guideById(GUIDE_PATH[pi - 1].id);
     pathNext = nx
-      ? '<a class="ap-next" href="article.html?id=' + nx.id + '&path=1"><span class="ap-k">다음 순서 · ' + (pi + 2) + '/' + GUIDE_PATH.length + '</span>' +
+      ? '<a class="ap-next" href="guide/' + nx.id + '.html"><span class="ap-k">다음 순서 · ' + (pi + 2) + '/' + GUIDE_PATH.length + '</span>' +
           '<b>' + esc(GUIDE_PATH[pi + 1].q) + ' — ' + esc(nx.title.split(" — ")[0]) + '</b><span class="ap-go">다음 글 읽기 →</span></a>'
       : '<div class="ap-next done"><span class="ap-k">순서를 다 읽었어요 🎉</span><b>이제 실제로 준비해 볼까요?</b>' +
           '<span class="ap-btns"><a class="btn primary" href="stay.html">지원 프로그램 보기</a><a class="btn ghost" href="guide.html">다른 가이드 보기</a></span></div>';
-    if (pv) pathNext += '<a class="ap-prev" href="article.html?id=' + pv.id + '&path=1">← 이전 순서: ' + esc(GUIDE_PATH[pi - 1].q) + '</a>';
+    if (pv) pathNext += '<a class="ap-prev" href="guide/' + pv.id + '.html">← 이전 순서: ' + esc(GUIDE_PATH[pi - 1].q) + '</a>';
   }
 
   var fixUrl = 'contact.html?type=' + encodeURIComponent("정보 정정 요청") + '&ref=' + encodeURIComponent(g.title);
@@ -84,7 +86,7 @@
 
   // 사이드: 목차 + 관련 서비스
   document.getElementById("art-side").innerHTML =
-    '<nav class="toc"><h4>목차</h4>' + (g.sections||[]).map(function(s,i){ return '<a href="#sec' + i + '">' + esc(s.h) + '</a>'; }).join("") + '</nav>' +
+    '<nav class="toc"><h4>목차</h4>' + (g.sections||[]).map(function(s,i){ return '<a href="' + location.pathname + '#sec' + i + '">' + esc(s.h) + '</a>'; }).join("") + '</nav>' +
     '<div class="cta-card"><div class="ce">이웃의 경험을 더해 주세요</div><h4>이 글에 보탤 이야기가 있나요?</h4>' +
       '<p>내 동네는 달랐다면, 더 좋은 방법을 알고 있다면 알려 주세요. 확인 후 가이드에 반영하고 날짜를 갱신해요.</p>' +
       '<a class="btn accent block" href="contact.html?type=' + encodeURIComponent("가이드 내용 제보") + '&ref=' + encodeURIComponent(g.title) + '">경험 제보하기</a>' +

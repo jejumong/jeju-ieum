@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105l">
+<link rel="stylesheet" href="assets/style.css?v=20261105m">
 </head>
 <body data-active="home">
 
@@ -102,15 +102,15 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261105l"></script>
-<script src="assets/seed-trade.js?v=20261105l"></script>
-<script src="assets/seed-extra.js?v=20261105l"></script>
-<script src="assets/seed-new.js?v=20261105l"></script>
-<script src="assets/seed-comments.js?v=20261105l"></script>
-<script src="assets/admin-data.js?v=20261105l"></script>
-<script src="assets/guide-data.js?v=20261105l"></script>
-<script src="assets/programs-data.js?v=20261105l"></script>
-<script src="assets/school-housing-data.js?v=20261105l"></script>
+<script src="assets/common.js?v=20261105m"></script>
+<script src="assets/seed-trade.js?v=20261105m"></script>
+<script src="assets/seed-extra.js?v=20261105m"></script>
+<script src="assets/seed-new.js?v=20261105m"></script>
+<script src="assets/seed-comments.js?v=20261105m"></script>
+<script src="assets/admin-data.js?v=20261105m"></script>
+<script src="assets/guide-data.js?v=20261105m"></script>
+<script src="assets/programs-data.js?v=20261105m"></script>
+<script src="assets/school-housing-data.js?v=20261105m"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -128,7 +128,7 @@
   // 처음 읽는 순서
   $("hx-path").innerHTML = GUIDE_PATH.map(function(x, i){
     var g = guideById(x.id); if (!g) return "";
-    return '<li><a href="article.html?id=' + g.id + '"><span class="p-n">' + (i+1) + '</span>' +
+    return '<li><a href="guide/' + g.id + '.html"><span class="p-n">' + (i+1) + '</span>' +
       '<span class="p-q">' + esc(x.q) + '</span><b>' + esc(g.title.split(" — ")[0]) + '</b>' +
       '<span class="p-m">' + g.min + '분 읽기</span></a></li>';
   }).join("");
@@ -144,7 +144,7 @@
   // 이번 달
   var m = new Date().getMonth() + 1, note = MONTH_NOTES[m];
   $("hx-month").innerHTML =
-    '<div class="hx-head"><h2>' + m + '월의 제주 생활</h2><a href="article.html?id=seasons">열두 달 보기 →</a></div>' +
+    '<div class="hx-head"><h2>' + m + '월의 제주 생활</h2><a href="guide/seasons.html">열두 달 보기 →</a></div>' +
     '<p class="hx-mt">' + esc(note.t) + '</p>' +
     '<ul class="hx-dots">' + note.items.slice(0, 4).map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul>';
 

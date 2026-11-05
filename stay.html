@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105l">
+<link rel="stylesheet" href="assets/style.css?v=20261105m">
 </head>
 <body data-active="stay">
 
@@ -79,7 +79,7 @@
   <div class="sec-title">
     <div><div class="st-eb">PLAN</div><h2>이주를 고민한다면, 한 달은 이렇게</h2>
       <p>관광지보다 '생활'을 경험하는 데 시간을 쓰세요.</p></div>
-    <a class="more" href="article.html?id=trial-stay">자세히 읽기 →</a>
+    <a class="more" href="guide/trial-stay.html">자세히 읽기 →</a>
   </div>
   <div class="week-plan">
     <div class="week"><div class="wn">WEEK 1</div><h4>숙소 주변 생활권</h4><p>마트·약국·병원·버스 정류장을 걸어서, 차로 확인. 단골 가게 하나 만들기.</p></div>
@@ -95,10 +95,10 @@
   <div class="g-grid" id="stay-guides"></div>
 </main>
 
-<script src="assets/common.js?v=20261105l"></script>
-<script src="assets/guide-data.js?v=20261105l"></script>
-<script src="assets/programs-data.js?v=20261105l"></script>
-<script src="assets/notify.js?v=20261105l"></script>
+<script src="assets/common.js?v=20261105m"></script>
+<script src="assets/guide-data.js?v=20261105m"></script>
+<script src="assets/programs-data.js?v=20261105m"></script>
+<script src="assets/notify.js?v=20261105m"></script>
 <script>
 /* ── 새 공고 무료 알림 (모집 시작이 반영되면 자동 발송) ── */
 (function(){
@@ -141,7 +141,7 @@ function drawPrograms(){
     return '<article class="pg s-' + p.status + '"><div class="pg-head"><span class="chip region">' + esc(p.cat) + '</span>' +
       (p.tags||[]).map(function(t){ return '<span class="chip stage">' + esc(t) + '</span>'; }).join("") +
       '<span class="pst ' + st[1] + ' pg-st">' + st[0] + '</span></div>' +
-      '<h3>' + esc(p.name) + '</h3><div class="pg-org">' + esc(p.org) + '</div>' +
+      '<h3>' + (p.id ? '<a href="program/' + p.id + '.html">' + esc(p.name) + '</a>' : esc(p.name)) + '</h3><div class="pg-org">' + esc(p.org) + '</div>' +
       '<dl><dt>대상</dt><dd>' + esc(p.who) + '</dd><dt>지원</dt><dd><b>' + esc(p.what) + '</b></dd>' +
       (p.cond && p.cond !== "—" ? '<dt>조건</dt><dd>' + esc(p.cond) + '</dd>' : '') +
       (p.school ? '<dt>학교</dt><dd>' + esc(p.school) + '</dd>' : '') +

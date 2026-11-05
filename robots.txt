@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /write.html
+Disallow: /mypage.html
+
+Sitemap: https://jeju.hintdaily.com/sitemap.xml

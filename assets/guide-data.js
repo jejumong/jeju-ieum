@@ -331,7 +331,7 @@ function guideText(g) {
 }
 function guideCardHtml(g, feature) {
   var e = function (s) { var d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; };
-  return '<a class="g-card' + (feature ? " feature" : "") + '" href="article.html?id=' + g.id + '">' +
+  return '<a class="g-card' + (feature ? " feature" : "") + '" href="guide/' + g.id + '.html">' +
     '<div class="g-top"><span class="g-ico">' + g.ico + '</span><span class="chip region">' + e(g.cat) + '</span>' +
     (g.stage || []).slice(0, 2).map(function (s) { return '<span class="chip stage">' + e(stageLabel(s)) + '</span>'; }).join("") + '</div>' +
     '<h3>' + e(g.title) + '</h3><p>' + e(g.lead) + '</p>' +
