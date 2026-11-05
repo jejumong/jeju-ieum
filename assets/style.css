@@ -1342,3 +1342,15 @@ a.ap-next:hover{background:var(--sea-600)}
 .km-links a:hover{border-color:var(--sea-200);color:var(--sea-700)}
 .km-none{font-size:14px;color:var(--ink-4)}
 @media (max-width:600px){.km-map{height:240px}}
+
+/* 생활도구를 사이트 안에서 */
+.tl-wrap{padding-top:16px!important;padding-bottom:24px!important}
+.tl-tabs{display:flex;align-items:center;gap:8px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.tl-tabs::-webkit-scrollbar{display:none}
+.tl-tabs a{flex:none;display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:var(--r-pill);background:#fff;border:1px solid var(--line);font-size:15px;font-weight:800;color:var(--ink-2);text-decoration:none}
+.tl-tabs a:hover{border-color:var(--sea-200);color:var(--sea-700)}
+.tl-tabs a.on{background:var(--sea);border-color:var(--sea);color:#fff}
+.tl-tabs a.tl-all{margin-left:auto;background:transparent;border:0;color:var(--ink-3);font-weight:700;font-size:14px}
+.tl-frame-box{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff;box-shadow:var(--sh-2)}
+.tl-frame-box iframe{display:block;width:100%;height:calc(100vh - 230px);min-height:560px;border:0}
+@media (max-width:680px){.tl-frame-box{margin:0 calc(-1*var(--gutter));border-radius:0;border-left:0;border-right:0}.tl-frame-box iframe{height:calc(100vh - 200px)}.tl-tabs a{padding:8px 13px;font-size:14px}}

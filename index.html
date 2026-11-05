@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105i">
+<link rel="stylesheet" href="assets/style.css?v=20261105j">
 </head>
 <body data-active="home">
 
@@ -77,9 +77,9 @@
   <section class="hx-sec">
     <div class="hx-head"><h2>매일 쓰는 생활도구</h2><a href="tools.html">도구 모음 →</a></div>
     <div class="hx-tools">
-      <a id="tl-tide" target="_blank" rel="noopener"><span>🌊</span><b>물때 시간표</b><small>오늘 만조·간조</small></a>
-      <a id="tl-cal" target="_blank" rel="noopener"><span>🗓️</span><b>열두 달 달력</b><small>축제·행사·제철</small></a>
-      <a id="tl-near" target="_blank" rel="noopener"><span>📍</span><b>내 근처 찾기</b><small>버스·맛집·카페</small></a>
+      <a id="tl-tide" href="tool.html?t=tide"><span>🌊</span><b>물때 시간표</b><small>오늘 만조·간조</small></a>
+      <a id="tl-cal" href="tool.html?t=cal"><span>🗓️</span><b>열두 달 달력</b><small>축제·행사·제철</small></a>
+      <a id="tl-near" href="tool.html?t=near"><span>📍</span><b>내 근처 찾기</b><small>버스·맛집·카페</small></a>
       <a href="stay.html#calc"><span>🧮</span><b>예산 계산기</b><small>한달살기 비용</small></a>
     </div>
   </section>
@@ -102,15 +102,15 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261105i"></script>
-<script src="assets/seed-trade.js?v=20261105i"></script>
-<script src="assets/seed-extra.js?v=20261105i"></script>
-<script src="assets/seed-new.js?v=20261105i"></script>
-<script src="assets/seed-comments.js?v=20261105i"></script>
-<script src="assets/admin-data.js?v=20261105i"></script>
-<script src="assets/guide-data.js?v=20261105i"></script>
-<script src="assets/programs-data.js?v=20261105i"></script>
-<script src="assets/school-housing-data.js?v=20261105i"></script>
+<script src="assets/common.js?v=20261105j"></script>
+<script src="assets/seed-trade.js?v=20261105j"></script>
+<script src="assets/seed-extra.js?v=20261105j"></script>
+<script src="assets/seed-new.js?v=20261105j"></script>
+<script src="assets/seed-comments.js?v=20261105j"></script>
+<script src="assets/admin-data.js?v=20261105j"></script>
+<script src="assets/guide-data.js?v=20261105j"></script>
+<script src="assets/programs-data.js?v=20261105j"></script>
+<script src="assets/school-housing-data.js?v=20261105j"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -149,9 +149,6 @@
     '<ul class="hx-dots">' + note.items.slice(0, 4).map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul>';
 
   // 생활도구 주소
-  $("tl-tide").href = SITE_CFG.tools.tide;
-  $("tl-cal").href = SITE_CFG.tools.calendar;
-  $("tl-near").href = SITE_CFG.tools.near;
 
   // 동네 소식 탭
   var posts = allPosts();

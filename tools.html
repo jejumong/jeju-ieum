@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105i">
+<link rel="stylesheet" href="assets/style.css?v=20261105j">
 <style>
 .tool-big{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .tool-big .tool-tile{min-height:220px;padding:26px}
@@ -35,12 +35,12 @@
 
 <main class="wrap">
   <div class="tool-big">
-    <a class="tool-tile sea" id="t-tide" target="_blank" rel="noopener"><span class="tt-ico">🌊</span><b>제주 물때 시간표</b>
-      <span>오늘의 만조·간조 시각. 바릇잡이, 낚시, 아이와 바닷가 산책 전에 확인하세요.</span><em>열기 ↗</em></a>
-    <a class="tool-tile" id="t-cal" target="_blank" rel="noopener"><span class="tt-ico">🗓️</span><b>제주 열두 달 달력</b>
-      <span>달마다 축제·행사·풍경·먹거리와 숙박 비수기까지. 매주 월요일 갱신.</span><em>열기 ↗</em></a>
-    <a class="tool-tile citrus" id="t-near" target="_blank" rel="noopener"><span class="tt-ico">📍</span><b>내 근처 찾기</b>
-      <span>지금 위치에서 가는 버스 정류장·번호, 가까운 맛집과 카페를 찾아 줍니다.</span><em>열기 ↗</em></a>
+    <a class="tool-tile sea" id="t-tide" href="tool.html?t=tide"><span class="tt-ico">🌊</span><b>제주 물때 시간표</b>
+      <span>오늘의 만조·간조 시각. 바릇잡이, 낚시, 아이와 바닷가 산책 전에 확인하세요.</span><em>열기 →</em></a>
+    <a class="tool-tile" id="t-cal" href="tool.html?t=cal"><span class="tt-ico">🗓️</span><b>제주 열두 달 달력</b>
+      <span>달마다 축제·행사·풍경·먹거리와 숙박 비수기까지. 매주 월요일 갱신.</span><em>열기 →</em></a>
+    <a class="tool-tile citrus" id="t-near" href="tool.html?t=near"><span class="tt-ico">📍</span><b>내 근처 찾기</b>
+      <span>지금 위치에서 가는 버스 정류장·번호, 가까운 맛집과 카페를 찾아 줍니다.</span><em>열기 →</em></a>
   </div>
 
   <div class="sec-title">
@@ -60,11 +60,8 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261105i"></script>
+<script src="assets/common.js?v=20261105j"></script>
 <script>
-document.getElementById("t-tide").href = SITE_CFG.tools.tide;
-document.getElementById("t-cal").href = SITE_CFG.tools.calendar;
-document.getElementById("t-near").href = SITE_CFG.tools.near;
 </script>
 </body>
 </html>

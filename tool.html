@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>생활도구 — 제주이음</title>
+<meta name="description" content="제주 물때 시간표, 열두 달 달력, 내 근처 찾기를 제주이음 안에서 바로 쓰세요.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css?v=20261105j">
+</head>
+<body data-active="tools">
+
+<main class="wrap tl-wrap">
+  <nav class="tl-tabs" id="tl-tabs" aria-label="생활도구"></nav>
+  <div class="tl-frame-box"><iframe id="tl-frame" title="생활도구" allow="geolocation; clipboard-write" loading="eager"></iframe></div>
+</main>
+
+<script src="assets/common.js?v=20261105j"></script>
+<script>
+(function(){
+  /* 생활도구는 각자 다른 저장소(jejumong.github.io/…)에 있고, 여기서는 틀(iframe)에 넣어 보여 줍니다.
+     도구 페이지는 틀 안에서 열리면 '제주몽 홈' 버튼을 스스로 숨깁니다. */
+  var TOOLS = [
+    { k: "tide", ico: "🌊", name: "물때 시간표", url: SITE_CFG.tools.tide },
+    { k: "cal",  ico: "🗓️", name: "열두 달 달력", url: SITE_CFG.tools.calendar },
+    { k: "near", ico: "📍", name: "내 근처 찾기", url: SITE_CFG.tools.near }
+  ];
+  var cur = new URLSearchParams(location.search).get("t") || "tide";
+  var t = TOOLS.filter(function(x){ return x.k === cur; })[0] || TOOLS[0];
+  document.title = t.name + " — 제주이음";
+  document.getElementById("tl-tabs").innerHTML = TOOLS.map(function(x){
+    return '<a href="tool.html?t=' + x.k + '"' + (x.k === t.k ? ' class="on" aria-current="page"' : '') + '><span>' + x.ico + '</span>' + x.name + '</a>';
+  }).join("") + '<a class="tl-all" href="tools.html">도구 모음 →</a>';
+  var f = document.getElementById("tl-frame");
+  f.title = t.name;
+  f.src = t.url + (t.url.indexOf("?") > -1 ? "&" : "?") + "embed=1";
+})();
+</script>
+</body>
+</html>
