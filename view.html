@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106a">
+<link rel="stylesheet" href="assets/style.css?v=20261106b">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -53,21 +53,21 @@
   <article class="post-view" id="pv"></article>
 
   <div class="cmt-wrap">
-    <div class="cmt-head">댓글 <b id="cmt-count">0</b></div>
+    <div class="cmt-head"><span class="cmt-ico">💬</span>댓글 <b id="cmt-count">0</b></div>
     <div id="cmt-list"></div>
     <div id="cmt-input"></div>
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106a"></script>
-<script src="assets/common.js?v=20261106a"></script>
-<script src="assets/db.js?v=20261106a"></script>
-<script src="assets/notify.js?v=20261106a"></script>
-<script src="assets/seed-trade.js?v=20261106a"></script>
-<script src="assets/seed-extra.js?v=20261106a"></script>
-<script src="assets/seed-new.js?v=20261106a"></script>
-<script src="assets/seed-comments.js?v=20261106a"></script>
-<script src="assets/admin-data.js?v=20261106a"></script>
+<script src="assets/kmap.js?v=20261106b"></script>
+<script src="assets/common.js?v=20261106b"></script>
+<script src="assets/db.js?v=20261106b"></script>
+<script src="assets/notify.js?v=20261106b"></script>
+<script src="assets/seed-trade.js?v=20261106b"></script>
+<script src="assets/seed-extra.js?v=20261106b"></script>
+<script src="assets/seed-new.js?v=20261106b"></script>
+<script src="assets/seed-comments.js?v=20261106b"></script>
+<script src="assets/admin-data.js?v=20261106b"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -136,7 +136,7 @@ if (!post) {
   document.getElementById("pv").innerHTML =
     '<div class="pv-board">' + esc(post.board) + (post.head && post.head !== post.board ? ' · ' + esc(post.head) : '') + '</div>' +
     '<h1 class="pv-title">' + esc(post.title) + '</h1>' +
-    '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag">내 글</span>' : '') + '</span>' +
+    '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : '') + '</span>' +
     '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
     extra +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
@@ -154,6 +154,9 @@ if (!post) {
     else document.getElementById("pv-map").innerHTML = '<p class="km-none">등록된 주소가 없어요.</p>';
   }
 
+  // '목록으로·수정·삭제'는 댓글 아래로
+  var acts = document.querySelector("#pv .pv-actions"), cw = document.querySelector(".cmt-wrap");
+  if (acts && cw) { acts.classList.add("pv-actions-bottom"); cw.parentNode.insertBefore(acts, cw.nextSibling); }
   paintAllJoinBtns();
   renderComments();
   if (post.db && post.board === "동호회") drawClubJoin();

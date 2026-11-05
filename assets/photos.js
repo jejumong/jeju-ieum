@@ -94,9 +94,10 @@ function photoCard(p, o) {
   var col = AVA_COLORS[_hash(au) % AVA_COLORS.length];
   var views = typeof viewsOf === "function" ? viewsOf(p) : (p.views || 0);
   var cm = typeof commentCountOf === "function" ? commentCountOf(p.id) : 0;
-  return '<a class="item-card pc' + (o.pm ? " premium" : "") + '" href="view.html?id=' + p.id + '">' +
+  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + '" href="view.html?id=' + p.id + '">' +
     '<div class="pc-ph"><img src="' + photoUrl(photoFor(p)) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
       (o.pm ? '<span class="pm-tag">⭐ 프리미엄</span>' : '') +
+      (o.mine ? '<span class="mine-tag">' + (o.mine.indexOf("모임") > -1 ? "👑 " : "✍️ ") + e(o.mine) + '</span>' : '') +
       (o.badge ? '<span class="pc-badge ' + (o.badge.cls || "") + '">' + e(o.badge.text) + '</span>' : '') +
     '</div>' +
     '<div class="pc-body">' +
@@ -105,7 +106,7 @@ function photoCard(p, o) {
       (o.extra || '') +
       '<div class="pc-foot">' +
         '<span class="pc-au"><i style="background:' + col + '">' + e(au.charAt(0)) + '</i>' + e(au) +
-          (o.mine ? '<em>' + e(o.mine) + '</em>' : '') + '</span>' +
+          '</span>' +
         '<span class="pc-st">' + (cm ? '<span>' + ICON_CMT + cm + '</span>' : '') +
           '<span>' + ICON_HEART + likesOf(p) + '</span><span>' + ICON_EYE + views.toLocaleString() + '</span></span>' +
       '</div>' +

@@ -1583,3 +1583,19 @@ a.act-item:hover{border-color:var(--sea-200)}
 .cn-body{font-size:14.5px;line-height:1.65;color:var(--ink-2);overflow-wrap:anywhere}
 .cn-body a{color:var(--sea-700);font-weight:700}
 .cn-empty{font-size:13.5px;color:var(--ink-4);padding:10px 0}
+
+/* 내 글·내 모임 표시를 눈에 띄게 */
+.item-card.pc.mine{border:2px solid var(--sea)!important}
+.mine-tag{position:absolute;top:12px;right:12px;z-index:2;background:var(--sea);color:#fff;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;box-shadow:0 3px 10px rgba(43,140,230,.35);white-space:nowrap}
+.own-tag.big{font-size:12px;color:#fff;background:var(--sea);padding:3px 10px}
+
+/* 댓글란을 하나의 상자로 */
+.cmt-wrap{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 22px 18px;margin-top:22px;box-shadow:0 2px 10px rgba(16,40,70,.05)}
+.cmt-head{display:flex;align-items:center;gap:6px;font-size:18px;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--line-2)}
+.cmt-head .cmt-ico{font-size:20px}
+.cmt-head b{margin-left:2px}
+.cmt-wrap .cmt-item{background:var(--bg-2);box-shadow:none;border-color:transparent}
+.cmt-form input{background:#fff;border:1.5px solid var(--line);font-size:15px;padding:12px 14px;border-radius:12px}
+.cmt-form .btn{padding:12px 20px}
+.pv-actions-bottom{max-width:860px;margin:16px auto 0;display:flex;align-items:center;gap:8px}
+@media (max-width:680px){.cmt-wrap{padding:14px 14px 12px}}
