@@ -21,7 +21,7 @@ var SITE_CFG = {
      비워 두면 '관심 목록'(이 브라우저에 저장, 방문할 때 바뀐 점 표시)만 동작합니다.
      사이트가 jejumong.github.io/저장소이름/ 처럼 하위 폴더에 있으면 onesignalPath 에 "/저장소이름/" 을 넣으세요.
      자체 도메인(예: jejuieum.com) 맨 앞에 두면 "/" 그대로 두면 됩니다. */
-  onesignalAppId: "",
+  onesignalAppId: "c7fd4d45-3d1b-4157-9230-d29e4676f659",
   onesignalPath: "/",
   youtube: "https://www.youtube.com/@Jejumong",
   tools: {
