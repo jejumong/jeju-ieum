@@ -1265,3 +1265,6 @@ a.ap-next:hover{background:var(--sea-600)}
 .ap-prev{display:inline-block;font-size:14px;font-weight:700;color:var(--ink-3);text-decoration:none;margin:6px 0 4px}
 .ap-prev:hover{color:var(--sea-700)}
 @media (max-width:600px){.ap-steps .ap-l{width:100%}.ap-next{padding:18px}.ap-next b{font-size:17px}.ap-next .ap-go{align-self:stretch;text-align:center}}
+.ap-steps a.ap-skip{margin-left:auto;padding:7px 14px;background:var(--sea);color:#fff;font-weight:800}
+.ap-steps a.ap-skip:hover{background:var(--sea-600)}
+@media (max-width:600px){.ap-steps a.ap-skip{margin-left:0;width:100%;justify-content:center}}

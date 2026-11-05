@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105b">
+<link rel="stylesheet" href="assets/style.css?v=20261105c">
 </head>
 <body data-active="article">
 
@@ -23,8 +23,8 @@
   <section class="related" id="related"></section>
 </main>
 
-<script src="assets/common.js?v=20261105b"></script>
-<script src="assets/guide-data.js?v=20261105b"></script>
+<script src="assets/common.js?v=20261105c"></script>
+<script src="assets/guide-data.js?v=20261105c"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
@@ -54,7 +54,7 @@
     pathTop = '<nav class="ap-steps" aria-label="처음 읽는 순서"><span class="ap-l">처음 읽는 순서</span>' +
       GUIDE_PATH.map(function(x, i){
         return '<a href="article.html?id=' + x.id + '&path=1" class="' + (i === pi ? "on" : (i < pi ? "done" : "")) + '"><span>' + (i < pi ? "✓" : i + 1) + '</span>' + esc(x.q) + '</a>';
-      }).join("") + '</nav>';
+      }).join("") + (GUIDE_PATH[pi + 1] ? '<a class="ap-skip" href="article.html?id=' + GUIDE_PATH[pi + 1].id + '&path=1">다음: ' + esc(GUIDE_PATH[pi + 1].q) + ' →</a>' : '') + '</nav>';
     var nx = GUIDE_PATH[pi + 1] && guideById(GUIDE_PATH[pi + 1].id), pv = pi > 0 && guideById(GUIDE_PATH[pi - 1].id);
     pathNext = nx
       ? '<a class="ap-next" href="article.html?id=' + nx.id + '&path=1"><span class="ap-k">다음 순서 · ' + (pi + 2) + '/' + GUIDE_PATH.length + '</span>' +
