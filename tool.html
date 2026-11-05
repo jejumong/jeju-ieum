@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105j">
+<link rel="stylesheet" href="assets/style.css?v=20261105k">
 </head>
 <body data-active="tools">
 
@@ -20,7 +20,7 @@
   <div class="tl-frame-box"><iframe id="tl-frame" title="생활도구" allow="geolocation; clipboard-write" loading="eager"></iframe></div>
 </main>
 
-<script src="assets/common.js?v=20261105j"></script>
+<script src="assets/common.js?v=20261105k"></script>
 <script>
 (function(){
   /* 생활도구는 각자 다른 저장소(jejumong.github.io/…)에 있고, 여기서는 틀(iframe)에 넣어 보여 줍니다.
@@ -39,6 +39,13 @@
   var f = document.getElementById("tl-frame");
   f.title = t.name;
   f.src = t.url + (t.url.indexOf("?") > -1 ? "&" : "?") + "embed=1";
+  /* 도구 페이지가 알려 주는 내용 높이에 맞춰 틀 높이 조절 → 페이지 전체가 한 번에 스크롤 */
+  var toolOrigin = new URL(t.url).origin;
+  window.addEventListener("message", function(e){
+    if (e.origin !== toolOrigin && toolOrigin.indexOf("localhost") < 0) return;
+    var h = e.data && +e.data.jjmHeight;
+    if (h > 200 && h < 30000) { f.style.height = Math.ceil(h) + "px"; f.classList.add("fit"); }
+  });
 })();
 </script>
 </body>
