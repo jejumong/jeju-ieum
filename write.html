@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>글쓰기 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › <span id="crumb-last">글쓰기</span></div>
+    <h1 id="page-title">글쓰기</h1>
+    <p id="page-desc">등록하면 해당 게시판에 바로 게시됩니다</p>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <div class="form-card">
+    <div class="field-row">
+      <div class="field">
+        <label for="board">게시판 선택 <span class="req">*</span></label>
+        <select id="board">
+          <optgroup label="커뮤니티 — 지역">
+            <option>제주북쪽</option><option>제주동쪽</option><option>제주서쪽</option><option>제주남쪽</option>
+          </optgroup>
+          <optgroup label="커뮤니티 — 주제">
+            <option>교육</option><option>건강웰빙</option><option>생활정보</option><option>취미여행</option>
+            <option>고민상담실</option><option selected>자유게시판</option><option>최신뉴스</option>
+          </optgroup>
+          <optgroup label="거래·모임">
+            <option>구인구직</option><option>부동산</option><option>중고사고팔기</option>
+            <option>동호회</option><option>축제정보</option>
+          </optgroup>
+          <optgroup label="승인제 게시판" id="restricted-group">
+            <option id="opt-제주상점">🔒 제주상점 (승인 필요)</option>
+            <option id="opt-특가공구">🔒 특가공구 (승인 필요)</option>
+          </optgroup>
+        </select>
+        <div class="hint" id="restrict-hint" style="display:none">제주상점·특가공구는 관리자 승인을 받은 회원만 글을 쓸 수 있어요.</div>
+      </div>
+      <div class="field">
+        <label for="head">말머리</label>
+        <select id="head">
+          <option>선택 안 함</option><option>질문</option><option>정보</option><option>후기</option><option>나눔</option><option>모집</option>
+        </select>
+        <div class="hint" id="head-hint" style="display:none">농어촌유학·작은학교 가까운 집이면 '학교근처', 1년 단위 집이면 '일년살이'를 골라 주세요. 본문에 가까운 학교 이름을 적으면 학교별로 찾을 수 있어요.</div>
+      </div>
+    </div>
+
+    <div id="extra-trade" style="display:none">
+      <div class="field-row">
+        <div class="field">
+          <label for="price">가격 (원)</label>
+          <input type="text" id="price" placeholder="예: 180000 (협의 시 비워두세요)">
+        </div>
+        <div class="field">
+          <label for="loc">거래 지역</label>
+          <input type="text" id="loc" placeholder="예: 구좌읍 세화리">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="title">제목 <span class="req">*</span></label>
+      <input type="text" id="title" placeholder="핵심이 드러나는 제목을 적어주세요" maxlength="80">
+    </div>
+
+    <div class="field">
+      <label for="content">내용 <span class="req">*</span></label>
+      <textarea id="content" placeholder="이웃에게 전하고 싶은 내용을 자유롭게 적어주세요.&#10;&#10;· 거래 글은 상태·구매 시기·직거래 가능 지역을 함께 적으면 빨리 나가요.&#10;· 개인정보(전화번호 등)는 쪽지로 주고받는 것을 권장합니다."></textarea>
+    </div>
+
+    <div class="field">
+      <label>사진 첨부</label>
+      <div class="file-drop" onclick="alert('사진 업로드는 서버 연동 후 제공됩니다.')">📷 클릭해서 사진 올리기 (최대 10장, 장당 10MB)</div>
+    </div>
+
+    <div class="form-actions">
+      <a class="btn ghost" href="javascript:history.back()">취소</a>
+      <button class="btn primary" id="submit-btn" onclick="submitPost()">등록하기</button>
+    </div>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+var user = currentUser();
+var editId = new URLSearchParams(location.search).get("edit");
+var editing = null;
+
+if (!user) {
+  if (confirm("글쓰기는 로그인 후 이용할 수 있어요.\n로그인 페이지로 이동할까요?")) {
+    location.href = "login.html?next=" + encodeURIComponent("write.html" + location.search);
+  } else {
+    location.href = "index.html";
+  }
+}
+
+/* 제한 게시판 옵션에 승인 상태 반영 (승인된 회원은 정상 옵션으로) */
+if (user) {
+  RESTRICTED_BOARDS.forEach(function (b) {
+    var opt = document.getElementById("opt-" + b);
+    if (opt && isApprovedSeller(b)) { opt.disabled = false; opt.textContent = b; }
+  });
+}
+
+/* 승인 없이 제한 게시판을 쓰려 하면 신청 페이지로 안내 */
+function checkBoardGate(board) {
+  if (!isRestrictedBoard(board)) return true;
+  if (isApprovedSeller(board)) return true;
+  alert(board + " 게시판은 관리자 승인을 받은 회원만 글을 쓸 수 있어요.\n승인 요청 페이지로 이동합니다.");
+  location.href = "seller-request.html?board=" + encodeURIComponent(board);
+  return false;
+}
+
+// 수정 모드 — 본인 글만
+if (user && editId) {
+  editing = findPost(editId);
+  if (!editing || !isMyPost(editing)) {
+    alert("수정할 수 없는 글입니다.");
+    location.href = "index.html";
+  } else if (checkBoardGate(editing.board)) {
+    document.getElementById("page-title").textContent = "글 수정";
+    document.getElementById("page-desc").textContent = "수정한 내용은 바로 반영됩니다";
+    document.getElementById("crumb-last").textContent = "글 수정";
+    document.getElementById("submit-btn").textContent = "수정 완료";
+    document.title = "글 수정 — 제주이음";
+
+    var bs = document.getElementById("board");
+    for (var i = 0; i < bs.options.length; i++) {
+      if (bs.options[i].value === editing.board || bs.options[i].text === editing.board) { bs.selectedIndex = i; break; }
+    }
+    var hs = document.getElementById("head");
+    for (var j = 0; j < hs.options.length; j++) {
+      if (hs.options[j].text === (editing.head || "선택 안 함")) { hs.selectedIndex = j; break; }
+    }
+    document.getElementById("title").value = editing.title || "";
+    document.getElementById("content").value = editing.content || "";
+    document.getElementById("price").value = editing.price || "";
+    document.getElementById("loc").value = editing.loc || "";
+  }
+}
+
+// ?board= 값으로 게시판 미리 선택 (새 글일 때만) — 제한 게시판이면 즉시 안내
+var pre = new URLSearchParams(location.search).get("board");
+if (pre && !editing) {
+  var sel = document.getElementById("board");
+  for (var k = 0; k < sel.options.length; k++) {
+    if (sel.options[k].value === pre || sel.options[k].text.replace("🔒 ", "").replace(" (승인 필요)", "") === pre) {
+      sel.selectedIndex = k;
+      break;
+    }
+  }
+  checkBoardGate(pre);
+}
+
+document.getElementById("board").addEventListener("change", function () {
+  toggleExtra();
+  toggleRestrictHint();
+});
+toggleExtra();
+toggleRestrictHint();
+
+/* 게시판별 말머리 — 부동산은 매물 종류(학교 근처·일년살이 포함) */
+function toggleExtra() {
+  var HEADS = {
+    "부동산": ["선택 안 함", "매매", "연세", "월세", "단기", "일년살이", "학교근처"],
+    "_": ["선택 안 함", "질문", "정보", "후기", "나눔", "모집"]
+  };
+  var v = document.getElementById("board").value;
+  var trade = ["구인구직", "부동산", "중고사고팔기", "특가공구"].indexOf(v) > -1;
+  document.getElementById("extra-trade").style.display = trade ? "block" : "none";
+  var hs = document.getElementById("head"), cur = hs.value;
+  if (!toggleExtra.done && typeof editing !== "undefined" && editing && editing.head) cur = editing.head;
+  toggleExtra.done = true;
+  var opts = HEADS[v] || HEADS._;
+  hs.innerHTML = opts.map(function (o) { return "<option" + (o === cur ? " selected" : "") + ">" + o + "</option>"; }).join("");
+  var hint = document.getElementById("head-hint");
+  if (hint) hint.style.display = v === "부동산" ? "block" : "none";
+}
+function toggleRestrictHint() {
+  var v = document.getElementById("board").value;
+  document.getElementById("restrict-hint").style.display = isRestrictedBoard(v) ? "block" : "none";
+}
+
+function submitPost() {
+  var board = document.getElementById("board").value;
+  if (!editing && !checkBoardGate(board)) return;
+
+  var head = document.getElementById("head").value;
+  var title = document.getElementById("title").value.trim();
+  var content = document.getElementById("content").value.trim();
+  if (!title) { alert("제목을 입력해주세요."); document.getElementById("title").focus(); return; }
+  if (!content) { alert("내용을 입력해주세요."); document.getElementById("content").focus(); return; }
+
+  var price = (document.getElementById("price").value || "").trim();
+  var loc = (document.getElementById("loc").value || "").trim();
+  var posts = JI.get("posts", []);
+
+  if (editing) {
+    for (var i = 0; i < posts.length; i++) {
+      if (posts[i].id === editing.id) {
+        posts[i].board = board;
+        posts[i].head = head === "선택 안 함" ? "" : head;
+        posts[i].title = title;
+        posts[i].content = content;
+        posts[i].price = price;
+        posts[i].loc = loc;
+        posts[i].editedAt = new Date().toISOString().slice(0, 10);
+        break;
+      }
+    }
+    JI.set("posts", posts);
+    alert("수정되었습니다.");
+    location.href = "view.html?id=" + editing.id;
+    return;
+  }
+
+  var id = "u" + Date.now();
+  posts.unshift({
+    id: id, board: board,
+    head: head === "선택 안 함" ? "" : head,
+    title: title, content: content,
+    price: price, loc: loc,
+    author: user.nick,
+    date: new Date().toISOString().slice(0, 10),
+    views: 0
+  });
+  JI.set("posts", posts);
+  alert("게시글이 등록되었습니다.");
+  location.href = "view.html?id=" + id;
+}
+</script>
+</body>
+</html>

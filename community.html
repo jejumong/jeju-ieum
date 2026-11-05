@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>커뮤니티 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="community">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 커뮤니티</div>
+    <h1 id="board-title">커뮤니티</h1>
+    <p id="board-desc">제주 곳곳의 이웃들과 나누는 동네 이야기</p>
+  </div>
+  <a class="btn accent" id="write-link" href="write.html">✏️ 글쓰기</a>
+</div></div>
+
+<main class="wrap">
+  <div class="layout">
+    <aside class="side" id="side-nav">
+      <h3>지역 게시판</h3>
+      <a href="?board=제주북쪽">제주북쪽</a>
+      <a href="?board=제주동쪽">제주동쪽</a>
+      <a href="?board=제주서쪽">제주서쪽</a>
+      <a href="?board=제주남쪽">제주남쪽</a>
+      <h3>주제 게시판</h3>
+      <a href="?board=교육">교육</a>
+      <a href="?board=건강웰빙">건강웰빙</a>
+      <a href="?board=생활정보">생활정보</a>
+      <a href="?board=취미여행">취미여행</a>
+      <a href="?board=고민상담실">고민상담실</a>
+      <a href="?board=자유게시판">자유게시판</a>
+      <a href="?board=최신뉴스">최신뉴스</a>
+    </aside>
+
+    <section>
+      <div class="filter-bar">
+        <button class="chip-btn on" onclick="setMode(this,'all')">전체글</button>
+        <button class="chip-btn" onclick="setMode(this,'hot')">인기글</button>
+        <span class="spacer"></span>
+        <span class="count">전체 <b id="total-count">0</b>건</span>
+      </div>
+
+      <div class="board-card">
+        <table class="post">
+          <thead><tr>
+            <th style="width:60px" class="hide-m">번호</th>
+            <th style="width:96px">말머리</th>
+            <th>제목</th>
+            <th style="width:90px" class="hide-m">글쓴이</th>
+            <th style="width:70px">날짜</th>
+            <th style="width:60px" class="hide-m">조회</th>
+          </tr></thead>
+          <tbody id="post-body"></tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="pager"></div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+var params = new URLSearchParams(location.search);
+var board = params.get("board");
+var q = params.get("q");
+var mode = "all";
+var page = 1, PER = 12;
+
+// 헤더 문구
+if (board) {
+  document.getElementById("board-title").textContent = board;
+  document.title = board + " — 제주이음";
+  document.querySelectorAll("#side-nav a").forEach(function(a){
+    if (a.textContent.trim() === board) a.classList.add("on");
+  });
+  document.getElementById("write-link").href = "write.html?board=" + encodeURIComponent(board);
+}
+if (q) {
+  document.getElementById("board-title").textContent = "‘" + q + "’ 검색 결과";
+  document.getElementById("board-desc").textContent = "커뮤니티 전체 게시판에서 검색했습니다";
+}
+
+function getList() {
+  var list = allPosts();
+  if (board) list = list.filter(function(p){ return p.board === board; });
+  else if (!q) list = list.filter(function(p){ return TRADE_BOARDS.indexOf(p.board) === -1; });
+  if (q) {
+    var k = q.toLowerCase();
+    list = list.filter(function(p){
+      return (p.title + " " + (p.content||"")).toLowerCase().indexOf(k) > -1;
+    });
+  }
+  if (mode === "hot") list = list.filter(function(p){ return viewsOf(p) >= 250; });
+  list.sort(function(a,b){ var x = a.date + (a.time || ""), y = b.date + (b.time || ""); return x < y ? 1 : x > y ? -1 : 0; });
+  return list;
+}
+
+function esc(s){ var d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+function render() {
+  var list = getList();
+  document.getElementById("total-count").textContent = list.length.toLocaleString();
+  var start = (page-1)*PER;
+  var pageList = list.slice(start, start+PER);
+  var tb = document.getElementById("post-body");
+  var rows = "";
+
+  // 공지 (첫 페이지, 검색 아닐 때)
+  if (page === 1 && !q) {
+    noticesFor(board).forEach(function(n){
+      rows += '<tr class="notice-row"><td class="hide-m">공지</td><td><span class="chip hot">' + (n.pinned ? '📌 공지' : '공지') + '</span></td>' +
+        '<td class="title"><a href="view.html?id=' + encodeURIComponent(n.id) + '"><b>' + esc(n.title) + '</b></a></td>' +
+        '<td class="hide-m">' + esc(n.author || "운영자") + '</td><td>' + fmtDate(n.date) + '</td><td class="hide-m">' + viewsOf(n).toLocaleString() + '</td></tr>';
+    });
+  }
+
+  if (!pageList.length && !rows) {
+    rows = '<tr><td colspan="6" style="padding:36px;color:var(--muted)">게시글이 없습니다. 첫 글을 남겨보세요!</td></tr>';
+  } else {
+    pageList.forEach(function(p, i){
+      var no = list.length - start - i;
+      var cmts = { length: commentCountOf(p.id) };
+      var isNew = p.id.charAt(0) === "u";
+      rows += '<tr>' +
+        '<td class="hide-m">' + no + '</td>' +
+        '<td><span class="chip ' + (isNew ? 'new' : 'region') + '">' + esc(p.head || p.board) + '</span></td>' +
+        '<td class="title"><a href="view.html?id=' + p.id + '">' + esc(p.title) +
+          (cmts.length ? ' <span class="cmt">[' + cmts.length + ']</span>' : '') + '</a></td>' +
+        '<td class="hide-m">' + esc(p.author) + '</td>' +
+        '<td>' + fmtDate(p.date) + '</td>' +
+        '<td class="hide-m">' + viewsOf(p).toLocaleString() + '</td></tr>';
+    });
+  }
+  tb.innerHTML = rows;
+
+  // 페이지네이션
+  var pages = Math.max(1, Math.ceil(list.length / PER));
+  var pg = "";
+  for (var n = 1; n <= pages; n++) {
+    pg += '<a href="#" class="' + (n === page ? "on" : "") + '" onclick="page=' + n + ';render();return false">' + n + '</a>';
+  }
+  document.getElementById("pager").innerHTML = pg;
+}
+
+function setMode(el, m){
+  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on");
+  mode = m; page = 1; render();
+}
+
+render();
+</script>
+</body>
+</html>

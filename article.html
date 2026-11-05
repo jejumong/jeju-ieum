@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제주살이 가이드 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="article">
+
+<main class="wrap" style="padding-top:28px">
+  <div class="crumb" id="crumb"><a href="index.html">홈</a> › <a href="guide.html">제주살이 가이드</a></div>
+  <div class="art-wrap">
+    <article class="art" id="art"></article>
+    <aside class="art-side" id="art-side"></aside>
+  </div>
+  <section class="related" id="related"></section>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/guide-data.js"></script>
+<script>
+(function(){
+  function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+  var id = new URLSearchParams(location.search).get("id");
+  var g = guideById(id) || GUIDES[0];
+  document.title = g.title + " — 제주이음";
+  var md = document.createElement("meta"); md.name = "description"; md.content = g.lead; document.head.appendChild(md);
+  document.getElementById("crumb").insertAdjacentHTML("beforeend", ' › <a href="guide.html?cat=' + encodeURIComponent(g.cat) + '">' + esc(g.cat) + '</a>');
+
+  // 본문 (가이드 데이터는 운영자가 쓰는 신뢰된 내용이라 목록의 <b> 태그는 그대로 씁니다)
+  var body = (g.sections||[]).map(function(s, i){
+    var h = '<h2 id="sec' + i + '">' + esc(s.h) + '</h2>';
+    (s.p||[]).forEach(function(t){ h += '<p>' + esc(t) + '</p>'; });
+    if (s.table) {
+      h += '<div class="tbl-scroll"><table class="cmp"><thead><tr>' + s.table.head.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join("") + '</tr></thead><tbody>' +
+        s.table.rows.map(function(r){ return '<tr>' + r.map(function(c, j){ return j===0 ? '<th>' + esc(c) + '</th>' : '<td>' + esc(c) + '</td>'; }).join("") + '</tr>'; }).join("") +
+        '</tbody></table></div>';
+    }
+    if (s.list) h += '<ul class="dots">' + s.list.map(function(t){ return '<li>' + t + '</li>'; }).join("") + '</ul>';
+    return h;
+  }).join("");
+
+  var fixUrl = 'contact.html?type=' + encodeURIComponent("정보 정정 요청") + '&ref=' + encodeURIComponent(g.title);
+  document.getElementById("art").innerHTML =
+    '<header class="art-head"><div class="chips"><span class="chip region">' + esc(g.cat) + '</span>' +
+      (g.stage||[]).map(function(s){ return '<span class="chip stage">' + esc(stageLabel(s)) + '</span>'; }).join("") + '</div>' +
+      '<h1>' + esc(g.title) + '</h1><p class="lead">' + esc(g.lead) + '</p>' +
+      '<div class="art-meta"><span class="by">' + LOGOMARK + '제주이음 운영자</span>' +
+      '<span class="upd">✓ ' + g.updated.replace(/-/g,".") + ' 내용 확인</span><span>' + g.min + '분 읽기</span></div></header>' +
+    '<div class="art-sum"><h4>3줄 요약</h4><ul>' + g.summary.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join("") + '</ul></div>' +
+    '<div class="art-body">' + body +
+      (g.tip ? '<div class="callout"><span class="ci">💡</span><div><b>운영자 메모</b><p>' + esc(g.tip) + '</p></div></div>' : '') +
+    '</div>' +
+    '<div class="src-box"><h4>출처 · 참고</h4><ul>' + (g.sources||[]).map(function(s){
+        var ext = /^https?:/.test(s[1]);
+        return '<li><a href="' + s[1] + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '>' + esc(s[0]) + '</a></li>';
+      }).join("") + '</ul>' +
+      '<div class="fix">바뀐 내용이 있나요? 제보해 주시면 확인 후 고치고 날짜를 갱신합니다.<a class="btn soft" href="' + fixUrl + '">정보 정정 요청</a>' +
+      '<a class="btn ghost" href="community.html?q=' + encodeURIComponent(g.cat.split("·")[0]) + '">이웃 이야기 보기</a></div></div>';
+
+  // 사이드: 목차 + 관련 서비스
+  document.getElementById("art-side").innerHTML =
+    '<nav class="toc"><h4>목차</h4>' + (g.sections||[]).map(function(s,i){ return '<a href="#sec' + i + '">' + esc(s.h) + '</a>'; }).join("") + '</nav>' +
+    '<div class="cta-card"><div class="ce">이웃의 경험을 더해 주세요</div><h4>이 글에 보탤 이야기가 있나요?</h4>' +
+      '<p>내 동네는 달랐다면, 더 좋은 방법을 알고 있다면 알려 주세요. 확인 후 가이드에 반영하고 날짜를 갱신해요.</p>' +
+      '<a class="btn accent block" href="contact.html?type=' + encodeURIComponent("가이드 내용 제보") + '&ref=' + encodeURIComponent(g.title) + '">경험 제보하기</a>' +
+      '<a class="btn block" style="margin-top:8px;background:rgba(255,255,255,.1);color:#fff" href="community.html?board=' + encodeURIComponent("고민상담실") + '">이웃에게 물어보기</a></div>';
+
+  // 관련 글
+  var rel = GUIDES.filter(function(x){ return x.id !== g.id && (x.cat === g.cat || (x.stage||[]).some(function(s){ return (g.stage||[]).indexOf(s) > -1; })); }).slice(0,3);
+  if (rel.length) document.getElementById("related").innerHTML =
+    '<div class="sec-title"><div><div class="st-eb">NEXT</div><h2>함께 읽으면 좋은 가이드</h2></div><a class="more" href="guide.html">전체 가이드 →</a></div>' +
+    '<div class="g-grid">' + rel.map(function(x){ return guideCardHtml(x); }).join("") + '</div>';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동호회 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="clubs">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 동호회</div>
+    <h1>동호회</h1>
+    <p>카드를 누르면 모임 소개를 볼 수 있어요</p>
+  </div>
+  <a class="btn accent" href="write.html?board=동호회">✏️ 모임 만들기</a>
+</div></div>
+
+<main class="wrap">
+  <div class="filter-bar">
+    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
+    <button class="chip-btn" data-filter="운동·아웃도어" onclick="applyChip(this)">운동·아웃도어</button>
+    <button class="chip-btn" data-filter="문화·취미" onclick="applyChip(this)">문화·취미</button>
+    <button class="chip-btn" data-filter="육아·가족" onclick="applyChip(this)">육아·가족</button>
+    <button class="chip-btn" data-filter="봉사·마을" onclick="applyChip(this)">봉사·마을</button>
+    <select id="region-sel" onchange="render()">
+      <option value="all">지역 전체</option><option value="제주시내">제주시내</option>
+      <option value="동부">동부</option><option value="서부">서부</option>
+      <option value="서귀포">서귀포</option><option value="전역">전역</option>
+    </select>
+    <span class="spacer"></span>
+    <span class="count">활동 모임 <b id="shown-count">0</b>개</span>
+  </div>
+
+  <div class="grid-cards" id="club-grid"></div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/photos.js"></script>
+<script src="assets/cards.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+var META = {
+  "tc1":{e:"🏄"}, "tc2":{e:"⛰️",warm:1}, "tc3":{e:"📖"},
+  "tc4":{e:"📷",warm:1}, "tc5":{e:"🧒"}, "tc6":{e:"🤲",warm:1}
+};
+var catFilter = "all";
+
+function applyChip(el){
+  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on");
+  catFilter = el.dataset.filter;
+  render();
+}
+function render(){
+  var rg = document.getElementById("region-sel").value;
+  var list = userPostsOf("동호회").concat(TRADE_SEEDS.filter(function(p){ return p.board === "동호회"; }));
+  list = list.filter(function(p){
+    var okC = catFilter === "all" || (p.head || "") === catFilter;
+    var okR = rg === "all" || (p.loc || "전역") === rg;
+    return okC && okR;
+  });
+  list = premiumFirst(list.sort(byRecent));
+  document.getElementById("shown-count").textContent = list.length;
+  document.getElementById("club-grid").innerHTML = pageSlice(list).map(function(p){
+    var isMine = p.id.charAt(0) === "u";
+    var jid = "club-" + p.id;
+    return photoCard(p, { pm: isPremium(p), badge: { text: p.head || "모임" },
+      info: '<span>' + escHtml(p.meta || (fmtDate(p.date) + " 개설")) + '</span><span>' + escHtml(p.loc || "전역") + '</span>',
+      extra: '<button type="button" class="btn primary block pc-btn" data-join="' + jid + '" data-kind="club" data-on="신청 완료 ✓ (다시 누르면 취소)" data-off="가입 신청">가입 신청</button>',
+      mine: isMine ? "내 모임" : "" });
+  }).join("") || '<p style="color:var(--muted);padding:24px">조건에 맞는 모임이 없습니다.</p>';
+  renderPager("club-grid", list.length);
+  paintAllJoinBtns();
+}
+render();
+</script>
+</body>
+</html>

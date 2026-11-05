@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제주살이 가이드 — 제주이음</title>
+<meta name="description" content="제주 이주·한달살기·정착을 위한 생활 가이드. 동네 고르기, 계절 생활, 집 관리, 아이랑 제주, 일과 생활비까지 업데이트 날짜와 출처를 함께 적습니다.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="guide">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 제주살이 가이드</div>
+    <h1 id="g-title">제주살이 가이드</h1>
+    <p id="g-desc">먼저 살아본 이웃이 정리한 제주 생활 정보 — 모든 글에 확인 날짜와 출처를 적습니다.</p>
+  </div>
+  <a class="btn ghost" href="contact.html?type=%EA%B0%80%EC%9D%B4%EB%93%9C%20%EC%A3%BC%EC%A0%9C%20%EC%A0%9C%EC%95%88">궁금한 주제 제안하기</a>
+</div></div>
+
+<main class="wrap">
+  <nav class="stage-tabs" id="stage-tabs" aria-label="상황별 가이드"></nav>
+  <div class="filter-bar" id="cat-bar"></div>
+  <div id="search-note"></div>
+  <div class="g-grid" id="g-grid"></div>
+
+  <div class="sec-title">
+    <div><div class="st-eb">COMMUNITY</div><h2>가이드에 없는 건 이웃에게 물어보세요</h2>
+      <p>지역·주제 게시판에 실제 사는 이웃들의 경험이 쌓이고 있어요.</p></div>
+    <a class="more" href="community.html">커뮤니티 가기 →</a>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/admin-data.js"></script>
+<script src="assets/guide-data.js"></script>
+<script>
+(function(){
+  var P = new URLSearchParams(location.search);
+  var stage = P.get("stage") || "", cat = P.get("cat") || "", q = (P.get("q") || "").trim();
+  function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+  function url(o){ var u = new URLSearchParams(); if (o.stage) u.set("stage", o.stage); if (o.cat) u.set("cat", o.cat); var s=u.toString(); return "guide.html" + (s ? "?" + s : ""); }
+
+  // 상황 탭
+  document.getElementById("stage-tabs").innerHTML =
+    '<a href="' + url({cat:cat}) + '" class="' + (!stage ? "on" : "") + '"><b>전체 보기</b><span>모든 가이드</span></a>' +
+    GUIDE_STAGES.map(function(s){
+      return '<a href="' + url({stage:s.id, cat:cat}) + '" class="' + (stage===s.id ? "on" : "") + '"><b>' + s.label + '</b><span>' + s.sub + '</span></a>';
+    }).join("");
+
+  // 주제 칩
+  var counts = {};
+  GUIDES.forEach(function(g){ counts[g.cat] = (counts[g.cat]||0) + 1; });
+  document.getElementById("cat-bar").innerHTML =
+    '<a class="chip-btn' + (!cat ? " on" : "") + '" href="' + url({stage:stage}) + '">전체 주제</a>' +
+    GUIDE_CATS.map(function(c){
+      return '<a class="chip-btn' + (cat===c ? " on" : "") + '" href="' + url({stage:stage, cat:c}) + '">' + c + ' <small style="opacity:.6">' + (counts[c]||0) + '</small></a>';
+    }).join("") + '<span class="spacer"></span><span class="count">가이드 <b id="shown-count">0</b>편</span>';
+
+  var list = GUIDES.filter(function(g){
+    if (stage && (g.stage||[]).indexOf(stage) < 0) return false;
+    if (cat && g.cat !== cat) return false;
+    if (q && guideText(g).toLowerCase().indexOf(q.toLowerCase()) < 0) return false;
+    return true;
+  });
+
+  if (stage) { var st = GUIDE_STAGES.filter(function(s){ return s.id===stage; })[0]; if (st) { document.getElementById("g-title").textContent = st.label + " 가이드"; } }
+  if (cat) document.getElementById("g-title").textContent = cat;
+
+  // 통합 검색: 가이드 + 커뮤니티
+  if (q) {
+    document.getElementById("g-title").textContent = "‘" + q + "’ 검색 결과";
+    var gs = document.getElementById("gsearch"); if (gs) gs.value = q;
+    var cm = allPosts().filter(function(p){ return ((p.title||"") + " " + (p.content||"")).indexOf(q) > -1; }).length;
+    document.getElementById("search-note").innerHTML = '<div class="search-note">가이드 ' + list.length + '편 · 커뮤니티 글 ' + cm + '건' +
+      (cm ? '<a href="community.html?q=' + encodeURIComponent(q) + '">커뮤니티 결과 보기 →</a>' : '') + '</div>';
+  }
+
+  document.getElementById("shown-count").textContent = list.length;
+  document.getElementById("g-grid").innerHTML = list.length
+    ? list.map(function(g, i){ return guideCardHtml(g, !stage && !cat && !q && i === 0); }).join("")
+    : '<div class="card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-3)">아직 이 조건의 가이드가 없어요. ' +
+      '<a style="color:var(--sea);font-weight:700" href="contact.html?type=%EA%B0%80%EC%9D%B4%EB%93%9C%20%EC%A3%BC%EC%A0%9C%20%EC%A0%9C%EC%95%88">주제를 제안해 주세요 →</a></div>';
+})();
+</script>
+</body>
+</html>

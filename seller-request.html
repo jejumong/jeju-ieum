@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>글쓰기 권한 문의 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.req-status{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r);margin-bottom:20px;font-size:14px}
+.req-status.pending{background:var(--sea-50);border:1px solid var(--sea-100);color:var(--sea-700)}
+.req-status.approved{background:#e9f9f1;border:1px solid #c7ecd9;color:var(--moss)}
+.req-status.rejected{background:var(--coral-50);border:1px solid #f7d4d1;color:var(--coral)}
+.req-status .ico{font-size:20px}
+.req-status .rt{font-weight:800}
+.req-status .rs{font-size:12.5px;opacity:.85;margin-top:2px}
+</style>
+</head>
+<body data-active="">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › <span id="crumb">글쓰기 권한 문의</span></div>
+    <h1 id="h1">글쓰기 권한 문의</h1>
+    <p id="sub">관리자 승인을 받으면 이 게시판에 글을 쓸 수 있어요</p>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <div class="form-card" style="max-width:560px">
+    <div id="status-box"></div>
+
+    <div id="form-box">
+      <h2 style="font-size:18px;font-weight:800;letter-spacing:-0.03em;margin-bottom:6px;color:var(--ink)">🔒 <span id="board-name"></span> 글쓰기는 승인제입니다</h2>
+      <p style="font-size:13.5px;color:var(--ink-3);margin-bottom:22px;line-height:1.6" id="board-desc"></p>
+
+      <div class="field">
+        <label for="msg">관리자에게 보낼 메시지 <span class="req">*</span></label>
+        <textarea id="msg" style="min-height:140px" placeholder="예) 세화리에서 감귤 농장을 운영하고 있습니다. 산지직송 공동구매를 진행하고 싶어 신청합니다."></textarea>
+        <div class="hint">간단한 소개와 어떤 글을 올리고 싶은지 적어주시면 승인이 빨라요.</div>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn ghost" href="javascript:history.back()">취소</a>
+        <button class="btn primary" onclick="submitRequest()">관리자에게 보내기</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+var user = currentUser();
+var board = new URLSearchParams(location.search).get("board") || "특가공구";
+var BOARD_INFO = {
+  "특가공구": { icon:"⚡", label:"공구문의하기", desc:"공동구매 글은 가격 오류나 배송 사고를 막기 위해 관리자 확인 후에만 올릴 수 있어요. 어떤 상품을, 어떤 조건으로 공구하고 싶은지 알려주세요." },
+  "제주상점": { icon:"🏬", label:"상점 등록 문의", desc:"제주상점은 실제 운영 중인 가게만 등록할 수 있도록 관리자가 확인하고 있어요. 가게 이름과 위치, 업종을 알려주시면 빠르게 검토해드립니다." }
+};
+var info = BOARD_INFO[board] || { icon:"🔒", label:"글쓰기 권한 문의", desc:"이 게시판은 관리자 승인 후 글을 쓸 수 있어요." };
+
+document.getElementById("board-name").textContent = board;
+document.getElementById("h1").textContent = info.label;
+document.getElementById("crumb").textContent = info.label;
+document.getElementById("sub").textContent = board + " 게시판에 글을 쓰려면 관리자 승인이 필요해요";
+document.getElementById("board-desc").textContent = info.desc;
+document.title = info.label + " — 제주이음";
+
+if (!user) {
+  if (confirm("문의는 로그인 후 이용할 수 있어요.\\n로그인 페이지로 이동할까요?")) {
+    location.href = "login.html?next=" + encodeURIComponent("seller-request.html?board=" + encodeURIComponent(board));
+  } else {
+    location.href = "index.html";
+  }
+}
+
+/* 이미 승인됐거나, 요청을 보낸 적 있으면 상태를 보여줌 */
+(function render(){
+  if (!user) return;
+  if (isApprovedSeller(board)) {
+    document.getElementById("status-box").innerHTML =
+      '<div class="req-status approved"><span class="ico">✅</span><div><div class="rt">이미 승인된 회원입니다</div>' +
+      '<div class="rs">바로 글을 작성할 수 있어요.</div></div></div>';
+    document.getElementById("form-box").style.display = "none";
+    var go = document.createElement("a");
+    go.className = "btn primary block"; go.href = "write.html?board=" + encodeURIComponent(board);
+    go.textContent = "✏️ " + board + " 글쓰기";
+    document.querySelector(".form-card").appendChild(go);
+    return;
+  }
+  var req = mySellerRequest(board);
+  if (req && req.status === "pending") {
+    document.getElementById("status-box").innerHTML =
+      '<div class="req-status pending"><span class="ico">⏳</span><div><div class="rt">승인 대기중</div>' +
+      '<div class="rs">' + req.date + '에 보낸 요청을 관리자가 확인하고 있어요.</div></div></div>';
+    document.getElementById("form-box").style.display = "none";
+  } else if (req && req.status === "rejected") {
+    document.getElementById("status-box").innerHTML =
+      '<div class="req-status rejected"><span class="ico">✕</span><div><div class="rt">이전 요청이 반려되었습니다</div>' +
+      '<div class="rs">내용을 보완해서 다시 요청해보세요.</div></div></div>';
+  }
+})();
+
+function submitRequest(){
+  var msg = document.getElementById("msg").value.trim();
+  if (msg.length < 10) { alert("어떤 글을 올리고 싶은지 조금 더 자세히 적어주세요. (10자 이상)"); return; }
+  sendSellerRequest(board, msg);
+  alert("관리자에게 전달되었습니다. 승인되면 알림 없이도 이 게시판에서 바로 글쓰기가 열립니다 — 이 페이지에 다시 방문해 확인해주세요.");
+  location.reload();
+}
+</script>
+</body>
+</html>

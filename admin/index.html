@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>제주이음 관리자 콘솔</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+body{background:#f3f5f8;margin:0}
+.adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+.side{border-radius:0;background:#0f1b2a;color:#c9d3de;padding:22px 14px;position:sticky;top:0;height:100vh;box-sizing:border-box;display:flex;flex-direction:column}
+.side .brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:16.5px;padding:4px 10px 22px}
+.side .brand small{display:block;font-size:11px;font-weight:600;color:#7f8fa2;letter-spacing:.06em}
+.side .brand .logomark{width:32px;height:32px}
+.side nav button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:#c9d3de;font:inherit;font-size:14.5px;font-weight:600;padding:11px 12px;border-radius:10px;cursor:pointer;text-align:left}
+.side nav button:hover{background:#18283b;color:#fff}
+.side nav button.on{background:#2b8ce6;color:#fff}
+.side nav .cnt{margin-left:auto;background:#ff8a1f;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:99px}
+.side .foot{margin-top:auto;display:grid;gap:6px}
+.side .foot a,.side .foot button{color:#9fb0c2;font-size:13px;background:none;border:0;text-align:left;padding:8px 12px;cursor:pointer;font:inherit;font-size:13px;border-radius:8px}
+.side .foot a:hover,.side .foot button:hover{background:#18283b;color:#fff}
+.main{padding:28px 32px 60px;min-width:0}
+.main h1{font-size:23px;font-weight:800;margin:0 0 4px;color:var(--ink)}
+.main .sub{color:var(--ink-3);font-size:14px;margin:0 0 22px}
+.panel{background:#fff;border:1px solid #e6e9ee;border-radius:14px;padding:20px;margin-bottom:18px}
+.panel h2{font-size:16px;font-weight:800;margin:0 0 14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid #e6e9ee;border-radius:14px;padding:18px 20px}
+.stat .k{font-size:13px;color:var(--ink-3);font-weight:600}
+.stat .v{font-size:26px;font-weight:800;color:var(--ink);margin-top:6px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.toolbar select,.toolbar input[type=search],.fld input,.fld select,.fld textarea{border:1px solid #dfe4ea;border-radius:10px;padding:9px 12px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.toolbar input[type=search]{flex:1;min-width:180px}
+.toolbar .total{margin-left:auto;color:var(--ink-3);font-size:13.5px}
+table.adm-t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.adm-t th{background:#f6f8fa;color:var(--ink-3);font-weight:700;text-align:left;padding:10px 8px;border-bottom:1px solid #e6e9ee;white-space:nowrap}
+table.adm-t td{padding:9px 8px;border-bottom:1px solid #f0f2f5;vertical-align:middle}
+table.adm-t tr:hover td{background:#fafbfc}
+table.adm-t .ttl{max-width:340px}
+table.adm-t .ttl a{color:var(--ink);font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.adm-t .ttl a:hover{color:var(--sea)}
+table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
+.bd{display:inline-block;font-size:11.5px;font-weight:700;background:#eef4fb;color:#1559b8;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.bd.user{background:#fff1e3;color:#b35604}
+.num{width:76px;border:1px solid #dfe4ea;border-radius:8px;padding:6px 8px;font:inherit;font-size:13px;text-align:right}
+.num.saved{border-color:#17a06a;background:#effaf4}
+.sw{position:relative;display:inline-block;width:42px;height:24px;cursor:pointer}
+.sw input{display:none}
+.sw i{position:absolute;inset:0;background:#d7dde4;border-radius:99px;transition:.2s}
+.sw i:after{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked+i{background:#ff8a1f}
+.sw input:checked+i:after{left:21px}
+.sw.na{opacity:.25;pointer-events:none}
+.acts{display:flex;gap:4px;white-space:nowrap}
+.mb{border:1px solid #dfe4ea;background:#fff;border-radius:8px;padding:5px 10px;font:inherit;font-size:12.5px;font-weight:700;color:var(--ink-2);cursor:pointer}
+.mb:hover{background:#f3f5f8}
+.mb.del{color:#e04b3f;border-color:#f3c9c5}
+.mb.del:hover{background:#fdedec}
+.mb.pri{background:#2b8ce6;color:#fff;border-color:#2b8ce6}
+.pager{display:flex;gap:4px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.pager button{min-width:34px;height:34px;border:1px solid #dfe4ea;background:#fff;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.pager button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fld{display:grid;gap:6px;margin-bottom:12px}
+.fld label{font-size:13px;font-weight:700;color:var(--ink-2)}
+.fld textarea{min-height:160px;resize:vertical;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal{position:fixed;inset:0;background:rgba(10,20,32,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.on{display:flex}
+.modal .box{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:620px;max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 16px;font-size:18px;font-weight:800}
+.modal .bt{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f1b2a;color:#fff;padding:11px 20px;border-radius:99px;font-size:14px;font-weight:600;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pm-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5}
+.pm-item img{width:64px;height:46px;object-fit:cover;border-radius:8px;background:#eef1f4;flex-shrink:0}
+.pm-item .t{flex:1;min-width:0;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-item .t small{display:block;color:var(--ink-4);font-weight:500;font-size:12px}
+.req{border:1px solid #e6e9ee;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.req .rh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.req .msg{background:#f6f8fa;border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.6;margin-bottom:10px}
+.st-ok{color:#17a06a;font-weight:800;font-size:13px}.st-no{color:#e04b3f;font-weight:800;font-size:13px}
+.empty{color:var(--ink-4);text-align:center;padding:30px}
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f1b2a;padding:16px}
+.gate .logomark{width:46px;height:46px;display:block}
+.gate .box{background:#fff;border-radius:18px;padding:34px 30px;width:100%;max-width:380px}
+.gate h2{margin:12px 0 4px;font-size:20px;font-weight:800}
+.gate p{margin:0 0 18px;color:var(--ink-3);font-size:13.5px}
+.gate input{width:100%;box-sizing:border-box;border:1px solid #dfe4ea;border-radius:10px;padding:12px 14px;font:inherit;font-size:15px;margin-bottom:10px}
+.gate .err{color:#e04b3f;font-size:13px;min-height:18px;margin-bottom:6px}
+@media (max-width:900px){
+  .adm{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;padding:12px}
+  .side .brand{padding:4px 8px;width:100%}
+  .side nav{display:flex;flex-wrap:wrap;gap:4px}
+  .side nav button{width:auto;padding:8px 10px;font-size:13px}
+  .side .foot{margin:0;display:flex}
+  .main{padding:20px 16px 50px}
+  .stats{grid-template-columns:1fr 1fr}
+  .pm-grid,.row2{grid-template-columns:1fr}
+  .tbl-wrap{overflow-x:auto}
+}
+</style>
+</head>
+<body data-admin>
+
+<div id="root"></div>
+<div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="../assets/common.js"></script>
+<script src="../assets/seed-trade.js"></script>
+<script src="../assets/seed-extra.js"></script>
+<script src="../assets/seed-new.js"></script>
+<script src="../assets/seed-comments.js"></script>
+<script src="../assets/photos.js"></script>
+<script src="../assets/admin-data.js"></script>
+<script>
+/* ─────────────────────────────────────────────
+   제주이음 관리자 콘솔
+   ※ 정적 프로토타입: 계정 확인이 브라우저 안에서만 이뤄집니다.
+     실제 서비스에서는 서버 로그인·권한 확인으로 바꿔야 합니다.
+   ───────────────────────────────────────────── */
+var ADMIN_ID = "admin";
+var DEFAULT_PW = "jeju2026!";
+var SITE = "../";
+
+function adminPw(){ return JI.get("admin_pw", DEFAULT_PW); }
+function esc(s){ var d=document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function toast(msg){ var t=document.getElementById("toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("on"); },1600); }
+
+/* ── 로그인 ── */
+function gate(){
+  document.getElementById("root").innerHTML =
+    '<div class="gate"><div class="box">' + LOGOMARK +
+    '<h2>관리자 로그인</h2><p>제주이음 운영자 전용 페이지입니다.</p>' +
+    '<input id="aid" placeholder="관리자 아이디" autocomplete="username">' +
+    '<input id="apw" type="password" placeholder="비밀번호" autocomplete="current-password">' +
+    '<div class="err" id="aerr"></div>' +
+    '<button class="btn primary block" onclick="login()">로그인</button></div></div>';
+  ["aid","apw"].forEach(function(i){ document.getElementById(i).addEventListener("keydown", function(e){ if(e.key==="Enter") login(); }); });
+  document.getElementById("aid").focus();
+}
+function login(){
+  var id=document.getElementById("aid").value.trim(), pw=document.getElementById("apw").value;
+  if (id === ADMIN_ID && pw === adminPw()) { sessionStorage.setItem("ji_admin_ok","1"); boot(); }
+  else document.getElementById("aerr").textContent = "아이디 또는 비밀번호가 맞지 않습니다.";
+}
+function logoutAdmin(){ sessionStorage.removeItem("ji_admin_ok"); gate(); }
+
+/* ── 데이터 ── */
+function userPosts(){ return JI.get("posts", []); }
+function isUserPost(p){ return p.id.charAt(0) === "u"; }
+function everyPost(){ return userPosts().concat(SEED_POSTS); }
+function findAny(id){
+  var all = everyPost();
+  for (var i=0;i<all.length;i++) if (all[i].id === id) return all[i];
+  return null;
+}
+/* 글 한 개의 값 바꾸기 — 회원 글은 ji_posts, 기본 글은 ji_admin_ov */
+function setFields(p, obj){
+  if (isUserPost(p)) {
+    var posts = userPosts();
+    posts.forEach(function(x){ if (x.id === p.id) for (var k in obj) x[k] = obj[k]; });
+    JI.set("posts", posts);
+  } else {
+    var ov = adminOv(); ov[p.id] = ov[p.id] || {};
+    for (var k in obj) ov[p.id][k] = obj[k];
+    JI.set("admin_ov", ov);
+  }
+  for (var k2 in obj) p[k2] = obj[k2];
+  _defaultPm = null;
+}
+function setViews(p, n){
+  var v = JI.get("views", {}); delete v[p.id]; JI.set("views", v);
+  setFields(p, { views: n });
+}
+function removeFrom(arr, p){ var i = arr.indexOf(p); if (i > -1) arr.splice(i, 1); }
+function deletePost(p){
+  if (isUserPost(p)) {
+    JI.set("posts", userPosts().filter(function(x){ return x.id !== p.id; }));
+    var cm = JI.get("comments", {}); delete cm[p.id]; JI.set("comments", cm);
+  } else {
+    var ov = adminOv(); ov[p.id] = ov[p.id] || {}; ov[p.id].deleted = true; JI.set("admin_ov", ov);
+    removeFrom(SEED_POSTS, p); removeFrom(TRADE_SEEDS, p);
+    if (REMOVED_SEEDS.indexOf(p) < 0) REMOVED_SEEDS.push(p);
+  }
+  _defaultPm = null;
+}
+function restorePost(p){
+  var ov = adminOv(); if (ov[p.id]) { delete ov[p.id].deleted; JI.set("admin_ov", ov); }
+  removeFrom(REMOVED_SEEDS, p);
+  SEED_POSTS.push(p);
+  if (TRADE_BOARDS.indexOf(p.board) > -1) TRADE_SEEDS.push(p);
+  _defaultPm = null;
+}
+function cmtCount(p){ return typeof commentCountOf === "function" ? commentCountOf(p.id) : 0; }
+
+/* ── 화면 틀 ── */
+var view = "dash";
+var MENU = [
+  ["dash","대시보드"],["posts","게시글 관리"],["notices","공지 관리"],["premium","프리미엄 관리"],
+  ["inquiries","문의·제보"],["sellers","판매자 승인"],["trash","삭제된 글"],["settings","설정"]
+];
+function boot(){
+  var pending = JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length;
+  document.getElementById("root").innerHTML =
+    '<div class="adm"><aside class="side">' +
+      '<div class="brand">' + LOGOMARK + '<div>제주이음<small>ADMIN CONSOLE</small></div></div>' +
+      '<nav>' + MENU.map(function(m){
+        return '<button data-v="' + m[0] + '" class="' + (view===m[0]?"on":"") + '" onclick="go(\'' + m[0] + '\')">' + m[1] +
+          (m[0]==="sellers" && pending ? '<span class="cnt">' + pending + '</span>' : '') + (m[0]==="inquiries" && newIq() ? '<span class="cnt">' + newIq() + '</span>' : '') + '</button>';
+      }).join("") + '</nav>' +
+      '<div class="foot"><a href="' + SITE + 'index.html" target="_blank">사이트 열기 ↗</a><button onclick="logoutAdmin()">로그아웃</button></div>' +
+    '</aside><main class="main" id="main"></main></div>';
+  draw();
+}
+function go(v){ view = v; boot(); window.scrollTo(0,0); }
+function draw(){ ({inquiries:drawInquiries,dash:drawDash,posts:drawPosts,notices:drawNotices,premium:drawPremium,sellers:drawSellers,trash:drawTrash,settings:drawSettings})[view](); }
+function M(){ return document.getElementById("main"); }
+
+/* ── 문의·제보 (contact.html 신청서) ──
+   ※ SITE_CFG.inquiryEndpoint 를 설정하지 않으면, 방문자가 남긴 신청서는 그 방문자 브라우저에만 저장됩니다.
+     실제 운영 전에 Formspree·구글 폼 같은 수신 주소를 assets/common.js 의 SITE_CFG 에 넣어 주세요. */
+var IQ_ST = { "new": "새 신청", "contacted": "연락함", "done": "완료" };
+function newIq(){ return JI.get("inquiries", []).filter(function(q){ return q.status === "new"; }).length; }
+function drawInquiries(){
+  var list = JI.get("inquiries", []).slice().reverse();
+  var warn = (typeof SITE_CFG !== "undefined" && SITE_CFG.inquiryEndpoint) ? "" :
+    '<div class="panel" style="border:1px solid #ffe2c2;background:#fff8f0"><b>온라인 접수 주소가 아직 없어요.</b> 지금은 이 브라우저에서 남긴 신청서만 보입니다. ' +
+    'assets/common.js 의 SITE_CFG.inquiryEndpoint(또는 contactEmail)를 채우면 실제 방문자 신청을 받을 수 있어요.</div>';
+  M().innerHTML = '<h1>문의·제보</h1><p class="sub">정보 정정 요청, 가이드 제보, 입점·제휴 문의가 모입니다.</p>' + warn +
+    '<div class="panel">' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>날짜</th><th>종류</th><th>이름·연락처</th><th>내용</th><th>상태</th><th></th></tr></thead><tbody>' +
+      list.map(function(q){
+        return '<tr><td style="white-space:nowrap">' + esc(q.date) + '</td><td><span class="bd">' + esc(q.type) + '</span></td>' +
+          '<td><b>' + esc(q.name) + '</b><br><small>' + esc(q.contact) + '</small></td>' +
+          '<td class="ttl"><small>' + esc([q.stage, q.when].filter(Boolean).join(" · ")) + '</small><div style="white-space:pre-wrap;max-width:420px">' + esc(q.msg) + '</div></td>' +
+          '<td><select onchange="setIq(\'' + q.id + '\',this.value)">' + Object.keys(IQ_ST).map(function(k){ return '<option value="' + k + '"' + (q.status===k?" selected":"") + '>' + IQ_ST[k] + '</option>'; }).join("") + '</select></td>' +
+          '<td><button class="mb" onclick="delIq(\'' + q.id + '\')">삭제</button></td></tr>';
+      }).join("") + '</tbody></table></div>' : '<div class="empty">아직 들어온 신청이 없습니다.</div>') + '</div>';
+}
+function setIq(id, st){ var l = JI.get("inquiries", []); l.forEach(function(q){ if (q.id === id) q.status = st; }); JI.set("inquiries", l); toast("상태를 바꿨어요"); boot(); }
+function delIq(id){ if (!confirm("이 신청을 삭제할까요?")) return; JI.set("inquiries", JI.get("inquiries", []).filter(function(q){ return q.id !== id; })); toast("삭제했어요"); boot(); }
+
+/* ── 대시보드 ── */
+function drawDash(){
+  var all = everyPost();
+  var views = all.reduce(function(s,p){ return s + viewsOf(p); }, 0);
+  var members = JI.get("users", []).length;
+  var pending = JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length;
+  var byBoard = ALL_BOARDS.map(function(b){
+    var ps = all.filter(function(p){ return p.board === b; });
+    return '<tr><td><span class="bd">' + esc(b) + '</span></td><td>' + ps.length + '</td><td>' +
+      ps.filter(function(p){ return isUserPost(p); }).length + '</td><td>' +
+      (PREMIUM_BOARDS.indexOf(b) > -1 ? ps.filter(isPremium).length : '—') + '</td><td>' +
+      ps.reduce(function(s,p){ return s+viewsOf(p); },0).toLocaleString() + '</td>' +
+      '<td><button class="mb" onclick="postBoard=\'' + b + '\';go(\'posts\')">관리</button></td></tr>';
+  }).join("");
+  var recent = userPosts().slice().sort(function(a,b){ return a.id < b.id ? 1 : -1; }).slice(0,6);
+  M().innerHTML = '<h1>대시보드</h1><p class="sub">사이트 전체 현황입니다.</p>' +
+    '<div class="stats">' +
+      stat("전체 게시글", all.length.toLocaleString()) + stat("누적 조회수", views.toLocaleString()) +
+      stat("가입 회원", members.toLocaleString()) + stat("승인 대기", pending) +
+    '</div>' +
+    '<div class="panel"><h2>게시판별 현황</h2><div class="tbl-wrap"><table class="adm-t"><thead><tr><th>게시판</th><th>글 수</th><th>회원 작성</th><th>프리미엄</th><th>조회수 합계</th><th></th></tr></thead><tbody>' + byBoard + '</tbody></table></div></div>' +
+    '<div class="panel"><h2>최근 회원 작성 글</h2>' + (recent.length ? '<table class="adm-t"><tbody>' + recent.map(function(p){
+      return '<tr><td><span class="bd user">' + esc(p.board) + '</span></td><td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank">' + esc(p.title) + '</a></td><td>' + esc(p.author) + '</td><td>' + esc(p.date) + '</td></tr>';
+    }).join("") + '</tbody></table>' : '<div class="empty">아직 회원이 쓴 글이 없습니다.</div>') + '</div>';
+}
+function stat(k,v){ return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
+
+/* ── 게시글 관리 ── */
+var postBoard = "all", postQ = "", postSort = "new", postPage = 1, PER = 20;
+function filteredPosts(){
+  var list = everyPost();
+  if (postBoard !== "all") list = list.filter(function(p){ return p.board === postBoard; });
+  if (postQ) { var k = postQ.toLowerCase(); list = list.filter(function(p){ return ((p.title||"")+" "+(p.author||"")+" "+(p.content||"")).toLowerCase().indexOf(k) > -1; }); }
+  list = list.slice();
+  if (postSort === "views") list.sort(function(a,b){ return viewsOf(b) - viewsOf(a); });
+  else if (postSort === "likes") list.sort(function(a,b){ return likesOf(b) - likesOf(a); });
+  else list.sort(function(a,b){ var x = a.date + (a.time || ''), y = b.date + (b.time || ''); return x < y ? 1 : x > y ? -1 : (a.id < b.id ? 1 : -1); });
+  return list;
+}
+function boardOptions(sel, withAll){
+  return (withAll ? '<option value="all">전체 게시판</option>' : '') +
+    ALL_BOARDS.map(function(b){ return '<option' + (sel===b?' selected':'') + '>' + b + '</option>'; }).join("");
+}
+function drawPosts(){
+  M().innerHTML = '<h1>게시글 관리</h1><p class="sub">모든 게시판의 글을 열람하고 수정·삭제할 수 있습니다. 조회수·좋아요 칸은 숫자를 바꾸고 Enter를 누르면 바로 저장됩니다.</p>' +
+    '<div class="panel"><div class="toolbar">' +
+      '<select id="f-board">' + boardOptions(postBoard, true) + '</select>' +
+      '<select id="f-sort"><option value="new">최신순</option><option value="views">조회수순</option><option value="likes">좋아요순</option></select>' +
+      '<input type="search" id="f-q" placeholder="제목·작성자·내용 검색" value="' + esc(postQ) + '">' +
+      '<span class="total" id="f-total"></span></div>' +
+    '<div class="tbl-wrap" id="post-table"></div><div class="pager" id="pager"></div></div>';
+  document.getElementById("f-board").value = postBoard;
+  document.getElementById("f-sort").value = postSort;
+  document.getElementById("f-board").onchange = function(){ postBoard = this.value; postPage = 1; drawPostTable(); };
+  document.getElementById("f-sort").onchange = function(){ postSort = this.value; postPage = 1; drawPostTable(); };
+  document.getElementById("f-q").oninput = function(){ postQ = this.value.trim(); postPage = 1; drawPostTable(); };
+  drawPostTable();
+}
+function drawPostTable(){
+  var list = filteredPosts();
+  var pages = Math.max(1, Math.ceil(list.length / PER));
+  if (postPage > pages) postPage = pages;
+  var rows = list.slice((postPage-1)*PER, postPage*PER).map(function(p){
+    var canPm = PREMIUM_BOARDS.indexOf(p.board) > -1;
+    return '<tr>' +
+      '<td><span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></td>' +
+      '<td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank" title="새 탭에서 보기">' + esc(p.title) + '</a>' +
+        '<small>' + esc(p.author) + ' · ' + esc(p.date) + (p.time ? ' ' + esc(p.time) : '') + ' · 댓글 ' + cmtCount(p) + '</small></td>' +
+      '<td><input class="num" type="number" min="0" value="' + viewsOf(p) + '" data-id="' + p.id + '" data-f="views"></td>' +
+      '<td><input class="num" type="number" min="0" value="' + likesOf(p) + '" data-id="' + p.id + '" data-f="likes"></td>' +
+      '<td><label class="sw' + (canPm?'':' na') + '" title="' + (canPm?'프리미엄 상단 노출':'커뮤니티 게시판은 프리미엄이 없습니다') + '"><input type="checkbox" data-pm="' + p.id + '"' + (isPremium(p)?' checked':'') + '><i></i></label></td>' +
+      '<td><div class="acts"><button class="mb" onclick="openEdit(\'' + p.id + '\')">수정</button>' +
+        '<button class="mb del" onclick="askDelete(\'' + p.id + '\')">삭제</button></div></td></tr>';
+  }).join("");
+  document.getElementById("f-total").textContent = "총 " + list.length.toLocaleString() + "건";
+  document.getElementById("post-table").innerHTML = list.length
+    ? '<table class="adm-t"><thead><tr><th>게시판</th><th>제목</th><th>조회수</th><th>좋아요</th><th>프리미엄</th><th>관리</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    : '<div class="empty">조건에 맞는 글이 없습니다.</div>';
+  var pg = "";
+  for (var i = 1; i <= pages; i++) pg += '<button class="' + (i===postPage?'on':'') + '" onclick="postPage=' + i + ';drawPostTable();window.scrollTo(0,0)">' + i + '</button>';
+  document.getElementById("pager").innerHTML = pages > 1 ? pg : "";
+  bindRowControls(document.getElementById("post-table"));
+}
+function bindRowControls(root){
+  root.querySelectorAll("input.num").forEach(function(inp){
+    function save(){
+      var p = findAny(inp.dataset.id), n = Math.max(0, parseInt(inp.value, 10) || 0);
+      if (!p) return;
+      var cur = inp.dataset.f === "views" ? viewsOf(p) : likesOf(p);
+      if (n === cur) return;
+      if (inp.dataset.f === "views") setViews(p, n); else setFields(p, { likes: n });
+      inp.value = n; inp.classList.add("saved"); setTimeout(function(){ inp.classList.remove("saved"); }, 900);
+      toast((inp.dataset.f === "views" ? "조회수" : "좋아요") + "를 " + n.toLocaleString() + "(으)로 바꿨습니다");
+    }
+    inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { save(); inp.blur(); } });
+    inp.addEventListener("change", save);
+  });
+  root.querySelectorAll("input[data-pm]").forEach(function(cb){
+    cb.addEventListener("change", function(){
+      var p = findAny(cb.dataset.pm); if (!p) return;
+      setFields(p, { premium: cb.checked });
+      toast(cb.checked ? "프리미엄으로 등록했습니다" : "프리미엄에서 내렸습니다");
+      if (view === "premium") drawPremium();
+    });
+  });
+}
+
+/* 수정 창 */
+function openEdit(id){
+  var p = findAny(id); if (!p) return;
+  var trade = TRADE_BOARDS.indexOf(p.board) > -1;
+  showModal('<h3>글 수정 <span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></h3>' +
+    '<div class="row2"><div class="fld"><label>말머리</label><input id="e-head" value="' + esc(p.head||"") + '"></div>' +
+    '<div class="fld"><label>작성자 표시</label><input id="e-author" value="' + esc(p.author||"") + '"></div></div>' +
+    '<div class="fld"><label>제목</label><input id="e-title" value="' + esc(p.title) + '"></div>' +
+    (trade ? '<div class="row2"><div class="fld"><label>' + (p.board==="축제정보"?"기간":"가격") + '</label><input id="e-' + (p.board==="축제정보"?"period":"price") + '" value="' + esc(p.board==="축제정보"?(p.period||""):(p.price||"")) + '"></div>' +
+      '<div class="fld"><label>지역·장소</label><input id="e-loc" value="' + esc(p.loc||"") + '"></div></div>' : '') +
+    '<div class="fld"><label>내용</label><textarea id="e-content">' + esc(p.content||"") + '</textarea></div>' +
+    '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" onclick="saveEdit(\'' + id + '\')">저장</button></div>');
+}
+function saveEdit(id){
+  var p = findAny(id); if (!p) return;
+  var obj = {};
+  ["head","author","title","price","period","loc","content"].forEach(function(k){
+    var el = document.getElementById("e-" + k); if (el) obj[k] = el.value;
+  });
+  if (!obj.title.trim()) { alert("제목을 입력하세요."); return; }
+  setFields(p, obj); closeModal(); toast("수정했습니다"); draw();
+}
+function askDelete(id){
+  var p = findAny(id); if (!p) return;
+  showModal('<h3>글을 삭제할까요?</h3><p style="margin:0 0 14px;color:var(--ink-2);line-height:1.6"><b>' + esc(p.title) + '</b><br>' +
+    (isUserPost(p) ? '회원이 쓴 글은 댓글과 함께 완전히 지워집니다.' : '기본 글은 사이트에서 숨겨지며, ‘삭제된 글’에서 되살릴 수 있습니다.') + '</p>' +
+    '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb del" onclick="doDelete(\'' + id + '\')">삭제</button></div>');
+}
+function doDelete(id){ var p = findAny(id); if (p) deletePost(p); closeModal(); toast("삭제했습니다"); draw(); }
+function showModal(html){ document.getElementById("modal-box").innerHTML = html; document.getElementById("modal").classList.add("on"); }
+function closeModal(){ document.getElementById("modal").classList.remove("on"); }
+document.getElementById("modal").addEventListener("click", function(e){ if (e.target === this) closeModal(); });
+
+/* ── 공지 관리 ── */
+function allNoticeItems(){
+  var list = adminNotices().slice();
+  if (!(adminOv().n1 && adminOv().n1.deleted)) { NOTICE.target = NOTICE.target || "커뮤니티"; list.push(NOTICE); }
+  return list.sort(function(a,b){ if (!!b.pinned !== !!a.pinned) return b.pinned ? 1 : -1; return a.date < b.date ? 1 : -1; });
+}
+function drawNotices(){
+  var list = allNoticeItems();
+  M().innerHTML = '<h1>공지 관리</h1><p class="sub">공지는 선택한 게시판 맨 위에 표시됩니다. ‘전체’로 올리면 홈 화면과 모든 게시판에 나옵니다.</p>' +
+    '<div class="panel"><h2>새 공지 작성</h2>' + noticeForm(null) +
+    '<div class="bt" style="display:flex;justify-content:flex-end"><button class="btn primary" onclick="saveNotice(null)">공지 올리기</button></div></div>' +
+    '<div class="panel"><h2>등록된 공지 (' + list.length + ')</h2>' + (list.length ? '<table class="adm-t"><thead><tr><th>대상</th><th>제목</th><th>조회수</th><th>관리</th></tr></thead><tbody>' +
+      list.map(function(n){
+        return '<tr><td><span class="bd">' + esc(n.target) + '</span>' + (n.pinned ? ' 📌' : '') + '</td>' +
+          '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(n.id) + '" target="_blank">' + esc(n.title) + '</a><small>' + esc(n.date) + '</small></td>' +
+          '<td><input class="num" type="number" min="0" value="' + viewsOf(n) + '" data-nid="' + n.id + '"></td>' +
+          '<td><div class="acts"><button class="mb" onclick="editNotice(\'' + n.id + '\')">수정</button><button class="mb del" onclick="delNotice(\'' + n.id + '\')">삭제</button></div></td></tr>';
+      }).join("") + '</tbody></table>' : '<div class="empty">등록된 공지가 없습니다.</div>') + '</div>';
+  M().querySelectorAll("input[data-nid]").forEach(function(inp){
+    function save(){ setNotice(inp.dataset.nid, { views: Math.max(0, parseInt(inp.value,10)||0) }, true); toast("조회수를 바꿨습니다"); }
+    inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { save(); inp.blur(); } });
+    inp.addEventListener("change", save);
+  });
+}
+function noticeForm(n){
+  n = n || { target:"전체", title:"", content:"", pinned:true };
+  var targets = ["전체","커뮤니티"].concat(ALL_BOARDS);
+  return '<div class="row2"><div class="fld"><label>표시할 곳</label><select id="n-target">' +
+      targets.map(function(t){ return '<option' + (n.target===t?' selected':'') + '>' + t + '</option>'; }).join("") + '</select></div>' +
+    '<div class="fld"><label>상단 고정</label><label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding-top:8px"><input type="checkbox" id="n-pin"' + (n.pinned?' checked':'') + '> 다른 공지보다 위에 고정</label></div></div>' +
+    '<div class="fld"><label>제목</label><input id="n-title" value="' + esc(n.title) + '" placeholder="공지 제목"></div>' +
+    '<div class="fld"><label>내용</label><textarea id="n-content" placeholder="회원들에게 알릴 내용을 적어주세요">' + esc(n.content) + '</textarea></div>';
+}
+function setNotice(id, obj, viewsReset){
+  if (viewsReset) { var v = JI.get("views", {}); delete v[id]; JI.set("views", v); }
+  if (id === "n1") {
+    var ov = adminOv(); ov.n1 = ov.n1 || {}; for (var k in obj) { ov.n1[k] = obj[k]; NOTICE[k] = obj[k]; } JI.set("admin_ov", ov); return;
+  }
+  var ns = adminNotices(); ns.forEach(function(n){ if (n.id === id) for (var k in obj) n[k] = obj[k]; }); JI.set("notices", ns);
+}
+function saveNotice(id){
+  var obj = { target: document.getElementById("n-target").value, pinned: document.getElementById("n-pin").checked,
+    title: document.getElementById("n-title").value.trim(), content: document.getElementById("n-content").value.trim() };
+  if (!obj.title) { alert("제목을 입력하세요."); return; }
+  if (id) { setNotice(id, obj); closeModal(); toast("공지를 수정했습니다"); }
+  else {
+    var ns = adminNotices();
+    obj.id = "an" + Date.now(); obj.board = "공지"; obj.head = "공지"; obj.author = "운영자"; obj.date = today(); obj.views = 0;
+    ns.push(obj); JI.set("notices", ns); toast("공지를 올렸습니다");
+  }
+  drawNotices();
+}
+function editNotice(id){
+  var n = allNoticeItems().filter(function(x){ return x.id === id; })[0]; if (!n) return;
+  showModal('<h3>공지 수정</h3>' + noticeForm(n) + '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" onclick="saveNotice(\'' + id + '\')">저장</button></div>');
+}
+function delNotice(id){
+  if (!confirm("이 공지를 삭제할까요?")) return;
+  if (id === "n1") setNotice("n1", { deleted: true });
+  else JI.set("notices", adminNotices().filter(function(n){ return n.id !== id; }));
+  toast("공지를 삭제했습니다"); drawNotices();
+}
+
+/* ── 프리미엄 관리 ── */
+var pmBoard = "구인구직";
+function drawPremium(){
+  var list = everyPost().filter(function(p){ return p.board === pmBoard; });
+  var on = list.filter(isPremium), off = list.filter(function(p){ return !isPremium(p); });
+  function item(p, isOn){
+    return '<div class="pm-item"><img src="' + photoUrl(photoFor(p), 160) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+      '<div class="t">' + esc(p.title) + '<small>' + esc(p.author) + ' · 조회 ' + viewsOf(p).toLocaleString() + '</small></div>' +
+      '<button class="mb' + (isOn ? ' del' : ' pri') + '" onclick="togglePm(\'' + p.id + '\',' + (!isOn) + ')">' + (isOn ? '내리기' : '등록') + '</button></div>';
+  }
+  M().innerHTML = '<h1>프리미엄 관리</h1><p class="sub">프리미엄으로 등록한 글은 해당 게시판 맨 위에 PREMIUM 표시와 함께 먼저 보입니다.</p>' +
+    '<div class="toolbar">' + PREMIUM_BOARDS.map(function(b){
+      return '<button class="mb' + (b===pmBoard?' pri':'') + '" onclick="pmBoard=\'' + b + '\';drawPremium()">' + b + '</button>';
+    }).join("") + '</div>' +
+    '<div class="pm-grid"><div class="panel"><h2>프리미엄 (' + on.length + ')</h2>' + (on.length ? on.map(function(p){ return item(p,true); }).join("") : '<div class="empty">프리미엄 글이 없습니다.</div>') + '</div>' +
+    '<div class="panel"><h2>일반 글 (' + off.length + ')</h2>' + (off.length ? off.map(function(p){ return item(p,false); }).join("") : '<div class="empty">일반 글이 없습니다.</div>') + '</div></div>';
+}
+function togglePm(id, val){ var p = findAny(id); if (!p) return; setFields(p, { premium: val }); toast(val ? "프리미엄으로 등록했습니다" : "프리미엄에서 내렸습니다"); drawPremium(); }
+
+/* ── 판매자 승인 (특가공구·제주상점 글쓰기 권한) ── */
+var reqTab = "pending";
+function drawSellers(){
+  var reqs = JI.get("seller_requests", []).slice().reverse();
+  var counts = { pending:0, approved:0, rejected:0 };
+  reqs.forEach(function(r){ counts[r.status] = (counts[r.status]||0) + 1; });
+  var list = reqs.filter(function(r){ return reqTab === "all" || r.status === reqTab; });
+  var L = { pending:"대기중", approved:"승인됨", rejected:"반려됨", all:"전체" };
+  M().innerHTML = '<h1>판매자 승인</h1><p class="sub">특가공구·제주상점 글쓰기 권한 요청과 공구 문의를 검토합니다.</p>' +
+    '<div class="toolbar">' + ["pending","approved","rejected","all"].map(function(t){
+      return '<button class="mb' + (reqTab===t?' pri':'') + '" onclick="reqTab=\'' + t + '\';drawSellers()">' + L[t] + ' (' + (t==="all"?reqs.length:(counts[t]||0)) + ')</button>';
+    }).join("") + '</div><div class="panel">' +
+    (list.length ? list.map(function(r){
+      var act = r.status === "pending"
+        ? '<div class="acts"><button class="mb pri" onclick="decide(\'' + r.id + '\',\'approved\')">승인</button><button class="mb del" onclick="decide(\'' + r.id + '\',\'rejected\')">반려</button></div>'
+        : (r.status === "approved" ? '<span class="st-ok">✓ 승인됨</span>' : '<span class="st-no">✕ 반려됨</span>');
+      return '<div class="req"><div class="rh"><b>' + esc(r.nick) + '</b><span class="bd">' + esc(r.board) + '</span><span style="margin-left:auto;color:var(--ink-4);font-size:12.5px">' + esc(r.date) + ' · ' + esc(r.email) + '</span></div>' +
+        '<div class="msg">' + esc(r.message) + '</div>' + act + '</div>';
+    }).join("") : '<div class="empty">해당하는 요청이 없습니다.</div>') + '</div>';
+}
+function decide(id, status){
+  var reqs = JI.get("seller_requests", []);
+  var r = reqs.filter(function(x){ return x.id === id; })[0]; if (!r) return;
+  r.status = status; JI.set("seller_requests", reqs);
+  if (status === "approved") {
+    var ap = JI.get("approved_sellers", {}); ap[r.board] = ap[r.board] || [];
+    if (ap[r.board].indexOf(r.email) < 0) ap[r.board].push(r.email);
+    JI.set("approved_sellers", ap);
+  }
+  toast(status === "approved" ? "승인했습니다" : "반려했습니다");
+  boot();
+}
+
+/* ── 삭제된 글 ── */
+function drawTrash(){
+  M().innerHTML = '<h1>삭제된 글</h1><p class="sub">관리자가 지운 기본 글입니다. 되살리면 원래 게시판에 다시 보입니다. (회원 글은 삭제 즉시 완전히 지워집니다)</p>' +
+    '<div class="panel">' + (REMOVED_SEEDS.length ? '<table class="adm-t"><thead><tr><th>게시판</th><th>제목</th><th></th></tr></thead><tbody>' +
+      REMOVED_SEEDS.map(function(p){
+        return '<tr><td><span class="bd">' + esc(p.board) + '</span></td><td class="ttl"><a>' + esc(p.title) + '</a><small>' + esc(p.author) + ' · ' + esc(p.date) + '</small></td>' +
+          '<td><button class="mb pri" onclick="restore(\'' + p.id + '\')">되살리기</button></td></tr>';
+      }).join("") + '</tbody></table>' : '<div class="empty">삭제된 글이 없습니다.</div>') + '</div>';
+}
+function restore(id){
+  var p = REMOVED_SEEDS.filter(function(x){ return x.id === id; })[0]; if (!p) return;
+  restorePost(p); toast("되살렸습니다"); drawTrash();
+}
+
+/* ── 설정 ── */
+function drawSettings(){
+  M().innerHTML = '<h1>설정</h1><p class="sub">관리자 비밀번호를 바꿉니다.</p>' +
+    '<div class="panel" style="max-width:460px"><div class="fld"><label>현재 비밀번호</label><input type="password" id="s-cur"></div>' +
+    '<div class="fld"><label>새 비밀번호 (6자 이상)</label><input type="password" id="s-new"></div>' +
+    '<div class="fld"><label>새 비밀번호 확인</label><input type="password" id="s-new2"></div>' +
+    '<button class="btn primary" onclick="changePw()">비밀번호 변경</button></div>';
+}
+function changePw(){
+  var c = document.getElementById("s-cur").value, n = document.getElementById("s-new").value, n2 = document.getElementById("s-new2").value;
+  if (c !== adminPw()) { alert("현재 비밀번호가 맞지 않습니다."); return; }
+  if (n.length < 6) { alert("새 비밀번호는 6자 이상이어야 합니다."); return; }
+  if (n !== n2) { alert("새 비밀번호가 서로 다릅니다."); return; }
+  JI.set("admin_pw", n); toast("비밀번호를 바꿨습니다"); drawSettings();
+}
+
+if (sessionStorage.getItem("ji_admin_ok") === "1") boot(); else gate();
+</script>
+</body>
+</html>

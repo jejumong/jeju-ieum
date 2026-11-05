@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>구인구직 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="jobs">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 구인구직</div>
+    <h1>구인구직</h1>
+    <p>제주 지역 일자리와 인재를 잇는 공간</p>
+  </div>
+  <a class="btn accent" href="write.html?board=구인구직">✏️ 공고 올리기</a>
+</div></div>
+
+<main class="wrap">
+  <div id="pm-banner"></div>
+
+  <div class="filter-bar">
+    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
+    <button class="chip-btn" data-filter="제주시내" onclick="applyChip(this)">제주시내</button>
+    <button class="chip-btn" data-filter="동부" onclick="applyChip(this)">동부(구좌·조천·성산)</button>
+    <button class="chip-btn" data-filter="서부" onclick="applyChip(this)">서부(애월·한림·대정)</button>
+    <button class="chip-btn" data-filter="서귀포" onclick="applyChip(this)">서귀포</button>
+    <select id="kind-sel" onchange="render()">
+      <option value="all">구분 전체</option><option value="구인">구인</option><option value="구직">구직</option>
+    </select>
+    <span class="spacer"></span>
+    <span class="count">등록 공고 <b id="shown-count">0</b>건</span>
+  </div>
+
+  <div id="job-wrap"></div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/photos.js"></script>
+<script src="assets/cards.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+document.getElementById("pm-banner").innerHTML = premiumBanner("공고");
+
+var REGION_MAP = { "함덕":"동부","성산":"동부","구좌":"동부","조천":"동부","제주시":"제주시내","노형동":"제주시내","대정":"서부","애월":"서부","한림":"서부","서귀포":"서귀포" };
+var META = {
+  "tj1":{e:"☕",job:"카페·요식",pay:"시급 11,000원"},
+  "tj2":{e:"🏨",job:"숙박·관광",pay:"월 220만원 (숙식 제공)"},
+  "tj3":{e:"🧑‍⚕️",job:"복지·의료",pay:"급여 협의"},
+  "tj4":{e:"💻",job:"사무·재택",pay:"급여 협의"},
+  "tj5":{e:"🍊",job:"농수산",pay:"일급 100,000원"},
+  "tj6":{e:"🐟",job:"카페·요식",pay:"시급 12,000원"},
+  "tj7":{e:"📊",job:"사무·재택",pay:"월 260만원 희망"},
+  "tj8":{e:"🌱",job:"농수산",pay:"일급 90,000원"},
+  "tj10":{e:"🤝",job:"복지·의료",pay:"월 240만원"},
+  "tj11":{e:"🥐",job:"카페·요식",pay:"시급 12,000원"},
+  "tj12":{e:"🍳",job:"카페·요식",pay:"급여 협의"},
+  "tj13":{e:"🚗",job:"숙박·관광",pay:"월 230만원"}
+};
+var regionFilter = "all";
+
+function applyChip(el){
+  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on");
+  regionFilter = el.dataset.filter;
+  render();
+}
+
+function jobCard(p, isPm){
+  var m = META[p.id] || { job: p.job || "기타", pay: p.pay || "급여 협의" };
+  var isMine = p.id.charAt(0) === "u";
+  var kind = p.head || "구인";
+  var pay = isMine ? (p.price ? parseInt(String(p.price).replace(/[^0-9]/g,""),10).toLocaleString() + "원" : "급여 협의") : m.pay;
+  return photoCard(p, { pm: isPm, badge: { text: kind, cls: kind === "구직" ? "dark" : "" },
+    info: '<b>' + escHtml(pay) + '</b><span>' + escHtml(m.job) + ' · ' + escHtml(p.loc || "지역 미기재") + '</span>',
+    mine: isMine ? "내 글" : "" });
+}
+
+function render(){
+  var kind = document.getElementById("kind-sel").value;
+  var list = userPostsOf("구인구직").concat(TRADE_SEEDS.filter(function(p){ return p.board === "구인구직"; }));
+  list = list.filter(function(p){
+    var rg = REGION_MAP[p.loc] || p.loc || "";
+    var okR = regionFilter === "all" || rg === regionFilter;
+    var okK = kind === "all" || (p.head || "구인") === kind;
+    return okR && okK;
+  });
+  document.getElementById("shown-count").textContent = list.length;
+  renderSections({
+    grid: document.getElementById("job-wrap"),
+    list: list,
+    card: jobCard,
+    emptyText: "조건에 맞는 공고가 없습니다."
+  });
+}
+render();
+</script>
+</body>
+</html>

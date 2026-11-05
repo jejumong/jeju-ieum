@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>생활·거래 — 제주이음</title>
+<meta name="description" content="제주 구인구직, 부동산, 중고거래, 제주상점, 동호회, 특가공구, 축제정보를 한눈에.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="trade">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 생활·거래</div>
+    <h1>생활·거래</h1>
+    <p>일자리, 집, 물건, 가게, 모임까지 — 제주 이웃끼리 나누는 생활 정보를 한눈에 봅니다.</p>
+  </div>
+  <a class="btn accent" href="write.html">✏️ 글쓰기</a>
+</div></div>
+
+<main class="wrap">
+  <div class="board-grid trade-hub" id="hub"></div>
+
+  <div class="biz-strip">
+    <div><b>제주에서 가게·숙소를 운영하시나요?</b><p>제주상점 입점과 특가공구 진행을 준비하고 있어요. 미리 문의를 남겨 주세요.</p></div>
+    <a class="btn accent" href="contact.html?type=%EC%9E%85%EC%A0%90%C2%B7%EC%A0%9C%ED%9C%B4%20%EB%AC%B8%EC%9D%98">입점·제휴 문의</a>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+(function(){
+  function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+  var BOARDS = [
+    ["부동산", "realestate.html", "🏡", "연세·월세·매매"],
+    ["구인구직", "jobs.html", "💼", "제주 일자리와 인재"],
+    ["중고사고팔기", "market.html", "📦", "동네 직거래"],
+    ["제주상점", "shops.html", "🏪", "이웃이 검증한 가게"],
+    ["동호회", "clubs.html", "🏄", "취미로 만나는 이웃"],
+    ["특가공구", "deals.html", "🍊", "함께 사면 더 싸게"],
+    ["축제정보", "festivals.html", "🎉", "지금 열리는 행사"]
+  ];
+  var posts = allPosts();
+  function shortPrice(p){
+    var v = (p.price || "").toString().replace(/[^0-9]/g, "");
+    if (!v) return "";
+    var n = +v;
+    if (n >= 100000000) return (Math.round(n/10000000)/10) + "억";
+    if (n >= 10000) return Math.round(n/10000).toLocaleString() + "만";
+    return n.toLocaleString();
+  }
+  document.getElementById("hub").innerHTML = BOARDS.map(function(b){
+    var list = premiumFirst(posts.filter(function(p){ return p.board === b[0]; }).sort(byRecent));
+    var items = list.slice(0, 5).map(function(p){
+      var pr = shortPrice(p);
+      return '<li>' + (isPremium(p) ? '<span class="chip new">AD</span>' : (p.loc ? '<span class="chip region">' + esc(String(p.loc).split(" ")[0]) + '</span>' : '')) +
+        '<a href="view.html?id=' + p.id + '">' + esc(p.title) + '</a>' + (pr ? '<span class="price">' + pr + '</span>' : '<span class="meta">' + fmtDate(p.date) + '</span>') + '</li>';
+    }).join("");
+    return '<section class="card"><div class="card-head"><h2><span class="ti">' + b[2] + '</span>' + b[0] + ' <span class="tc">' + list.length + '</span></h2>' +
+      '<a href="' + b[1] + '" class="more">전체 보기 +</a></div>' +
+      '<p style="font-size:13px;color:var(--ink-4);margin:-4px 0 6px">' + b[3] + '</p>' +
+      '<ul>' + (items || '<li style="color:var(--ink-4)">아직 글이 없어요</li>') + '</ul></section>';
+  }).join("");
+  document.getElementById("hub").appendChild(document.querySelector(".biz-strip")); // 7개 + 입점 안내로 칸 맞춤
+})();
+</script>
+</body>
+</html>

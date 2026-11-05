@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>축제정보 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* ── 축제 지도 (이미지 + 점 오버레이) ── */
+.map-wrap{position:relative;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px;line-height:0;box-shadow:var(--sh-3)}
+.map-wrap img{display:block;width:100%;height:auto}
+.map-caption{position:absolute;left:18px;top:16px;font-size:13px;font-weight:700;line-height:1.4;color:var(--ink-2);background:rgba(255,255,255,.92);padding:7px 15px;border-radius:var(--r-pill);z-index:5;box-shadow:var(--sh-2);backdrop-filter:blur(4px)}
+.map-legend{position:absolute;right:18px;top:16px;display:flex;gap:14px;font-size:12.5px;font-weight:600;line-height:1.4;color:var(--ink-2);background:rgba(255,255,255,.92);padding:7px 16px;border-radius:var(--r-pill);z-index:5;box-shadow:var(--sh-2);backdrop-filter:blur(4px)}
+.map-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+
+.fest-dot{position:absolute;width:22px;height:22px;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;padding:0;z-index:6}
+.fest-dot::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:inherit;opacity:.6;animation:pulse 2s ease-out infinite;z-index:-1}
+@keyframes pulse{0%{transform:scale(1);opacity:.6}70%{transform:scale(2.3);opacity:0}100%{transform:scale(2.3);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fest-dot::after{animation:none;opacity:0}}
+.fest-dot:hover{border-width:4px}
+
+.map-pop{position:absolute;width:244px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh-4);padding:15px 17px;z-index:20;display:none;line-height:1.5}
+.map-pop.show{display:block}
+.map-pop .close{position:absolute;top:8px;right:10px;border:0;background:none;font-size:16px;color:var(--muted);cursor:pointer;line-height:1}
+.map-pop .pop-chip{margin-bottom:6px}
+.map-pop h4{font-size:14.5px;font-weight:800;letter-spacing:-0.2px;line-height:1.4;margin:2px 0 6px;padding-right:14px}
+.map-pop .pop-meta{font-size:12.5px;color:var(--muted);line-height:1.6}
+.map-pop .pop-link{display:inline-block;margin-top:8px;font-size:13px;font-weight:700;color:var(--sea)}
+.map-pop .pop-link:hover{text-decoration:underline}
+.map-pop::after{content:"";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);border:8px solid transparent;border-bottom:0;border-top-color:var(--white)}
+.map-pop.below::after{bottom:auto;top:-8px;border:8px solid transparent;border-top:0;border-bottom-color:var(--white)}
+@media (max-width:680px){
+  .map-legend{display:none}
+  .map-pop{width:200px}
+  .fest-dot{width:18px;height:18px;border-width:2.5px}
+}
+</style>
+</head>
+<body data-active="festivals">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 축제정보</div>
+    <h1>축제정보</h1>
+    <p>지도의 점을 눌러 확인하세요 · 종료된 축제는 7일 뒤 목록에서 자동으로 내려갑니다</p>
+  </div>
+  <a class="btn accent" href="write.html?board=축제정보">✏️ 축제 제보</a>
+</div></div>
+
+<main class="wrap">
+
+  <!-- 제주도 지도 -->
+  <div class="map-wrap" id="map-wrap">
+    <span class="map-caption">🍊 제주 축제 지도</span>
+    <div class="map-legend">
+      <span><i style="background:#f08a24"></i>진행중</span>
+      <span><i style="background:#2b8ce6"></i>예정</span>
+      <span><i style="background:#9aa4ae"></i>종료</span>
+    </div>
+
+    <img src="assets/jeju-map.jpg" alt="제주도 축제 지도" id="jeju-img">
+    <div id="dot-layer"></div>
+
+    <!-- 축제 팝업 -->
+    <div class="map-pop" id="map-pop">
+      <button class="close" onclick="closePop()" aria-label="닫기">×</button>
+      <div class="pop-chip" id="pop-chip"></div>
+      <h4 id="pop-title"></h4>
+      <div class="pop-meta" id="pop-meta"></div>
+      <a class="pop-link" id="pop-link" href="#">자세히 보기 →</a>
+    </div>
+  </div>
+
+  <!-- 필터 + 목록 -->
+  <div class="filter-bar">
+    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
+    <button class="chip-btn" data-filter="진행중" onclick="applyChip(this)">진행중</button>
+    <button class="chip-btn" data-filter="예정" onclick="applyChip(this)">예정</button>
+    <button class="chip-btn" data-filter="마감" onclick="applyChip(this)">종료</button>
+    <span class="spacer"></span>
+    <span class="count">등록 축제 <b id="shown-count">0</b>건</span>
+  </div>
+
+  <div class="grid-cards" id="fest-grid"></div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/photos.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+/* ── 축제별 지도 좌표(이미지 크기 대비 %)와 카드 이모지 ── */
+var FEST_META = {
+  "tf1": { px:40.5, py:21.0, e:"🛶" },   /* 이호테우해변 — 제주시 서쪽 북해안 */
+  "tf2": { px:51.0, py:21.5, e:"🖤" },   /* 삼양검은모래해변 — 제주시 동쪽 */
+  "tf3": { px:80.0, py:61.5, e:"🏖️" },  /* 표선해수욕장 — 동남 해안 */
+  "tf4": { px:45.8, py:20.3, e:"🎭" },   /* 탑동광장 — 제주시내 */
+  "tf5": { px:17.0, py:79.0, e:"🐟" },   /* 모슬포항 — 대정읍 서남단 */
+  "tf6": { px:31.5, py:26.5, e:"🌙" },   /* 한담해변 — 애월 북서 해안 */
+  "tf7": { px:34.0, py:43.0, e:"🔥" }    /* 새별오름 — 애월 중산간 */
+};
+var STATE_COLOR = { "진행중":"#f08a24", "예정":"#2b8ce6", "마감":"#9aa4ae" };
+var CHIP_CLS = { "진행중":"new", "예정":"region", "마감":"done" };
+
+function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+function fests(){
+  return activeFestivals().sort(function(a,b){
+    var order = { "진행중":0, "예정":1, "마감":2 };
+    var d = (a.head in order ? order[a.head] : 3) - (b.head in order ? order[b.head] : 3);
+    return d !== 0 ? d : ((a.start || "") < (b.start || "") ? -1 : 1);
+  });
+}
+
+/* ── 지도에 축제 점 얹기 ── */
+(function drawDots(){
+  var layer = document.getElementById("dot-layer");
+  fests().forEach(function(p){
+    var m = FEST_META[p.id] || (p.px ? { px:p.px, py:p.py, e:p.emoji } : null);
+    if (!m) return; // 좌표가 등록된 축제만 지도에 표시
+    var b = document.createElement("button");
+    b.className = "fest-dot";
+    b.type = "button";
+    b.setAttribute("aria-label", p.title);
+    b.style.left = m.px + "%";
+    b.style.top = m.py + "%";
+    b.style.background = STATE_COLOR[p.head] || STATE_COLOR["진행중"];
+    b.addEventListener("click", function(ev){ ev.stopPropagation(); openPop(p, m); });
+    layer.appendChild(b);
+  });
+})();
+
+/* ── 점 클릭 팝업 ── */
+function openPop(p, m){
+  var img = document.getElementById("jeju-img");
+  var pop = document.getElementById("map-pop");
+  var w = img.clientWidth, h = img.clientHeight;
+  var px = m.px / 100 * w;
+  var py = m.py / 100 * h;
+
+  document.getElementById("pop-chip").innerHTML = '<span class="chip ' + (CHIP_CLS[p.head] || "new") + '">' + esc(p.head || "진행중") + '</span>';
+  document.getElementById("pop-title").textContent = p.title.split(" — ")[0];
+  document.getElementById("pop-meta").innerHTML =
+    (p.period ? '📅 ' + esc(p.period) + '<br>' : '') + '📍 ' + esc(p.loc || "");
+  document.getElementById("pop-link").href = "view.html?id=" + p.id;
+
+  pop.classList.add("show");
+  var pw = pop.offsetWidth, ph = pop.offsetHeight;
+  var left = Math.min(Math.max(px - pw / 2, 8), w - pw - 8);
+  var above = py - ph - 22;
+  if (above > 8) {
+    pop.classList.remove("below");
+    pop.style.top = above + "px";
+  } else {
+    pop.classList.add("below");
+    pop.style.top = (py + 22) + "px";
+  }
+  pop.style.left = left + "px";
+}
+function closePop(){ document.getElementById("map-pop").classList.remove("show"); }
+document.getElementById("map-wrap").addEventListener("click", function(e){
+  if (!e.target.closest(".fest-dot") && !e.target.closest(".map-pop")) closePop();
+});
+window.addEventListener("resize", closePop);
+
+/* ── 목록 렌더링 ── */
+var stateFilter = "all";
+function applyChip(el){
+  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on");
+  stateFilter = el.dataset.filter;
+  render();
+}
+function render(){
+  var list = fests().filter(function(p){ return stateFilter === "all" || (p.head || "진행중") === stateFilter; });
+  list = premiumFirst(list);
+  document.getElementById("shown-count").textContent = list.length;
+  document.getElementById("fest-grid").innerHTML = list.map(function(p){
+    var isMine = p.id.charAt(0) === "u";
+    var head = p.head || "제보";
+    return photoCard(p, { pm: isPremium(p), badge: { text: head, cls: head === "진행중" ? "live" : head === "마감" ? "dark" : "" },
+      title: p.title.split(" — ")[0],
+      info: (p.period ? '<b>' + esc(p.period) + '</b>' : '') + '<span>' + esc(p.loc || "") + '</span>',
+      mine: isMine ? "내 글" : "" });
+  }).join("") || '<p style="color:var(--muted);padding:24px">조건에 맞는 축제가 없습니다.</p>';
+}
+render();
+</script>
+</body>
+</html>

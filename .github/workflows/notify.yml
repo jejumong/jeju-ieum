@@ -1,0 +1,32 @@
+# 제주이음 · 자동 알림 발송
+# 데이터 파일이 GitHub 에 올라오면(파일 업로드·커밋 모두) 이 작업이 저절로 실행됩니다.
+# 바뀐 항목(빈자리 생김, 새 공고 모집 시작)을 찾아, 그 알림을 켠 사람에게만 무료 브라우저 알림을 보냅니다.
+# 준비: 저장소 Settings → Secrets and variables → Actions 에 아래 두 값을 넣으세요.
+#   ONESIGNAL_APP_ID   (OneSignal 앱 ID)
+#   ONESIGNAL_API_KEY  (OneSignal REST API Key)
+#   SITE_URL           (선택, 예: https://jejuieum.com/) — Variables 탭에 넣으면 알림을 눌렀을 때 그 주소로 열립니다.
+name: notify-subscribers
+
+on:
+  push:
+    paths:
+      - "assets/school-housing-data.js"
+      - "assets/programs-data.js"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 바뀐 항목 찾아 알림 보내기
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: node scripts/notify-changes.mjs

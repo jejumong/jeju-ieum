@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원정보 수정 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.me-card{max-width:640px;margin:0 auto}
+.me-top{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;flex-wrap:wrap;box-shadow:var(--sh-2)}
+.ava-box{position:relative;flex-shrink:0}
+.ava-img{width:72px;height:72px;border-radius:50%;object-fit:cover;display:block;border:2px solid var(--line)}
+.ava-ph{width:72px;height:72px;border-radius:50%;background:linear-gradient(150deg,#4aa3f0,var(--sea-deep));color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800}
+.ava-btn{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;background:var(--sea);color:#fff;border:2px solid #fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.ava-btn:hover{background:var(--sea-deep)}
+.me-top .who{font-size:21px;font-weight:800;letter-spacing:-0.045em;color:var(--ink)}
+.me-top .sub{font-size:13px;color:var(--muted);margin-top:3px}
+.ava-del{font-size:12px;color:var(--muted);background:none;border:0;cursor:pointer;padding:2px 0;margin-top:4px}
+.ava-del:hover{color:#c0392b;text-decoration:underline}
+
+/* 활동 통계 버튼 */
+.me-stats{display:flex;gap:8px;width:100%;margin-top:4px}
+.stat-btn{flex:1;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 8px;text-align:center;cursor:pointer;transition:all .14s var(--ease)}
+.stat-btn:hover{border-color:var(--sea);background:var(--sea-pale)}
+.stat-btn.on{border-color:var(--sea);background:var(--sea-pale);box-shadow:inset 0 -3px 0 var(--sea)}
+.stat-btn b{display:block;font-size:19px;color:var(--sea-deep);line-height:1.2}
+.stat-btn span{font-size:12px;color:var(--muted);font-weight:600}
+.stat-btn i{font-style:normal;font-size:11px;color:var(--muted);margin-left:3px}
+
+/* 활동 상세 패널 */
+.act-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;margin-bottom:18px;display:none;box-shadow:var(--sh-2)}
+.act-panel.show{display:block}
+.act-panel .ah{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.act-panel .ah .cnt{color:var(--sea)}
+.act-panel .ah button{margin-left:auto;border:0;background:none;font-size:13px;color:var(--muted);cursor:pointer}
+.act-panel .ah button:hover{color:var(--sea)}
+.act-row{display:block;padding:13px 15px;border-radius:var(--r);border:1px solid var(--line);margin-bottom:9px;transition:all .14s var(--ease)}
+.act-row:hover{border-color:var(--sea-200);background:var(--sea-50);transform:translateX(2px)}
+.act-row .rt{font-size:14.5px;font-weight:700;letter-spacing:-0.2px;line-height:1.4}
+.act-row:hover .rt{color:var(--sea)}
+.act-row .rm{font-size:12.5px;color:var(--muted);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.act-row .rtop{display:flex;align-items:flex-start;gap:10px}
+.act-row .rtop .rt{flex:1}
+.act-row .own-actions{flex-shrink:0}
+.act-row .quote{font-size:14px;color:var(--basalt-soft);background:var(--sand);border-radius:8px;padding:8px 11px;margin-top:7px;line-height:1.55}
+.act-empty{color:var(--muted);font-size:14px;padding:20px 0;text-align:center}
+.act-empty a{color:var(--sea);font-weight:700}
+
+.sec-t{font-size:13px;font-weight:800;color:var(--basalt-soft);margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.me-block{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 28px;margin-bottom:18px;box-shadow:var(--sh-2)}
+.fixed-val{background:var(--sand);border:1px solid var(--line);border-radius:8px;padding:11px 12px;font-size:14.5px;color:var(--muted)}
+.danger{color:#c0392b;font-weight:700;background:none;border:0;font-size:13px;cursor:pointer;padding:0}
+.danger:hover{text-decoration:underline}
+</style>
+</head>
+<body data-active="">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 내 정보</div>
+    <h1>내 정보</h1>
+    <p>프로필과 활동 내역을 확인하고 수정할 수 있어요</p>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <div class="me-card">
+
+    <!-- 프로필 -->
+    <div class="me-top">
+      <div class="ava-box">
+        <div id="ava-slot"></div>
+        <button class="ava-btn" onclick="document.getElementById('photo-input').click()" title="사진 변경">📷</button>
+        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+      </div>
+      <div>
+        <div class="who" id="who">-</div>
+        <div class="sub" id="sub">-</div>
+        <button class="ava-del" id="ava-del" onclick="removePhoto()" style="display:none">사진 삭제</button>
+      </div>
+      <div class="me-stats">
+        <button class="stat-btn" id="tab-posts" onclick="showTab('posts')"><b id="st-posts">0</b><span>내가 쓴 글 <i>▾</i></span></button>
+        <button class="stat-btn" id="tab-cmts" onclick="showTab('cmts')"><b id="st-cmts">0</b><span>내가 쓴 댓글 <i>▾</i></span></button>
+        <button class="stat-btn" id="tab-joins" onclick="showTab('joins')"><b id="st-joins">0</b><span>가입·참여 <i>▾</i></span></button>
+      </div>
+    </div>
+
+    <!-- 활동 상세 -->
+    <div class="act-panel" id="panel"></div>
+
+    <!-- 승인 신청 내역 -->
+    <div class="me-block" id="req-block" style="display:none">
+      <h2 class="sec-t">제주상점 · 특가공구 신청 내역</h2>
+      <div id="req-list"></div>
+    </div>
+
+    <!-- 기본 정보 -->
+    <div class="me-block">
+      <h2 class="sec-t">기본 정보</h2>
+      <div class="field">
+        <label>이메일</label>
+        <div class="fixed-val" id="email-val">-</div>
+        <div class="hint">이메일은 변경할 수 없습니다.</div>
+      </div>
+      <div class="field">
+        <label for="nick">닉네임 <span class="req">*</span></label>
+        <input type="text" id="nick" maxlength="10" placeholder="2~10자">
+        <div class="hint">기존에 쓴 글과 댓글의 이름도 함께 바뀝니다.</div>
+      </div>
+      <div class="field">
+        <label for="region">사는 지역 <span class="req">*</span></label>
+        <select id="region">
+          <option>제주북쪽</option><option>제주동쪽</option><option>제주서쪽</option>
+          <option>제주남쪽</option><option>도외 (이주 준비 중)</option>
+        </select>
+      </div>
+      <div class="check-line">
+        <input type="checkbox" id="noti"><label for="noti">동네 소식·공구 알림 수신</label>
+      </div>
+      <div class="form-actions">
+        <a class="btn ghost" href="index.html">취소</a>
+        <button class="btn primary" onclick="saveBasic()">저장하기</button>
+      </div>
+    </div>
+
+    <!-- 비밀번호 -->
+    <div class="me-block">
+      <h2 class="sec-t">비밀번호 변경</h2>
+      <div class="field">
+        <label for="cur">현재 비밀번호</label>
+        <input type="password" id="cur" placeholder="현재 비밀번호" autocomplete="current-password">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="new1">새 비밀번호</label>
+          <input type="password" id="new1" placeholder="8자 이상" autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label for="new2">새 비밀번호 확인</label>
+          <input type="password" id="new2" placeholder="다시 입력" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn primary" onclick="savePw()">비밀번호 변경</button>
+      </div>
+    </div>
+
+    <div class="me-block" style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:13px;color:var(--muted)">더 이상 이용하지 않으신가요?</div>
+      <button class="danger" style="margin-left:auto" onclick="leave()">회원 탈퇴</button>
+    </div>
+
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+var user = currentUser();
+if (!user) {
+  alert("로그인이 필요한 페이지입니다.");
+  location.href = "login.html?next=profile.html";
+}
+function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+function users(){ return JI.get("users", []); }
+function myIndex(){ return users().findIndex(function(u){ return u.email === user.email; }); }
+
+/* ── 내 활동 수집 ── */
+function myPosts(){
+  return JI.get("posts", []).filter(function(p){ return p.author === user.nick; });
+}
+function myComments(){
+  var cm = JI.get("comments", {}), out = [];
+  Object.keys(cm).forEach(function(pid){
+    cm[pid].forEach(function(c, idx){
+      if (c.author === user.nick) {
+        var p = findPost(pid);
+        out.push({ text: c.text, date: c.date, edited: c.edited, postId: pid, idx: idx,
+          postTitle: (p ? p.title : (c.postTitle || "삭제된 글")), board: p ? p.board : "" });
+      }
+    });
+  });
+  return out.sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+}
+function myJoins(){
+  var out = [];
+  JI.get("joined_clubs", []).forEach(function(jid){
+    var p = findPost(jid.replace(/^club-/, ""));
+    out.push({ kind: "동호회", icon: "🤝", id: p ? p.id : null,
+      title: p ? p.title : jid, sub: p ? (p.meta || p.loc || "") : "" });
+  });
+  JI.get("joined_deals", []).forEach(function(jid){
+    var p = findPost(jid.replace(/^deal-/, ""));
+    var sub = "";
+    if (p) sub = (p.cur && p.goal ? p.cur + "/" + p.goal + " 참여" : "") + (p.dday ? " · " + p.dday : "");
+    out.push({ kind: "특가공구", icon: "⚡", id: p ? p.id : null,
+      title: p ? p.title : jid, sub: sub });
+  });
+  return out;
+}
+
+/* ── 프로필 표시 ── */
+function paintAvatar(){
+  var ph = myPhoto();
+  document.getElementById("ava-slot").innerHTML = ph
+    ? '<img class="ava-img" src="' + ph + '" alt="프로필 사진">'
+    : '<div class="ava-ph">' + esc(user.nick.charAt(0)) + '</div>';
+  document.getElementById("ava-del").style.display = ph ? "block" : "none";
+}
+
+function fill(){
+  var all = users();
+  var me = all[myIndex()] || user;
+  paintAvatar();
+  document.getElementById("who").textContent = user.nick;
+  document.getElementById("sub").textContent = user.region + (me.joined ? " · " + me.joined + " 가입" : "");
+  document.getElementById("email-val").textContent = user.email;
+  document.getElementById("nick").value = user.nick;
+  var sel = document.getElementById("region");
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].text === user.region) { sel.selectedIndex = i; break; }
+  }
+  document.getElementById("noti").checked = !!me.noti;
+
+  document.getElementById("st-posts").textContent = myPosts().length;
+  document.getElementById("st-cmts").textContent = myComments().length;
+  document.getElementById("st-joins").textContent = myJoins().length;
+
+  fillRequests();
+}
+
+/* ── 승인제 게시판 신청 내역 (특가공구·제주상점) ── */
+var REQ_STATUS = { pending: ["대기중", "chip new"], approved: ["승인됨", "chip region"], rejected: ["반려됨", "chip done"] };
+function fillRequests(){
+  var list = RESTRICTED_BOARDS.map(mySellerRequest).filter(Boolean);
+  var block = document.getElementById("req-block");
+  if (!list.length) { block.style.display = "none"; return; }
+  block.style.display = "block";
+  document.getElementById("req-list").innerHTML = list.map(function(r){
+    var approvedNow = isApprovedSeller(r.board);
+    var st = approvedNow ? REQ_STATUS.approved : (REQ_STATUS[r.status] || REQ_STATUS.pending);
+    return '<div class="act-row">' +
+      '<div class="rtop"><div class="rt">' + esc(r.board) + ' 글쓰기 신청</div>' +
+      '<span class="' + st[1] + '">' + st[0] + '</span></div>' +
+      '<div class="rm"><span>' + esc(r.date) + '</span><span>' + esc(r.message.slice(0, 40)) + (r.message.length > 40 ? "…" : "") + '</span></div>' +
+      (approvedNow ? '<div style="margin-top:8px"><a class="btn primary" href="write.html?board=' + encodeURIComponent(r.board) + '" style="padding:7px 14px;font-size:13px">' + esc(r.board) + ' 글쓰기 →</a></div>' : '') +
+      '</div>';
+  }).join("");
+}
+if (user) fill();
+
+/* ── 사진 업로드 (160px로 축소해 저장) ── */
+function uploadPhoto(input){
+  var f = input.files && input.files[0];
+  if (!f) return;
+  if (!/^image\//.test(f.type)) { alert("이미지 파일만 올릴 수 있어요."); return; }
+  if (f.size > 8 * 1024 * 1024) { alert("8MB 이하 이미지를 올려주세요."); return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var img = new Image();
+    img.onload = function(){
+      var S = 160;
+      var cv = document.createElement("canvas");
+      cv.width = S; cv.height = S;
+      var ctx = cv.getContext("2d");
+      // 정사각형으로 가운데 크롭
+      var side = Math.min(img.width, img.height);
+      var sx = (img.width - side) / 2, sy = (img.height - side) / 2;
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, S, S);
+      try {
+        setMyPhoto(cv.toDataURL("image/jpeg", 0.85));
+        paintAvatar();
+        // 상단바 아바타도 갱신
+        var hdr = document.querySelector(".me-link img, .me-link span[style]");
+        if (hdr) hdr.outerHTML = avatarHtml(22);
+        alert("프로필 사진이 변경되었습니다.");
+      } catch (err) {
+        alert("사진 저장에 실패했습니다. 더 작은 이미지를 사용해보세요.");
+      }
+      input.value = "";
+    };
+    img.onerror = function(){ alert("이미지를 읽을 수 없습니다."); input.value = ""; };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+function removePhoto(){
+  if (!confirm("프로필 사진을 삭제할까요?")) return;
+  setMyPhoto(null);
+  paintAvatar();
+  var hdr = document.querySelector(".me-link img");
+  if (hdr) hdr.outerHTML = avatarHtml(22);
+}
+
+/* ── 활동 상세 패널 ── */
+var curTab = null;
+function showTab(t){
+  var panel = document.getElementById("panel");
+  ["posts","cmts","joins"].forEach(function(k){
+    document.getElementById("tab-" + k).classList.toggle("on", k === t && curTab !== t);
+  });
+  if (curTab === t) { curTab = null; panel.classList.remove("show"); return; }
+  curTab = t;
+  panel.classList.add("show");
+  panel.innerHTML = t === "posts" ? postsHtml() : (t === "cmts" ? cmtsHtml() : joinsHtml());
+}
+function closePanel(){
+  curTab = null;
+  document.getElementById("panel").classList.remove("show");
+  ["posts","cmts","joins"].forEach(function(k){ document.getElementById("tab-" + k).classList.remove("on"); });
+}
+
+function postsHtml(){
+  var list = myPosts();
+  var rows = list.map(function(p){
+    var cm = (JI.get("comments", {})[p.id] || []).length;
+    return '<div class="act-row">' +
+      '<div class="rtop">' +
+        '<a class="rt" href="view.html?id=' + p.id + '">' + esc(p.title) + '</a>' +
+        '<div class="own-actions">' +
+          '<button class="mini-btn" onclick="editPost(\'' + p.id + '\')">수정</button>' +
+          '<button class="mini-btn danger-btn" onclick="removePost(\'' + p.id + '\')">삭제</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rm"><span>' + esc(p.board) + '</span><span>' + esc(p.date) + '</span>' +
+      (p.editedAt ? '<span>수정됨</span>' : '') +
+      '<span>💬 ' + cm + '</span><span>👁 ' + viewsOf(p).toLocaleString() + '</span></div></div>';
+  }).join("");
+  return '<div class="ah">📝 내가 쓴 글 <span class="cnt">' + list.length + '</span><button onclick="closePanel()">닫기 ✕</button></div>' +
+    (rows || '<div class="act-empty">아직 작성한 글이 없어요.<br><a href="write.html">첫 글을 남겨보세요 →</a></div>');
+}
+function cmtsHtml(){
+  var list = myComments();
+  var rows = list.map(function(c, i){
+    return '<div class="act-row" id="mycmt-' + i + '">' +
+      '<div class="rtop">' +
+        '<a class="rt" href="view.html?id=' + c.postId + '">' + esc(c.postTitle) + '</a>' +
+        '<div class="own-actions">' +
+          '<button class="mini-btn" onclick="editCmt(' + i + ')">수정</button>' +
+          '<button class="mini-btn danger-btn" onclick="removeCmt(' + i + ')">삭제</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="quote" id="myq-' + i + '">" ' + esc(c.text) + ' "</div>' +
+      '<div class="rm">' + (c.board ? '<span>' + esc(c.board) + '</span>' : '') +
+      '<span>' + esc(c.date) + (c.edited ? ' (수정됨)' : '') + '</span></div></div>';
+  }).join("");
+  return '<div class="ah">💬 내가 쓴 댓글 <span class="cnt">' + list.length + '</span><button onclick="closePanel()">닫기 ✕</button></div>' +
+    (rows || '<div class="act-empty">아직 작성한 댓글이 없어요.<br><a href="community.html">커뮤니티 둘러보기 →</a></div>');
+}
+function joinsHtml(){
+  var list = myJoins();
+  var rows = list.map(function(j){
+    var inner = '<div class="rt">' + j.icon + ' ' + esc(j.title) + '</div>' +
+      '<div class="rm"><span>' + esc(j.kind) + '</span>' + (j.sub ? '<span>' + esc(j.sub) + '</span>' : '') + '</div>';
+    return j.id ? '<a class="act-row" href="view.html?id=' + j.id + '">' + inner + '</a>'
+                : '<div class="act-row">' + inner + '</div>';
+  }).join("");
+  return '<div class="ah">⭐ 가입·참여 내역 <span class="cnt">' + list.length + '</span><button onclick="closePanel()">닫기 ✕</button></div>' +
+    (rows || '<div class="act-empty">아직 가입하거나 참여한 항목이 없어요.<br><a href="clubs.html">동호회 보기 →</a> · <a href="deals.html">공구 보기 →</a></div>');
+}
+
+/* ── 내 글 · 내 댓글 관리 ── */
+function editPost(id){ location.href = "write.html?edit=" + id; }
+function removePost(id){
+  if (!confirm("이 글을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.")) return;
+  if (deleteMyPost(id)) {
+    fill();
+    document.getElementById("panel").innerHTML = postsHtml();
+  }
+}
+function editCmt(i){
+  var c = myComments()[i];
+  if (!c) return;
+  var box = document.getElementById("myq-" + i);
+  box.outerHTML = '<div class="edit-box" id="myq-' + i + '">' +
+    '<input type="text" id="myc-edit-' + i + '" maxlength="300">' +
+    '<button class="btn primary" onclick="saveCmt(' + i + ')">저장</button>' +
+    '<button class="btn ghost" onclick="reloadCmts()">취소</button></div>';
+  var inp = document.getElementById("myc-edit-" + i);
+  inp.value = c.text;
+  inp.focus();
+  inp.addEventListener("keydown", function(e){ if (e.key === "Enter") saveCmt(i); });
+}
+function saveCmt(i){
+  var c = myComments()[i];
+  var t = document.getElementById("myc-edit-" + i).value.trim();
+  if (!t) { alert("댓글 내용을 입력해주세요."); return; }
+  if (updateMyComment(c.postId, c.idx, t)) reloadCmts();
+}
+function removeCmt(i){
+  var c = myComments()[i];
+  if (!c) return;
+  if (!confirm("이 댓글을 삭제할까요?")) return;
+  if (deleteMyComment(c.postId, c.idx)) { fill(); reloadCmts(); }
+}
+function reloadCmts(){ document.getElementById("panel").innerHTML = cmtsHtml(); }
+
+/* ── 저장 ── */
+function saveBasic(){
+  var nick = document.getElementById("nick").value.trim();
+  var region = document.getElementById("region").value;
+  var noti = document.getElementById("noti").checked;
+  if (nick.length < 2) { alert("닉네임은 2자 이상 입력해주세요."); return; }
+
+  var all = users(), idx = myIndex();
+  if (idx < 0) { alert("회원 정보를 찾을 수 없습니다."); return; }
+  if (all.some(function(u, i){ return i !== idx && u.nick === nick; })) {
+    alert("이미 사용 중인 닉네임입니다."); return;
+  }
+
+  var oldNick = user.nick;
+  all[idx].nick = nick; all[idx].region = region; all[idx].noti = noti;
+  JI.set("users", all);
+  JI.set("session", { email: user.email, nick: nick, region: region });
+
+  if (oldNick !== nick) {
+    var posts = JI.get("posts", []);
+    posts.forEach(function(p){ if (p.author === oldNick) p.author = nick; });
+    JI.set("posts", posts);
+    var cm = JI.get("comments", {});
+    Object.keys(cm).forEach(function(k){
+      cm[k].forEach(function(c){ if (c.author === oldNick) c.author = nick; });
+    });
+    JI.set("comments", cm);
+  }
+  alert("회원정보가 저장되었습니다.");
+  location.reload();
+}
+
+function savePw(){
+  var cur = document.getElementById("cur").value;
+  var n1 = document.getElementById("new1").value;
+  var n2 = document.getElementById("new2").value;
+  var all = users(), idx = myIndex();
+  if (idx < 0) return;
+  if (all[idx].pw !== cur) { alert("현재 비밀번호가 올바르지 않습니다."); return; }
+  if (n1.length < 8) { alert("새 비밀번호는 8자 이상이어야 합니다."); return; }
+  if (n1 !== n2) { alert("새 비밀번호가 서로 일치하지 않습니다."); return; }
+  all[idx].pw = n1;
+  JI.set("users", all);
+  document.getElementById("cur").value = "";
+  document.getElementById("new1").value = "";
+  document.getElementById("new2").value = "";
+  alert("비밀번호가 변경되었습니다.");
+}
+
+function leave(){
+  if (!confirm("정말 탈퇴하시겠습니까?\n작성한 글과 댓글은 삭제되지 않습니다.")) return;
+  setMyPhoto(null);
+  JI.set("users", users().filter(function(u){ return u.email !== user.email; }));
+  JI.set("session", null);
+  alert("탈퇴 처리되었습니다. 이용해주셔서 감사합니다.");
+  location.href = "index.html";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제주이음 — 제주살이 생활 정보와 동네 커뮤니티</title>
+<meta name="description" content="제주에 살아보려는 사람과 이미 사는 사람을 잇는 생활 정보 채널. 동네 고르기, 한달살기 준비, 계절 생활, 물때·달력 같은 생활도구와 동네 커뮤니티.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="home">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="tile hero-copy">
+      <span class="eyebrow">제주 생활 정보 채널</span>
+      <h1>제주살이,<br>먼저 살아본 <em>이웃</em>에게</h1>
+      <p>관광 정보 말고, 사는 사람의 정보. 동네 고르기부터 습기·태풍, 아이 학교, 마을 관계까지 솔직하게 정리합니다.</p>
+      <div class="hero-ctas">
+        <a class="btn primary" href="guide.html">제주살이 가이드</a>
+        <a class="btn ghost" href="stay.html">한달살기 준비</a>
+      </div>
+      <div class="trust-mini">
+        <div><b id="tm-guides">–</b>생활 가이드</div>
+        <div><b>3종</b>무료 생활도구</div>
+        <div><b>7년</b>구좌읍 이주 가족 운영</div>
+      </div>
+    </div>
+    <div class="tile hero-photo">
+      <img src="https://images.unsplash.com/photo-1674606059344-68bdc8cd06d0?w=1400&h=900&fit=crop&auto=format&q=75" alt="제주 바다와 초록 언덕" loading="eager">
+      <div class="hp-shade"></div>
+      <div class="hp-top"><span class="hint-chip">지금 어떤 상황이세요?</span></div>
+      <nav class="hp-stages" aria-label="상황별 가이드">
+        <a href="guide.html?stage=%EA%B3%A0%EB%AF%BC"><span class="sn">STEP 1</span><span class="st">제주 이주<br>고민 중</span><span class="ss">동네·일·생활비</span></a>
+        <a href="stay.html"><span class="sn">STEP 2</span><span class="st">한달살기<br>준비해요</span><span class="ss">지원사업·예산</span></a>
+        <a href="guide.html?stage=%EC%A0%95%EC%B0%A9"><span class="sn">STEP 3</span><span class="st">막 이사<br>왔어요</span><span class="ss">정착 체크리스트</span></a>
+        <a href="guide.html?stage=%EB%8F%84%EB%AF%BC"><span class="sn">DAILY</span><span class="st">제주 사는<br>도민이에요</span><span class="ss">생활도구·커뮤니티</span></a>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div id="home-notice"></div>
+
+  <!-- 이번 달 + 생활도구 -->
+  <div class="now-row">
+    <div class="month-card" id="month-card"></div>
+    <div class="tool-stack">
+      <a class="tool-tile sea" id="tl-tide" target="_blank" rel="noopener"><span class="tt-ico">🌊</span><b>물때 시간표</b><span>오늘 만조·간조</span></a>
+      <a class="tool-tile" id="tl-cal" target="_blank" rel="noopener"><span class="tt-ico">🗓️</span><b>열두 달 달력</b><span>축제·행사·제철</span></a>
+      <a class="tool-tile citrus" id="tl-near" target="_blank" rel="noopener"><span class="tt-ico">📍</span><b>내 근처 찾기</b><span>버스·맛집·카페</span></a>
+      <a class="tool-tile light" href="stay.html#calc"><span class="tt-ico">🧮</span><b>예산 계산기</b><span>한달살기 비용</span></a>
+    </div>
+  </div>
+
+  <!-- 가이드 -->
+  <div class="sec-title">
+    <div><div class="st-eb">GUIDE</div><h2>제주살이 가이드</h2>
+      <p>모든 글에 확인 날짜와 출처를 적습니다. 틀린 내용은 제보해 주세요.</p></div>
+    <a class="more" href="guide.html">전체 가이드 →</a>
+  </div>
+  <div class="g-grid" id="home-guides"></div>
+
+  <!-- 한달살기·이주 준비 -->
+  <div class="sec-title">
+    <div><div class="st-eb">BEFORE YOU MOVE</div><h2>이주 전에, 먼저 살아보기</h2>
+      <p>지원 프로그램과 예산, 순서를 한곳에 정리했어요.</p></div>
+    <a class="more" href="stay.html">한달살기·이주 →</a>
+  </div>
+  <div class="prep-band">
+    <div class="prep-card">
+      <h3>장기체류·정착 지원 <span class="pg-count" id="prep-n"></span></h3>
+      <p class="pc-sub">체류 체험·워케이션·귀농·정착 지원을 모았어요. 인기 공모는 경쟁이 치열하니 다음 공고를 놓치지 마세요.</p>
+      <ul class="prep-list" id="prep-list"></ul>
+      <div class="form-actions" style="justify-content:flex-start"><a class="btn soft" href="stay.html#programs-top">전체 프로그램 보기</a><a class="btn ghost" href="stay.html#calc">예산 계산하기</a></div>
+    </div>
+    <div class="prep-card">
+      <h3>이주 준비, 이 순서로</h3>
+      <p class="pc-sub">이주 후회는 대부분 순서를 건너뛸 때 생겨요.</p>
+      <div class="steps-mini">
+        <a href="article.html?id=region"><span class="n">1</span><div><b>동네 고르기</b><span>동·서·남·북 생활 비교</span></div><span class="arr">→</span></a>
+        <a href="article.html?id=trial-stay"><span class="n">2</span><div><b>한 달 먼저 살아보기</b><span>여행이 아닌 시험 생활</span></div><span class="arr">→</span></a>
+        <a href="article.html?id=work-money"><span class="n">3</span><div><b>일과 수입 정하기</b><span>제주에서 먹고사는 현실</span></div><span class="arr">→</span></a>
+        <a href="article.html?id=settle-checklist"><span class="n">4</span><div><b>첫 달 정착 체크리스트</b><span>행정부터 마을 인사까지</span></div><span class="arr">→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 동네 커뮤니티 (기존 기능 그대로) -->
+  <div class="sec-title">
+    <div><div class="st-eb">NEIGHBORS</div><h2>동네 소식</h2>
+      <p>가이드에 없는 건 이웃에게. <span id="region-links"></span></p></div>
+    <a class="more" href="community.html">커뮤니티 →</a>
+  </div>
+  <div class="home-grid">
+   <div>
+    <div class="board-grid">
+    <section class="card">
+      <div class="card-head"><h2>커뮤니티 인기글</h2><a href="community.html" class="more">더보기 +</a></div>
+      <ul>
+        <li><span class="chip region">동쪽</span><a href="view.html?id=s1">세화 오일장 요즘 갈치 시세 어때요?</a><span class="meta cmt-n" data-cid="s1"></span></li>
+        <li><span class="chip region">남쪽</span><a href="view.html?id=s2">서귀포 소아과 대기 짧은 곳 공유합니다</a><span class="meta cmt-n" data-cid="s2"></span></li>
+        <li><span class="chip hot">HOT</span><a href="view.html?id=s3">이주 3년차, 텃세 이렇게 풀었습니다</a><span class="meta cmt-n" data-cid="s3"></span></li>
+        <li><span class="chip region">서쪽</span><a href="view.html?id=s4">애월 쪽 태풍 대비 창문 보강 어떻게 하세요?</a><span class="meta cmt-n" data-cid="s4"></span></li>
+        <li><span class="chip region">북쪽</span><a href="view.html?id=s8">제주시 연동 저녁 배드민턴 같이 치실 분</a><span class="meta cmt-n" data-cid="s8"></span></li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>부동산</h2><a href="realestate.html" class="more">더보기 +</a></div>
+      <ul>
+        <li><span class="chip new">N</span><a href="view.html?id=tr1">[매매] 구좌읍 리모델링 농가주택 250평</a><span class="price">4.9억</span></li>
+        <li><a href="view.html?id=tr2">[연세] 조천읍 신축 투룸, 주차 가능</a><span class="price">800/년</span></li>
+        <li><a href="view.html?id=tr3">[월세] 노형동 오피스텔 풀옵션</a><span class="price">30/65</span></li>
+        <li><span class="chip new">N</span><a href="view.html?id=tr4">[매매] 한림 바다뷰 토지 180평</a><span class="price">2.3억</span></li>
+        <li><a href="view.html?id=tr5">[연세] 표선면 단독주택, 마당 넓음</a><span class="price">650/년</span></li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>구인구직</h2><a href="jobs.html" class="more">더보기 +</a></div>
+      <ul>
+        <li><span class="chip new">N</span><a href="view.html?id=tj1">[함덕] 카페 주말 오전 파트타임 구합니다</a><span class="meta">시급 11,000</span></li>
+        <li><a href="view.html?id=tj2">[성산] 게스트하우스 스태프 (숙식 제공)</a><span class="meta">월급제</span></li>
+        <li><span class="chip new">N</span><a href="view.html?id=tj3">[제주시] 요양보호사 주간 근무 2명</a><span class="meta">협의</span></li>
+        <li><a href="view.html?id=tj5">[대정] 감귤 선과장 단기 인력 모집</a><span class="meta">일급 10만</span></li>
+        <li><a href="view.html?id=tj4">[구직] 웹디자인·영상편집 재택 가능합니다</a><span class="meta">경력 5년</span></li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>중고사고팔기</h2><a href="market.html" class="more">더보기 +</a></div>
+      <ul>
+        <li><span class="chip new">N</span><a href="view.html?id=tm1">혼다 4행정 예초기 (사용 2년)</a><span class="meta cmt-n" data-cid="tm1"></span><span class="price">18만</span></li>
+        <li><a href="view.html?id=tm2">아기 유모차 + 카시트 일괄</a><span class="meta cmt-n" data-cid="tm2"></span><span class="price">12만</span></li>
+        <li><a href="view.html?id=tm3">서핑 롱보드 9ft, 월정리 직거래</a><span class="meta cmt-n" data-cid="tm3"></span><span class="price">35만</span></li>
+        <li><span class="chip new">N</span><a href="view.html?id=tm4">삼성 김치냉장고 300L, 이사로 급처</a><span class="meta cmt-n" data-cid="tm4"></span><span class="price">25만</span></li>
+        <li><a href="view.html?id=tm5">캠핑 텐트·타프 세트 (거의 새것)</a><span class="meta cmt-n" data-cid="tm5"></span><span class="price">20만</span></li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>동호회 · 제주상점</h2><a href="clubs.html" class="more">더보기 +</a></div>
+      <ul>
+        <li><span class="chip region">동호회</span><a href="view.html?id=tc1">제주 동쪽 새벽 서핑 모임 (매주 토)</a><span class="meta">멤버 34</span></li>
+        <li><span class="chip region">동호회</span><a href="view.html?id=tc2">오름 완등 프로젝트 — 이번 주 다랑쉬</a><span class="meta">멤버 58</span></li>
+        <li><span class="chip region">상점</span><a href="view.html?id=ts1">세화 수제 감귤빵 — 회원 10% 할인</a><span class="meta">⭐ 4.9</span></li>
+        <li><span class="chip region">상점</span><a href="view.html?id=ts2">한림 자동차정비 — 이주민 첫 점검 무료</a><span class="meta">⭐ 4.8</span></li>
+        <li><span class="chip region">동호회</span><a href="view.html?id=tc3">40대 독서모임, 제주시 격주 화요일</a><span class="meta">멤버 12</span></li>
+      </ul>
+    </section>
+
+    <section class="card deal">
+      <div class="card-head"><h2>특가공구</h2><span class="timer">이번 주 마감</span></div>
+      <ul>
+        <li><a href="view.html?id=td1">하우스 감귤 5kg 산지직송 공구</a><span class="price">19,900</span></li>
+        <li><a href="view.html?id=td2">제주 흑돼지 구이세트 (2~3인)</a><span class="price">29,000</span></li>
+        <li><span class="chip new">N</span><a href="view.html?id=td3">태풍 대비 창문 안전필름 공동구매</a><span class="price">1.2만/장</span></li>
+        <li><a href="view.html?id=td4">등유 공동주문 — 구좌·조천 권역</a><span class="price">시세 -5%</span></li>
+        <li><a href="view.html?id=td5">제주 생수 2L×24 정기배송 공구</a><span class="price">월 9,900</span></li>
+      </ul>
+    </section>
+    </div>
+   </div>
+
+   <aside class="rank-col">
+     <section class="panel">
+       <div class="panel-head"><h2>실시간 인기글</h2><span class="live">LIVE</span><span class="upd">방금 전</span></div>
+       <div class="panel-body" id="rank-list"></div>
+     </section>
+
+     <section class="panel">
+       <div class="panel-head"><h2>바로가기</h2></div>
+       <div class="quick-grid">
+         <a href="jobs.html"><img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=240&h=170&fit=crop&auto=format&q=70" alt="" loading="lazy"><span class="ql">구인구직</span></a>
+         <a href="realestate.html"><img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=240&h=170&fit=crop&auto=format&q=70" alt="" loading="lazy"><span class="ql">부동산</span></a>
+         <a href="market.html"><img src="https://images.unsplash.com/photo-1601067095185-b8b73ad7db10?w=240&h=170&fit=crop&auto=format&q=70" alt="" loading="lazy"><span class="ql">중고거래</span></a>
+         <a href="deals.html"><img src="https://images.unsplash.com/photo-1743071877775-87d87793c8b4?w=240&h=170&fit=crop&auto=format&q=70" alt="" loading="lazy"><span class="ql">특가공구</span></a>
+         <a href="festivals.html"><img src="https://images.unsplash.com/photo-1560986752-2e31d9507413?w=240&h=170&fit=crop&auto=format&q=70" alt="" loading="lazy"><span class="ql">축제정보</span></a>
+         <a href="clubs.html"><img src="https://images.unsplash.com/photo-1559054109-82d938dac629?w=240&h=170&fit=crop&auto=format&q=70" alt="" loading="lazy"><span class="ql">동호회</span></a>
+       </div>
+     </section>
+   </aside>
+  </div>
+
+  <!-- 참여 -->
+  <div class="sec-title"><div><div class="st-eb">JOIN</div><h2>이웃의 제보로 자라는 정보</h2></div><a class="more" href="contact.html">문의·제보 →</a></div>
+  <div class="svc-band">
+    <div class="sb-intro">
+      <div class="st-eb">제주이음 운영자</div>
+      <h2>먼저 살아본 이웃이<br>함께 고쳐 가는 정보</h2>
+      <p>구좌읍 7년 차 이주 가족이 운영합니다. 바뀐 정보, 내 동네 이야기를 보태 주시면 확인 후 가이드에 반영해요.</p>
+      <a class="btn accent" href="about.html" style="margin-top:22px">운영자 소개</a>
+    </div>
+    <div class="svc-mini-grid">
+      <a class="svc-mini" href="contact.html?type=%EC%A0%95%EB%B3%B4%20%EC%A0%95%EC%A0%95%20%EC%9A%94%EC%B2%AD"><span class="sv-ico">✍️</span><div><b>정보 정정 요청</b><p>바뀐 규칙·날짜·장소를 알려 주세요</p></div></a>
+      <a class="svc-mini" href="contact.html?type=%EA%B0%80%EC%9D%B4%EB%93%9C%20%EC%A3%BC%EC%A0%9C%20%EC%A0%9C%EC%95%88"><span class="sv-ico">💡</span><div><b>가이드 주제 제안</b><p>이주 전에 알고 싶었던 것</p></div></a>
+      <a class="svc-mini" href="write.html"><span class="sv-ico">💬</span><div><b>동네 이야기 쓰기</b><p>지역 게시판에 경험 나누기</p></div></a>
+      <a class="svc-mini" href="contact.html?type=%EC%9E%85%EC%A0%90%C2%B7%EC%A0%9C%ED%9C%B4%20%EB%AC%B8%EC%9D%98"><span class="sv-ico">🏪</span><div><b>입점·제휴 문의</b><p>제주상점·특가공구 준비 중</p></div></a>
+    </div>
+  </div>
+
+  <!-- 신뢰 원칙 -->
+  <div class="sec-title"><div><div class="st-eb">TRUST</div><h2>제주이음이 정보를 다루는 방법</h2></div><a class="more" href="about.html#principles">운영 원칙 →</a></div>
+  <div class="trust-row">
+    <div class="trust"><span class="ti">📅</span><b>확인 날짜 표시</b><p>모든 가이드에 마지막으로 확인한 날짜를 적어요.</p></div>
+    <div class="trust"><span class="ti">🔗</span><b>출처 공개</b><p>공식 기관·기사 내용은 출처를, 경험은 경험이라고 밝혀요.</p></div>
+    <div class="trust"><span class="ti">🏷️</span><b>광고는 광고라고</b><p>입점·제휴·프리미엄 글은 눈에 보이게 표시해요.</p></div>
+    <div class="trust"><span class="ti">✍️</span><b>정정 요청 환영</b><p>바뀐 정보를 알려 주시면 확인 후 바로 고쳐요.</p></div>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/admin-data.js"></script>
+<script src="assets/guide-data.js"></script>
+<script src="assets/programs-data.js"></script>
+<script>
+(function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
+
+(function(){
+  function esc(t){ var d=document.createElement("div"); d.textContent=t||""; return d.innerHTML; }
+  var posts = allPosts();
+
+  // 신뢰 숫자
+  document.getElementById("tm-guides").textContent = GUIDES.length + "편";
+
+  // 생활도구 주소
+  document.getElementById("tl-tide").href = SITE_CFG.tools.tide;
+  document.getElementById("tl-cal").href = SITE_CFG.tools.calendar;
+  document.getElementById("tl-near").href = SITE_CFG.tools.near;
+
+  // 이번 달 제주 생활
+  var m = new Date().getMonth() + 1, note = MONTH_NOTES[m];
+  document.getElementById("month-card").innerHTML =
+    '<div class="mc-top"><span class="mc-m">' + m + '월</span><span class="mc-k">이번 달 제주 생활</span></div>' +
+    '<h3>' + esc(note.t) + '</h3><ul>' + note.items.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join("") + '</ul>' +
+    '<div class="mc-foot"><a class="btn soft" href="article.html?id=seasons">열두 달 생활 달력</a><a class="btn ghost" href="festivals.html">이달의 축제</a></div>';
+
+  // 장기체류·정착 지원 (programs-data.js 의 top 표시 항목)
+  document.getElementById("prep-n").textContent = PROGRAMS.length + "개";
+  document.getElementById("prep-list").innerHTML = PROGRAMS.filter(function(p){ return p.top; }).slice(0, 5).map(function(p){
+    var st = PROGRAM_STATUS[p.status];
+    return '<li><span class="pst ' + st[1] + '">' + st[0] + '</span><span class="pl-t">' + esc(p.name) + '<small>' + esc(p.what.length > 46 ? p.what.slice(0, 46) + "…" : p.what) + '</small></span></li>';
+  }).join("");
+
+  // 가이드 카드 (추천 1 + 6)
+  var feat = GUIDES.filter(function(g){ return g.featured; });
+  var rest = GUIDES.filter(function(g){ return !g.featured; });
+  var pick = [feat[0]].concat(feat.slice(1), rest).slice(0, 7);
+  document.getElementById("home-guides").innerHTML = pick.map(function(g, i){ return guideCardHtml(g, i === 0); }).join("");
+
+  // 지역 링크 + 게시글 수
+  document.getElementById("region-links").innerHTML = [["제주북쪽","북쪽"],["제주동쪽","동쪽"],["제주서쪽","서쪽"],["제주남쪽","남쪽"]].map(function(r){
+    return '<a style="color:var(--sea-700);font-weight:700;margin-left:8px" href="community.html?board=' + encodeURIComponent(r[0]) + '">' + r[1] + '</a>';
+  }).join("");
+
+
+  // 메인 카드의 글 링크 — 관리자가 지운 글은 빼고, 관리자가 고친 제목은 반영
+  var ov = adminOv();
+  document.querySelectorAll('.board-grid a[href^="view.html?id="]').forEach(function(a){
+    var id = a.getAttribute("href").split("id=")[1];
+    var p = findPost(id), li = a.closest("li");
+    if (!p) { if (li) li.parentNode.removeChild(li); return; }
+    if (ov[id] && ov[id].title !== undefined) a.textContent = p.title;
+  });
+  document.querySelectorAll(".cmt-n").forEach(function(el){
+    var n = commentCountOf(el.dataset.cid);
+    el.textContent = n ? "💬 " + n : "";
+  });
+
+  // 실시간 인기글 — 조회수 순
+  var top = posts.filter(function(p){ return TRADE_BOARDS.indexOf(p.board) === -1; })
+    .sort(function(a,b){ return viewsOf(b) - viewsOf(a); }).slice(0,8);
+  document.getElementById("rank-list").innerHTML = top.map(function(p,i){
+    var cm = commentCountOf(p.id);
+    return '<a class="rank-item" href="view.html?id=' + p.id + '"><span class="no">' + (i+1) + '</span><span class="rt">' + esc(p.title) + '</span>' +
+      (cm ? '<span class="rc">' + cm + '</span>' : '') + '</a>';
+  }).join("");
+})();
+</script>
+</body>
+</html>

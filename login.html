@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="">
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>로그인</h1>
+    <p class="sub-t">제주이음에 오신 것을 환영합니다</p>
+
+    <div class="field">
+      <label for="email">이메일</label>
+      <input type="email" id="email" placeholder="example@email.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="pw">비밀번호</label>
+      <input type="password" id="pw" placeholder="비밀번호 입력" autocomplete="current-password">
+    </div>
+
+    <button class="btn primary block" onclick="doLogin()">로그인</button>
+
+    <div class="divider">또는</div>
+    <div class="social">
+      <button class="kakao" onclick="alert('소셜 로그인은 서버 연동 후 제공됩니다.')">카카오로 시작하기</button>
+      <button class="naver" onclick="alert('소셜 로그인은 서버 연동 후 제공됩니다.')">네이버로 시작하기</button>
+    </div>
+
+    <div class="auth-foot">
+      아직 회원이 아니신가요? <a href="signup.html">회원가입</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/common.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+// 이미 로그인 상태면 홈으로
+if (currentUser()) location.href = "index.html";
+
+function doLogin() {
+  var email = document.getElementById("email").value.trim().toLowerCase();
+  var pw = document.getElementById("pw").value;
+  if (!email || !pw) { alert("이메일과 비밀번호를 입력해주세요."); return; }
+
+  var users = JI.get("users", []);
+  var u = users.find(function(x){ return x.email === email; });
+  if (!u) { alert("등록되지 않은 이메일입니다.\n회원가입 후 이용해주세요."); return; }
+  if (u.pw !== pw) { alert("비밀번호가 올바르지 않습니다."); return; }
+
+  JI.set("session", { email: u.email, nick: u.nick, region: u.region });
+  var next = new URLSearchParams(location.search).get("next");
+  location.href = next || "index.html";
+}
+document.getElementById("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>상담·서비스 — 제주이음</title>
+<meta name="description" content="제주 이주 상담과 동네 탐방, 이주 가족 정착 적응 코칭, 제주 소상공인 홍보 패키지, 제주살이 준비 키트.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+<meta name="robots" content="noindex">
+<!-- 보관 중: 서비스 판매 보류(2026-11). 메뉴에서 빠져 있고, 다시 쓸 때 common.js 메뉴에 연결하세요. -->
+</head>
+<body data-active="services">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 상담·서비스</div>
+    <h1>정보로 부족할 땐, 이웃이 직접 도와드려요</h1>
+    <p>제주에 7년째 사는 가족이 운영합니다. 정신건강 분야 작업치료사, 사회복지사, 영상·드론 제작자가 함께해요.</p>
+  </div>
+  <a class="btn ghost" href="about.html">운영자 소개 →</a>
+</div></div>
+
+<main class="wrap">
+  <div class="svc-grid" id="svc-grid"></div>
+
+  <div class="sec-title">
+    <div><div class="st-eb">DIGITAL</div><h2>제주살이 준비 키트</h2>
+      <p>가이드를 바로 쓸 수 있는 파일로. 출시 알림을 신청하면 가장 먼저 알려 드려요.</p></div>
+  </div>
+  <div class="prod-grid" id="prod-grid"></div>
+
+  <div class="sec-title" id="ask">
+    <div><div class="st-eb">CONTACT</div><h2>문의 · 사전 신청</h2>
+      <p>부담 없이 남겨 주세요. 확인 후 남겨 주신 연락처로 답장드립니다.</p></div>
+  </div>
+  <div class="ask-wrap">
+    <div class="ask-info">
+      <h3>이렇게 진행돼요</h3>
+      <p>신청서를 보고 먼저 짧게 연락드려 상황을 듣습니다. 맞지 않는 서비스라면 솔직하게 말씀드리고 더 맞는 곳을 안내해요.</p>
+      <ol>
+        <li>신청서 남기기 — 상황과 궁금한 점을 편하게</li>
+        <li>운영자가 확인 후 연락 (보통 2~3일 안)</li>
+        <li>일정·방식·비용 안내 후 진행 여부 결정</li>
+      </ol>
+      <div class="alt" id="alt-links"></div>
+    </div>
+    <div class="ask-form" id="ask-box">
+      <form id="ask-form">
+        <div class="field"><label>무엇을 도와드릴까요? <span class="req">*</span></label><select id="f-type" required></select></div>
+        <div class="field-row">
+          <div class="field"><label>이름(닉네임) <span class="req">*</span></label><input id="f-name" required maxlength="30"></div>
+          <div class="field"><label>연락처 (이메일 또는 전화) <span class="req">*</span></label><input id="f-contact" required maxlength="60"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>지금 상황</label><select id="f-stage"><option value="">선택 안 함</option><option>이주 고민 중</option><option>한달살기 준비</option><option>이주 1년 이내</option><option>제주 도민</option><option>제주 사업자</option></select></div>
+          <div class="field"><label>희망 시기</label><input id="f-when" placeholder="예: 내년 봄, 12월 중" maxlength="40"></div>
+        </div>
+        <div class="field"><label>내용 <span class="req">*</span></label><textarea id="f-msg" required maxlength="2000" placeholder="가족 구성, 관심 있는 동네, 궁금한 점 등을 자유롭게 적어 주세요."></textarea></div>
+        <label class="check-line"><input type="checkbox" id="f-agree" required><span>답변을 위해 이름·연락처를 수집하고, 상담이 끝나면 지우는 데 동의합니다.</span></label>
+        <div class="form-actions"><button class="btn accent" type="submit">신청서 보내기</button></div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/services-data.js"></script>
+<script>
+function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+function askUrl(t){ return "services.html?type=" + encodeURIComponent(t) + "#ask"; }
+
+document.getElementById("svc-grid").innerHTML = SERVICES.map(function(s){
+  var st = STATUS_LABEL[s.status];
+  return '<div class="svc ' + s.tone + '" id="' + s.id + '"><div class="sv-top"><span class="sv-ico">' + s.ico + '</span><div><div class="sv-who">' + esc(s.who) + '</div>' +
+    '<span class="chip ' + st[1] + '">' + st[0] + '</span></div></div>' +
+    '<h3>' + esc(s.title) + '</h3><p class="sv-desc">' + esc(s.desc) + '</p>' +
+    '<ul>' + s.points.map(function(p){ return '<li>' + esc(p) + '</li>'; }).join("") + '</ul>' +
+    (s.note ? '<div class="sv-note">' + esc(s.note) + '</div>' : '') +
+    '<div class="sv-foot"><div class="sv-price">' + (s.price ? esc(s.price) : "가격 문의") + '<small>' + (s.unit ? esc(s.unit) + " 기준 · " : "") + '상황에 따라 안내</small></div>' +
+    '<a class="btn ' + (s.status === "open" ? "accent" : "primary") + '" href="' + askUrl(s.title) + '">' + st[0] + '</a></div></div>';
+}).join("");
+
+document.getElementById("prod-grid").innerHTML = PRODUCTS.map(function(p){
+  return '<div class="prod"><div class="pr-cover" style="background:linear-gradient(150deg,' + p.c1 + ',' + p.c2 + ')"><small>' + esc(p.kicker) + '</small><b>' + esc(p.title) + '</b></div>' +
+    '<div class="pr-body"><p>' + esc(p.desc) + '</p><a class="btn ghost block" href="' + askUrl("출시 알림: " + p.title) + '">출시 알림 받기</a></div></div>';
+}).join("");
+
+// 다른 연락 방법 (설정한 것만 보임)
+var alt = [];
+if (SITE_CFG.kakaoChannel) alt.push('<a href="' + SITE_CFG.kakaoChannel + '" target="_blank" rel="noopener">💬 카카오톡 채널</a>');
+if (SITE_CFG.contactEmail) alt.push('<a href="mailto:' + SITE_CFG.contactEmail + '">✉️ 메일 보내기</a>');
+alt.push('<a href="' + SITE_CFG.youtube + '" target="_blank" rel="noopener">▶ 유튜브 제주몽</a>');
+document.getElementById("alt-links").innerHTML = alt.join("");
+
+// 신청 종류
+var P = new URLSearchParams(location.search);
+var types = SERVICES.map(function(s){ return s.title; }).concat(PRODUCTS.map(function(p){ return "출시 알림: " + p.title; }),
+  ["가이드 주제 제안", "도구 제안", "정보 정정 요청", "광고·제휴 문의", "기타 문의"]);
+var want = P.get("type");
+if (want && types.indexOf(want) < 0) types.unshift(want);
+var sel = document.getElementById("f-type");
+sel.innerHTML = '<option value="">선택해 주세요</option>' + types.map(function(t){ return '<option' + (t === want ? " selected" : "") + '>' + esc(t) + '</option>'; }).join("");
+if (P.get("ref")) document.getElementById("f-msg").value = "[" + P.get("ref") + "]\n";
+var u = currentUser(); if (u) { document.getElementById("f-name").value = u.nick; document.getElementById("f-contact").value = u.email || ""; }
+
+document.getElementById("ask-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var data = { type: sel.value, name: document.getElementById("f-name").value.trim(), contact: document.getElementById("f-contact").value.trim(),
+    stage: document.getElementById("f-stage").value, when: document.getElementById("f-when").value.trim(), msg: document.getElementById("f-msg").value.trim() };
+  if (!data.type || !data.name || !data.contact || !data.msg) return;
+  var btn = e.target.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "보내는 중…";
+  saveInquiry(data, function(sent){
+    var mail = SITE_CFG.contactEmail ? '<a class="btn soft" href="mailto:' + SITE_CFG.contactEmail + '?subject=' + encodeURIComponent("[제주이음] " + data.type) +
+      '&body=' + encodeURIComponent(data.msg + "\n\n이름: " + data.name + "\n연락처: " + data.contact) + '">메일로도 보내기</a>' : '';
+    document.getElementById("ask-box").innerHTML = '<div class="ask-done"><div class="ad-i">🍊</div><h3>신청서를 받았어요</h3>' +
+      '<p>' + esc(data.name) + '님, 남겨 주신 연락처로 곧 연락드릴게요.<br>보통 2~3일 안에 답장드립니다.</p>' +
+      (sent === true ? '' : '<p style="margin-top:10px;font-size:13px;color:var(--citrus-700)">지금은 온라인 접수를 시험 운영 중이에요. 빠른 답변이 필요하면 ' +
+        (SITE_CFG.contactEmail || SITE_CFG.kakaoChannel ? '아래 메일·카카오톡으로도 보내 주세요.' : '유튜브 제주몽 댓글로도 알려 주세요.') + '</p>') +
+      '<div class="form-actions" style="justify-content:center;margin-top:18px">' + mail + '<a class="btn ghost" href="guide.html">가이드 더 보기</a></div></div>';
+  });
+});
+</script>
+</body>
+</html>

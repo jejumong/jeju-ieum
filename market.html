@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>중고사고팔기 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>.mk-cmt{color:var(--citrus-600,#d5710b);font-weight:800;margin-right:6px}</style>
+</head>
+<body data-active="market">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 중고사고팔기</div>
+    <h1>중고사고팔기</h1>
+    <p>가까운 이웃과 직거래로 안전하게</p>
+  </div>
+  <a class="btn accent" href="write.html?board=중고사고팔기">✏️ 판매글 올리기</a>
+</div></div>
+
+<main class="wrap">
+  <div class="filter-bar">
+    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
+    <button class="chip-btn" data-filter="가전" onclick="applyChip(this)">가전·가구</button>
+    <button class="chip-btn" data-filter="유아" onclick="applyChip(this)">유아·육아</button>
+    <button class="chip-btn" data-filter="레저" onclick="applyChip(this)">레저·스포츠</button>
+    <button class="chip-btn" data-filter="공구" onclick="applyChip(this)">농기구·공구</button>
+    <span class="spacer"></span>
+    <span class="count">판매중 <b id="shown-count">0</b>건</span>
+  </div>
+
+  <div class="grid-cards" id="mk-grid"></div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/photos.js"></script>
+<script src="assets/cards.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+var META = {
+  "tm1":{e:"🪚",c:"공구",warm:1}, "tm2":{e:"🍼",c:"유아"}, "tm3":{e:"🏄",c:"레저"},
+  "tm4":{e:"🧊",c:"가전",warm:1}, "tm5":{e:"⛺",c:"레저"}, "tm6":{e:"🚲",c:"레저",warm:1},
+  "tm7":{e:"📚",c:"유아"}, "tm8":{e:"🛠️",c:"공구",warm:1}
+};
+var CAT_LABEL = { "가전":"가전·가구","유아":"유아·육아","레저":"레저·스포츠","공구":"농기구·공구" };
+var catFilter = "all";
+
+function fmtPrice(p){
+  if(!p) return "가격 협의";
+  var n = parseInt(String(p).replace(/[^0-9]/g,""), 10);
+  return isNaN(n) ? p : n.toLocaleString() + "원";
+}
+function applyChip(el){
+  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on");
+  catFilter = el.dataset.filter;
+  render();
+}
+function render(){
+  var list = userPostsOf("중고사고팔기").concat(TRADE_SEEDS.filter(function(p){ return p.board === "중고사고팔기"; }));
+  list = list.filter(function(p){
+    var cat = META[p.id] ? META[p.id].c : (p.cat || "기타");
+    return catFilter === "all" || cat === catFilter;
+  });
+  list = premiumFirst(list.sort(byRecent));
+  document.getElementById("shown-count").textContent = list.length;
+  document.getElementById("mk-grid").innerHTML = pageSlice(list).map(function(p){
+    var m = META[p.id] || { c: p.cat || "기타" };
+    var isMine = p.id.charAt(0) === "u";
+    return photoCard(p, { pm: isPremium(p), badge: { text: CAT_LABEL[m.c] || "기타" },
+      info: '<b>' + escHtml(fmtPrice(p.price)) + '</b><span>' + escHtml(p.loc || "") + ' · 직거래</span>',
+      mine: isMine ? "내 글" : "" });
+  }).join("") || '<p style="color:var(--muted);padding:24px">조건에 맞는 물건이 없습니다.</p>';
+  renderPager("mk-grid", list.length);
+}
+render();
+</script>
+</body>
+</html>

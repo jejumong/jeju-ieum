@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한달살기·이주 준비 — 제주이음</title>
+<meta name="description" content="제주 한달살기와 이주 준비: 지원 프로그램 모음, 한 달 예산 계산기, 준비 체크리스트, 주차별 시험 생활 계획.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="stay">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 한달살기·이주</div>
+    <h1>먼저 살아보고, 그다음에 결정해요</h1>
+    <p>한달살기를 '여행'이 아닌 '시험 생활'로 — 지원사업, 예산, 준비물, 주차별 계획을 한곳에 모았습니다.</p>
+  </div>
+  <a class="btn accent" href="community.html?board=%EA%B3%A0%EB%AF%BC%EC%83%81%EB%8B%B4%EC%8B%A4">이웃에게 물어보기</a>
+</div></div>
+
+<main class="wrap">
+
+  <div class="sec-title" style="margin-top:8px" id="programs-top">
+    <div><div class="st-eb">SUPPORT</div><h2>장기체류·정착 지원 프로그램 <span class="pg-count" id="pg-count"></span></h2>
+      <p>제주도 공식 누리집과 기사에서 모아 정리했어요. 마지막 확인 <b id="pg-checked"></b> — 신청 전에는 꼭 원문 공고를 확인하세요.</p></div>
+    <button class="more" type="button" id="pg-bell">🔔 새 공고 무료 알림</button>
+  </div>
+  <div class="pg-cats" id="pg-cats"></div>
+  <div class="filter-bar" id="pg-filter"></div>
+  <div class="pg-list" id="programs"></div>
+  <div class="pg-pager" id="pg-pager"></div>
+
+  <div class="sec-title" id="calc">
+    <div><div class="st-eb">BUDGET</div><h2>한 달 예산 계산기</h2>
+      <p>기본값은 예시입니다. 내 상황에 맞게 숫자를 고치면 바로 계산돼요.</p></div>
+  </div>
+  <div class="calc">
+    <div class="calc-form">
+      <div class="field-row">
+        <div class="field"><label>기간</label><select id="c-weeks"><option value="1">1주</option><option value="2">2주</option><option value="4" selected>4주 (한 달)</option><option value="8">8주</option><option value="12">12주</option></select></div>
+        <div class="field"><label>인원</label><select id="c-people"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option></select></div>
+      </div>
+      <div class="field"><label>숙소 비용 (한 달 기준, 원)</label><input id="c-room" type="number" step="10000" value="1500000"><div class="hint">독채·연세 단기·농어촌민박 등 유형마다 차이가 커요. 지원사업 선정 시 지원금을 아래에 넣으세요.</div></div>
+      <div class="field"><label>이동 수단</label>
+        <div class="seg" id="c-car"><button type="button" data-v="rent" class="on">렌터카 장기</button><button type="button" data-v="own">자차 배편 입도</button><button type="button" data-v="bus">대중교통</button></div></div>
+      <div class="field-row">
+        <div class="field"><label id="c-car-l">렌터카 (한 달, 원)</label><input id="c-carcost" type="number" step="10000" value="800000"></div>
+        <div class="field"><label>유류·교통비 (한 달, 원)</label><input id="c-fuel" type="number" step="10000" value="250000"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>식비 (1인 1일, 원)</label><input id="c-food" type="number" step="1000" value="25000"></div>
+        <div class="field"><label>체험·여가 (한 달, 원)</label><input id="c-fun" type="number" step="10000" value="300000"></div>
+      </div>
+      <div class="field"><label>받는 지원금 (원)</label><input id="c-grant" type="number" step="10000" value="0"></div>
+    </div>
+    <div class="calc-out">
+      <div class="co-l">예상 총비용</div>
+      <div class="co-total" id="o-total">–</div>
+      <div class="co-sub" id="o-sub">–</div>
+      <div class="bar" id="o-bar"></div>
+      <ul id="o-list"></ul>
+      <div class="co-note">입력한 값으로만 계산하는 참고용 도구예요. 실제 비용은 시기(성수기·비수기)와 지역에 따라 크게 달라집니다.</div>
+    </div>
+  </div>
+
+  <div class="sec-title">
+    <div><div class="st-eb">CHECKLIST</div><h2>준비 체크리스트</h2>
+      <p>체크한 내용은 이 브라우저에 저장돼요. 다음에 들어와도 이어서 볼 수 있습니다.</p></div>
+    <button class="more" type="button" id="chk-reset">체크 초기화</button>
+  </div>
+  <div class="chk-wrap" id="chk"></div>
+
+  <div class="sec-title">
+    <div><div class="st-eb">PLAN</div><h2>이주를 고민한다면, 한 달은 이렇게</h2>
+      <p>관광지보다 '생활'을 경험하는 데 시간을 쓰세요.</p></div>
+    <a class="more" href="article.html?id=trial-stay">자세히 읽기 →</a>
+  </div>
+  <div class="week-plan">
+    <div class="week"><div class="wn">WEEK 1</div><h4>숙소 주변 생활권</h4><p>마트·약국·병원·버스 정류장을 걸어서, 차로 확인. 단골 가게 하나 만들기.</p></div>
+    <div class="week"><div class="wn">WEEK 2</div><h4>실제 시간대로 이동</h4><p>출퇴근·등하교를 가정하고 아침 8시, 저녁 6시에 직접 움직여 보기.</p></div>
+    <div class="week"><div class="wn">WEEK 3</div><h4>후보 동네 탐방</h4><p>관심 마을 2~3곳의 바람·소음·습기를 보고, 부동산 시세를 물어보기.</p></div>
+    <div class="week"><div class="wn">WEEK 4</div><h4>이웃과 이야기</h4><p>오일장, 도서관 프로그램, 동호회에 참여해 실제 사는 사람의 이야기 듣기.</p></div>
+  </div>
+
+  <div class="sec-title">
+    <div><div class="st-eb">GUIDE</div><h2>한달살기 전에 읽어 두면 좋은 글</h2></div>
+    <a class="more" href="guide.html?stage=%ED%95%9C%EB%8B%AC%EC%82%B4%EA%B8%B0">한달살기 가이드 전체 →</a>
+  </div>
+  <div class="g-grid" id="stay-guides"></div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/guide-data.js"></script>
+<script src="assets/programs-data.js"></script>
+<script src="assets/notify.js"></script>
+<script>
+/* ── 새 공고 무료 알림 (모집 시작이 반영되면 자동 발송) ── */
+(function(){
+  var b = document.getElementById("pg-bell");
+  function label(){ b.textContent = JINotify.isOn("programs") ? "🔔 새 공고 알림 켜짐" : "🔔 새 공고 무료 알림"; }
+  b.onclick = function(){ JINotify.openSheet({ topic: "programs", label: "장기체류·정착 지원 새 공고", status: "",
+    title: "새 지원 공고 알림", desc: "체류·워케이션·귀농·농어촌유학 등 새 공고가 모집을 시작하면 알려 드려요.", onChange: label }); };
+  label();
+})();
+
+/* ── 지원 프로그램 (데이터: assets/programs-data.js) ── */
+function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+var pgCat = "", pgStatus = "", pgPage = 1;
+document.getElementById("pg-count").textContent = PROGRAMS.length + "개";
+document.getElementById("pg-checked").textContent = PROGRAMS_CHECKED.replace(/-/g, ".");
+function inCat(p, c){ return !c || p.cat === c || (p.tags||[]).indexOf(c) > -1; }
+function drawCats(){
+  document.getElementById("pg-cats").innerHTML = PROGRAM_CATS.map(function(c){
+    var n = PROGRAMS.filter(function(p){ return inCat(p, c.id); }).length;
+    return '<button type="button" class="pg-cat' + (pgCat === c.id ? " on" : "") + '" data-c="' + c.id + '"><span class="pc-i">' + c.ico + '</span>' +
+      '<b>' + c.id + ' <small>' + n + '</small></b><span>' + c.desc + '</span></button>';
+  }).join("");
+  var st = [["", "전체 상태"]].concat(Object.keys(PROGRAM_STATUS).map(function(k){ return [k, PROGRAM_STATUS[k][0]]; }));
+  document.getElementById("pg-filter").innerHTML = (pgCat ? '<button class="chip-btn" data-c="">✕ ' + esc(pgCat) + ' 해제</button>' : '') +
+    st.map(function(x){ var dot = x[0] ? '<span class="dot" style="background:' + PROGRAM_STATUS[x[0]][2] + '"></span>' : '';
+      return '<button class="chip-btn' + (pgStatus === x[0] ? " on" : "") + '" data-s="' + x[0] + '">' + dot + x[1] + '</button>'; }).join("") +
+    '<span class="spacer"></span><span class="count"><b id="pg-shown">0</b>개 표시</span>';
+}
+var ORDER = { open: 0, always: 1, ask: 2, wait: 3 };
+function drawPrograms(){
+  var list = PROGRAMS.filter(function(p){ return inCat(p, pgCat) && (!pgStatus || p.status === pgStatus); })
+    .sort(function(a, b){ return (b.top ? 1 : 0) - (a.top ? 1 : 0) || ORDER[a.status] - ORDER[b.status]; });
+  document.getElementById("pg-shown").textContent = list.length;
+  var pages = Math.max(1, Math.ceil(list.length / PROGRAMS_PER_PAGE));
+  if (pgPage > pages) pgPage = pages;
+  var shown = list.slice((pgPage - 1) * PROGRAMS_PER_PAGE, pgPage * PROGRAMS_PER_PAGE);
+  drawPager(pages);
+  document.getElementById("programs").innerHTML = shown.map(function(p){
+    var st = PROGRAM_STATUS[p.status];
+    return '<article class="pg s-' + p.status + '"><div class="pg-head"><span class="chip region">' + esc(p.cat) + '</span>' +
+      (p.tags||[]).map(function(t){ return '<span class="chip stage">' + esc(t) + '</span>'; }).join("") +
+      '<span class="pst ' + st[1] + ' pg-st">' + st[0] + '</span></div>' +
+      '<h3>' + esc(p.name) + '</h3><div class="pg-org">' + esc(p.org) + '</div>' +
+      '<dl><dt>대상</dt><dd>' + esc(p.who) + '</dd><dt>지원</dt><dd><b>' + esc(p.what) + '</b></dd>' +
+      (p.cond && p.cond !== "—" ? '<dt>조건</dt><dd>' + esc(p.cond) + '</dd>' : '') +
+      (p.school ? '<dt>학교</dt><dd>' + esc(p.school) + '</dd>' : '') +
+      '<dt>시기</dt><dd>' + esc(p.when) + '</dd><dt>문의</dt><dd>' + esc(p.contact) + '</dd></dl>' +
+      '<div class="pg-foot"><a class="btn soft" href="' + p.url + '" target="_blank" rel="noopener">공고·안내 보기 ↗</a>' +
+      '<span class="pg-src">출처: ' + (p.src||[]).map(function(s){ return '<a href="' + s[1] + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>'; }).join(", ") + '</span></div></article>';
+  }).join("") || '<div class="card" style="text-align:center;color:var(--ink-3);padding:30px">이 조건의 프로그램이 없어요.</div>';
+}
+function drawPager(pages){
+  var el = document.getElementById("pg-pager");
+  if (pages < 2) { el.innerHTML = ""; return; }
+  var h = '<button type="button" data-p="' + (pgPage - 1) + '"' + (pgPage === 1 ? " disabled" : "") + '>‹ 이전</button>';
+  for (var i = 1; i <= pages; i++) h += '<button type="button" data-p="' + i + '" class="' + (i === pgPage ? "on" : "") + '">' + i + '</button>';
+  h += '<button type="button" data-p="' + (pgPage + 1) + '"' + (pgPage === pages ? " disabled" : "") + '>다음 ›</button>';
+  el.innerHTML = h;
+}
+document.getElementById("pg-pager").addEventListener("click", function(e){
+  var b = e.target.closest("[data-p]"); if (!b || b.disabled) return;
+  pgPage = +b.dataset.p; drawPrograms();
+  document.getElementById("pg-filter").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+document.getElementById("pg-cats").addEventListener("click", function(e){ var b = e.target.closest("[data-c]"); if (!b) return; pgCat = pgCat === b.dataset.c ? "" : b.dataset.c; pgPage = 1; drawCats(); drawPrograms(); });
+document.getElementById("pg-filter").addEventListener("click", function(e){
+  var b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.c !== undefined) pgCat = ""; if (b.dataset.s !== undefined) pgStatus = b.dataset.s; pgPage = 1;
+  drawCats(); drawPrograms();
+});
+drawCats(); drawPrograms();
+
+/* ── 예산 계산기 ── */
+var carMode = "rent";
+var CAR_LABEL = { rent: "렌터카 (한 달, 원)", own: "배편 왕복 + 차량 선적 (총액, 원)", bus: "교통카드 충전 (한 달, 원)" };
+var CAR_DEF = { rent: 800000, own: 600000, bus: 0 };
+document.querySelectorAll("#c-car button").forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll("#c-car button").forEach(function(x){ x.classList.remove("on"); });
+    b.classList.add("on"); carMode = b.dataset.v;
+    document.getElementById("c-car-l").textContent = CAR_LABEL[carMode];
+    document.getElementById("c-carcost").value = CAR_DEF[carMode];
+    if (carMode === "bus") document.getElementById("c-fuel").value = 90000;
+    calc();
+  };
+});
+function v(id){ return Math.max(0, +document.getElementById(id).value || 0); }
+function won(n){ return n >= 10000 ? (Math.round(n/10000)).toLocaleString() + "만 원" : n.toLocaleString() + "원"; }
+function calc(){
+  var w = v("c-weeks"), ppl = v("c-people"), m = w / 4;
+  var room = v("c-room") * m;
+  var car = carMode === "own" ? v("c-carcost") : v("c-carcost") * m;
+  var fuel = v("c-fuel") * m, food = v("c-food") * ppl * w * 7, fun = v("c-fun") * m, grant = v("c-grant");
+  var items = [["숙소", room, "#4aa3f0"], ["이동", car + fuel, "#ff8a1f"], ["식비", food, "#17a06a"], ["체험·여가", fun, "#a6cef4"]];
+  var sum = items.reduce(function(s,i){ return s + i[1]; }, 0), total = Math.max(0, sum - grant);
+  document.getElementById("o-total").textContent = won(Math.round(total));
+  document.getElementById("o-sub").textContent = w + "주 · " + ppl + "명 기준 · 1인당 약 " + won(Math.round(total/ppl)) + (grant ? " · 지원금 " + won(grant) + " 반영" : "");
+  document.getElementById("o-bar").innerHTML = items.map(function(i){ return '<i style="width:' + (sum ? i[1]/sum*100 : 0) + '%;background:' + i[2] + '"></i>'; }).join("");
+  document.getElementById("o-list").innerHTML = items.map(function(i){
+    return '<li><span><i style="display:inline-block;width:9px;height:9px;border-radius:3px;background:' + i[2] + ';margin-right:8px"></i>' + i[0] + '</span><b>' + won(Math.round(i[1])) + '</b></li>';
+  }).join("") + (grant ? '<li><span>지원금</span><b>− ' + won(grant) + '</b></li>' : '');
+}
+document.querySelectorAll(".calc-form input,.calc-form select").forEach(function(el){ el.addEventListener("input", calc); });
+calc();
+
+/* ── 체크리스트 (이 브라우저에 저장) ── */
+var CHK = [
+  ["떠나기 전", ["숙소 계약 조건(관리비·전기·가스 포함 여부) 확인", "이동 수단 결정 — 렌터카 예약 또는 배편 예약", "아이 체험학습 신청서 학교 제출", "택배 받을 주소·도서산간 배송비 확인", "상비약·우비·방풍 겉옷 챙기기"]],
+  ["도착 첫 주", ["가까운 마트·약국·병원·응급실 위치 저장", "클린하우스 위치와 쓰레기 배출 요일 확인", "숙소 습기·환기 상태 점검", "동네 오일장 날짜 알아두기"]],
+  ["생활해 보기", ["출퇴근·등하교 시간대에 실제로 이동해 보기", "후보 동네 2~3곳 걸어서 둘러보기", "동네 모임·도서관 프로그램 한 번 참여", "비 오는 날·바람 센 날 집 안팎 느낌 기록"]],
+  ["돌아가기 전", ["이주한다면 살고 싶은 동네 순위 정하기", "한 달 실제 지출 정리 (계산기와 비교)", "다른 계절에 한 번 더 올지 결정", "커뮤니티에 후기 남기기 — 다음 사람에게 큰 도움"]]
+];
+var done = JI.get("stay_chk", {});
+function drawChk(){
+  document.getElementById("chk").innerHTML = CHK.map(function(g, gi){
+    var n = g[1].filter(function(_, i){ return done[gi + "-" + i]; }).length;
+    return '<div class="chk-group"><h3>' + g[0] + '<small>' + n + ' / ' + g[1].length + '</small></h3>' +
+      g[1].map(function(t, i){ var k = gi + "-" + i;
+        return '<label><input type="checkbox" data-k="' + k + '"' + (done[k] ? " checked" : "") + '><span>' + esc(t) + '</span></label>'; }).join("") + '</div>';
+  }).join("");
+}
+document.getElementById("chk").addEventListener("change", function(e){
+  var k = e.target.dataset.k; if (!k) return;
+  if (e.target.checked) done[k] = 1; else delete done[k];
+  JI.set("stay_chk", done); drawChk();
+});
+document.getElementById("chk-reset").onclick = function(){ done = {}; JI.set("stay_chk", done); drawChk(); };
+drawChk();
+
+document.getElementById("stay-guides").innerHTML = GUIDES.filter(function(g){ return (g.stage||[]).indexOf("한달살기") > -1; }).slice(0,3).map(function(g){ return guideCardHtml(g); }).join("");
+</script>
+</body>
+</html>

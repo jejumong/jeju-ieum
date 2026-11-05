@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원가입 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="">
+
+<div class="auth-wrap" style="max-width:480px">
+  <div class="auth-card">
+    <h1>회원가입</h1>
+    <p class="sub-t">사는 동네를 등록하면 우리 지역 소식이 먼저 보여요</p>
+
+    <div class="field">
+      <label for="email">이메일 <span class="req">*</span></label>
+      <input type="email" id="email" placeholder="example@email.com" autocomplete="email">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="pw">비밀번호 <span class="req">*</span></label>
+        <input type="password" id="pw" placeholder="8자 이상" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="pw2">비밀번호 확인 <span class="req">*</span></label>
+        <input type="password" id="pw2" placeholder="다시 입력" autocomplete="new-password">
+      </div>
+    </div>
+    <div class="field">
+      <label for="nick">닉네임 <span class="req">*</span></label>
+      <input type="text" id="nick" placeholder="커뮤니티에서 사용할 이름 (2~10자)" maxlength="10">
+      <div class="hint">글과 댓글에 이 이름으로 표시돼요.</div>
+    </div>
+    <div class="field">
+      <label for="region">사는 지역 <span class="req">*</span></label>
+      <select id="region">
+        <option value="">지역을 선택하세요</option>
+        <option>제주북쪽</option>
+        <option>제주동쪽</option>
+        <option>제주서쪽</option>
+        <option>제주남쪽</option>
+        <option>도외 (이주 준비 중)</option>
+      </select>
+      <div class="hint">선택한 지역 게시판 소식이 먼저 보여요.</div>
+    </div>
+
+    <div class="check-line"><input type="checkbox" id="t1"><label for="t1">[필수] 이용약관에 동의합니다</label></div>
+    <div class="check-line"><input type="checkbox" id="t2"><label for="t2">[필수] 개인정보 수집·이용에 동의합니다</label></div>
+    <div class="check-line"><input type="checkbox" id="t3"><label for="t3">[선택] 동네 소식·공구 알림 수신에 동의합니다</label></div>
+
+    <button class="btn primary block" style="margin-top:8px" onclick="doSignup()">가입하기</button>
+
+    <div class="auth-foot">이미 계정이 있으신가요? <a href="login.html">로그인</a></div>
+  </div>
+</div>
+
+<script src="assets/common.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+if (currentUser()) location.href = "index.html";
+
+function doSignup() {
+  var email = document.getElementById("email").value.trim().toLowerCase();
+  var pw = document.getElementById("pw").value;
+  var pw2 = document.getElementById("pw2").value;
+  var nick = document.getElementById("nick").value.trim();
+  var region = document.getElementById("region").value;
+
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { alert("올바른 이메일 형식이 아닙니다."); return; }
+  if (pw.length < 8) { alert("비밀번호는 8자 이상이어야 합니다."); return; }
+  if (pw !== pw2) { alert("비밀번호가 서로 일치하지 않습니다."); return; }
+  if (nick.length < 2) { alert("닉네임은 2자 이상 입력해주세요."); return; }
+  if (!region) { alert("사는 지역을 선택해주세요."); return; }
+  if (!document.getElementById("t1").checked || !document.getElementById("t2").checked) {
+    alert("필수 약관에 동의해주세요."); return;
+  }
+
+  var users = JI.get("users", []);
+  if (users.some(function(u){ return u.email === email; })) { alert("이미 가입된 이메일입니다."); return; }
+  if (users.some(function(u){ return u.nick === nick; })) { alert("이미 사용 중인 닉네임입니다."); return; }
+
+  users.push({ email: email, pw: pw, nick: nick, region: region, joined: new Date().toISOString().slice(0,10) });
+  JI.set("users", users);
+  JI.set("session", { email: email, nick: nick, region: region });
+
+  alert(nick + "님, 가입을 환영합니다! 🍊");
+  location.href = "index.html";
+}
+</script>
+</body>
+</html>

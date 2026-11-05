@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>게시글 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
+.pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
+.pv-title{font-size:25px;font-weight:800;letter-spacing:-0.045em;line-height:1.38;color:var(--ink)}
+.pv-meta{display:flex;gap:14px;font-size:13px;color:var(--muted);margin:10px 0 18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.pv-extra{background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r);padding:14px 18px;font-size:14px;margin-bottom:20px;display:flex;gap:28px;flex-wrap:wrap;color:var(--ink-3)}
+.pv-extra b{color:var(--ink);font-weight:800;letter-spacing:-0.02em}
+.pv-content{font-size:16px;line-height:1.85;white-space:pre-wrap;min-height:130px;color:var(--ink-2);letter-spacing:-0.015em}
+.pv-actions{display:flex;gap:8px;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.pv-join{background:linear-gradient(140deg,var(--bg-2),#fff);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-top:24px;box-shadow:var(--sh-1)}
+.pv-join .jt{font-size:14.5px;font-weight:800;margin-bottom:12px}
+.pv-join .progress{height:9px;background:#e6eaed;border-radius:6px;overflow:hidden;margin:0 0 8px}
+.pv-join .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--tangerine),#f6a94f);border-radius:6px}
+.pv-join .jmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:14px}
+.pv-join .jmeta b{color:#c96a08}
+.pv-join .btn{width:100%;padding:13px;font-size:15px}
+.pv-join .jnote{font-size:12.5px;color:var(--muted);margin-top:9px;text-align:center}
+.cmt-wrap{max-width:860px;margin:18px auto 0}
+.cmt-head{font-size:16px;font-weight:800;margin-bottom:12px;letter-spacing:-0.035em;color:var(--ink)}
+.cmt-head b{color:var(--sea)}
+.cmt-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 17px;margin-bottom:9px;box-shadow:var(--sh-1)}
+.cmt-item .who{font-size:13px;font-weight:700}
+.cmt-item .when{font-size:12px;color:var(--muted);margin-left:8px;font-weight:400}
+.cmt-reply{margin-left:34px;display:flex;gap:10px;background:var(--bg-2,#f8fafc);border-left:3px solid var(--sea,#2b8ce6)}
+.cmt-reply .reply-arrow{font-size:18px;color:var(--sea,#2b8ce6);font-weight:800;line-height:1.2;flex-shrink:0}
+.cmt-reply .reply-body{flex:1;min-width:0}
+.cmt-reply .reply-to{font-size:12px;font-weight:700;color:var(--sea-600,#1a71c8);margin-bottom:3px}
+@media (max-width:680px){.cmt-reply{margin-left:16px}}
+.cmt-item p{font-size:14.5px;margin-top:4px}
+.cmt-form{display:flex;gap:8px;margin-top:12px}
+.cmt-form input{flex:1;border:1px solid var(--line);border-radius:8px;padding:11px 12px;outline:none}
+.cmt-form input:focus{border-color:var(--sea)}
+.cmt-login{background:var(--sand);border:1px dashed var(--line);border-radius:10px;padding:16px;text-align:center;font-size:14px;color:var(--muted);margin-top:12px}
+.cmt-login a{color:var(--sea);font-weight:700}
+</style>
+</head>
+<body data-active="">
+
+<main class="wrap">
+  <article class="post-view" id="pv"></article>
+
+  <div class="cmt-wrap">
+    <div class="cmt-head">댓글 <b id="cmt-count">0</b></div>
+    <div id="cmt-list"></div>
+    <div id="cmt-input"></div>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/seed-trade.js"></script>
+<script src="assets/seed-extra.js"></script>
+<script src="assets/seed-new.js"></script>
+<script src="assets/seed-comments.js"></script>
+<script src="assets/admin-data.js"></script>
+<script>
+var id = new URLSearchParams(location.search).get("id");
+var post = findPost(id);
+function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+
+var TRADE_PAGE = {
+  "구인구직":"jobs.html", "부동산":"realestate.html", "중고사고팔기":"market.html",
+  "제주상점":"shops.html", "동호회":"clubs.html", "특가공구":"deals.html", "축제정보":"festivals.html"
+};
+
+/* 동호회 가입 / 공구 참여 영역 */
+function joinBlock(p){
+  if (p.board === "동호회") {
+    var jid = "club-" + p.id;
+    return '<div class="pv-join">' +
+      '<div class="jt">🤝 이 모임에 함께하기</div>' +
+      (p.meta ? '<div class="jmeta"><span>' + esc(p.meta) + '</span><b>' + esc(p.loc || "전역") + '</b></div>' : '') +
+      '<button type="button" class="btn primary" data-join="' + jid + '" data-kind="club" ' +
+      'data-on="가입 신청 완료 ✓ (다시 누르면 취소)" data-off="가입 신청">가입 신청</button>' +
+      '<div class="jnote">신청하면 모임장이 확인 후 단체 안내를 보내드립니다.</div>' +
+      '</div>';
+  }
+  if (p.board === "특가공구") {
+    var did = "deal-" + p.id;
+    var pct = (p.cur && p.goal) ? Math.min(100, Math.round(p.cur / p.goal * 100)) : 0;
+    var bar = (p.cur && p.goal)
+      ? '<div class="progress"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="jmeta"><span>' + p.cur + ' / ' + p.goal + ' 참여 (' + pct + '%)</span><b>' + esc(p.dday || "진행중") + '</b></div>'
+      : '<div class="jmeta"><span>모집 진행중</span><b>' + esc(p.dday || "") + '</b></div>';
+    return '<div class="pv-join">' +
+      '<div class="jt">⚡ 이 공구에 참여하기</div>' + bar +
+      '<button type="button" class="btn accent" data-join="' + did + '" data-kind="deal" ' +
+      'data-on="참여 완료 ✓ (다시 누르면 취소)" data-off="참여하기">참여하기</button>' +
+      '<div class="jnote">목표 인원이 모이면 확정되고, 결제 안내를 따로 보내드립니다.</div>' +
+      '</div>';
+  }
+  return "";
+}
+
+if (!post) {
+  document.getElementById("pv").innerHTML =
+    '<p style="padding:30px;text-align:center;color:var(--muted)">게시글을 찾을 수 없습니다.</p>' +
+    '<div class="pv-actions"><a class="btn ghost" href="community.html">목록으로</a></div>';
+} else {
+  addViews(id);
+  document.title = post.title + " — 제주이음";
+
+  var extra = "";
+  if (post.price || post.loc || post.period) {
+    extra = '<div class="pv-extra">' +
+      (post.period ? '<span>기간 <b>' + esc(post.period) + '</b></span>' : '') +
+      (post.price ? '<span>가격 <b>' + esc(post.price) + '원</b></span>' : '') +
+      (post.loc ? '<span>' + (post.period ? '장소' : '지역') + ' <b>' + esc(post.loc) + '</b></span>' : '') +
+      '</div>';
+  }
+
+  var backHref = TRADE_PAGE[post.board] ||
+    (post.board && post.board !== "공지" ? "community.html?board=" + encodeURIComponent(post.board) : "community.html");
+
+  document.getElementById("pv").innerHTML =
+    '<div class="pv-board">' + esc(post.board) + (post.head && post.head !== post.board ? ' · ' + esc(post.head) : '') + '</div>' +
+    '<h1 class="pv-title">' + esc(post.title) + '</h1>' +
+    '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag">내 글</span>' : '') + '</span>' +
+    '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
+    extra +
+    '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
+    joinBlock(post) +
+    '<div class="pv-actions"><a class="btn ghost" href="' + backHref + '">목록으로</a>' +
+    (isMyPost(post)
+      ? '<div class="own-actions"><button class="mini-btn" onclick="editPost()">수정</button>' +
+        '<button class="mini-btn danger-btn" onclick="removePost()">삭제</button></div>'
+      : '<a class="btn primary" href="write.html' + (post.board ? "?board=" + encodeURIComponent(post.board) : "") + '" style="margin-left:auto">✏️ 글쓰기</a>') +
+    '</div>';
+
+  paintAllJoinBtns();
+  renderComments();
+}
+
+function renderComments() {
+  var all = JI.get("comments", {});
+  var list = all[id] || [];
+  var seeds = seedCommentsOf(id);
+  document.getElementById("cmt-count").textContent = seeds.length + list.length;
+  var seedHtml = seeds.map(function(c){
+    var isAuthor = post && c.author === post.author;
+    var isReply = c.reply !== undefined && seeds[c.reply];
+    var who = '<span class="who">' + esc(c.author) + (isAuthor ? ' <span class="own-tag">작성자</span>' : '') + '</span>';
+    if (isReply) {
+      return '<div class="cmt-item cmt-reply"><span class="reply-arrow" aria-hidden="true">↳</span><div class="reply-body">' +
+        '<div class="reply-to">@' + esc(seeds[c.reply].author) + ' 님에게 답글</div>' +
+        '<div style="display:flex;align-items:center">' + who + '<span class="when">' + esc(c.date) + '</span></div>' +
+        '<p>' + esc(c.text) + '</p></div></div>';
+    }
+    return '<div class="cmt-item"><div style="display:flex;align-items:center">' + who +
+      '<span class="when">' + esc(c.date) + '</span></div><p>' + esc(c.text) + '</p></div>';
+  }).join("");
+  document.getElementById("cmt-list").innerHTML = seedHtml + list.map(function(c, i){
+    var own = isMyComment(c);
+    return '<div class="cmt-item" id="cmt-' + i + '">' +
+      '<div style="display:flex;align-items:center">' +
+        '<span class="who">' + esc(c.author) + '</span>' +
+        '<span class="when">' + esc(c.date) + (c.edited ? ' (수정됨)' : '') + '</span>' +
+        (own ? '<div class="own-actions">' +
+          '<button class="mini-btn" onclick="startEditCmt(' + i + ')">수정</button>' +
+          '<button class="mini-btn danger-btn" onclick="removeCmt(' + i + ')">삭제</button></div>' : '') +
+      '</div>' +
+      '<p id="cmt-text-' + i + '">' + esc(c.text) + '</p></div>';
+  }).join("") || (seedHtml ? "" : '<div class="cmt-item" style="color:var(--muted)">아직 댓글이 없어요. 첫 댓글을 남겨보세요.</div>');
+
+  var u = currentUser();
+  document.getElementById("cmt-input").innerHTML = u
+    ? '<div class="cmt-form"><input type="text" id="cmt-text" placeholder="' + esc(u.nick) + '님, 따뜻한 댓글을 남겨주세요" maxlength="300"><button class="btn primary" onclick="addComment()">등록</button></div>'
+    : '<div class="cmt-login">댓글을 쓰려면 <a href="login.html?next=' + encodeURIComponent("view.html?id=" + id) + '">로그인</a>이 필요해요.</div>';
+
+  var inp = document.getElementById("cmt-text");
+  if (inp) inp.addEventListener("keydown", function(e){ if(e.key === "Enter") addComment(); });
+}
+
+function editPost(){ location.href = "write.html?edit=" + post.id; }
+function removePost(){
+  if (!confirm("이 글을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.")) return;
+  if (deleteMyPost(post.id)) {
+    alert("글이 삭제되었습니다.");
+    location.href = TRADE_PAGE[post.board] ||
+      (post.board ? "community.html?board=" + encodeURIComponent(post.board) : "community.html");
+  }
+}
+
+function startEditCmt(i){
+  var all = JI.get("comments", {});
+  var c = (all[id] || [])[i];
+  if (!c) return;
+  var box = document.getElementById("cmt-text-" + i);
+  box.outerHTML = '<div class="edit-box" id="cmt-text-' + i + '">' +
+    '<input type="text" id="cmt-edit-' + i + '" maxlength="300">' +
+    '<button class="btn primary" onclick="saveCmt(' + i + ')">저장</button>' +
+    '<button class="btn ghost" onclick="renderComments()">취소</button></div>';
+  var inp = document.getElementById("cmt-edit-" + i);
+  inp.value = c.text;
+  inp.focus();
+  inp.addEventListener("keydown", function(e){ if (e.key === "Enter") saveCmt(i); });
+}
+function saveCmt(i){
+  var t = document.getElementById("cmt-edit-" + i).value.trim();
+  if (!t) { alert("댓글 내용을 입력해주세요."); return; }
+  if (updateMyComment(id, i, t)) renderComments();
+}
+function removeCmt(i){
+  if (!confirm("이 댓글을 삭제할까요?")) return;
+  if (deleteMyComment(id, i)) renderComments();
+}
+
+function addComment() {
+  var u = currentUser();
+  if (!u) return;
+  var inp = document.getElementById("cmt-text");
+  var text = inp.value.trim();
+  if (!text) { alert("댓글 내용을 입력해주세요."); return; }
+  var all = JI.get("comments", {});
+  if (!all[id]) all[id] = [];
+  all[id].push({
+    author: u.nick, text: text,
+    date: new Date().toISOString().slice(0,10),
+    postTitle: post ? post.title : "",
+    postId: id
+  });
+  JI.set("comments", all);
+  renderComments();
+}
+</script>
+</body>
+</html>

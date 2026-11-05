@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>문의·제보 — 제주이음</title>
+<meta name="description" content="제주이음 정보 정정 요청, 가이드 주제 제안, 동네 소식 제보, 입점·제휴 문의.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-active="contact">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › 문의·제보</div>
+    <h1>제주이음은 이웃의 제보로 자랍니다</h1>
+    <p>틀린 정보, 궁금한 주제, 우리 동네 소식 — 무엇이든 알려 주세요. 확인 후 사이트에 반영합니다.</p>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <div class="trust-row" id="kinds"></div>
+
+  <div class="sec-title" id="ask">
+    <div><div class="st-eb">CONTACT</div><h2>보내기</h2>
+      <p>답변이 필요한 내용이면 연락처를 남겨 주세요.</p></div>
+  </div>
+  <div class="ask-wrap">
+    <div class="ask-info">
+      <h3>보내 주신 내용은 이렇게 쓰여요</h3>
+      <p>제보는 운영자가 직접 확인합니다. 확인되지 않은 내용은 바로 올리지 않아요.</p>
+      <ol>
+        <li>운영자가 내용 확인 (공식 발표·현장 확인)</li>
+        <li>가이드·도구에 반영하고 '확인 날짜' 갱신</li>
+        <li>연락처를 남기셨다면 반영 결과를 알려 드려요</li>
+      </ol>
+      <div class="alt" id="alt-links"></div>
+    </div>
+    <div class="ask-form" id="ask-box">
+      <form id="ask-form">
+        <div class="field"><label>어떤 내용인가요? <span class="req">*</span></label><select id="f-type" required></select></div>
+        <div class="field-row">
+          <div class="field"><label>이름(닉네임) <span class="req">*</span></label><input id="f-name" required maxlength="30"></div>
+          <div class="field"><label>연락처 (선택)</label><input id="f-contact" maxlength="60" placeholder="답변이 필요하면 이메일·전화"></div>
+        </div>
+        <div class="field"><label>내용 <span class="req">*</span></label><textarea id="f-msg" required maxlength="2000" placeholder="어떤 글의 어느 부분인지, 어디서 확인한 내용인지 함께 적어 주시면 빨리 반영할 수 있어요."></textarea></div>
+        <label class="check-line"><input type="checkbox" id="f-agree" required><span>답변과 확인을 위해 입력한 정보를 수집하고, 처리가 끝나면 지우는 데 동의합니다.</span></label>
+        <div class="form-actions"><button class="btn accent" type="submit">보내기</button></div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script src="assets/common.js"></script>
+<script src="assets/services-data.js"></script>
+<script>
+function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+var KINDS = [
+  ["✍️", "정보 정정 요청", "바뀐 규칙, 틀린 날짜, 문 닫은 장소를 알려 주세요."],
+  ["💡", "가이드 주제 제안", "이주 전에 알고 싶었던 것, 궁금한 주제를 남겨 주세요."],
+  ["📣", "동네 소식 제보", "우리 마을 행사, 도로 통제, 새로 생긴 시설 소식."],
+  ["🏪", "입점·제휴 문의", "제주상점 입점, 특가공구 진행을 준비하고 있어요."]
+];
+document.getElementById("kinds").innerHTML = KINDS.map(function(k){
+  return '<a class="trust" href="contact.html?type=' + encodeURIComponent(k[1]) + '#ask"><span class="ti">' + k[0] + '</span><b>' + k[1] + '</b><p>' + k[2] + '</p></a>';
+}).join("");
+
+var alt = [];
+if (SITE_CFG.kakaoChannel) alt.push('<a href="' + SITE_CFG.kakaoChannel + '" target="_blank" rel="noopener">💬 카카오톡 채널</a>');
+if (SITE_CFG.contactEmail) alt.push('<a href="mailto:' + SITE_CFG.contactEmail + '">✉️ 메일 보내기</a>');
+alt.push('<a href="community.html">💬 커뮤니티에 묻기</a>');
+document.getElementById("alt-links").innerHTML = alt.join("");
+
+var P = new URLSearchParams(location.search);
+var types = KINDS.map(function(k){ return k[1]; }).concat(["가이드 내용 제보", "도구 제안", "기타 문의"]);
+var want = P.get("type");
+if (want && types.indexOf(want) < 0) types.unshift(want);
+var sel = document.getElementById("f-type");
+sel.innerHTML = '<option value="">선택해 주세요</option>' + types.map(function(t){ return '<option' + (t === want ? " selected" : "") + '>' + esc(t) + '</option>'; }).join("");
+if (P.get("ref")) document.getElementById("f-msg").value = "[" + P.get("ref") + "]\n";
+var u = currentUser(); if (u) { document.getElementById("f-name").value = u.nick; document.getElementById("f-contact").value = u.email || ""; }
+if (want) setTimeout(function(){ document.getElementById("ask").scrollIntoView(); }, 50);
+
+/* 빈자리·공고 알림 요청: 자동 발송이 아니라 운영자가 확인 후 직접 연락 */
+function alertMode(){
+  var t = sel.value || "", on = /빈자리|알림/.test(t), c = document.getElementById("f-contact");
+  c.required = on;
+  c.placeholder = on ? "알림을 받을 이메일 또는 전화번호 (필수)" : "답변이 필요하면 이메일·전화";
+  var n = document.getElementById("alert-note");
+  if (!n) { document.getElementById("ask-form").insertAdjacentHTML("afterbegin", '<div class="sample-note" id="alert-note"><span class="sn-b">안내</span><span>자동 발송이 아니에요. 운영자가 마을·기관에 확인한 뒤 남겨 주신 연락처로 <b>직접</b> 알려 드려요.</span></div>'); n = document.getElementById("alert-note"); }
+  n.style.display = on ? "flex" : "none";
+}
+sel.addEventListener("change", alertMode); alertMode();
+
+document.getElementById("ask-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var data = { type: sel.value, name: document.getElementById("f-name").value.trim(), contact: document.getElementById("f-contact").value.trim(),
+    msg: document.getElementById("f-msg").value.trim() };
+  if (!data.type || !data.name || !data.msg) return;
+  var btn = e.target.querySelector("button[type=submit]"); btn.disabled = true; btn.textContent = "보내는 중…";
+  saveInquiry(data, function(sent){
+    document.getElementById("ask-box").innerHTML = '<div class="ask-done"><div class="ad-i">🍊</div><h3>고맙습니다</h3>' +
+      '<p>' + esc(data.name) + '님이 보내 주신 내용을 확인한 뒤 반영할게요.</p>' +
+      (sent === true ? '' : '<p style="margin-top:10px;font-size:13px;color:var(--citrus-700)">지금은 온라인 접수를 시험 운영 중이에요. 급한 내용은 커뮤니티 게시판에도 남겨 주세요.</p>') +
+      '<div class="form-actions" style="justify-content:center;margin-top:18px"><a class="btn ghost" href="guide.html">가이드 보기</a></div></div>';
+  });
+});
+</script>
+</body>
+</html>
