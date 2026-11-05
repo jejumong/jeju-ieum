@@ -125,12 +125,12 @@ for (const h of SCHOOL_HOUSES) {
   const title = `${h.name} — ${h.school}${/초$/.test(h.school) ? "등학교" : ""} 학교 연계 주택 (${h.city} ${h.village})`;
   const desc = cut(`${h.city} ${h.village} ${h.school} 학교 연계 ${h.kind}. ${h.rule || ""} ${h.cost ? "비용: " + h.cost : ""}`, 150);
   wr(file, page({
-    file, title: title + " — 제주이음", desc, active: "realestate",
+    file, title: title + " — 제주이음", desc, active: "school",
     jsonld: { "@context": "https://schema.org", "@type": "Residence", name: h.name, description: desc,
       address: { "@type": "PostalAddress", streetAddress: addr, addressRegion: "제주특별자치도", addressCountry: "KR" },
       ...(h.lat ? { geo: { "@type": "GeoCoordinates", latitude: h.lat, longitude: h.lng } } : {}) },
     body: `<main class="wrap" style="padding-top:28px;max-width:880px">
-  <div class="crumb"><a href="index.html">홈</a> › <a href="realestate.html?tab=school">부동산</a> › <a href="house/index.html">학교 연계·체류형 집</a></div>
+  <div class="crumb"><a href="index.html">홈</a> › <a href="school.html">학교 연계 집</a> › <a href="house/index.html">전체 목록</a></div>
   <article class="hp">
     <div class="hr-top"><span class="hst ${st[1]}">${esc(st[0])}</span><span class="hr-sc">🏫 ${esc(h.school)}</span><span class="hr-city">${esc(h.city)} · ${esc(h.village)}</span></div>
     <h1>${esc(h.name)}</h1>
@@ -140,7 +140,7 @@ for (const h of SCHOOL_HOUSES) {
     </dl>
     ${h.note ? `<div class="callout"><span class="ci">📝</span><div><b>알아 둘 점</b><p>${esc(h.note)}</p></div></div>` : ""}
     <div class="hp-btns">
-      <a class="btn primary" href="realestate.html?house=${h.id}">🔔 빈자리 알림 · 지도 보기</a>
+      <a class="btn primary" href="school.html?house=${h.id}">🔔 빈자리 알림 · 지도 보기</a>
       <a class="btn ghost" href="${mapQ}" target="_blank" rel="noopener">🗺️ 카카오맵</a>
       ${h.tel ? `<a class="btn ghost" href="tel:${h.tel.replace(/[^0-9]/g, "")}">📞 전화 문의</a>` : ""}
     </div>
@@ -157,13 +157,13 @@ wr("house/index.html", page({
   file: "house/index.html", ogType: "website",
   title: "제주 학교 연계 주택·마을 공동주택 전체 목록 — 제주이음",
   desc: `제주시·서귀포시 작은학교 살리기 마을 공동주택과 학교 연계 주택 ${SCHOOL_HOUSES.length}곳의 주소, 입주 조건, 비용, 문의처를 정리했습니다.`,
-  active: "realestate",
+  active: "school",
   body: `<main class="wrap" style="padding-top:28px;max-width:880px">
-  <div class="crumb"><a href="index.html">홈</a> › <a href="realestate.html?tab=school">부동산</a> › 학교 연계·체류형 집</div>
+  <div class="crumb"><a href="index.html">홈</a> › <a href="school.html">학교 연계 집</a> › 전체 목록</div>
   <h1 class="hp-h1">제주 학교 연계 주택 전체 목록</h1>
   <p class="hp-lead">작은학교를 살리려고 마을이 지은 공동주택과 학교 연계 주택 ${SCHOOL_HOUSES.length}곳이에요. 마지막 확인: ${SCHOOL_HOUSES_CHECKED}</p>
   ${["제주시", "서귀포시"].map((c) => `<section class="hp-more"><h2>${c}</h2><ul>${SCHOOL_HOUSES.filter((x) => x.city === c).map((x) => `<li><a href="house/${x.id}.html"><b>${esc(x.name)}</b><span>${esc(x.school)} · ${esc(x.village)}${x.units ? " · " + esc(x.units) : ""}</span></a></li>`).join("")}</ul></section>`).join("")}
-  <p style="margin-top:20px"><a class="btn primary" href="realestate.html?tab=school">필터·지도·빈자리 알림으로 보기 →</a></p>
+  <p style="margin-top:20px"><a class="btn primary" href="school.html">필터·지도·빈자리 알림으로 보기 →</a></p>
 </main>`
 }));
 
@@ -216,7 +216,7 @@ wr("program/index.html", page({
 const today = new Date().toISOString().slice(0, 10);
 const urls = [
   ["", today, "1.0"], ["guide.html", today, "0.9"], ["stay.html", PROGRAMS_CHECKED, "0.9"], ["realestate.html", today, "0.8"],
-  ["realestate.html?tab=school", SCHOOL_HOUSES_CHECKED, "0.8"], ["tools.html", today, "0.6"], ["trade.html", today, "0.6"],
+  ["school.html", SCHOOL_HOUSES_CHECKED, "0.9"], ["tools.html", today, "0.6"], ["trade.html", today, "0.6"],
   ["community.html", today, "0.6"], ["about.html", today, "0.4"], ["contact.html", today, "0.3"],
   ["house/index.html", SCHOOL_HOUSES_CHECKED, "0.8"], ["program/index.html", PROGRAMS_CHECKED, "0.8"],
   ...GUIDES.map((g) => [`guide/${g.id}.html`, g.updated, "0.8"]),

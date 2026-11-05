@@ -256,8 +256,9 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
             ["집·생활", "guide.html?cat=집·생활"], ["아이랑 제주", "guide.html?cat=아이랑 제주"],
             ["일·돈", "guide.html?cat=일·돈"], ["마을·관계", "guide.html?cat=마을·관계"]]) },
     { id: "stay", label: "한달살기·이주", href: "stay.html" },
+    { id: "school", label: "학교 연계 집", href: "school.html" },
     { id: "realestate", label: "부동산", href: "realestate.html",
-      dd: ddGroup("부동산", [["일반 매물", "realestate.html"], ["학교 연계·체류형 집", "realestate.html?tab=school"], ["매물 등록", "write.html?board=부동산"]], "auto") },
+      dd: ddGroup("부동산", [["매물 보기", "realestate.html"], ["매물 등록", "write.html?board=부동산"]], "auto") },
     { id: "trade", label: "생활·거래", href: "trade.html", match: ["jobs", "market", "shops", "clubs", "deals", "festivals"],
       dd: ddGroup("이웃과 나누기", [["전체 한눈에", "trade.html"], ["구인구직", "jobs.html"], ["중고사고팔기", "market.html"],
             ["제주상점", "shops.html"], ["동호회", "clubs.html"], ["특가공구", "deals.html"], ["축제정보", "festivals.html"]]) },
@@ -306,13 +307,13 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
         '<div class="footer-col"><h4>제주살이 정보</h4>' +
           '<a href="guide.html">제주살이 가이드</a>' +
           '<a href="stay.html">한달살기·이주 준비</a>' +
+          '<a href="school.html">학교 연계 집</a>' +
           '<a href="tools.html">생활도구</a>' +
           '<a href="festivals.html">축제정보</a>' +
           '<a href="community.html">동네 커뮤니티</a>' +
         '</div>' +
         '<div class="footer-col"><h4>부동산·거래</h4>' +
           '<a href="realestate.html">부동산 매물</a>' +
-          '<a href="realestate.html?tab=school">학교 연계 집</a>' +
           '<a href="jobs.html">구인구직</a>' +
           '<a href="market.html">중고사고팔기</a>' +
           '<a href="shops.html">제주상점</a>' +

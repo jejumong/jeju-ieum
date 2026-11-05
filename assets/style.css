@@ -1376,3 +1376,4 @@ a.ap-next:hover{background:var(--sea-600)}
 .hp-more .more{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;color:var(--sea-700);text-decoration:none}
 .pg h3 a{color:inherit;text-decoration:none}.pg h3 a:hover{color:var(--sea-700);text-decoration:underline}
 @media (max-width:640px){.hp{padding:18px}.hp-more ul{grid-template-columns:minmax(0,1fr)}.hp-dl>div{grid-template-columns:1fr;gap:0}}
+.sh{margin-top:0}

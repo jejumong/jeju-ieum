@@ -56,7 +56,7 @@ const jobs = [];
       jobs.push(send(`house_${h.id}`,
         `🏫 ${h.name} 빈자리 소식`,
         `${h.school} ${h.village} — 입주자 모집·빈자리가 확인됐어요. ${h.telLabel || "리사무소"}${h.tel ? " " + h.tel : ""}에 바로 문의해 보세요.`,
-        SITE ? `${SITE}realestate.html?house=${h.id}#school-stay` : ""));
+        SITE ? `${SITE}school.html?house=${h.id}` : ""));
     }
   }
 }
