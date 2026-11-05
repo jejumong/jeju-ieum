@@ -60,8 +60,6 @@
           <div class="field"><label for="f-tel">연락처 <span class="req">*</span></label><input id="f-tel" maxlength="20" inputmode="tel" placeholder="010-0000-0000 (관리자만 봐요)"></div>
           <div class="field"><label for="f-addr">가게·농장 위치 <span class="req">*</span></label><input id="f-addr" maxlength="80" placeholder="예: 제주시 구좌읍 세화리"></div>
         </div>
-        <div class="field"><label for="f-intro">한 줄 소개 <span class="req">*</span></label><input id="f-intro" maxlength="80" placeholder="예: 3대째 농약 줄여 키우는 구좌 당근·감귤 농장"></div>
-        <div class="field"><label for="f-link">운영 채널 <small>(선택)</small></label><input id="f-link" maxlength="200" placeholder="인스타그램·스마트스토어·홈페이지·네이버 지도 주소"></div>
       </div>
 
       <div class="sr-sec" id="sec-deal">
@@ -162,12 +160,12 @@ document.getElementById("sec-shop").style.display = board === "특가공구" ? "
 
 function v(id){ var e = document.getElementById(id); return e ? e.value.trim() : ""; }
 function submitRequest(){
-  var need = [["f-name","상호명"],["f-owner","대표자 이름"],["f-cat","업종"],["f-tel","연락처"],["f-addr","가게·농장 위치"],["f-intro","한 줄 소개"]]
+  var need = [["f-name","상호명"],["f-owner","대표자 이름"],["f-cat","업종"],["f-tel","연락처"],["f-addr","가게·농장 위치"]]
     .concat(board === "특가공구" ? [["d-item","공구할 상품"]] : [["s-menu","대표 메뉴·서비스"]]);
   for (var i = 0; i < need.length; i++) if (!v(need[i][0])) { alert(need[i][1] + "을(를) 입력해 주세요."); document.getElementById(need[i][0]).focus(); return; }
   if (!/^[0-9\-\s]{9,}$/.test(v("f-tel"))) { alert("연락처를 숫자로 정확히 적어 주세요."); document.getElementById("f-tel").focus(); return; }
   if (!document.getElementById("agree").checked) { alert("정보 이용에 동의해 주세요."); return; }
-  var d = { 상호명: v("f-name"), 대표자: v("f-owner"), 업종: v("f-cat"), 사업자등록번호: v("f-biz"), 연락처: v("f-tel"), 위치: v("f-addr"), 소개: v("f-intro"), 운영채널: v("f-link") };
+  var d = { 상호명: v("f-name"), 대표자: v("f-owner"), 업종: v("f-cat"), 사업자등록번호: v("f-biz"), 연락처: v("f-tel"), 위치: v("f-addr") };
   if (board === "특가공구") { d.공구상품 = v("d-item"); d.가격 = v("d-price"); d.인원 = v("d-goal"); d.시기 = v("d-when"); d.받는방법 = v("d-ship"); }
   else { d.영업시간 = v("s-hours"); d.주차 = v("s-park"); d.대표메뉴 = v("s-menu"); d.이웃혜택 = v("s-benefit"); }
   var text = Object.keys(d).filter(function(k){ return d[k]; }).map(function(k){ return k + ": " + d[k]; }).join("\n") + (v("msg") ? "\n\n" + v("msg") : "");
