@@ -168,6 +168,12 @@ var JIDB = (function () {
     return client.from("club_joins").select("id,applicant_nick,status,decided_at,created_at").eq("club_id", clubId).order("created_at").then(err);
   }
 
+  /* ── 상점·공구 승인 요청 (관리자만 봄) ── */
+  function sendSellerRequest(board, details, message) {
+    need(); var u = me(); if (!u) return Promise.reject(new Error("로그인이 필요해요"));
+    return client.from("seller_requests").insert({ board: board, applicant: u.id, applicant_nick: u.nick, details: details, message: message || "" }).then(err);
+  }
+
   /* ── 알림함 ── */
   function notifications() {
     var u = me(); if (!client || !u) return Promise.resolve([]);
@@ -207,6 +213,7 @@ var JIDB = (function () {
     myJoin: myJoin, requestJoin: requestJoin, cancelJoin: cancelJoin, receivedJoins: receivedJoins, sentJoins: sentJoins,
     decideJoin: decideJoin, joinCount: joinCount,
     clubNotices: clubNotices, addNotice: addNotice, deleteNotice: deleteNotice, clubMembers: clubMembers,
+    sendSellerRequest: sendSellerRequest,
     notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead
   };
 })();

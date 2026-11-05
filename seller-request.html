@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106e">
+<link rel="stylesheet" href="assets/style.css?v=20261106f">
 <style>
 .req-status{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r);margin-bottom:20px;font-size:14px}
 .req-status.pending{background:var(--sea-50);border:1px solid var(--sea-100);color:var(--sea-700)}
@@ -19,6 +19,12 @@
 .req-status .ico{font-size:20px}
 .req-status .rt{font-weight:800}
 .req-status .rs{font-size:12.5px;opacity:.85;margin-top:2px}
+.sr-sec{border-top:1px solid var(--line-2);padding-top:18px;margin-top:18px}
+.sr-sec:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.sr-sec h3{font-size:15.5px;font-weight:800;color:var(--ink);margin-bottom:12px}
+.sr-sec label small{font-weight:500;color:var(--ink-4)}
+.sr-done{background:var(--bg-2);border-radius:var(--r);padding:14px 16px;margin-top:4px;font-size:13.5px;line-height:1.7;color:var(--ink-2)}
+.sr-done b{color:var(--ink)}
 </style>
 </head>
 <body data-active="">
@@ -32,31 +38,74 @@
 </div></div>
 
 <main class="wrap">
-  <div class="form-card" style="max-width:560px">
+  <div class="form-card" style="max-width:720px">
     <div id="status-box"></div>
 
     <div id="form-box">
       <h2 style="font-size:18px;font-weight:800;letter-spacing:-0.03em;margin-bottom:6px;color:var(--ink)">🔒 <span id="board-name"></span> 글쓰기는 승인제입니다</h2>
       <p style="font-size:13.5px;color:var(--ink-3);margin-bottom:22px;line-height:1.6" id="board-desc"></p>
 
-      <div class="field">
-        <label for="msg">관리자에게 보낼 메시지 <span class="req">*</span></label>
-        <textarea id="msg" style="min-height:140px" placeholder="예) 세화리에서 감귤 농장을 운영하고 있습니다. 산지직송 공동구매를 진행하고 싶어 신청합니다."></textarea>
-        <div class="hint">간단한 소개와 어떤 글을 올리고 싶은지 적어주시면 승인이 빨라요.</div>
+      <div class="sr-sec">
+        <h3>1. 가게·판매자 정보</h3>
+        <div class="field-row">
+          <div class="field"><label for="f-name">상호명 <span class="req">*</span></label><input id="f-name" maxlength="40" placeholder="예: 세화 귤빛농장"></div>
+          <div class="field"><label for="f-owner">대표자 이름 <span class="req">*</span></label><input id="f-owner" maxlength="20" placeholder="실명"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="f-cat">업종 <span class="req">*</span></label>
+            <select id="f-cat"><option value="">선택하세요</option><option>농수산물·특산품</option><option>음식점·카페</option><option>숙박</option><option>공방·체험</option><option>생활 서비스 (이사·청소·인테리어)</option><option>기타</option></select></div>
+          <div class="field"><label for="f-biz">사업자등록번호 <small>(없으면 비워 두세요)</small></label><input id="f-biz" maxlength="12" inputmode="numeric" placeholder="000-00-00000"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="f-tel">연락처 <span class="req">*</span></label><input id="f-tel" maxlength="20" inputmode="tel" placeholder="010-0000-0000 (관리자만 봐요)"></div>
+          <div class="field"><label for="f-addr">가게·농장 위치 <span class="req">*</span></label><input id="f-addr" maxlength="80" placeholder="예: 제주시 구좌읍 세화리"></div>
+        </div>
+        <div class="field"><label for="f-intro">한 줄 소개 <span class="req">*</span></label><input id="f-intro" maxlength="80" placeholder="예: 3대째 농약 줄여 키우는 구좌 당근·감귤 농장"></div>
+        <div class="field"><label for="f-link">운영 채널 <small>(선택)</small></label><input id="f-link" maxlength="200" placeholder="인스타그램·스마트스토어·홈페이지·네이버 지도 주소"></div>
+      </div>
+
+      <div class="sr-sec" id="sec-deal">
+        <h3>2. 공동구매 계획</h3>
+        <div class="field"><label for="d-item">공구할 상품 <span class="req">*</span></label><input id="d-item" maxlength="60" placeholder="예: 구좌 흙당근 5kg (못난이 포함)"></div>
+        <div class="field-row">
+          <div class="field"><label for="d-price">평소 가격 / 공구 가격</label><input id="d-price" maxlength="40" placeholder="예: 25,000원 → 18,000원"></div>
+          <div class="field"><label for="d-goal">최소 · 목표 인원</label><input id="d-goal" maxlength="40" placeholder="예: 최소 20명 · 목표 50명"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="d-when">진행 희망 시기</label><input id="d-when" maxlength="40" placeholder="예: 12월 첫째 주, 1주일간"></div>
+          <div class="field"><label for="d-ship">받는 방법</label>
+            <select id="d-ship"><option>택배 배송</option><option>직접 수령 (픽업)</option><option>택배·픽업 둘 다</option></select></div>
+        </div>
+      </div>
+
+      <div class="sr-sec" id="sec-shop">
+        <h3>2. 가게 정보</h3>
+        <div class="field-row">
+          <div class="field"><label for="s-hours">영업 시간</label><input id="s-hours" maxlength="60" placeholder="예: 10:00~18:00, 화요일 휴무"></div>
+          <div class="field"><label for="s-park">주차</label><select id="s-park"><option>주차 가능</option><option>주변 공영주차장</option><option>주차 어려움</option></select></div>
+        </div>
+        <div class="field"><label for="s-menu">대표 메뉴·서비스 <span class="req">*</span></label><input id="s-menu" maxlength="100" placeholder="예: 보말칼국수 12,000원 · 전복죽 15,000원"></div>
+        <div class="field"><label for="s-benefit">제주이음 이웃 혜택 <small>(선택)</small></label><input id="s-benefit" maxlength="80" placeholder="예: 제주이음 보고 왔다고 하면 음료 1잔 서비스"></div>
+      </div>
+
+      <div class="sr-sec">
+        <h3>3. 더 하고 싶은 말</h3>
+        <div class="field"><textarea id="msg" style="min-height:110px" maxlength="1000" placeholder="관리자에게 전하고 싶은 내용을 자유롭게 적어 주세요. (선택)"></textarea></div>
+        <div class="check-line"><input type="checkbox" id="agree"><label for="agree">[필수] 입력한 정보를 승인 검토에 쓰는 데 동의합니다. 연락처와 사업자 정보는 관리자만 봐요.</label></div>
       </div>
 
       <div class="form-actions">
         <a class="btn ghost" href="javascript:history.back()">취소</a>
-        <button class="btn primary" onclick="submitRequest()">관리자에게 보내기</button>
+        <button class="btn primary" id="sr-send" onclick="submitRequest()">승인 요청 보내기</button>
       </div>
     </div>
   </div>
 </main>
 
-<script src="assets/common.js?v=20261106e"></script>
-<script src="assets/db.js?v=20261106e"></script>
-<script src="assets/notify.js?v=20261106e"></script>
-<script src="assets/admin-data.js?v=20261106e"></script>
+<script src="assets/common.js?v=20261106f"></script>
+<script src="assets/db.js?v=20261106f"></script>
+<script src="assets/notify.js?v=20261106f"></script>
+<script src="assets/admin-data.js?v=20261106f"></script>
 <script>
 var user = currentUser();
 var board = new URLSearchParams(location.search).get("board") || "특가공구";
@@ -108,12 +157,29 @@ if (!user) {
   }
 })();
 
+document.getElementById("sec-deal").style.display = board === "특가공구" ? "block" : "none";
+document.getElementById("sec-shop").style.display = board === "특가공구" ? "none" : "block";
+
+function v(id){ var e = document.getElementById(id); return e ? e.value.trim() : ""; }
 function submitRequest(){
-  var msg = document.getElementById("msg").value.trim();
-  if (msg.length < 10) { alert("어떤 글을 올리고 싶은지 조금 더 자세히 적어주세요. (10자 이상)"); return; }
-  sendSellerRequest(board, msg);
-  alert("관리자에게 전달되었습니다. 승인되면 알림 없이도 이 게시판에서 바로 글쓰기가 열립니다 — 이 페이지에 다시 방문해 확인해주세요.");
-  location.reload();
+  var need = [["f-name","상호명"],["f-owner","대표자 이름"],["f-cat","업종"],["f-tel","연락처"],["f-addr","가게·농장 위치"],["f-intro","한 줄 소개"]]
+    .concat(board === "특가공구" ? [["d-item","공구할 상품"]] : [["s-menu","대표 메뉴·서비스"]]);
+  for (var i = 0; i < need.length; i++) if (!v(need[i][0])) { alert(need[i][1] + "을(를) 입력해 주세요."); document.getElementById(need[i][0]).focus(); return; }
+  if (!/^[0-9\-\s]{9,}$/.test(v("f-tel"))) { alert("연락처를 숫자로 정확히 적어 주세요."); document.getElementById("f-tel").focus(); return; }
+  if (!document.getElementById("agree").checked) { alert("정보 이용에 동의해 주세요."); return; }
+  var d = { 상호명: v("f-name"), 대표자: v("f-owner"), 업종: v("f-cat"), 사업자등록번호: v("f-biz"), 연락처: v("f-tel"), 위치: v("f-addr"), 소개: v("f-intro"), 운영채널: v("f-link") };
+  if (board === "특가공구") { d.공구상품 = v("d-item"); d.가격 = v("d-price"); d.인원 = v("d-goal"); d.시기 = v("d-when"); d.받는방법 = v("d-ship"); }
+  else { d.영업시간 = v("s-hours"); d.주차 = v("s-park"); d.대표메뉴 = v("s-menu"); d.이웃혜택 = v("s-benefit"); }
+  var text = Object.keys(d).filter(function(k){ return d[k]; }).map(function(k){ return k + ": " + d[k]; }).join("\n") + (v("msg") ? "\n\n" + v("msg") : "");
+  var btn = document.getElementById("sr-send"); btn.disabled = true; btn.textContent = "보내는 중…";
+  var done = function(){
+    sendSellerRequest(board, text, d);
+    alert("승인 요청을 보냈어요. 관리자가 확인한 뒤 연락드리거나 이 게시판 글쓰기를 열어 드려요.");
+    location.reload();
+  };
+  if (window.JIDB && JIDB.enabled && user && user.id) {
+    JIDB.sendSellerRequest(board, d, v("msg")).then(done, function(e){ console.warn(e); done(); });
+  } else done();
 }
 </script>
 </body>

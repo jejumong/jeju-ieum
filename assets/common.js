@@ -213,14 +213,14 @@ function mySellerRequest(board) {
 }
 
 /* 관리자에게 요청 전송 (localStorage에 저장 — 실제 서비스에선 서버로 전달) */
-function sendSellerRequest(board, message) {
+function sendSellerRequest(board, message, details) {
   var u = currentUser();
   if (!u) return null;
   var reqs = JI.get("seller_requests", []);
   var req = {
     id: "req" + Date.now(),
     board: board, email: u.email, nick: u.nick, region: u.region,
-    message: message, date: new Date().toISOString().slice(0, 10),
+    message: message, details: details || null, date: new Date().toISOString().slice(0, 10),
     status: "pending"
   };
   reqs.push(req);
