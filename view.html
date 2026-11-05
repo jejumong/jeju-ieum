@@ -271,7 +271,7 @@ function renderComments() {
           '<button class="mini-btn danger-btn" onclick="removeCmt(' + i + ')">삭제</button></div>' : '') +
       '</div>' +
       '<p id="cmt-text-' + i + '">' + esc(c.text) + '</p></div>';
-  }).join("") || (seedHtml ? "" : '<div class="cmt-item" style="color:var(--muted)">아직 댓글이 없어요. 첫 댓글을 남겨보세요.</div>');
+  }).join("");
 
   var u = currentUser();
   document.getElementById("cmt-input").innerHTML = u
