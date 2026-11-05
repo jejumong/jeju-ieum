@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105h">
+<link rel="stylesheet" href="assets/style.css?v=20261105i">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -59,12 +59,13 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261105h"></script>
-<script src="assets/seed-trade.js?v=20261105h"></script>
-<script src="assets/seed-extra.js?v=20261105h"></script>
-<script src="assets/seed-new.js?v=20261105h"></script>
-<script src="assets/seed-comments.js?v=20261105h"></script>
-<script src="assets/admin-data.js?v=20261105h"></script>
+<script src="assets/kmap.js?v=20261105i"></script>
+<script src="assets/common.js?v=20261105i"></script>
+<script src="assets/seed-trade.js?v=20261105i"></script>
+<script src="assets/seed-extra.js?v=20261105i"></script>
+<script src="assets/seed-new.js?v=20261105i"></script>
+<script src="assets/seed-comments.js?v=20261105i"></script>
+<script src="assets/admin-data.js?v=20261105i"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -118,6 +119,7 @@ if (!post) {
       (post.period ? '<span>기간 <b>' + esc(post.period) + '</b></span>' : '') +
       (post.price ? '<span>가격 <b>' + esc(post.price) + '원</b></span>' : '') +
       (post.loc ? '<span>' + (post.period ? '장소' : '지역') + ' <b>' + esc(post.loc) + '</b></span>' : '') +
+      (post.addr ? '<span>주소 <b>' + esc(post.addr) + '</b></span>' : '') +
       '</div>';
   }
 
@@ -131,6 +133,7 @@ if (!post) {
     '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
     extra +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
+    (post.board === "부동산" ? '<div class="pv-map"><h3>매물 위치</h3><div id="pv-map"></div></div>' : '') +
     joinBlock(post) +
     '<div class="pv-actions"><a class="btn ghost" href="' + backHref + '">목록으로</a>' +
     (isMyPost(post)
@@ -138,6 +141,11 @@ if (!post) {
         '<button class="mini-btn danger-btn" onclick="removePost()">삭제</button></div>'
       : '<a class="btn primary" href="write.html' + (post.board ? "?board=" + encodeURIComponent(post.board) : "") + '" style="margin-left:auto">✏️ 글쓰기</a>') +
     '</div>';
+  if (post.board === "부동산") {
+    var mq = post.addr || (post.loc ? "제주특별자치도 " + post.loc : "");
+    if (mq) JIMap.show(document.getElementById("pv-map"), mq, { approx: !post.addr });
+    else document.getElementById("pv-map").innerHTML = '<p class="km-none">등록된 주소가 없어요.</p>';
+  }
 
   paintAllJoinBtns();
   renderComments();

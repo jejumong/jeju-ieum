@@ -23,6 +23,8 @@ var SITE_CFG = {
      자체 도메인(예: jejuieum.com) 맨 앞에 두면 "/" 그대로 두면 됩니다. */
   onesignalAppId: "c7fd4d45-3d1b-4157-9230-d29e4676f659",
   onesignalPath: "/",
+  /* 카카오맵 JavaScript 키 — 카카오 디벨로퍼스 '제주이음' 앱. 플랫폼 → Web 에 사이트 도메인을 등록해야 지도가 열립니다. */
+  kakaoJsKey: "e8daa949540834b55af58b73b1a279ef",
   youtube: "https://www.youtube.com/@Jejumong",
   tools: {
     tide: "https://jejumong.github.io/jeju-tide/",
