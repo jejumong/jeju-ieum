@@ -1294,3 +1294,4 @@ a.ap-next:hover{background:var(--sea-600)}
   .re-frow .filter-bar{width:100%}
 }
 @media (max-width:700px){.pm-info{display:block!important;line-height:1.6}.pm-info a{display:inline-block;margin:8px 0 0!important}}
+.footer-brand .fb-yt.fb-about{margin-top:8px}

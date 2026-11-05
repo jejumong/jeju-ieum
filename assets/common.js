@@ -299,6 +299,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
           '<p>제주에 살고 있거나 살아보려는 사람들을 위한 생활 정보 채널이자 동네 커뮤니티입니다. ' +
           '모든 가이드에는 업데이트 날짜와 출처를 적습니다.</p>' +
           '<a class="fb-yt" href="' + SITE_CFG.youtube + '" target="_blank" rel="noopener">▶ 유튜브 제주몽</a>' +
+          '<br><a class="fb-yt fb-about" href="about.html">👋 운영자 소개</a>' +
         '</div>' +
         '<div class="footer-col"><h4>제주살이 정보</h4>' +
           '<a href="guide.html">제주살이 가이드</a>' +
@@ -318,7 +319,6 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
           '<a href="contact.html">문의·제보</a>' +
           '<a href="contact.html?type=' + encodeURIComponent("정보 정정 요청") + '">정보 정정 요청</a>' +
           '<a href="contact.html?type=' + encodeURIComponent("입점·제휴 문의") + '">입점·제휴 문의</a>' +
-          '<a href="about.html">운영자 소개</a>' +
           '<a href="about.html#principles">정보 운영 원칙</a>' +
         '</div>' +
       '</div>' +
