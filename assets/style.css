@@ -1523,3 +1523,4 @@ a.ap-next:hover{background:var(--sea-600)}
 .item-card.pc.premium{border:1.5px solid #ffb95c;background:#fff;box-shadow:none}
 .item-card.pc.premium:hover{border-color:#ff9f2e;box-shadow:0 14px 30px -12px rgba(16,24,40,.18)}
 .item-card.pc.premium .pm-tag,.item-card.pc .pm-tag{background:rgba(255,255,255,.95);color:#e07a00;border:1px solid #ffc87f;box-shadow:none}
+.ref-types b{font-weight:700}
