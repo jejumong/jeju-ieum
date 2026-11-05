@@ -61,10 +61,34 @@ var JINotify = (function () {
       return OneSignal.Notifications.requestPermission().then(function () {
         if (!OneSignal.Notifications.permission) return { push: false, denied: true, saved: true };
         OneSignal.User.addTag(topic, "1");
+        linkAccount();
         return { push: true, saved: true };
       });
     }).catch(function () { return { push: false, saved: true }; });
   }
+
+  /* 로그인한 회원이면 이 기기의 푸시를 회원 계정(external_id)과 연결 → 가입 신청 알림 등을 이 기기로 받음 */
+  function linkAccount() {
+    var u = (typeof currentUser === "function") ? currentUser() : null;
+    if (!u || !u.id || !pushSupported()) return Promise.resolve(false);
+    return loadPush().then(function (OneSignal) {
+      if (!OneSignal) return false;
+      try { OneSignal.login(u.id); } catch (e) {}
+      return true;
+    }).catch(function () { return false; });
+  }
+  /* 회원 알림(가입 신청 등)을 이 기기에서 받기 */
+  function enableAccountPush() {
+    if (!pushSupported()) return Promise.resolve({ push: false });
+    return loadPush().then(function (OneSignal) {
+      if (!OneSignal) return { push: false };
+      return OneSignal.Notifications.requestPermission().then(function () {
+        if (!OneSignal.Notifications.permission) return { push: false, denied: true };
+        return linkAccount().then(function () { return { push: true }; });
+      });
+    }).catch(function () { return { push: false }; });
+  }
+  function accountPushOn() { return pushSupported() && window.Notification && Notification.permission === "granted"; }
 
   function unsubscribe(topic) {
     var w = getWatch(); delete w[topic]; setWatch(w);
@@ -130,5 +154,6 @@ var JINotify = (function () {
     document.addEventListener("keydown", function k(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", k); } });
   }
 
-  return { subscribe: subscribe, unsubscribe: unsubscribe, isOn: isOn, changes: changes, acknowledge: acknowledge, openSheet: openSheet, pushSupported: pushSupported };
+  return { linkAccount: linkAccount, enableAccountPush: enableAccountPush, accountPushOn: accountPushOn, isIOSBrowser: isIOSBrowser,
+    subscribe: subscribe, unsubscribe: unsubscribe, isOn: isOn, changes: changes, acknowledge: acknowledge, openSheet: openSheet, pushSupported: pushSupported };
 })();

@@ -1524,3 +1524,43 @@ a.ap-next:hover{background:var(--sea-600)}
 .item-card.pc.premium:hover{border-color:#ff9f2e;box-shadow:0 14px 30px -12px rgba(16,24,40,.18)}
 .item-card.pc.premium .pm-tag,.item-card.pc .pm-tag{background:rgba(255,255,255,.95);color:#e07a00;border:1px solid #ffc87f;box-shadow:none}
 .ref-types b{font-weight:700}
+
+/* 알림 종 (위쪽) */
+.hd-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--line);font-size:17px;text-decoration:none}
+.hd-bell:hover{border-color:var(--sea-200)}
+.hd-bell-n{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--coral,#e04b3f);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;font-style:normal}
+@media (max-width:680px){.hd-bell{width:30px;height:30px;font-size:14px;border:0;background:transparent}}
+
+/* 내 알림·가입 신청 */
+.act-tabs{margin-top:16px}
+.act-panel{display:none}.act-panel.on{display:block}
+.act-list{display:flex;flex-direction:column;gap:8px}
+.act-item{display:block;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;text-decoration:none;color:var(--ink-2)}
+a.act-item:hover{border-color:var(--sea-200)}
+.act-item.unread{border-left:4px solid var(--sea)}
+.act-item .ai-t{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.act-item .ai-t b{font-size:15.5px;color:var(--ink)}
+.act-item .ai-t span{font-size:12.5px;color:var(--ink-4);white-space:nowrap}
+.act-item p{font-size:14px;margin-top:4px;line-height:1.55}
+.act-item .ai-club{font-size:13.5px;margin-top:4px;color:var(--ink-3)}
+.act-item .ai-club a{color:var(--sea-700);font-weight:700;text-decoration:none}
+.act-item .ai-msg{background:var(--bg-2);border-radius:10px;padding:8px 12px;color:var(--ink-2)}
+.act-item .ai-btns{display:flex;gap:8px;margin-top:10px}
+.act-item .ai-st{margin-top:8px;font-size:13.5px;font-weight:800;color:var(--ink-3)}
+.act-item.s-approved .ai-st{color:var(--moss,#2f9e6e)}
+.act-item.s-pending .ai-st{color:#d47a00}
+.act-empty{padding:30px 16px;text-align:center;color:var(--ink-4);background:#fff;border:1px dashed var(--line);border-radius:var(--r);line-height:1.8}
+.act-empty a{color:var(--sea-700);font-weight:700}
+.act-push-box{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--sea-50);border-radius:var(--r);padding:14px 16px;margin-top:12px}
+.act-push-box b{display:block;font-size:15px;color:var(--ink)}
+.act-push-box span{font-size:13px;color:var(--ink-3);line-height:1.55}
+.act-push-on{margin-top:12px;font-size:13.5px;color:var(--moss,#2f9e6e);font-weight:700}
+@media (max-width:600px){.act-push-box{flex-direction:column;align-items:flex-start}}
+
+/* 글 화면 가입 신청 영역 */
+.pv-join textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;resize:vertical;margin-bottom:8px;outline:none}
+.pv-join textarea:focus{border-color:var(--sea)}
+.join-st{display:flex;flex-direction:column;gap:2px;background:var(--bg-2);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.join-st b{font-size:15px;color:var(--ink)}
+.join-st span{font-size:13px;color:var(--ink-3)}
+.join-st.s-approved{background:#eaf7f0}.join-st.s-pending{background:#fff6e8}

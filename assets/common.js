@@ -24,6 +24,9 @@ var SITE_CFG = {
   onesignalAppId: "c7fd4d45-3d1b-4157-9230-d29e4676f659",
   onesignalPath: "/",
   /* 카카오맵 JavaScript 키 — 카카오 디벨로퍼스 '제주이음' 앱. 플랫폼 → Web 에 사이트 도메인을 등록해야 지도가 열립니다. */
+  /* Supabase (회원·동호회 가입 신청·알림) — 비워 두면 예전처럼 브라우저 저장 방식으로만 동작 */
+  supabaseUrl: "",
+  supabaseKey: "",
   kakaoJsKey: "e8daa949540834b55af58b73b1a279ef",
   youtube: "https://www.youtube.com/@Jejumong",
   tools: {
@@ -48,9 +51,8 @@ var JI = {
 /* ── 인증 ── */
 function currentUser() { return JI.get("session", null); }
 function logout() {
-  JI.set("session", null);
-  alert("로그아웃되었습니다.");
-  location.href = "index.html";
+  var done = function () { JI.set("session", null); alert("로그아웃되었습니다."); location.href = "index.html"; };
+  if (window.JIDB && JIDB.enabled) JIDB.signOut().then(done, done); else done();
 }
 /* ── 프로필 사진 ── */
 function myPhoto() {
@@ -127,6 +129,7 @@ var NOTICE = { id:"n1", board:"공지", head:"공지", title:"태풍 접근 시 
 /* 로그인한 사람이 쓴 글인지 (회원이 작성한 글만 수정·삭제 가능) */
 function isMyPost(p) {
   var u = currentUser();
+  if (p && p.db) return !!(u && u.id && p.authorId === u.id);
   return !!(u && p && p.id && p.id.charAt(0) === "u" && p.author === u.nick);
 }
 

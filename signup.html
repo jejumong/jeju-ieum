@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105w">
+<link rel="stylesheet" href="assets/style.css?v=20261105x">
 </head>
 <body data-active="">
 
@@ -61,8 +61,10 @@
   </div>
 </div>
 
-<script src="assets/common.js?v=20261105w"></script>
-<script src="assets/admin-data.js?v=20261105w"></script>
+<script src="assets/common.js?v=20261105x"></script>
+<script src="assets/db.js?v=20261105x"></script>
+<script src="assets/notify.js?v=20261105x"></script>
+<script src="assets/admin-data.js?v=20261105x"></script>
 <script>
 if (currentUser()) location.href = "index.html";
 
@@ -80,6 +82,22 @@ function doSignup() {
   if (!region) { alert("사는 지역을 선택해주세요."); return; }
   if (!document.getElementById("t1").checked || !document.getElementById("t2").checked) {
     alert("필수 약관에 동의해주세요."); return;
+  }
+
+  // 데이터베이스가 연결되어 있으면 진짜 회원가입
+  if (window.JIDB && JIDB.enabled) {
+    var btn = document.querySelector(".btn.primary.block"); btn.disabled = true; btn.textContent = "가입 중…";
+    JIDB.ready.then(function(){ return JIDB.signUp(email, pw, nick, region); }).then(function(r){
+      if (r.needConfirm) { alert("거의 다 됐어요! " + email + " 로 보낸 확인 메일의 링크를 누르면 가입이 끝나요."); location.href = "login.html"; }
+      else { alert(nick + "님, 가입을 환영합니다! 🍊"); location.href = "index.html"; }
+    }).catch(function(e){
+      btn.disabled = false; btn.textContent = "가입하기";
+      var m = String(e && e.message || e);
+      if (/registered|already/i.test(m)) m = "이미 가입된 이메일입니다.";
+      else if (/rate limit/i.test(m)) m = "잠시 후 다시 시도해 주세요. (가입 메일 발송 한도)";
+      alert(m);
+    });
+    return;
   }
 
   var users = JI.get("users", []);

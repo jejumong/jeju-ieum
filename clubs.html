@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105w">
+<link rel="stylesheet" href="assets/style.css?v=20261105x">
 </head>
 <body data-active="clubs">
 
@@ -42,20 +42,23 @@
   <div class="grid-cards" id="club-grid"></div>
 </main>
 
-<script src="assets/common.js?v=20261105w"></script>
-<script src="assets/seed-trade.js?v=20261105w"></script>
-<script src="assets/seed-extra.js?v=20261105w"></script>
-<script src="assets/seed-new.js?v=20261105w"></script>
-<script src="assets/seed-comments.js?v=20261105w"></script>
-<script src="assets/photos.js?v=20261105w"></script>
-<script src="assets/cards.js?v=20261105w"></script>
-<script src="assets/admin-data.js?v=20261105w"></script>
+<script src="assets/common.js?v=20261105x"></script>
+<script src="assets/db.js?v=20261105x"></script>
+<script src="assets/notify.js?v=20261105x"></script>
+<script src="assets/seed-trade.js?v=20261105x"></script>
+<script src="assets/seed-extra.js?v=20261105x"></script>
+<script src="assets/seed-new.js?v=20261105x"></script>
+<script src="assets/seed-comments.js?v=20261105x"></script>
+<script src="assets/photos.js?v=20261105x"></script>
+<script src="assets/cards.js?v=20261105x"></script>
+<script src="assets/admin-data.js?v=20261105x"></script>
 <script>
 var META = {
   "tc1":{e:"🏄"}, "tc2":{e:"⛰️",warm:1}, "tc3":{e:"📖"},
   "tc4":{e:"📷",warm:1}, "tc5":{e:"🧒"}, "tc6":{e:"🤲",warm:1}
 };
 var catFilter = "all";
+var DB_CLUBS = [];   // 데이터베이스에 저장된 진짜 모임 (회원이 만든 모임)
 
 function applyChip(el){
   el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
@@ -65,7 +68,7 @@ function applyChip(el){
 }
 function render(){
   var rg = document.getElementById("region-sel").value;
-  var list = userPostsOf("동호회").concat(TRADE_SEEDS.filter(function(p){ return p.board === "동호회"; }));
+  var list = DB_CLUBS.concat(userPostsOf("동호회"), TRADE_SEEDS.filter(function(p){ return p.board === "동호회"; }));
   list = list.filter(function(p){
     var okC = catFilter === "all" || (p.head || "") === catFilter;
     var okR = rg === "all" || (p.loc || "전역") === rg;
@@ -74,7 +77,7 @@ function render(){
   list = premiumFirst(list.sort(byRecent));
   document.getElementById("shown-count").textContent = list.length;
   document.getElementById("club-grid").innerHTML = pageSlice(list).map(function(p){
-    var isMine = p.id.charAt(0) === "u";
+    var isMine = p.db ? isMyPost(p) : p.id.charAt(0) === "u";
     return photoCard(p, { pm: isPremium(p), badge: { text: p.head || "모임" },
       info: '<span>' + escHtml(p.meta || (fmtDate(p.date) + " 개설")) + '</span><span>' + escHtml(p.loc || "전역") + '</span>',
       mine: isMine ? "내 모임" : "" });
@@ -83,6 +86,7 @@ function render(){
   paintAllJoinBtns();
 }
 render();
+if (window.JIDB && JIDB.enabled) JIDB.listPosts("동호회").then(function(rows){ DB_CLUBS = rows; if (rows.length) render(); });
 </script>
 </body>
 </html>

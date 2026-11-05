@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105w">
+<link rel="stylesheet" href="assets/style.css?v=20261105x">
 </head>
 <body data-active="">
 
@@ -42,8 +42,10 @@
   </div>
 </div>
 
-<script src="assets/common.js?v=20261105w"></script>
-<script src="assets/admin-data.js?v=20261105w"></script>
+<script src="assets/common.js?v=20261105x"></script>
+<script src="assets/db.js?v=20261105x"></script>
+<script src="assets/notify.js?v=20261105x"></script>
+<script src="assets/admin-data.js?v=20261105x"></script>
 <script>
 // 이미 로그인 상태면 홈으로
 if (currentUser()) location.href = "index.html";
@@ -53,13 +55,25 @@ function doLogin() {
   var pw = document.getElementById("pw").value;
   if (!email || !pw) { alert("이메일과 비밀번호를 입력해주세요."); return; }
 
+  var next = new URLSearchParams(location.search).get("next");
+  if (window.JIDB && JIDB.enabled) {
+    JIDB.ready.then(function(){ return JIDB.signIn(email, pw); }).then(function(){
+      location.href = next || "index.html";
+    }).catch(function(e){
+      var m = String(e && e.message || e);
+      if (/invalid login/i.test(m)) m = "이메일 또는 비밀번호가 올바르지 않습니다.";
+      else if (/not confirmed/i.test(m)) m = "가입 확인 메일의 링크를 먼저 눌러 주세요.";
+      alert(m);
+    });
+    return;
+  }
+
   var users = JI.get("users", []);
   var u = users.find(function(x){ return x.email === email; });
   if (!u) { alert("등록되지 않은 이메일입니다.\n회원가입 후 이용해주세요."); return; }
   if (u.pw !== pw) { alert("비밀번호가 올바르지 않습니다."); return; }
 
   JI.set("session", { email: u.email, nick: u.nick, region: u.region });
-  var next = new URLSearchParams(location.search).get("next");
   location.href = next || "index.html";
 }
 document.getElementById("pw").addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });

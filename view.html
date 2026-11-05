@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105w">
+<link rel="stylesheet" href="assets/style.css?v=20261105x">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -59,13 +59,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261105w"></script>
-<script src="assets/common.js?v=20261105w"></script>
-<script src="assets/seed-trade.js?v=20261105w"></script>
-<script src="assets/seed-extra.js?v=20261105w"></script>
-<script src="assets/seed-new.js?v=20261105w"></script>
-<script src="assets/seed-comments.js?v=20261105w"></script>
-<script src="assets/admin-data.js?v=20261105w"></script>
+<script src="assets/kmap.js?v=20261105x"></script>
+<script src="assets/common.js?v=20261105x"></script>
+<script src="assets/db.js?v=20261105x"></script>
+<script src="assets/notify.js?v=20261105x"></script>
+<script src="assets/seed-trade.js?v=20261105x"></script>
+<script src="assets/seed-extra.js?v=20261105x"></script>
+<script src="assets/seed-new.js?v=20261105x"></script>
+<script src="assets/seed-comments.js?v=20261105x"></script>
+<script src="assets/admin-data.js?v=20261105x"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -78,6 +80,10 @@ var TRADE_PAGE = {
 
 /* 동호회 가입 / 공구 참여 영역 */
 function joinBlock(p){
+  if (p.board === "동호회" && window.JIDB && JIDB.enabled) {
+    if (!p.db) return '<div class="pv-join"><div class="jt">🤝 이 모임에 함께하기</div><div class="jnote">이 모임은 화면 구성을 보여 드리기 위한 예시라 가입 신청을 받을 수 없어요.</div></div>';
+    return '<div class="pv-join" id="club-join"><div class="jt">🤝 이 모임에 함께하기</div><div class="jnote">불러오는 중…</div></div>';
+  }
   if (p.board === "동호회") {
     var jid = "club-" + p.id;
     return '<div class="pv-join">' +
@@ -105,6 +111,7 @@ function joinBlock(p){
   return "";
 }
 
+function renderPost() {
 if (!post) {
   document.getElementById("pv").innerHTML =
     '<p style="padding:30px;text-align:center;color:var(--muted)">게시글을 찾을 수 없습니다.</p>' +
@@ -149,6 +156,53 @@ if (!post) {
 
   paintAllJoinBtns();
   renderComments();
+  if (post.db && post.board === "동호회") drawClubJoin();
+}
+}
+
+if (!post && window.JIDB && JIDB.enabled && JIDB.isUuid(id)) {
+  document.getElementById("pv").innerHTML = '<p style="padding:30px;text-align:center;color:var(--muted)">불러오는 중…</p>';
+  JIDB.getPost(id).then(function (p) { post = p; renderPost(); }, function () { renderPost(); });
+} else renderPost();
+
+/* ── 동호회 가입 신청 (데이터베이스) ── */
+function drawClubJoin() {
+  var box = document.getElementById("club-join"); if (!box) return;
+  var u = currentUser();
+  var head = '<div class="jt">🤝 이 모임에 함께하기</div>' +
+    (post.meta ? '<div class="jmeta"><span>' + esc(post.meta) + '</span><b>' + esc(post.loc || "전역") + '</b></div>' : '');
+  if (u && u.id && post.authorId === u.id) {
+    JIDB.joinCount(post.id).then(function (n) {
+      box.innerHTML = head + '<a class="btn primary" href="activity.html#received">받은 가입 신청 ' + (n || 0) + '건 보기 →</a>' +
+        '<div class="jnote">내가 만든 모임이에요. 신청이 오면 알림으로 알려 드려요.</div>';
+    });
+    return;
+  }
+  if (!u || !u.id) {
+    box.innerHTML = head + '<a class="btn primary" href="login.html?next=' + encodeURIComponent("view.html?id=" + id) + '">로그인하고 가입 신청</a>' +
+      '<div class="jnote">신청하면 모임장에게 바로 알림이 가요.</div>';
+    return;
+  }
+  JIDB.myJoin(post.id).then(function (j) {
+    if (!j) {
+      box.innerHTML = head +
+        '<textarea id="join-msg" maxlength="300" rows="2" placeholder="모임장에게 한마디 (선택) — 예: 주말 오전에 참여할 수 있어요"></textarea>' +
+        '<button type="button" class="btn primary" id="join-send">가입 신청</button>' +
+        '<div class="jnote">신청하면 모임장에게 바로 알림이 가고, 결과도 알림으로 알려 드려요.</div>';
+      document.getElementById("join-send").onclick = function () {
+        this.disabled = true;
+        JIDB.requestJoin(post, document.getElementById("join-msg").value.trim()).then(drawClubJoin)
+          .catch(function (e) { alert("신청하지 못했어요: " + (e.message || e)); drawClubJoin(); });
+      };
+      return;
+    }
+    var ST = { pending: ["⏳ 승인 대기 중", "모임장이 확인하면 알림으로 알려 드려요."], approved: ["🎉 가입 승인됨", "모임장의 안내를 기다려 주세요."], rejected: ["이번에는 함께하기 어려워요", "다른 모임도 둘러보세요."] };
+    var st = ST[j.status] || ST.pending;
+    box.innerHTML = head + '<div class="join-st s-' + j.status + '"><b>' + st[0] + '</b><span>' + st[1] + '</span></div>' +
+      (j.status === "pending" ? '<button type="button" class="btn ghost" id="join-cancel">신청 취소</button>' : '');
+    var c = document.getElementById("join-cancel");
+    if (c) c.onclick = function () { if (confirm("가입 신청을 취소할까요?")) JIDB.cancelJoin(j.id).then(drawClubJoin); };
+  });
 }
 
 function renderComments() {
@@ -194,6 +248,11 @@ function renderComments() {
 function editPost(){ location.href = "write.html?edit=" + post.id; }
 function removePost(){
   if (!confirm("이 글을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.")) return;
+  if (post.db) {
+    JIDB.deletePost(post.id).then(function(){ alert("글이 삭제되었습니다."); location.href = TRADE_PAGE[post.board] || "community.html"; },
+      function(e){ alert("삭제하지 못했어요: " + (e.message || e)); });
+    return;
+  }
   if (deleteMyPost(post.id)) {
     alert("글이 삭제되었습니다.");
     location.href = TRADE_PAGE[post.board] ||

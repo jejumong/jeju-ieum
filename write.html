@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105w">
+<link rel="stylesheet" href="assets/style.css?v=20261105x">
 </head>
 <body data-active="">
 
@@ -100,13 +100,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261105w"></script>
-<script src="assets/common.js?v=20261105w"></script>
-<script src="assets/seed-trade.js?v=20261105w"></script>
-<script src="assets/seed-extra.js?v=20261105w"></script>
-<script src="assets/seed-new.js?v=20261105w"></script>
-<script src="assets/seed-comments.js?v=20261105w"></script>
-<script src="assets/admin-data.js?v=20261105w"></script>
+<script src="assets/kmap.js?v=20261105x"></script>
+<script src="assets/common.js?v=20261105x"></script>
+<script src="assets/db.js?v=20261105x"></script>
+<script src="assets/notify.js?v=20261105x"></script>
+<script src="assets/seed-trade.js?v=20261105x"></script>
+<script src="assets/seed-extra.js?v=20261105x"></script>
+<script src="assets/seed-new.js?v=20261105x"></script>
+<script src="assets/seed-comments.js?v=20261105x"></script>
+<script src="assets/admin-data.js?v=20261105x"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -137,13 +139,7 @@ function checkBoardGate(board) {
   return false;
 }
 
-// 수정 모드 — 본인 글만
-if (user && editId) {
-  editing = findPost(editId);
-  if (!editing || !isMyPost(editing)) {
-    alert("수정할 수 없는 글입니다.");
-    location.href = "index.html";
-  } else if (checkBoardGate(editing.board)) {
+function fillEdit(editing) {
     document.getElementById("page-title").textContent = "글 수정";
     document.getElementById("page-desc").textContent = "수정한 내용은 바로 반영됩니다";
     document.getElementById("crumb-last").textContent = "글 수정";
@@ -164,6 +160,22 @@ if (user && editId) {
     document.getElementById("loc").value = editing.loc || "";
     if (editing.htype) document.getElementById("htype").value = editing.htype;
     document.getElementById("addr").value = editing.addr || "";
+  if (typeof toggleExtra === "function") toggleExtra();
+}
+
+// 수정 모드 — 본인 글만 (데이터베이스 글은 불러와서 확인)
+if (user && editId && window.JIDB && JIDB.enabled && JIDB.isUuid(editId)) {
+  JIDB.getPost(editId).then(function (p) {
+    if (!p || !user.id || p.authorId !== user.id) { alert("수정할 수 없는 글입니다."); location.href = "index.html"; return; }
+    editing = p; fillEdit(p);
+  });
+} else if (user && editId) {
+  editing = findPost(editId);
+  if (!editing || !isMyPost(editing)) {
+    alert("수정할 수 없는 글입니다.");
+    location.href = "index.html";
+  } else if (checkBoardGate(editing.board)) {
+    fillEdit(editing);
   }
 }
 
@@ -231,6 +243,16 @@ function submitPost() {
   var loc = (document.getElementById("loc").value || "").trim();
   var htype = board === "부동산" ? document.getElementById("htype").value : "";
   var addr = board === "부동산" ? (document.getElementById("addr").value || "").trim() : "";
+  // 동호회는 데이터베이스에 저장 (모임장이 가입 신청을 받을 수 있게)
+  if (window.JIDB && JIDB.enabled && (board === "동호회" || (editing && editing.db))) {
+    if (!user.id) { alert("새 회원 시스템으로 다시 로그인해 주세요."); location.href = "login.html?next=" + encodeURIComponent("write.html" + location.search); return; }
+    var btn = document.getElementById("submit-btn"); btn.disabled = true;
+    var data = { board: board, head: head === "선택 안 함" ? "" : head, title: title, content: content, price: price, loc: loc, meta: (editing && editing.meta) || "" };
+    (editing && editing.db ? JIDB.updatePost(editing.id, data) : JIDB.createPost(data)).then(function (p) {
+      location.href = "view.html?id=" + p.id;
+    }).catch(function (e) { btn.disabled = false; alert("저장하지 못했어요: " + (e.message || e)); });
+    return;
+  }
   var posts = JI.get("posts", []);
 
   if (editing) {

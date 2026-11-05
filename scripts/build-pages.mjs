@@ -63,6 +63,8 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(
 <!-- 이 파일은 scripts/build-pages.mjs 가 데이터에서 자동으로 만듭니다. 직접 고치지 말고 데이터 파일을 고치세요. -->
 ${body}
 <script src="assets/common.js?v=${VER}"></script>
+<script src="assets/db.js?v=${VER}"></script>
+<script src="assets/notify.js?v=${VER}"></script>
 ${extraScripts}
 </body>
 </html>
