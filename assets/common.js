@@ -127,6 +127,23 @@ var NOTICE = { id:"n1", board:"공지", head:"공지", title:"태풍 접근 시 
 /* ── 내 글 · 내 댓글 권한과 수정·삭제 ── */
 
 /* 로그인한 사람이 쓴 글인지 (회원이 작성한 글만 수정·삭제 가능) */
+/* 구인구직 급여 표시: "시급 11,000원" */
+function payText(p) {
+  if (!p || !p.payType) return "";
+  if (p.payType === "협의" || !p.pay) return p.payType === "협의" ? "급여 협의" : p.payType + " 협의";
+  return p.payType + " " + (+p.pay).toLocaleString() + "원";
+}
+/* 채용완료 표시 전환 (내 구인 글) */
+function toggleJobClosed(id) {
+  var posts = JI.get("posts", []);
+  for (var i = 0; i < posts.length; i++) if (posts[i].id === id) {
+    if (!isMyPost(posts[i])) return null;
+    if (posts[i].head === "채용완료") { posts[i].head = posts[i].headPrev || "구인"; delete posts[i].headPrev; }
+    else { posts[i].headPrev = posts[i].head || "구인"; posts[i].head = "채용완료"; }
+    JI.set("posts", posts); return posts[i];
+  }
+  return null;
+}
 function isMyPost(p) {
   var u = currentUser();
   if (p && p.db) return !!(u && u.id && p.authorId === u.id);

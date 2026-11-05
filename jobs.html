@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106c">
+<link rel="stylesheet" href="assets/style.css?v=20261106d">
 </head>
 <body data-active="jobs">
 
@@ -33,7 +33,7 @@
     <button class="chip-btn" data-filter="서부" onclick="applyChip(this)">서부(애월·한림·대정)</button>
     <button class="chip-btn" data-filter="서귀포" onclick="applyChip(this)">서귀포</button>
     <select id="kind-sel" onchange="render()">
-      <option value="all">구분 전체</option><option value="구인">구인</option><option value="구직">구직</option>
+      <option value="all">구분 전체</option><option value="구인">구인</option><option value="알바">알바</option><option value="재택">재택</option><option value="채용완료">채용완료</option>
     </select>
     <span class="spacer"></span>
     <span class="count">등록 공고 <b id="shown-count">0</b>건</span>
@@ -42,16 +42,16 @@
   <div id="job-wrap"></div>
 </main>
 
-<script src="assets/common.js?v=20261106c"></script>
-<script src="assets/db.js?v=20261106c"></script>
-<script src="assets/notify.js?v=20261106c"></script>
-<script src="assets/seed-trade.js?v=20261106c"></script>
-<script src="assets/seed-extra.js?v=20261106c"></script>
-<script src="assets/seed-new.js?v=20261106c"></script>
-<script src="assets/seed-comments.js?v=20261106c"></script>
-<script src="assets/photos.js?v=20261106c"></script>
-<script src="assets/cards.js?v=20261106c"></script>
-<script src="assets/admin-data.js?v=20261106c"></script>
+<script src="assets/common.js?v=20261106d"></script>
+<script src="assets/db.js?v=20261106d"></script>
+<script src="assets/notify.js?v=20261106d"></script>
+<script src="assets/seed-trade.js?v=20261106d"></script>
+<script src="assets/seed-extra.js?v=20261106d"></script>
+<script src="assets/seed-new.js?v=20261106d"></script>
+<script src="assets/seed-comments.js?v=20261106d"></script>
+<script src="assets/photos.js?v=20261106d"></script>
+<script src="assets/cards.js?v=20261106d"></script>
+<script src="assets/admin-data.js?v=20261106d"></script>
 <script>
 document.getElementById("pm-banner").innerHTML = premiumBanner("공고");
 
@@ -83,8 +83,8 @@ function jobCard(p, isPm){
   var m = META[p.id] || { job: p.job || "기타", pay: p.pay || "급여 협의" };
   var isMine = p.id.charAt(0) === "u";
   var kind = p.head || "구인";
-  var pay = isMine ? (p.price ? parseInt(String(p.price).replace(/[^0-9]/g,""),10).toLocaleString() + "원" : "급여 협의") : m.pay;
-  return photoCard(p, { pm: isPm, badge: { text: kind, cls: kind === "구직" ? "dark" : "" },
+  var pay = p.payType ? payText(p) : (isMine ? (p.price ? parseInt(String(p.price).replace(/[^0-9]/g,""),10).toLocaleString() + "원" : "급여 협의") : m.pay);
+  return photoCard(p, { pm: isPm, closed: kind === "채용완료", badge: { text: kind, cls: (kind === "구직" || kind === "채용완료") ? "dark" : "" },
     info: '<b>' + escHtml(pay) + '</b><span>' + escHtml(m.job) + ' · ' + escHtml(p.loc || "지역 미기재") + '</span>',
     mine: isMine ? "내 글" : "" });
 }

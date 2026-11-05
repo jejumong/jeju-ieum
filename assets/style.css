@@ -1600,3 +1600,9 @@ a.act-item:hover{border-color:var(--sea-200)}
 .pv-actions-bottom{max-width:860px;margin:16px auto 0;display:flex;align-items:center;gap:8px}
 @media (max-width:680px){.cmt-wrap{padding:14px 14px 12px}}
 .board-fixed .bf-v{display:inline-flex;align-items:center;height:44px;padding:0 14px;border-radius:12px;background:var(--bg-2);font-weight:800;color:var(--ink)}
+
+/* 채용완료 */
+.item-card.pc.closed{opacity:.55}
+.item-card.pc.closed .pc-title{text-decoration:line-through;text-decoration-thickness:1.5px}
+.closed-tag{display:inline-block;vertical-align:middle;font-size:13px;font-weight:800;color:#fff;background:var(--ink-3);padding:3px 10px;border-radius:999px;margin-right:8px}
+.own-actions .job-close{padding:7px 14px;font-size:13.5px}

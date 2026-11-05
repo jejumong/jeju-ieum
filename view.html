@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106c">
+<link rel="stylesheet" href="assets/style.css?v=20261106d">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -59,15 +59,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106c"></script>
-<script src="assets/common.js?v=20261106c"></script>
-<script src="assets/db.js?v=20261106c"></script>
-<script src="assets/notify.js?v=20261106c"></script>
-<script src="assets/seed-trade.js?v=20261106c"></script>
-<script src="assets/seed-extra.js?v=20261106c"></script>
-<script src="assets/seed-new.js?v=20261106c"></script>
-<script src="assets/seed-comments.js?v=20261106c"></script>
-<script src="assets/admin-data.js?v=20261106c"></script>
+<script src="assets/kmap.js?v=20261106d"></script>
+<script src="assets/common.js?v=20261106d"></script>
+<script src="assets/db.js?v=20261106d"></script>
+<script src="assets/notify.js?v=20261106d"></script>
+<script src="assets/seed-trade.js?v=20261106d"></script>
+<script src="assets/seed-extra.js?v=20261106d"></script>
+<script src="assets/seed-new.js?v=20261106d"></script>
+<script src="assets/seed-comments.js?v=20261106d"></script>
+<script src="assets/admin-data.js?v=20261106d"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -121,7 +121,12 @@ if (!post) {
   document.title = post.title + " — 제주이음";
 
   var extra = "";
-  if (post.price || post.loc || post.period) {
+  if (post.board === "구인구직" && (post.payType || post.addr)) {
+    extra = '<div class="pv-extra">' +
+      (post.payType ? '<span>급여 <b>' + esc(payText(post)) + '</b></span>' : '') +
+      (post.addr ? '<span>근무지 <b>' + esc(post.addr) + '</b></span>' : '') +
+      '</div>';
+  } else if (post.price || post.loc || post.period) {
     extra = '<div class="pv-extra">' +
       (post.period ? '<span>기간 <b>' + esc(post.period) + '</b></span>' : '') +
       (post.price ? '<span>가격 <b>' + esc(post.price) + '원</b></span>' : '') +
@@ -135,19 +140,22 @@ if (!post) {
 
   document.getElementById("pv").innerHTML =
     '<div class="pv-board">' + esc(post.board) + (post.head && post.head !== post.board ? ' · ' + esc(post.head) : '') + '</div>' +
-    '<h1 class="pv-title">' + esc(post.title) + '</h1>' +
+    '<h1 class="pv-title">' + (post.head === "채용완료" ? '<span class="closed-tag">채용완료</span>' : '') + esc(post.title) + '</h1>' +
     '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : '') + '</span>' +
     '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
     extra +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
-    (post.board === "부동산" ? '<div class="pv-map"><h3>매물 위치</h3><div id="pv-map"></div></div>' : '') +
+    (post.board === "부동산" || (post.board === "구인구직" && post.addr) ? '<div class="pv-map"><h3>' + (post.board === "구인구직" ? "근무지 위치" : "매물 위치") + '</h3><div id="pv-map"></div></div>' : '') +
     joinBlock(post) +
     '<div class="pv-actions"><a class="btn ghost" href="' + backHref + '">목록으로</a>' +
     (isMyPost(post)
-      ? '<div class="own-actions"><button class="mini-btn" onclick="editPost()">수정</button>' +
+      ? '<div class="own-actions">' +
+        (post.board === "구인구직" ? '<button class="btn ' + (post.head === "채용완료" ? "ghost" : "primary") + ' job-close" onclick="closeJob()">' + (post.head === "채용완료" ? "채용 다시 열기" : "✅ 채용완료") + '</button>' : '') +
+        '<button class="mini-btn" onclick="editPost()">수정</button>' +
         '<button class="mini-btn danger-btn" onclick="removePost()">삭제</button></div>'
       : '') +
     '</div>';
+  if (post.board === "구인구직" && post.addr) JIMap.show(document.getElementById("pv-map"), post.addr);
   if (post.board === "부동산") {
     var mq = post.addr || (post.loc ? "제주특별자치도 " + post.loc : "");
     if (mq) JIMap.show(document.getElementById("pv-map"), mq, { approx: !post.addr });
@@ -282,6 +290,11 @@ function renderComments() {
   if (inp) inp.addEventListener("keydown", function(e){ if(e.key === "Enter") addComment(); });
 }
 
+function closeJob(){
+  var closing = post.head !== "채용완료";
+  if (!confirm(closing ? "이 공고를 채용완료로 바꿀까요?\n목록에 '채용완료'로 표시돼요." : "채용완료를 취소하고 다시 모집할까요?")) return;
+  var p = toggleJobClosed(post.id); if (p) location.reload();
+}
 function editPost(){ location.href = "write.html?edit=" + post.id; }
 function removePost(){
   if (!confirm("이 글을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.")) return;

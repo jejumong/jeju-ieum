@@ -94,7 +94,7 @@ function photoCard(p, o) {
   var col = AVA_COLORS[_hash(au) % AVA_COLORS.length];
   var views = typeof viewsOf === "function" ? viewsOf(p) : (p.views || 0);
   var cm = typeof commentCountOf === "function" ? commentCountOf(p.id) : 0;
-  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + '" href="view.html?id=' + p.id + '">' +
+  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed ? " closed" : "") + '" href="view.html?id=' + p.id + '">' +
     '<div class="pc-ph"><img src="' + photoUrl(photoFor(p)) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
       (o.pm ? '<span class="pm-tag">⭐ 프리미엄</span>' : '') +
       (o.mine ? '<span class="mine-tag">' + (o.mine.indexOf("모임") > -1 ? "👑 " : "✍️ ") + e(o.mine) + '</span>' : '') +
