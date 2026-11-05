@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105c">
+<link rel="stylesheet" href="assets/style.css?v=20261105d">
 </head>
 <body data-active="">
 
@@ -55,6 +55,10 @@
     </div>
 
     <div id="extra-trade" style="display:none">
+      <div class="field" id="htype-field" style="display:none">
+        <label for="htype">집 종류</label>
+        <select id="htype"><option>전원·단독주택</option><option>아파트</option><option>빌라·연립</option><option>원룸·투룸·오피스텔</option><option>토지·밭</option><option>상가·기타</option></select>
+      </div>
       <div class="field-row">
         <div class="field">
           <label for="price">가격 (원)</label>
@@ -89,12 +93,12 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261105c"></script>
-<script src="assets/seed-trade.js?v=20261105c"></script>
-<script src="assets/seed-extra.js?v=20261105c"></script>
-<script src="assets/seed-new.js?v=20261105c"></script>
-<script src="assets/seed-comments.js?v=20261105c"></script>
-<script src="assets/admin-data.js?v=20261105c"></script>
+<script src="assets/common.js?v=20261105d"></script>
+<script src="assets/seed-trade.js?v=20261105d"></script>
+<script src="assets/seed-extra.js?v=20261105d"></script>
+<script src="assets/seed-new.js?v=20261105d"></script>
+<script src="assets/seed-comments.js?v=20261105d"></script>
+<script src="assets/admin-data.js?v=20261105d"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -150,6 +154,7 @@ if (user && editId) {
     document.getElementById("content").value = editing.content || "";
     document.getElementById("price").value = editing.price || "";
     document.getElementById("loc").value = editing.loc || "";
+    if (editing.htype) document.getElementById("htype").value = editing.htype;
   }
 }
 
@@ -182,6 +187,7 @@ function toggleExtra() {
   var v = document.getElementById("board").value;
   var trade = ["구인구직", "부동산", "중고사고팔기", "특가공구"].indexOf(v) > -1;
   document.getElementById("extra-trade").style.display = trade ? "block" : "none";
+  document.getElementById("htype-field").style.display = v === "부동산" ? "block" : "none";
   var hs = document.getElementById("head"), cur = hs.value;
   if (!toggleExtra.done && typeof editing !== "undefined" && editing && editing.head) cur = editing.head;
   toggleExtra.done = true;
@@ -207,6 +213,7 @@ function submitPost() {
 
   var price = (document.getElementById("price").value || "").trim();
   var loc = (document.getElementById("loc").value || "").trim();
+  var htype = board === "부동산" ? document.getElementById("htype").value : "";
   var posts = JI.get("posts", []);
 
   if (editing) {
@@ -218,6 +225,7 @@ function submitPost() {
         posts[i].content = content;
         posts[i].price = price;
         posts[i].loc = loc;
+        posts[i].htype = htype;
         posts[i].editedAt = new Date().toISOString().slice(0, 10);
         break;
       }
@@ -233,7 +241,7 @@ function submitPost() {
     id: id, board: board,
     head: head === "선택 안 함" ? "" : head,
     title: title, content: content,
-    price: price, loc: loc,
+    price: price, loc: loc, htype: htype,
     author: user.nick,
     date: new Date().toISOString().slice(0, 10),
     views: 0

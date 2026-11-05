@@ -254,12 +254,14 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
             ["집·생활", "guide.html?cat=집·생활"], ["아이랑 제주", "guide.html?cat=아이랑 제주"],
             ["일·돈", "guide.html?cat=일·돈"], ["마을·관계", "guide.html?cat=마을·관계"]]) },
     { id: "stay", label: "한달살기·이주", href: "stay.html" },
+    { id: "realestate", label: "부동산", href: "realestate.html",
+      dd: ddGroup("부동산", [["일반 매물", "realestate.html"], ["학교 연계·체류형 집", "realestate.html?tab=school"], ["매물 등록", "write.html?board=부동산"]]) },
     { id: "tools", label: "생활도구", href: "tools.html" },
     { id: "community", label: "동네 커뮤니티", href: "community.html",
       dd: ddGroup("주제 게시판", boardLinks(["자유게시판", "고민상담실", "생활정보", "최신뉴스", "취미여행", "교육", "건강웰빙"])) +
           ddGroup("지역 게시판", boardLinks(["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"])) },
-    { id: "trade", label: "생활·거래", href: "trade.html", match: ["jobs", "realestate", "market", "shops", "clubs", "deals", "festivals"],
-      dd: ddGroup("이웃과 나누기", [["전체 한눈에", "trade.html"], ["부동산", "realestate.html"], ["구인구직", "jobs.html"], ["중고사고팔기", "market.html"],
+    { id: "trade", label: "생활·거래", href: "trade.html", match: ["jobs", "market", "shops", "clubs", "deals", "festivals"],
+      dd: ddGroup("이웃과 나누기", [["전체 한눈에", "trade.html"], ["구인구직", "jobs.html"], ["중고사고팔기", "market.html"],
             ["제주상점", "shops.html"], ["동호회", "clubs.html"], ["특가공구", "deals.html"], ["축제정보", "festivals.html"]]) },
     { id: "contact", label: "문의·제보", href: "contact.html" }
   ];
@@ -305,12 +307,12 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
           '<a href="festivals.html">축제정보</a>' +
           '<a href="community.html">동네 커뮤니티</a>' +
         '</div>' +
-        '<div class="footer-col"><h4>생활·거래</h4>' +
-          '<a href="realestate.html">부동산</a>' +
+        '<div class="footer-col"><h4>부동산·거래</h4>' +
+          '<a href="realestate.html">부동산 매물</a>' +
+          '<a href="realestate.html?tab=school">학교 연계 집</a>' +
           '<a href="jobs.html">구인구직</a>' +
           '<a href="market.html">중고사고팔기</a>' +
           '<a href="shops.html">제주상점</a>' +
-          '<a href="deals.html">특가공구</a>' +
         '</div>' +
         '<div class="footer-col"><h4>참여·안내</h4>' +
           '<a href="contact.html">문의·제보</a>' +
@@ -334,7 +336,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
   document.body.insertAdjacentHTML("beforeend", foot);
 
   /* 생활·거래 묶음 페이지: 헤더 아래 탭으로 서로 이동 */
-  var TRADE_TABS = [["trade", "전체", "trade.html"], ["realestate", "부동산", "realestate.html"], ["jobs", "구인구직", "jobs.html"],
+  var TRADE_TABS = [["trade", "전체", "trade.html"], ["jobs", "구인구직", "jobs.html"],
     ["market", "중고사고팔기", "market.html"], ["shops", "제주상점", "shops.html"], ["clubs", "동호회", "clubs.html"],
     ["deals", "특가공구", "deals.html"], ["festivals", "축제정보", "festivals.html"]];
   var isTrade = TRADE_TABS.some(function (t) { return t[0] === active; });

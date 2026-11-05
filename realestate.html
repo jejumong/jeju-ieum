@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105c">
+<link rel="stylesheet" href="assets/style.css?v=20261105d">
 </head>
 <body data-active="realestate">
 
@@ -18,12 +18,44 @@
   <div>
     <div class="crumb"><a href="index.html">홈</a> › 부동산</div>
     <h1>부동산</h1>
-    <p>학교 연계 주택·체류형 집부터 이웃 직거래 매매·연세·월세 매물까지</p>
+    <p>보고 싶은 집의 종류를 먼저 골라 주세요.</p>
   </div>
   <a class="btn accent" href="write.html?board=부동산">✏️ 매물 등록</a>
 </div></div>
 
 <main class="wrap">
+  <nav class="re-switch" role="tablist" aria-label="부동산 분류">
+    <button type="button" role="tab" data-p="general" id="sw-general">
+      <span class="rs-ico">🏠</span><span class="rs-t"><b>일반 매물</b><small>전원주택·아파트·빌라·원룸·토지 — 이웃 직거래 <em id="rs-n1"></em></small></span>
+    </button>
+    <button type="button" role="tab" data-p="school" id="sw-school">
+      <span class="rs-ico">🏫</span><span class="rs-t"><b>학교 연계·체류형 집</b><small>작은학교 마을 공동주택·농어촌유학·체류 지원 <em id="rs-n2"></em></small></span>
+    </button>
+  </nav>
+
+  <div class="re-panel" id="re-general">
+  <div id="pm-banner"></div>
+
+  <div class="re-filters">
+    <div class="re-frow"><span class="re-fl">집 종류</span><div class="filter-bar" id="htype-bar"></div></div>
+    <div class="re-frow"><span class="re-fl">거래 방식</span>
+  <div class="filter-bar" id="deal-bar">
+    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
+    <button class="chip-btn" data-filter="매매" onclick="applyChip(this)">매매</button>
+    <button class="chip-btn" data-filter="연세" onclick="applyChip(this)">연세</button>
+    <button class="chip-btn" data-filter="월세" onclick="applyChip(this)">월세</button>
+    <button class="chip-btn" data-filter="단기" onclick="applyChip(this)">단기·한달살이</button>
+    <button class="chip-btn" data-filter="일년살이" onclick="applyChip(this)">일년살이</button>
+    <span class="spacer"></span>
+    <span class="count">매물 <b id="shown-count">0</b>건</span>
+  </div>
+    </div>
+  </div>
+
+  <div id="re-wrap"></div>
+  </div>
+
+  <div class="re-panel" id="re-school">
   <!-- 학교 연계·체류형 집 (데이터: assets/school-housing-data.js, programs-data.js) -->
   <section class="sh" id="school-stay">
     <div class="sh-head">
@@ -64,40 +96,49 @@
     </div>
   </section>
 
-  <div class="sec-title" style="margin-top:40px"><div><div class="st-eb">LISTINGS</div><h2>이웃 매물</h2></div></div>
-  <div id="pm-banner"></div>
-
-  <div class="filter-bar">
-    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
-    <button class="chip-btn" data-filter="매매" onclick="applyChip(this)">매매</button>
-    <button class="chip-btn" data-filter="연세" onclick="applyChip(this)">연세</button>
-    <button class="chip-btn" data-filter="월세" onclick="applyChip(this)">월세</button>
-    <button class="chip-btn" data-filter="단기" onclick="applyChip(this)">단기·한달살이</button>
-    <button class="chip-btn" data-filter="일년살이" onclick="applyChip(this)">일년살이</button>
-    <button class="chip-btn" data-filter="학교근처" onclick="applyChip(this)">🏫 학교근처</button>
-    <span class="spacer"></span>
-    <span class="count">등록 매물 <b id="shown-count">0</b>건</span>
   </div>
-
-  <div id="re-wrap"></div>
 </main>
 
-<script src="assets/common.js?v=20261105c"></script>
-<script src="assets/seed-trade.js?v=20261105c"></script>
-<script src="assets/seed-extra.js?v=20261105c"></script>
-<script src="assets/seed-new.js?v=20261105c"></script>
-<script src="assets/seed-comments.js?v=20261105c"></script>
-<script src="assets/photos.js?v=20261105c"></script>
-<script src="assets/cards.js?v=20261105c"></script>
-<script src="assets/admin-data.js?v=20261105c"></script>
-<script src="assets/school-housing-data.js?v=20261105c"></script>
-<script src="assets/programs-data.js?v=20261105c"></script>
-<script src="assets/notify.js?v=20261105c"></script>
+<script src="assets/common.js?v=20261105d"></script>
+<script src="assets/seed-trade.js?v=20261105d"></script>
+<script src="assets/seed-extra.js?v=20261105d"></script>
+<script src="assets/seed-new.js?v=20261105d"></script>
+<script src="assets/seed-comments.js?v=20261105d"></script>
+<script src="assets/photos.js?v=20261105d"></script>
+<script src="assets/cards.js?v=20261105d"></script>
+<script src="assets/admin-data.js?v=20261105d"></script>
+<script src="assets/school-housing-data.js?v=20261105d"></script>
+<script src="assets/programs-data.js?v=20261105d"></script>
+<script src="assets/notify.js?v=20261105d"></script>
 <script>
 document.getElementById("pm-banner").innerHTML = premiumBanner("매물");
 
 var EMOJI = { "tr1":"🏡","tr2":"🏢","tr3":"🏙️","tr4":"🌊","tr5":"🏠","tr6":"🌙","tr7":"🏪","tr8":"🌾","tr9":"🚪","tr10":"🐕","tr11":"🍊","tr12":"🛏️" };
-var typeFilter = "all";
+var typeFilter = "all", htFilter = "all";
+var HTYPES = ["전원·단독주택", "아파트", "빌라·연립", "원룸·투룸·오피스텔", "토지·밭", "상가·기타"];
+/* 집 종류 — 글쓰기에서 고른 값이 있으면 그것, 없으면 제목·내용 단어로 추정 */
+function htypeOf(p){
+  if (p.htype) return p.htype;
+  var t = (p.title || "") + " " + (p.content || "").slice(0, 80);
+  if (/아파트/.test(t)) return "아파트";
+  if (/빌라|연립|다세대/.test(t)) return "빌라·연립";
+  if (/원룸|투룸|쓰리룸|오피스텔|방\s?[1-3]/.test(t)) return "원룸·투룸·오피스텔";
+  if (/상가|사무실|창고/.test(p.title || "")) return "상가·기타";
+  if (/토지|밭|임야|대지\s?\d/.test(p.title || "") && !/주택|구옥|독채/.test(p.title || "")) return "토지·밭";
+  return "전원·단독주택";
+}
+function allRe(){ return userPostsOf("부동산").concat(TRADE_SEEDS.filter(function(p){ return p.board === "부동산"; })); }
+function applyHt(el){
+  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on"); htFilter = el.dataset.ht; render();
+}
+(function(){
+  var all = allRe(), cnt = {};
+  all.forEach(function(p){ var k = htypeOf(p); cnt[k] = (cnt[k] || 0) + 1; });
+  document.getElementById("htype-bar").innerHTML = '<button class="chip-btn on" data-ht="all" onclick="applyHt(this)">전체 <small>' + all.length + '</small></button>' +
+    HTYPES.map(function(h){ return '<button class="chip-btn" data-ht="' + h + '" onclick="applyHt(this)">' + h + ' <small>' + (cnt[h] || 0) + '</small></button>'; }).join("");
+  document.getElementById("rs-n1").textContent = all.length + "건";
+})();
 
 function fmtPrice(p){
   if(!p) return "협의";
@@ -121,8 +162,9 @@ function reCard(p, isPm){
     mine: isMine ? "내 글" : "" });
 }
 function render(){
-  var list = userPostsOf("부동산").concat(TRADE_SEEDS.filter(function(p){ return p.board === "부동산"; }));
+  var list = allRe();
   list = list.filter(function(p){ return typeFilter === "all" || (p.head || "") === typeFilter; });
+  list = list.filter(function(p){ return htFilter === "all" || htypeOf(p) === htFilter; });
   if (reQ) list = list.filter(function(p){ return ((p.title||"") + " " + (p.content||"") + " " + (p.loc||"")).indexOf(reQ) > -1; });
   document.getElementById("shown-count").textContent = list.length;
   renderSections({
@@ -134,9 +176,24 @@ function render(){
 }
 /* ?q=한동 처럼 학교·마을 이름으로 매물 거르기 */
 var reQ = (new URLSearchParams(location.search).get("q") || "").trim();
-if (reQ) document.querySelector(".filter-bar .count").insertAdjacentHTML("beforebegin",
+if (reQ) document.querySelector("#deal-bar .count").insertAdjacentHTML("beforebegin",
   '<span class="chip-btn on" style="cursor:default">‘' + escHtml(reQ) + '’ 포함 <a href="realestate.html" style="margin-left:6px">✕</a></span>');
 render();
+
+/* ── 맨 위 분류 전환: 일반 매물 / 학교 연계·체류형 집 ── */
+function showPanel(k, push){
+  ["general", "school"].forEach(function(x){
+    document.getElementById("re-" + x).classList.toggle("on", x === k);
+    var b = document.getElementById("sw-" + x); b.classList.toggle("on", x === k); b.setAttribute("aria-selected", x === k);
+  });
+  if (push) history.replaceState(null, "", "realestate.html" + (k === "school" ? "?tab=school" : ""));
+}
+document.querySelector(".re-switch").addEventListener("click", function(e){ var b = e.target.closest("button"); if (b) showPanel(b.dataset.p, true); });
+(function(){
+  var P = new URLSearchParams(location.search);
+  var school = P.get("tab") === "school" || P.get("house") || (location.hash === "#school-stay" && !P.get("q"));
+  showPanel(school ? "school" : "general");
+})();
 
 /* ── 학교 연계·체류형 집 ── */
 (function(){
@@ -146,6 +203,7 @@ render();
   document.getElementById("sh-n1").textContent = SCHOOL_HOUSES.length;
   document.getElementById("sh-n2").textContent = YUHAK_SCHOOLS.length;
   document.getElementById("sh-checked").textContent = SCHOOL_HOUSES_CHECKED.replace(/-/g, ".");
+  document.getElementById("rs-n2").textContent = TOT.villages + "개 마을";
   document.getElementById("sh-total").textContent = TOT.villages + "개 마을 약 " + TOT.units + "세대";
   var sj = document.getElementById("src-jj"), ss = document.getElementById("src-sg");
   sj.textContent = SCHOOL_HOUSE_SOURCES.jejusi.label; sj.href = SCHOOL_HOUSE_SOURCES.jejusi.url;
@@ -258,7 +316,7 @@ render();
       '<div class="hm-src"><b>출처</b><ul>' + srcList(h) + '</ul>' +
         '<a href="contact.html?type=' + q("정보 정정 요청") + '&ref=' + q(h.school + " " + h.name) + '">정보가 다르면 알려 주세요 →</a></div></div>';
     document.body.appendChild(wrap);
-    function close(){ wrap.remove(); history.replaceState(null, "", location.pathname + location.search.replace(/[?&]house=[^&]*/, "").replace(/^&/, "?") + "#school-stay"); }
+    function close(){ wrap.remove(); history.replaceState(null, "", "realestate.html?tab=school"); }
     wrap.addEventListener("click", function(e){
       if (e.target === wrap || e.target.closest(".jn-x")) return close();
       var b = e.target.closest("[data-bell]"); if (b) bell(h);
@@ -289,7 +347,7 @@ render();
         '<a href="https://map.kakao.com/?q=' + q("제주 " + full) + '" target="_blank" rel="noopener">🗺️ 위치</a>' +
         '<a href="https://search.naver.com/search.naver?query=' + q(full + " 근처 연세") + '" target="_blank" rel="noopener">🏠 연세 검색</a>' +
         '<a href="https://search.naver.com/search.naver?query=' + q(full + " 한달살기") + '" target="_blank" rel="noopener">🧳 한달살기 검색</a>' +
-        '<a href="realestate.html?q=' + q(s.replace(/초$/, "")) + '#school-stay">💬 제주이음 매물 ' + mine + '</a>' +
+        '<a href="realestate.html?q=' + q(s.replace(/초$/, "")) + '">💬 제주이음 매물 ' + mine + '</a>' +
       '</div></div>';
   }).join("");
 
@@ -302,7 +360,7 @@ render();
       '<b>' + esc(p.name) + '</b><p>' + esc(p.what) + '</p><span class="sup-when">' + esc(p.when) + '</span></a>';
   }).join("");
 
-  if (reQ) document.querySelector(".filter-bar").scrollIntoView();
+  if (reQ) document.getElementById("deal-bar").scrollIntoView();
 })();
 </script>
 </body>

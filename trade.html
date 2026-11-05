@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>생활·거래 — 제주이음</title>
-<meta name="description" content="제주 구인구직, 부동산, 중고거래, 제주상점, 동호회, 특가공구, 축제정보를 한눈에.">
+<meta name="description" content="제주 구인구직, 중고거래, 제주상점, 동호회, 특가공구, 축제정보를 한눈에.">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1f74d0">
@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105c">
+<link rel="stylesheet" href="assets/style.css?v=20261105d">
 </head>
 <body data-active="trade">
 
@@ -33,17 +33,16 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261105c"></script>
-<script src="assets/seed-trade.js?v=20261105c"></script>
-<script src="assets/seed-extra.js?v=20261105c"></script>
-<script src="assets/seed-new.js?v=20261105c"></script>
-<script src="assets/seed-comments.js?v=20261105c"></script>
-<script src="assets/admin-data.js?v=20261105c"></script>
+<script src="assets/common.js?v=20261105d"></script>
+<script src="assets/seed-trade.js?v=20261105d"></script>
+<script src="assets/seed-extra.js?v=20261105d"></script>
+<script src="assets/seed-new.js?v=20261105d"></script>
+<script src="assets/seed-comments.js?v=20261105d"></script>
+<script src="assets/admin-data.js?v=20261105d"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
   var BOARDS = [
-    ["부동산", "realestate.html", "🏡", "연세·월세·매매"],
     ["구인구직", "jobs.html", "💼", "제주 일자리와 인재"],
     ["중고사고팔기", "market.html", "📦", "동네 직거래"],
     ["제주상점", "shops.html", "🏪", "이웃이 검증한 가게"],
@@ -72,7 +71,7 @@
       '<p style="font-size:13px;color:var(--ink-4);margin:-4px 0 6px">' + b[3] + '</p>' +
       '<ul>' + (items || '<li style="color:var(--ink-4)">아직 글이 없어요</li>') + '</ul></section>';
   }).join("");
-  document.getElementById("hub").appendChild(document.querySelector(".biz-strip")); // 7개 + 입점 안내로 칸 맞춤
+  document.getElementById("hub").appendChild(document.querySelector(".biz-strip")); // 6개 + 입점 안내
 })();
 </script>
 </body>
