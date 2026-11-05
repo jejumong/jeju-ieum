@@ -15,25 +15,34 @@
 </head>
 <body data-active="guide">
 
-<div class="page-head"><div class="inner">
-  <div>
+<main class="wrap gd">
+  <div class="gd-top">
     <div class="crumb"><a href="index.html">홈</a> › 제주살이 가이드</div>
     <h1 id="g-title">제주살이 가이드</h1>
-    <p id="g-desc">먼저 살아본 이웃이 정리한 제주 생활 정보 — 모든 글에 확인 날짜와 출처를 적습니다.</p>
+    <p>지금 상황을 고르면 꼭 필요한 글만 보여 드려요. 글마다 어떤 내용이 들어 있는지 미리 볼 수 있어요.</p>
+    <form class="gd-search" onsubmit="return false">
+      <input id="gq" type="search" placeholder="궁금한 걸 검색해 보세요 (예: 습기, 학교, 생활비)" autocomplete="off">
+    </form>
   </div>
-  <a class="btn ghost" href="contact.html?type=%EA%B0%80%EC%9D%B4%EB%93%9C%20%EC%A3%BC%EC%A0%9C%20%EC%A0%9C%EC%95%88">궁금한 주제 제안하기</a>
-</div></div>
 
-<main class="wrap">
-  <nav class="stage-tabs" id="stage-tabs" aria-label="상황별 가이드"></nav>
-  <div class="filter-bar" id="cat-bar"></div>
+  <nav class="gd-stages" id="gd-stages" aria-label="상황 선택"></nav>
+
   <div id="search-note"></div>
-  <div class="g-grid" id="g-grid"></div>
 
-  <div class="sec-title">
-    <div><div class="st-eb">COMMUNITY</div><h2>가이드에 없는 건 이웃에게 물어보세요</h2>
-      <p>지역·주제 게시판에 실제 사는 이웃들의 경험이 쌓이고 있어요.</p></div>
-    <a class="more" href="community.html">커뮤니티 가기 →</a>
+  <section id="gd-path-wrap">
+    <h2 class="gd-h">처음이라면 이 순서로</h2>
+    <ol class="hx-path" id="gd-path"></ol>
+  </section>
+
+  <h2 class="gd-h" id="list-h">모든 가이드</h2>
+  <div class="gd-list" id="gd-list"></div>
+
+  <div class="gd-ask">
+    <div><b>찾는 내용이 없나요?</b><span>궁금한 주제를 알려 주시면 다음 가이드로 정리해요. 이웃에게 바로 물어봐도 좋아요.</span></div>
+    <div class="gd-ask-btns">
+      <a class="btn ghost" href="community.html">이웃에게 묻기</a>
+      <a class="btn primary" href="contact.html?type=%EA%B0%80%EC%9D%B4%EB%93%9C%20%EC%A3%BC%EC%A0%9C%20%EC%A0%9C%EC%95%88">주제 제안하기</a>
+    </div>
   </div>
 </main>
 
@@ -47,25 +56,30 @@
 (function(){
   var P = new URLSearchParams(location.search);
   var stage = P.get("stage") || "", cat = P.get("cat") || "", q = (P.get("q") || "").trim();
-  function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
-  function url(o){ var u = new URLSearchParams(); if (o.stage) u.set("stage", o.stage); if (o.cat) u.set("cat", o.cat); var s=u.toString(); return "guide.html" + (s ? "?" + s : ""); }
+  function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
+  function $(id){ return document.getElementById(id); }
+  var STAGE_ICO = { "": "📚", "고민": "🤔", "한달살기": "🧳", "정착": "📦", "도민": "🏠" };
 
-  // 상황 탭
-  document.getElementById("stage-tabs").innerHTML =
-    '<a href="' + url({cat:cat}) + '" class="' + (!stage ? "on" : "") + '"><b>전체 보기</b><span>모든 가이드</span></a>' +
-    GUIDE_STAGES.map(function(s){
-      return '<a href="' + url({stage:s.id, cat:cat}) + '" class="' + (stage===s.id ? "on" : "") + '"><b>' + s.label + '</b><span>' + s.sub + '</span></a>';
+  // 상황 선택
+  function stageUrl(id){ return "guide.html" + (id ? "?stage=" + encodeURIComponent(id) : ""); }
+  var stages = [{ id:"", label:"전체", sub:"모든 가이드" }].concat(GUIDE_STAGES);
+  $("gd-stages").innerHTML = stages.map(function(s){
+    var n = s.id ? GUIDES.filter(function(g){ return (g.stage||[]).indexOf(s.id) > -1; }).length : GUIDES.length;
+    return '<a href="' + stageUrl(s.id) + '" class="' + (stage === s.id && !cat && !q ? "on" : "") + '">' +
+      '<span class="s-ico">' + STAGE_ICO[s.id] + '</span><b>' + s.label + '</b><small>' + s.sub + ' · ' + n + '편</small></a>';
+  }).join("");
+
+  // 처음 읽는 순서 (전체 보기일 때만)
+  var PATH = [["region","어디에 살까?"],["trial-stay","먼저 살아보기"],["work-money","일과 수입"],["settle-checklist","이사 첫 달"]];
+  if (!stage && !cat && !q) {
+    $("gd-path").innerHTML = PATH.map(function(x, i){
+      var g = guideById(x[0]); if (!g) return "";
+      return '<li><a href="article.html?id=' + g.id + '"><span class="p-n">' + (i+1) + '</span><span class="p-q">' + esc(x[1]) + '</span>' +
+        '<b>' + esc(g.title.split(" — ")[0]) + '</b><span class="p-m">' + g.min + '분 읽기</span></a></li>';
     }).join("");
+  } else { $("gd-path-wrap").style.display = "none"; }
 
-  // 주제 칩
-  var counts = {};
-  GUIDES.forEach(function(g){ counts[g.cat] = (counts[g.cat]||0) + 1; });
-  document.getElementById("cat-bar").innerHTML =
-    '<a class="chip-btn' + (!cat ? " on" : "") + '" href="' + url({stage:stage}) + '">전체 주제</a>' +
-    GUIDE_CATS.map(function(c){
-      return '<a class="chip-btn' + (cat===c ? " on" : "") + '" href="' + url({stage:stage, cat:c}) + '">' + c + ' <small style="opacity:.6">' + (counts[c]||0) + '</small></a>';
-    }).join("") + '<span class="spacer"></span><span class="count">가이드 <b id="shown-count">0</b>편</span>';
-
+  // 목록
   var list = GUIDES.filter(function(g){
     if (stage && (g.stage||[]).indexOf(stage) < 0) return false;
     if (cat && g.cat !== cat) return false;
@@ -73,23 +87,37 @@
     return true;
   });
 
-  if (stage) { var st = GUIDE_STAGES.filter(function(s){ return s.id===stage; })[0]; if (st) { document.getElementById("g-title").textContent = st.label + " 가이드"; } }
-  if (cat) document.getElementById("g-title").textContent = cat;
+  var st = GUIDE_STAGES.filter(function(s){ return s.id === stage; })[0];
+  if (st) { $("g-title").textContent = st.label + "이라면"; $("list-h").textContent = st.label + " — 가이드 " + list.length + "편"; }
+  else if (cat) { $("g-title").textContent = cat; $("list-h").textContent = cat + " — 가이드 " + list.length + "편"; }
+  else $("list-h").textContent = "모든 가이드 " + list.length + "편";
 
-  // 통합 검색: 가이드 + 커뮤니티
   if (q) {
-    document.getElementById("g-title").textContent = "‘" + q + "’ 검색 결과";
-    var gs = document.getElementById("gsearch"); if (gs) gs.value = q;
+    $("g-title").textContent = "‘" + q + "’ 검색 결과";
+    $("gq").value = q;
+    $("list-h").textContent = "가이드 " + list.length + "편";
     var cm = allPosts().filter(function(p){ return ((p.title||"") + " " + (p.content||"")).indexOf(q) > -1; }).length;
-    document.getElementById("search-note").innerHTML = '<div class="search-note">가이드 ' + list.length + '편 · 커뮤니티 글 ' + cm + '건' +
-      (cm ? '<a href="community.html?q=' + encodeURIComponent(q) + '">커뮤니티 결과 보기 →</a>' : '') + '</div>';
+    if (cm) $("search-note").innerHTML = '<div class="search-note">커뮤니티에도 관련 글이 ' + cm + '건 있어요 <a href="community.html?q=' + encodeURIComponent(q) + '">커뮤니티 결과 보기 →</a></div>';
   }
 
-  document.getElementById("shown-count").textContent = list.length;
-  document.getElementById("g-grid").innerHTML = list.length
-    ? list.map(function(g, i){ return guideCardHtml(g, !stage && !cat && !q && i === 0); }).join("")
-    : '<div class="card" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-3)">아직 이 조건의 가이드가 없어요. ' +
-      '<a style="color:var(--sea);font-weight:700" href="contact.html?type=%EA%B0%80%EC%9D%B4%EB%93%9C%20%EC%A3%BC%EC%A0%9C%20%EC%A0%9C%EC%95%88">주제를 제안해 주세요 →</a></div>';
+  $("gd-list").innerHTML = list.length ? list.map(function(g){
+    var parts = g.title.split(" — ");
+    var inside = (g.sections || []).map(function(s){ return s.h; }).slice(0, 3);
+    return '<a class="gd-row" href="article.html?id=' + g.id + '">' +
+      '<span class="r-ico">' + g.ico + '</span>' +
+      '<span class="r-body">' +
+        '<span class="r-cat">' + esc(g.cat) + '</span>' +
+        '<b>' + esc(parts[0]) + '</b>' +
+        (parts[1] ? '<span class="r-sub">' + esc(parts[1]) + '</span>' : '') +
+        (inside.length ? '<span class="r-in"><em>이런 내용을 담았어요</em>' + inside.map(function(h){ return '<i>' + esc(h) + '</i>'; }).join("") + '</span>' : '') +
+      '</span>' +
+      '<span class="r-side"><span>' + g.min + '분</span><small>' + g.updated.slice(5).replace("-", ".") + ' 확인</small><span class="r-arr">›</span></span>' +
+    '</a>';
+  }).join("") : '<div class="gd-empty">이 조건의 가이드가 아직 없어요. 아래에서 주제를 제안해 주세요.</div>';
+
+  $("gq").addEventListener("keydown", function(e){
+    if (e.key === "Enter") { var v = this.value.trim(); location.href = "guide.html" + (v ? "?q=" + encodeURIComponent(v) : ""); }
+  });
 })();
 </script>
 </body>
