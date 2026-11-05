@@ -13,7 +13,7 @@ var JIDB = (function () {
     return new Promise(function (resolve, reject) {
       if (window.supabase && window.supabase.createClient) return resolve();
       var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.js";
       s.onload = function () { resolve(); };
       s.onerror = function () { reject(new Error("supabase load failed")); };
       document.head.appendChild(s);

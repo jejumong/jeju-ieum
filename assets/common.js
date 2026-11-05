@@ -25,8 +25,8 @@ var SITE_CFG = {
   onesignalPath: "/",
   /* 카카오맵 JavaScript 키 — 카카오 디벨로퍼스 '제주이음' 앱. 플랫폼 → Web 에 사이트 도메인을 등록해야 지도가 열립니다. */
   /* Supabase (회원·동호회 가입 신청·알림) — 비워 두면 예전처럼 브라우저 저장 방식으로만 동작 */
-  supabaseUrl: "",
-  supabaseKey: "",
+  supabaseUrl: "https://nxwyilwhxtegwvfgoijd.supabase.co",
+  supabaseKey: "sb_publishable_GtNXRk00YModXwfvddAZSQ_zmtUSeVq",
   kakaoJsKey: "e8daa949540834b55af58b73b1a279ef",
   youtube: "https://www.youtube.com/@Jejumong",
   tools: {
