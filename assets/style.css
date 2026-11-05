@@ -1401,3 +1401,26 @@ a.ap-next:hover{background:var(--sea-600)}
   .search button{padding:7px 13px;font-size:12.5px}
 }
 @media (max-width:360px){.hb-write{font-size:0!important;padding:7px 9px!important}.hb-write .hb-ico{font-size:14px}}
+
+/* 학교 연계 집: 세 개의 큰 탭을 가장 눈에 띄게, 운영 방식(1~4)은 작게 */
+.sh-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;border-bottom:0;margin:4px 0 16px;overflow:visible}
+.sh-tabs button{display:flex;align-items:center;gap:12px;text-align:left;margin:0;padding:16px 18px;border:1.5px solid var(--line);border-radius:var(--r);background:#fff;color:var(--ink-2);cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s;font:inherit}
+.sh-tabs button:hover{border-color:var(--sea-200);box-shadow:var(--sh-2)}
+.sh-tabs button.on{background:var(--sea);border-color:var(--sea);color:#fff;box-shadow:0 8px 20px rgba(43,140,230,.28)}
+.sh-tabs .st-i{font-size:26px;flex:none}
+.sh-tabs .st-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sh-tabs .st-t b{font-size:16.5px;font-weight:800;letter-spacing:-.03em;color:inherit}
+.sh-tabs .st-t em{font-style:normal;font-size:13px;font-weight:600;opacity:.75}
+.sh-tabs button small{font-size:12.5px;font-weight:800;color:var(--sea-700);background:var(--sea-50);padding:1px 7px;border-radius:var(--r-pill);margin-left:4px}
+.sh-tabs button.on small{background:rgba(255,255,255,.22);color:#fff}
+.sh-how{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 14px;padding:10px 14px;background:transparent;border:1px dashed var(--line);border-radius:var(--r-sm)}
+.sh-how li{background:none;border:0;padding:0 0 0 22px;position:relative;font-size:13px}
+.sh-how li::before{left:0;top:1px;width:17px;height:17px;border-radius:50%;font-size:10.5px;background:var(--ink-5)}
+.sh-how b{display:inline;font-size:13px;font-weight:700;color:var(--ink-2)}
+.sh-how span{display:none}
+@media (max-width:760px){
+  .sh-tabs{grid-template-columns:minmax(0,1fr);gap:8px}
+  .sh-tabs button{padding:12px 14px}
+  .sh-tabs .st-i{font-size:22px}
+  .sh-tabs .st-t b{font-size:15.5px}
+}
