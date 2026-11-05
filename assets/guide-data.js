@@ -14,6 +14,14 @@ var GUIDE_STAGES = [
   { id: "도민", label: "제주 사는 도민", sub: "생활 꿀정보" }
 ];
 
+/* 처음 읽는 순서 — 메인·가이드 목록의 1~4단계, 글 안의 '다음 순서' 버튼이 모두 이 목록을 씁니다 */
+var GUIDE_PATH = [
+  { id: "region", q: "어디에 살까?" },
+  { id: "trial-stay", q: "먼저 살아보기" },
+  { id: "work-money", q: "일과 수입" },
+  { id: "settle-checklist", q: "이사 첫 달" }
+];
+
 var GUIDES = [
 {
   id: "region", cat: "동네 고르기", ico: "🧭", stage: ["고민", "한달살기"], featured: true,

@@ -256,8 +256,8 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
     { id: "stay", label: "한달살기·이주", href: "stay.html" },
     { id: "tools", label: "생활도구", href: "tools.html" },
     { id: "community", label: "동네 커뮤니티", href: "community.html",
-      dd: ddGroup("지역 게시판", boardLinks(["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"])) +
-          ddGroup("주제 게시판", boardLinks(["교육", "건강웰빙", "생활정보", "취미여행", "고민상담실", "자유게시판", "최신뉴스"])) },
+      dd: ddGroup("주제 게시판", boardLinks(["자유게시판", "고민상담실", "생활정보", "최신뉴스", "취미여행", "교육", "건강웰빙"])) +
+          ddGroup("지역 게시판", boardLinks(["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"])) },
     { id: "trade", label: "생활·거래", href: "trade.html", match: ["jobs", "realestate", "market", "shops", "clubs", "deals", "festivals"],
       dd: ddGroup("이웃과 나누기", [["전체 한눈에", "trade.html"], ["부동산", "realestate.html"], ["구인구직", "jobs.html"], ["중고사고팔기", "market.html"],
             ["제주상점", "shops.html"], ["동호회", "clubs.html"], ["특가공구", "deals.html"], ["축제정보", "festivals.html"]]) },

@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105a">
+<link rel="stylesheet" href="assets/style.css?v=20261105b">
 </head>
 <body data-active="">
 
@@ -28,12 +28,11 @@
       <div class="field">
         <label for="board">게시판 선택 <span class="req">*</span></label>
         <select id="board">
+          <optgroup label="커뮤니티 — 주제">
+            <option selected>자유게시판</option><option>고민상담실</option><option>생활정보</option><option>최신뉴스</option><option>취미여행</option><option>교육</option><option>건강웰빙</option>
+          </optgroup>
           <optgroup label="커뮤니티 — 지역">
             <option>제주북쪽</option><option>제주동쪽</option><option>제주서쪽</option><option>제주남쪽</option>
-          </optgroup>
-          <optgroup label="커뮤니티 — 주제">
-            <option>교육</option><option>건강웰빙</option><option>생활정보</option><option>취미여행</option>
-            <option>고민상담실</option><option selected>자유게시판</option><option>최신뉴스</option>
           </optgroup>
           <optgroup label="거래·모임">
             <option>구인구직</option><option>부동산</option><option>중고사고팔기</option>
@@ -90,12 +89,12 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261105a"></script>
-<script src="assets/seed-trade.js?v=20261105a"></script>
-<script src="assets/seed-extra.js?v=20261105a"></script>
-<script src="assets/seed-new.js?v=20261105a"></script>
-<script src="assets/seed-comments.js?v=20261105a"></script>
-<script src="assets/admin-data.js?v=20261105a"></script>
+<script src="assets/common.js?v=20261105b"></script>
+<script src="assets/seed-trade.js?v=20261105b"></script>
+<script src="assets/seed-extra.js?v=20261105b"></script>
+<script src="assets/seed-new.js?v=20261105b"></script>
+<script src="assets/seed-comments.js?v=20261105b"></script>
+<script src="assets/admin-data.js?v=20261105b"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");

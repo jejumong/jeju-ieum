@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105a">
+<link rel="stylesheet" href="assets/style.css?v=20261105b">
 </head>
 <body data-active="home">
 
@@ -102,15 +102,15 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261105a"></script>
-<script src="assets/seed-trade.js?v=20261105a"></script>
-<script src="assets/seed-extra.js?v=20261105a"></script>
-<script src="assets/seed-new.js?v=20261105a"></script>
-<script src="assets/seed-comments.js?v=20261105a"></script>
-<script src="assets/admin-data.js?v=20261105a"></script>
-<script src="assets/guide-data.js?v=20261105a"></script>
-<script src="assets/programs-data.js?v=20261105a"></script>
-<script src="assets/school-housing-data.js?v=20261105a"></script>
+<script src="assets/common.js?v=20261105b"></script>
+<script src="assets/seed-trade.js?v=20261105b"></script>
+<script src="assets/seed-extra.js?v=20261105b"></script>
+<script src="assets/seed-new.js?v=20261105b"></script>
+<script src="assets/seed-comments.js?v=20261105b"></script>
+<script src="assets/admin-data.js?v=20261105b"></script>
+<script src="assets/guide-data.js?v=20261105b"></script>
+<script src="assets/programs-data.js?v=20261105b"></script>
+<script src="assets/school-housing-data.js?v=20261105b"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -126,11 +126,10 @@
   $("d-houses").textContent = t.villages + "개 마을 · " + t.units + "세대";
 
   // 처음 읽는 순서
-  var PATH = [["region","어디에 살까?"],["trial-stay","먼저 살아보기"],["work-money","일과 수입"],["settle-checklist","이사 첫 달"]];
-  $("hx-path").innerHTML = PATH.map(function(x, i){
-    var g = guideById(x[0]); if (!g) return "";
+  $("hx-path").innerHTML = GUIDE_PATH.map(function(x, i){
+    var g = guideById(x.id); if (!g) return "";
     return '<li><a href="article.html?id=' + g.id + '"><span class="p-n">' + (i+1) + '</span>' +
-      '<span class="p-q">' + esc(x[1]) + '</span><b>' + esc(g.title.split(" — ")[0]) + '</b>' +
+      '<span class="p-q">' + esc(x.q) + '</span><b>' + esc(g.title.split(" — ")[0]) + '</b>' +
       '<span class="p-m">' + g.min + '분 읽기</span></a></li>';
   }).join("");
 
