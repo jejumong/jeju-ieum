@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261105f">
+<link rel="stylesheet" href="assets/style.css?v=20261105g">
 </head>
 <body data-active="realestate">
 
@@ -81,7 +81,8 @@
         <li><b>🔔 빈자리 알림</b><span>무료 알림을 켜 두면 소식이 확인될 때 자동으로 알려 드려요</span></li>
       </ol>
       <div class="filter-bar sh-filter" id="sh-filter"></div>
-      <div class="hs-grid" id="sh-list"></div>
+      <div class="hr-list" id="sh-list"></div>
+      <div class="pg-pager" id="sh-pager"></div>
       <p class="sh-note">공식 목록·보도 기준 <b id="sh-total"></b>. 출처: <a id="src-jj" target="_blank" rel="noopener"></a> · <a id="src-sg" target="_blank" rel="noopener"></a>. 입주 조건·임대료는 마을마다 다르고 바뀔 수 있어요 · 마지막 정리 <b id="sh-checked"></b></p>
     </div>
 
@@ -99,17 +100,17 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261105f"></script>
-<script src="assets/seed-trade.js?v=20261105f"></script>
-<script src="assets/seed-extra.js?v=20261105f"></script>
-<script src="assets/seed-new.js?v=20261105f"></script>
-<script src="assets/seed-comments.js?v=20261105f"></script>
-<script src="assets/photos.js?v=20261105f"></script>
-<script src="assets/cards.js?v=20261105f"></script>
-<script src="assets/admin-data.js?v=20261105f"></script>
-<script src="assets/school-housing-data.js?v=20261105f"></script>
-<script src="assets/programs-data.js?v=20261105f"></script>
-<script src="assets/notify.js?v=20261105f"></script>
+<script src="assets/common.js?v=20261105g"></script>
+<script src="assets/seed-trade.js?v=20261105g"></script>
+<script src="assets/seed-extra.js?v=20261105g"></script>
+<script src="assets/seed-new.js?v=20261105g"></script>
+<script src="assets/seed-comments.js?v=20261105g"></script>
+<script src="assets/photos.js?v=20261105g"></script>
+<script src="assets/cards.js?v=20261105g"></script>
+<script src="assets/admin-data.js?v=20261105g"></script>
+<script src="assets/school-housing-data.js?v=20261105g"></script>
+<script src="assets/programs-data.js?v=20261105g"></script>
+<script src="assets/notify.js?v=20261105g"></script>
 <script>
 document.getElementById("pm-banner").innerHTML = premiumBanner("매물");
 
@@ -247,7 +248,7 @@ document.querySelector(".re-switch").addEventListener("click", function(e){ var 
   }
 
   // 필터
-  var fCity = "", fYuhak = false, fWatch = false;
+  var fCity = "", fYuhak = false, fWatch = false, shPage = 1, SH_PER = 10;
   function drawFilter(){
     var n = function(fn){ return SCHOOL_HOUSES.filter(fn).length; };
     document.getElementById("sh-filter").innerHTML =
@@ -261,7 +262,7 @@ document.querySelector(".re-switch").addEventListener("click", function(e){ var 
     if (b.dataset.city !== undefined) fCity = b.dataset.city;
     if (b.dataset.yuhak) fYuhak = !fYuhak;
     if (b.dataset.watch) fWatch = !fWatch;
-    drawFilter(); drawList();
+    shPage = 1; drawFilter(); drawList();
   });
 
   // 카드
@@ -270,17 +271,39 @@ document.querySelector(".re-switch").addEventListener("click", function(e){ var 
     var list = SCHOOL_HOUSES.filter(function(h){
       return (!fCity || h.city === fCity) && (!fYuhak || isYuhak(h)) && (!fWatch || JINotify.isOn(topic(h)));
     }).sort(function(a,b){ return ORDER[a.status] - ORDER[b.status] || (a.city < b.city ? -1 : a.city > b.city ? 1 : 0); });
-    document.getElementById("sh-list").innerHTML = list.map(function(h){
+    var pages = Math.max(1, Math.ceil(list.length / SH_PER)); if (shPage > pages) shPage = pages;
+    var shown = list.slice((shPage - 1) * SH_PER, shPage * SH_PER);
+    function row(k, v){ return v ? '<div><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>' : ''; }
+    document.getElementById("sh-list").innerHTML = shown.map(function(h){
       var st = SCHOOL_HOUSE_STATUS[h.status], on = JINotify.isOn(topic(h));
-      return '<article class="hc s-' + h.status + '" data-id="' + h.id + '" tabindex="0" role="button" aria-label="' + esc(h.name) + ' 자세히 보기">' +
-        '<div class="hc-ph' + (h.photos && h.photos.length ? '" style="background-image:url(' + h.photos[0] + ')' : ' none') + '">' +
-          (h.photos && h.photos.length ? '' : '<span>🏘️</span>') + '<span class="hst ' + st[1] + '">' + st[0] + '</span></div>' +
-        '<div class="hc-b"><div class="hc-sc">🏫 ' + esc(h.school) + (isYuhak(h) ? ' <span class="chip stage">농어촌유학</span>' : '') + '</div>' +
-        '<h3>' + esc(h.name) + '</h3><div class="hc-v">📍 ' + esc(h.city + " " + h.village) + '</div>' +
-        '<div class="hc-m"><span>' + esc(h.units.split(" · ")[0].split(" (")[0]) + '</span>' + (areaText(h) ? '<span>' + esc(areaText(h)) + '</span>' : '') + (h.built ? '<span>' + h.built + '년</span>' : '') + '</div>' +
-        '<div class="hc-f"><span class="hc-more">자세히 보기 →</span><button type="button" class="bell' + (on ? " on" : "") + '" data-bell="' + h.id + '" aria-label="빈자리 알림">' + (on ? "🔔 알림 켜짐" : "🔕 빈자리 알림") + '</button></div></div></article>';
-    }).join("") || '<div class="card" style="grid-column:1/-1;text-align:center;color:var(--ink-3);padding:30px">조건에 맞는 주택이 없어요.</div>';
+      var size = [h.units, areaText(h), h.built ? h.built + "년 준공" : ""].filter(Boolean).join(" · ");
+      return '<article class="hr s-' + h.status + '" data-id="' + h.id + '" tabindex="0" role="button" aria-label="' + esc(h.name) + ' 자세히 보기">' +
+        '<div class="hr-top"><span class="hst ' + st[1] + '">' + st[0] + '</span>' +
+          '<span class="hr-sc">🏫 ' + esc(h.school) + '</span>' + (isYuhak(h) ? '<span class="chip stage">농어촌유학</span>' : '') +
+          '<span class="hr-city">' + esc(h.city) + '</span></div>' +
+        '<h3>' + esc(h.name) + '</h3>' +
+        '<dl class="hr-dl">' +
+          row("주소", h.address || (h.city + " " + h.village)) +
+          row("규모", size) +
+          row("입주 조건", h.rule) +
+          row("거주 기간", h.stay) +
+          row("비용", h.cost) +
+          row("문의", h.tel ? h.tel + (h.telLabel ? " (" + h.telLabel + ")" : "") : "") +
+        '</dl>' +
+        '<div class="hr-f"><span class="hc-more">지도·출처 자세히 보기 →</span><button type="button" class="bell' + (on ? " on" : "") + '" data-bell="' + h.id + '" aria-label="빈자리 알림">' + (on ? "🔔 알림 켜짐" : "🔕 빈자리 알림") + '</button></div></article>';
+    }).join("") || '<div class="card" style="text-align:center;color:var(--ink-3);padding:30px">조건에 맞는 주택이 없어요.</div>';
+    var pg = document.getElementById("sh-pager");
+    if (pages < 2) { pg.innerHTML = ""; return; }
+    var b = '<button type="button" data-pg="' + (shPage - 1) + '"' + (shPage === 1 ? " disabled" : "") + '>‹</button>';
+    for (var k = 1; k <= pages; k++) b += '<button type="button" data-pg="' + k + '"' + (k === shPage ? ' class="on"' : "") + '>' + k + '</button>';
+    b += '<button type="button" data-pg="' + (shPage + 1) + '"' + (shPage === pages ? " disabled" : "") + '>›</button>';
+    pg.innerHTML = b;
   }
+  document.getElementById("sh-pager").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-pg]"); if (!b || b.disabled) return;
+    shPage = +b.dataset.pg; drawList();
+    document.getElementById("sh-filter").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   function bell(h){
     JINotify.openSheet({ topic: topic(h), label: h.name, status: h.status,
@@ -327,10 +350,10 @@ document.querySelector(".re-switch").addEventListener("click", function(e){ var 
   document.getElementById("sh-list").addEventListener("click", function(e){
     var b = e.target.closest("[data-bell]");
     if (b) { e.stopPropagation(); bell(SCHOOL_HOUSES.filter(function(x){ return x.id === b.dataset.bell; })[0]); return; }
-    var c = e.target.closest(".hc"); if (c) openDetail(c.dataset.id);
+    var c = e.target.closest(".hr"); if (c) openDetail(c.dataset.id);
   });
   document.getElementById("sh-list").addEventListener("keydown", function(e){
-    if (e.key === "Enter" && e.target.classList.contains("hc")) openDetail(e.target.dataset.id);
+    if (e.key === "Enter" && e.target.classList.contains("hr")) openDetail(e.target.dataset.id);
   });
 
   drawFilter(); drawList();

@@ -1295,3 +1295,22 @@ a.ap-next:hover{background:var(--sea-600)}
 }
 @media (max-width:700px){.pm-info{display:block!important;line-height:1.6}.pm-info a{display:inline-block;margin:8px 0 0!important}}
 .footer-brand .fb-yt.fb-about{margin-top:8px}
+
+/* 학교 연계 집: 사진 없이 상세 문구 목록 */
+.hr-list{display:flex;flex-direction:column;gap:10px}
+.hr{background:#fff;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:var(--r);padding:18px 20px 14px;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.hr:hover,.hr:focus-visible{box-shadow:var(--sh-2);border-color:var(--sea-200);outline:none}
+.hr.s-open{border-left-color:var(--coral)}
+.hr.s-wait{border-left-color:var(--ink-5)}
+.hr.s-check{border-left-color:var(--sea)}
+.hr.s-plan{border-left-color:var(--citrus)}
+.hr-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hr-sc{font-size:13px;font-weight:800;color:var(--sea-700)}
+.hr-city{margin-left:auto;font-size:12px;font-weight:700;color:var(--ink-4)}
+.hr h3{font-size:18px;font-weight:800;letter-spacing:-.03em;color:var(--ink);margin:8px 0 10px;line-height:1.35}
+.hr-dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 24px;margin:0}
+.hr-dl>div{display:grid;grid-template-columns:64px 1fr;gap:8px;font-size:14px;line-height:1.55;min-width:0}
+.hr-dl dt{color:var(--ink-4);font-weight:700}
+.hr-dl dd{color:var(--ink-2);margin:0;min-width:0;overflow-wrap:anywhere}
+.hr-f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line-2)}
+@media (max-width:760px){.hr{padding:16px}.hr-dl{grid-template-columns:minmax(0,1fr)}.hr h3{font-size:16px}}
