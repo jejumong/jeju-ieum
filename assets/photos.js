@@ -86,6 +86,17 @@ var ICON_HEART = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="t
 var ICON_EYE = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
 var ICON_CMT = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M4 5h16v11H9l-5 4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 
+/* 카드 대표 사진: 회원이 올린 첫 사진 → 없으면 회원 글은 게시판 아이콘, 예시 글은 예시 사진 */
+var BOARD_ICON = { "구인구직": "💼", "중고사고팔기": "🛍️", "부동산": "🏠", "제주상점": "🏪", "동호회": "🏄", "특가공구": "🎁", "축제정보": "🎉",
+  "자유게시판": "💬", "고민상담실": "🤝", "생활정보": "📌", "최신뉴스": "📰", "취미여행": "🧭", "교육": "📚", "건강웰빙": "🌿" };
+function postPhotos(p) { return (p && p.extra && Array.isArray(p.extra.photos)) ? p.extra.photos : []; }
+function cardImage(p) {
+  var ph = postPhotos(p);
+  if (ph.length) return '<img src="' + ph[0].replace(/"/g, "") + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">';
+  if (typeof isUserPost === "function" && isUserPost(p)) return '<span class="pc-ico" aria-hidden="true">' + (BOARD_ICON[p.board] || "📝") + '</span>';
+  return '<img src="' + photoUrl(photoFor(p)) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">';
+}
+
 /* o = { pm, badge:{text,cls}, info:"html", extra:"html", mine:"내가 올린 글", title } */
 function photoCard(p, o) {
   o = o || {};
@@ -95,7 +106,7 @@ function photoCard(p, o) {
   var views = typeof viewsOf === "function" ? viewsOf(p) : (p.views || 0);
   var cm = typeof commentCountOf === "function" ? commentCountOf(p.id) : 0;
   return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed ? " closed" : "") + '" href="view.html?id=' + p.id + '">' +
-    '<div class="pc-ph"><img src="' + photoUrl(photoFor(p)) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' +
+    '<div class="pc-ph">' + cardImage(p) +
       (o.pm ? '<span class="pm-tag">⭐ 프리미엄</span>' : '') +
       (o.mine ? '<span class="mine-tag">' + (o.mine.indexOf("모임") > -1 ? "👑 " : "✍️ ") + e(o.mine) + '</span>' : '') +
       (o.badge ? '<span class="pc-badge ' + (o.badge.cls || "") + '">' + e(o.badge.text) + '</span>' : '') +

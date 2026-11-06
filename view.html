@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106x">
+<link rel="stylesheet" href="assets/style.css?v=20261106y">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -59,15 +59,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106x"></script>
-<script src="assets/common.js?v=20261106x"></script>
-<script src="assets/db.js?v=20261106x"></script>
-<script src="assets/notify.js?v=20261106x"></script>
-<script src="assets/seed-trade.js?v=20261106x"></script>
-<script src="assets/seed-extra.js?v=20261106x"></script>
-<script src="assets/seed-new.js?v=20261106x"></script>
-<script src="assets/seed-comments.js?v=20261106x"></script>
-<script src="assets/admin-data.js?v=20261106x"></script>
+<script src="assets/kmap.js?v=20261106y"></script>
+<script src="assets/common.js?v=20261106y"></script>
+<script src="assets/db.js?v=20261106y"></script>
+<script src="assets/notify.js?v=20261106y"></script>
+<script src="assets/seed-trade.js?v=20261106y"></script>
+<script src="assets/seed-extra.js?v=20261106y"></script>
+<script src="assets/seed-new.js?v=20261106y"></script>
+<script src="assets/seed-comments.js?v=20261106y"></script>
+<script src="assets/admin-data.js?v=20261106y"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -144,6 +144,7 @@ if (!post) {
     '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : msgLink(post.authorId, post.author)) + '</span>' +
     '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
     extra +
+    galleryHtml(post) +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
     (post.board === "구인구직" && isMyPost(post)
       ? '<div class="job-status' + (post.head === "채용완료" ? " done" : "") + '"><div><b>' + (post.head === "채용완료" ? "✅ 채용이 끝난 공고예요" : "📢 지금 모집 중인 공고예요") + '</b>' +
@@ -260,6 +261,25 @@ function drawClubJoin() {
     if (j.status === "approved") { box.insertAdjacentHTML("beforeend", '<div id="club-notices"></div>'); drawNotices(false); }
   });
 }
+
+/* 글 사진 보기 */
+var PV_PH, PV_I;   // 값은 galleryHtml 에서 (글 그리기가 이 줄보다 먼저 실행될 수 있음)
+function galleryHtml(p) {
+  PV_PH = (p && p.extra && Array.isArray(p.extra.photos)) ? p.extra.photos : []; PV_I = 0;
+  if (!PV_PH.length) return "";
+  var many = PV_PH.length > 1;
+  return '<div class="pv-gallery"><div class="pv-main"><img id="pv-img" src="' + esc(PV_PH[0]) + '" alt="첨부 사진 1" onclick="window.open(this.src,\'_blank\')">' +
+    (many ? '<button type="button" class="pv-nav l" onclick="pvGo(-1)" aria-label="이전 사진">‹</button><button type="button" class="pv-nav r" onclick="pvGo(1)" aria-label="다음 사진">›</button>' +
+      '<span class="pv-count" id="pv-count">1 / ' + PV_PH.length + '</span>' : '') + '</div>' +
+    (many ? '<div class="pv-thumbs" id="pv-thumbs">' + PV_PH.map(function (u, i) { return '<button type="button" class="' + (i ? '' : 'on') + '" onclick="pvShow(' + i + ')"><img src="' + esc(u) + '" alt="" loading="lazy"></button>'; }).join("") + '</div>' : '') + '</div>';
+}
+function pvShow(i) {
+  PV_I = (i + PV_PH.length) % PV_PH.length;
+  var im = document.getElementById("pv-img"); im.src = PV_PH[PV_I]; im.alt = "첨부 사진 " + (PV_I + 1);
+  var c = document.getElementById("pv-count"); if (c) c.textContent = (PV_I + 1) + " / " + PV_PH.length;
+  document.querySelectorAll("#pv-thumbs button").forEach(function (b, j) { b.classList.toggle("on", j === PV_I); });
+}
+function pvGo(d) { pvShow(PV_I + d); }
 
 /* 회원에게 쪽지 보내기 링크 (서버 회원 글·댓글에만) */
 function msgLink(uid, nick) {

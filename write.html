@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106x">
+<link rel="stylesheet" href="assets/style.css?v=20261106y">
 </head>
 <body data-active="">
 
@@ -100,7 +100,10 @@
 
     <div class="field">
       <label>사진 첨부</label>
-      <div class="file-drop" onclick="alert('사진 업로드는 서버 연동 후 제공됩니다.')">📷 클릭해서 사진 올리기 (최대 10장, 장당 10MB)</div>
+      <input type="file" id="ph-input" accept="image/jpeg,image/png,image/webp,image/heic,image/*" multiple hidden>
+      <div class="ph-grid" id="ph-grid"></div>
+      <div class="file-drop" id="ph-drop" role="button" tabindex="0">📷 눌러서 사진 올리기 <small>(최대 10장 · 첫 번째 사진이 목록 대표 사진이 돼요)</small></div>
+      <p class="ph-note" id="ph-note"></p>
     </div>
 
     <div class="form-actions">
@@ -110,15 +113,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106x"></script>
-<script src="assets/common.js?v=20261106x"></script>
-<script src="assets/db.js?v=20261106x"></script>
-<script src="assets/notify.js?v=20261106x"></script>
-<script src="assets/seed-trade.js?v=20261106x"></script>
-<script src="assets/seed-extra.js?v=20261106x"></script>
-<script src="assets/seed-new.js?v=20261106x"></script>
-<script src="assets/seed-comments.js?v=20261106x"></script>
-<script src="assets/admin-data.js?v=20261106x"></script>
+<script src="assets/kmap.js?v=20261106y"></script>
+<script src="assets/common.js?v=20261106y"></script>
+<script src="assets/db.js?v=20261106y"></script>
+<script src="assets/notify.js?v=20261106y"></script>
+<script src="assets/seed-trade.js?v=20261106y"></script>
+<script src="assets/seed-extra.js?v=20261106y"></script>
+<script src="assets/seed-new.js?v=20261106y"></script>
+<script src="assets/seed-comments.js?v=20261106y"></script>
+<script src="assets/admin-data.js?v=20261106y"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -173,6 +176,10 @@ function fillEdit(editing) {
     if (editing.payType) document.getElementById("paytype").value = editing.payType;
     document.getElementById("pay").value = editing.pay || "";
   if (typeof toggleExtra === "function") toggleExtra();
+  // 이미 올린 사진 불러오기
+  if (editing.extra && editing.extra.photos && editing.extra.photos.length) {
+    PHOTOS = editing.extra.photos.map(function (u) { return { url: u, preview: u }; }); drawPhotos();
+  }
 }
 
 // 수정 모드 — 본인 글만 (데이터베이스 글은 불러와서 확인)
@@ -269,6 +276,48 @@ function toggleRestrictHint() {
   document.getElementById("restrict-hint").style.display = isRestrictedBoard(v) ? "block" : "none";
 }
 
+/* ── 사진 첨부 ── */
+var PHOTOS = [], PH_BUSY = 0, PH_MAX = 10;
+function drawPhotos() {
+  var g = document.getElementById("ph-grid");
+  g.innerHTML = PHOTOS.map(function (p, i) {
+    return '<div class="ph-item' + (p.url ? '' : ' up') + '">' + '<img src="' + (p.url || p.preview) + '" alt="">' +
+      (i === 0 ? '<span class="ph-main">대표</span>' : '') + (p.url ? '' : '<span class="ph-load">올리는 중…</span>') +
+      '<div class="ph-acts">' + (i > 0 ? '<button type="button" onclick="movePhoto(' + i + ',-1)" title="앞으로">‹</button>' : '') +
+      (i < PHOTOS.length - 1 ? '<button type="button" onclick="movePhoto(' + i + ',1)" title="뒤로">›</button>' : '') +
+      '<button type="button" class="ph-del" onclick="removePhoto(' + i + ')" title="빼기">✕</button></div></div>';
+  }).join("");
+  var drop = document.getElementById("ph-drop");
+  drop.style.display = PHOTOS.length >= PH_MAX ? "none" : "";
+  document.getElementById("ph-note").textContent = PHOTOS.length ? PHOTOS.length + " / " + PH_MAX + "장" + (PH_BUSY ? " · 올리는 중이에요. 다 올라간 뒤 등록해 주세요." : "") : "";
+}
+function movePhoto(i, d) { var t = PHOTOS[i]; PHOTOS[i] = PHOTOS[i + d]; PHOTOS[i + d] = t; drawPhotos(); }
+function removePhoto(i) { PHOTOS.splice(i, 1); drawPhotos(); }
+function addPhotos(files) {
+  if (!(window.JIDB && JIDB.enabled)) { alert("사진은 서버가 연결된 뒤 올릴 수 있어요."); return; }
+  var u = currentUser(); if (!u || !u.id) { alert("로그인 후 사진을 올릴 수 있어요."); return; }
+  [].slice.call(files, 0, PH_MAX - PHOTOS.length).forEach(function (f) {
+    if (!/^image\//.test(f.type) && !/\.(jpe?g|png|webp|heic)$/i.test(f.name)) { alert(f.name + " 은(는) 사진 파일이 아니에요."); return; }
+    var item = { preview: URL.createObjectURL(f), url: "" }; PHOTOS.push(item); PH_BUSY++;
+    JIDB.shrinkImage(f, 1600, 0.82).then(function (b) { return JIDB.uploadPhoto(b, "photo.jpg"); }).then(function (r) {
+      item.url = r.url; PH_BUSY--; drawPhotos();
+    }, function (e) {
+      PH_BUSY--; var k = PHOTOS.indexOf(item); if (k > -1) PHOTOS.splice(k, 1); drawPhotos();
+      alert("사진을 올리지 못했어요: " + (e.message || e));
+    });
+  });
+  drawPhotos();
+}
+(function () {
+  var inp = document.getElementById("ph-input"), drop = document.getElementById("ph-drop");
+  drop.onclick = function () { inp.click(); };
+  drop.onkeydown = function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inp.click(); } };
+  inp.onchange = function () { if (this.files.length) addPhotos(this.files); this.value = ""; };
+  ["dragover", "dragenter"].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.add("on"); }); });
+  ["dragleave", "drop"].forEach(function (t) { drop.addEventListener(t, function (e) { e.preventDefault(); drop.classList.remove("on"); }); });
+  drop.addEventListener("drop", function (e) { if (e.dataTransfer.files.length) addPhotos(e.dataTransfer.files); });
+})();
+
 function submitPost() {
   var board = document.getElementById("board").value;
   if (!editing && !checkBoardGate(board)) return;
@@ -296,8 +345,10 @@ function submitPost() {
   if (window.JIDB && JIDB.enabled && !(editing && !editing.db)) {
     if (!user.id) { alert("새 회원 시스템으로 다시 로그인해 주세요."); location.href = "login.html?next=" + encodeURIComponent("write.html" + location.search); return; }
     var btn = document.getElementById("submit-btn"); btn.disabled = true;
+    if (PH_BUSY) { alert("사진을 올리는 중이에요. 다 올라간 뒤 등록해 주세요."); return; }
     var extra = Object.assign({}, (editing && editing.extra) || {});
     extra.htype = htype; extra.addr = addr; extra.payType = payType; extra.pay = pay;
+    extra.photos = PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; });
     var data = { board: board, head: head === "선택 안 함" ? "" : head, title: title, content: content, price: price, loc: loc, meta: (editing && editing.meta) || "", extra: extra };
     (editing && editing.db ? JIDB.updatePost(editing.id, data) : JIDB.createPost(data)).then(function (p) {
       location.href = "view.html?id=" + p.id;

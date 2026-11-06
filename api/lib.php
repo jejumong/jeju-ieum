@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 4;
+const JI_SCHEMA = 5;
 
 /* ── 응답 ── */
 function cors() {
@@ -103,6 +103,10 @@ function migrate($pdo) {
     body VARCHAR(2000) NOT NULL, kind VARCHAR(20) NOT NULL DEFAULT 'dm', ref VARCHAR(40) NOT NULL DEFAULT '',
     read_at DATETIME NULL, del_s TINYINT(1) NOT NULL DEFAULT 0, del_r TINYINT(1) NOT NULL DEFAULT 0, created_at DATETIME NOT NULL,
     INDEX (receiver, created_at), INDEX (sender, created_at))$T");
+  $pdo->exec("CREATE TABLE IF NOT EXISTS ji_uploads (
+    id CHAR(36) PRIMARY KEY, user_id CHAR(36) NOT NULL, path VARCHAR(120) NOT NULL UNIQUE, bytes INT NOT NULL DEFAULT 0,
+    w INT NOT NULL DEFAULT 0, h INT NOT NULL DEFAULT 0, post_id CHAR(36) NULL, created_at DATETIME NOT NULL,
+    INDEX (user_id, created_at), INDEX (post_id))$T");
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_login_fails (
     ip VARCHAR(45) NOT NULL, at DATETIME NOT NULL, INDEX (ip, at))$T");
   // 버전별 정리
@@ -162,6 +166,37 @@ function can_write_board($u, $b) {
   return true;
 }
 function setting($k, $def) { $r = one("SELECT v FROM ji_settings WHERE k = ?", [$k]); return $r ? json_decode($r['v'], true) : $def; }
+/* ── 사진 ── */
+function upload_dir() { return dirname(__DIR__) . '/uploads'; }   // www/jeju/uploads
+function upload_base() {
+  global $CFG;
+  if (!empty($CFG['upload_url'])) return rtrim($CFG['upload_url'], '/') . '/';
+  $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https' || ($_SERVER['SERVER_PORT'] ?? '') == 443;
+  $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+  if (preg_match('/mycafe24\.com$/', $host)) $https = true;
+  return ($https ? 'https://' : 'http://') . $host . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\') . '/uploads/';
+}
+/* 글에 붙은 사진 목록 정리: 내가 올린 사진만 남기고 글에 연결 */
+function attach_photos($postId, $uid, $photos, $isMod = false) {
+  $base = upload_base(); $keep = [];
+  foreach (array_slice(is_array($photos) ? $photos : [], 0, 10) as $url) {
+    if (!is_string($url) || strpos($url, $base) !== 0) continue;
+    $path = substr($url, strlen($base));
+    $u = one("SELECT user_id, post_id FROM ji_uploads WHERE path = ?", [$path]);
+    if (!$u || ($u['user_id'] !== $uid && !$isMod) || ($u['post_id'] && $u['post_id'] !== $postId)) continue;
+    $keep[] = $path;
+  }
+  // 이 글에서 빠진 사진은 지움
+  foreach (all("SELECT path FROM ji_uploads WHERE post_id = ?", [$postId]) as $old)
+    if (!in_array($old['path'], $keep, true)) remove_upload($old['path']);
+  foreach ($keep as $path) q("UPDATE ji_uploads SET post_id = ? WHERE path = ?", [$postId, $path]);
+  return array_map(function ($p) use ($base) { return $base . $p; }, $keep);
+}
+function remove_upload($path) {
+  if (!preg_match('#^\d{6}/[0-9a-f-]{36}\.(jpg|png|webp)$#', $path)) return;
+  @unlink(upload_dir() . '/' . $path);
+  q("DELETE FROM ji_uploads WHERE path = ?", [$path]);
+}
 function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user']; }
 
 /* ── 알림 + 휴대폰 푸시 (OneSignal) ── */

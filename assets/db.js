@@ -164,6 +164,31 @@ var JIDB = (function () {
   function changePassword(cur, nw) { return call("password_change", { cur: cur, "new": nw }); }
   function deleteAccount(pw) { return call("account_delete", { pw: pw }).then(function () { return signOut(); }); }
 
+  /* ── 사진 올리기: 브라우저에서 줄인 뒤 multipart 로 보냄 (사전 확인 없는 요청) ── */
+  function uploadPhoto(blob, name) {
+    if (!enabled) return Promise.reject(new Error("서버가 연결되지 않았어요"));
+    var fd = new FormData(); fd.append("_t", token()); fd.append("file", blob, name || "photo.jpg");
+    return fetch(API + "?a=upload", { method: "POST", body: fd }).then(function (r) {
+      return r.json().catch(function () { throw new Error("서버 응답을 읽지 못했어요 (" + r.status + ")"); });
+    }, function () { throw new Error("서버에 연결하지 못했어요."); }).then(function (j) { if (!j.ok) throw new Error(j.error || "올리지 못했어요"); return j.data; });
+  }
+  /* 사진을 가로·세로 최대 maxPx 로 줄여 JPEG Blob 으로 (위치정보 같은 EXIF 도 빠짐) */
+  function shrinkImage(file, maxPx, quality) {
+    maxPx = maxPx || 1600; quality = quality || 0.82;
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, maxPx / Math.max(w, h));
+        var c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k);
+        var g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(function (b) { b ? resolve(b) : reject(new Error("사진을 줄이지 못했어요")); }, "image/jpeg", quality);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("사진 파일을 읽지 못했어요 (HEIC 사진은 jpg로 바꿔서 올려 주세요)")); };
+      img.src = url;
+    });
+  }
+
   /* ── 쪽지 ── */
   function sendMessage(to, body) { return call("msg_send", JIDB.isUuid(to) ? { to: to, body: body } : { to_nick: to, body: body }); }
   function messages(box) { return me() ? call("msg_list", { box: box || "in" }) : Promise.resolve([]); }
@@ -211,7 +236,7 @@ var JIDB = (function () {
     decideJoin: decideJoin, joinCount: joinCount,
     clubNotices: clubNotices, addNotice: addNotice, deleteNotice: deleteNotice, clubMembers: clubMembers,
     sendSellerRequest: sendSellerRequest, syncFeed: syncFeed,
-    sendMessage: sendMessage, messages: messages, readMessage: readMessage, deleteMessage: deleteMessage, unreadMessages: unreadMessages,
+    uploadPhoto: uploadPhoto, shrinkImage: shrinkImage, sendMessage: sendMessage, messages: messages, readMessage: readMessage, deleteMessage: deleteMessage, unreadMessages: unreadMessages,
     comments: comments, addComment: addComment, myComments: myComments, changePassword: changePassword, deleteAccount: deleteAccount, updateComment: updateComment, deleteComment: deleteComment,
     notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead
   };

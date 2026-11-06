@@ -1781,3 +1781,37 @@ a.act-item:hover{border-color:var(--sea-200)}
   body.board-on .page-head .pg-write{display:flex!important;width:100%;justify-content:center;margin-top:12px;padding:12px;font-size:15px}
   body.board-on .page-head .inner{flex-wrap:wrap}
 }
+
+/* ── 글쓰기: 사진 첨부 ── */
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:10px}
+.ph-grid:empty{display:none}
+.ph-item{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:#eef1f5;border:1px solid var(--line)}
+.ph-item img{width:100%;height:100%;object-fit:cover;display:block}
+.ph-item.up img{opacity:.45;filter:blur(1px)}
+.ph-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--ink-2)}
+.ph-main{position:absolute;left:6px;top:6px;background:var(--sea);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px}
+.ph-acts{position:absolute;right:5px;bottom:5px;display:flex;gap:4px}
+.ph-acts button{width:28px;height:28px;border:0;border-radius:8px;background:rgba(14,22,33,.72);color:#fff;font-size:15px;font-weight:800;cursor:pointer;line-height:1}
+.ph-acts .ph-del{background:rgba(217,74,74,.9)}
+.file-drop{cursor:pointer}
+.file-drop small{display:block;font-size:12px;color:var(--ink-4);margin-top:4px;font-weight:500}
+.file-drop.on{border-color:var(--sea);background:var(--sea-50)}
+.ph-note{margin:6px 0 0;font-size:12.5px;color:var(--ink-4)}
+.ph-note:empty{display:none}
+
+/* ── 목록 카드: 사진 없는 회원 글은 게시판 아이콘 ── */
+.pc-ph .pc-ico{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,#eef5fd,#f7f2ea)}
+@media (max-width:680px){ .grid-cards .item-card.pc .pc-ph .pc-ico{font-size:32px} }
+
+/* ── 글 상세: 사진 ── */
+.pv-gallery{margin:4px 0 20px}
+.pv-main{position:relative;border-radius:14px;overflow:hidden;background:#0e1621;display:flex;align-items:center;justify-content:center;max-height:560px}
+.pv-main img{max-width:100%;max-height:560px;object-fit:contain;display:block;cursor:zoom-in}
+.pv-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.88);font-size:22px;font-weight:800;cursor:pointer;color:var(--ink)}
+.pv-nav.l{left:10px}.pv-nav.r{right:10px}
+.pv-count{position:absolute;right:10px;bottom:10px;background:rgba(14,22,33,.7);color:#fff;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px}
+.pv-thumbs{display:flex;gap:8px;margin-top:8px;overflow-x:auto;padding-bottom:2px}
+.pv-thumbs button{flex:0 0 64px;height:64px;padding:0;border:2px solid transparent;border-radius:10px;overflow:hidden;cursor:pointer;background:#eef1f5}
+.pv-thumbs button.on{border-color:var(--sea)}
+.pv-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+@media (max-width:680px){ .pv-main,.pv-main img{max-height:420px} }

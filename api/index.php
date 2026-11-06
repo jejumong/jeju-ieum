@@ -10,9 +10,12 @@ cors();
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
 $a = preg_replace('/[^a-z_]/', '', $_GET['a'] ?? '');
-$raw = file_get_contents('php://input');
-$R = $raw ? json_decode($raw, true) : [];
-if (!is_array($R)) $R = [];
+if ($a === 'upload') { $R = ['_t' => $_POST['_t'] ?? '']; }   // 사진은 multipart 로 받음
+else {
+  $raw = file_get_contents('php://input');
+  $R = $raw ? json_decode($raw, true) : [];
+  if (!is_array($R)) $R = [];
+}
 if ($a === '' || $a === 'ping') out(['pong' => true, 'time' => iso(now()), 'schema' => (int)(one("SELECT v FROM ji_meta WHERE k='schema'")['v'] ?? 0)]);
 
 function post_out($r) {
@@ -119,6 +122,41 @@ case 'my_comments': {
   out(array_map('cmt_out', all("SELECT * FROM ji_comments WHERE author = ? ORDER BY created_at DESC LIMIT 300", [$u['id']])));
 }
 
+/* ───────── 사진 올리기 ───────── */
+case 'upload': {
+  $u = me($R);
+  $n = one("SELECT COUNT(*) n FROM ji_uploads WHERE user_id = ? AND created_at > (NOW() - INTERVAL 10 MINUTE)", [$u['id']])['n'];
+  if ($n >= 40 && !is_mod($u)) fail('사진을 너무 많이 올리고 있어요. 잠시 후 다시 해 주세요.', 429);
+  $f = $_FILES['file'] ?? null;
+  if (!$f || ($f['error'] ?? 1) !== UPLOAD_ERR_OK) fail('사진을 받지 못했어요 (' . ($f['error'] ?? '없음') . ')');
+  if ($f['size'] > 6 * 1024 * 1024) fail('사진이 너무 커요 (최대 6MB)');
+  $info = @getimagesize($f['tmp_name']);
+  $ext = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'][$info['mime'] ?? ''] ?? null;
+  if (!$info || !$ext) fail('jpg, png, webp 사진만 올릴 수 있어요');
+  if ($info[0] < 20 || $info[1] < 20 || $info[0] > 8000 || $info[1] > 8000) fail('사진 크기가 올바르지 않아요');
+  $dir = date('Ym'); $full = upload_dir() . '/' . $dir;
+  if (!is_dir($full) && !@mkdir($full, 0755, true)) fail('사진 폴더를 만들지 못했어요', 500);
+  if (!file_exists(upload_dir() . '/index.html')) @file_put_contents(upload_dir() . '/index.html', '');
+  if (!file_exists($full . '/index.html')) @file_put_contents($full . '/index.html', '');
+  $id = uuid(); $path = $dir . '/' . $id . '.' . $ext;
+  // GD 가 있으면 다시 저장해서 사진 속 위치정보(EXIF)·숨은 데이터를 없앰
+  $saved = false;
+  if (function_exists('imagecreatefromstring') && $ext !== 'webp') {
+    $img = @imagecreatefromstring(file_get_contents($f['tmp_name']));
+    if ($img) {
+      $saved = $ext === 'png' ? @imagepng($img, $full . '/' . $id . '.png', 7) : @imagejpeg($img, $full . '/' . $id . '.jpg', 85);
+      imagedestroy($img);
+    }
+  }
+  if (!$saved && !@move_uploaded_file($f['tmp_name'], $full . '/' . $id . '.' . $ext)) fail('사진을 저장하지 못했어요', 500);
+  @chmod($full . '/' . $id . '.' . $ext, 0644);
+  $bytes = (int)@filesize($full . '/' . $id . '.' . $ext);
+  q("INSERT INTO ji_uploads (id, user_id, path, bytes, w, h, created_at) VALUES (?,?,?,?,?,?,?)", [$id, $u['id'], $path, $bytes, $info[0], $info[1], now()]);
+  // 글에 붙지 않고 하루가 지난 사진 정리
+  if (random_int(1, 20) === 1) foreach (all("SELECT path FROM ji_uploads WHERE post_id IS NULL AND created_at < (NOW() - INTERVAL 1 DAY) LIMIT 50") as $o) remove_upload($o['path']);
+  out(['url' => upload_base() . $path, 'w' => $info[0], 'h' => $info[1], 'bytes' => $bytes]);
+}
+
 /* ───────── 글 ───────── */
 case 'post_list': {
   $b = str($R['board'] ?? '', 30); if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
@@ -140,7 +178,11 @@ case 'post_create': {
   $id = uuid(); $t = now();
   q("INSERT INTO ji_posts (id, board, head, title, content, loc, meta, price, extra, author, author_nick, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
     [$id, $b, str($R['head'] ?? '', 30), $title, str($R['content'] ?? '', 20000), str($R['loc'] ?? '', 100), str($R['meta'] ?? '', 255),
-     str($R['price'] ?? '', 60), json_encode($R['extra'] ?? new stdClass(), JSON_UNESCAPED_UNICODE), $u['id'], $u['nick'], $t, $t]);
+     str($R['price'] ?? '', 60), json_encode(array_diff_key(is_array($R['extra'] ?? null) ? $R['extra'] : [], ['photos' => 1]) ?: new stdClass(), JSON_UNESCAPED_UNICODE), $u['id'], $u['nick'], $t, $t]);
+  if (!empty($R['extra']['photos'])) {
+    $x = $R['extra']; $x['photos'] = attach_photos($id, $u['id'], $x['photos']);
+    q("UPDATE ji_posts SET extra = ? WHERE id = ?", [json_encode($x, JSON_UNESCAPED_UNICODE), $id]);
+  }
   out(post_out(one("SELECT * FROM ji_posts WHERE id = ?", [$id])));
 }
 case 'post_update': {
@@ -148,7 +190,12 @@ case 'post_update': {
   if (!$r) fail('글을 찾을 수 없어요', 404);
   if ($r['author'] !== $u['id'] && !is_mod($u)) fail('내가 쓴 글만 고칠 수 있어요', 403);
   $title = str($R['title'] ?? $r['title'], 120); if ($title === '') fail('제목을 입력해 주세요.');
-  $extra = array_key_exists('extra', $R) ? json_encode($R['extra'] ?: new stdClass(), JSON_UNESCAPED_UNICODE) : $r['extra'];
+  if (array_key_exists('extra', $R)) {
+    $x = is_array($R['extra']) ? $R['extra'] : [];
+    $x['photos'] = attach_photos($id, $r['author'], $x['photos'] ?? [], is_mod($u));
+    if (!$x['photos']) unset($x['photos']);
+    $extra = json_encode($x ?: new stdClass(), JSON_UNESCAPED_UNICODE);
+  } else $extra = $r['extra'];
   q("UPDATE ji_posts SET head = ?, title = ?, content = ?, loc = ?, meta = ?, price = ?, extra = ?, updated_at = ? WHERE id = ?",
     [str($R['head'] ?? $r['head'], 30), $title, str($R['content'] ?? $r['content'], 20000), str($R['loc'] ?? $r['loc'], 100),
      str($R['meta'] ?? $r['meta'], 255), str($R['price'] ?? $r['price'], 60), $extra, now(), $id]);
@@ -162,6 +209,7 @@ case 'post_delete': {
   q("DELETE FROM ji_club_joins WHERE club_id = ?", [$id]);
   q("DELETE FROM ji_club_notices WHERE club_id = ?", [$id]);
   q("DELETE FROM ji_comments WHERE post_id = ?", [$id]);
+  foreach (all("SELECT path FROM ji_uploads WHERE post_id = ?", [$id]) as $o) remove_upload($o['path']);
   out(true);
 }
 
