@@ -28,11 +28,11 @@
   /* 생활도구는 각자 다른 저장소(jejumong.github.io/…)에 있고, 여기서는 틀(iframe)에 넣어 보여 줍니다.
      도구 페이지는 틀 안에서 열리면 '제주몽 홈' 버튼을 스스로 숨깁니다. */
   var TOOLS = [
-    { k: "tide", ico: "🌊", name: "물때 시간표", url: SITE_CFG.tools.tide },
     { k: "cal",  ico: "🗓️", name: "열두 달 달력", url: SITE_CFG.tools.calendar },
-    { k: "near", ico: "📍", name: "내 근처 찾기", url: SITE_CFG.tools.near }
+    { k: "near", ico: "📍", name: "내 근처 찾기", url: SITE_CFG.tools.near },
+    { k: "tide", ico: "🌊", name: "물때 시간표", url: SITE_CFG.tools.tide }
   ];
-  var cur = new URLSearchParams(location.search).get("t") || "tide";
+  var cur = new URLSearchParams(location.search).get("t") || "cal";
   var t = TOOLS.filter(function(x){ return x.k === cur; })[0] || TOOLS[0];
   document.title = t.name + " — 제주이음";
   document.getElementById("tl-tabs").innerHTML = TOOLS.map(function(x){
