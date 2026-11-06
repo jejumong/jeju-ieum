@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106n">
+<link rel="stylesheet" href="assets/style.css?v=20261106o">
 </head>
 <body data-active="stay">
 
@@ -95,11 +95,11 @@
   <div class="g-grid" id="stay-guides"></div>
 </main>
 
-<script src="assets/common.js?v=20261106n"></script>
-<script src="assets/db.js?v=20261106n"></script>
-<script src="assets/guide-data.js?v=20261106n"></script>
-<script src="assets/programs-data.js?v=20261106n"></script>
-<script src="assets/notify.js?v=20261106n"></script>
+<script src="assets/common.js?v=20261106o"></script>
+<script src="assets/db.js?v=20261106o"></script>
+<script src="assets/guide-data.js?v=20261106o"></script>
+<script src="assets/programs-data.js?v=20261106o"></script>
+<script src="assets/notify.js?v=20261106o"></script>
 <script>
 /* ── 새 공고 무료 알림 (모집 시작이 반영되면 자동 발송) ── */
 (function(){
@@ -144,9 +144,10 @@ function drawPrograms(){
       '<span class="pst ' + st[1] + ' pg-st">' + st[0] + '</span></div>' +
       '<h3>' + (p.id ? '<a href="program/' + p.id + '.html">' + esc(p.name) + '</a>' : esc(p.name)) + '</h3><div class="pg-org">' + esc(p.org) + '</div>' +
       '<dl><dt>대상</dt><dd>' + esc(p.who) + '</dd><dt>지원</dt><dd><b>' + esc(p.what) + '</b></dd>' +
-      (p.cond && p.cond !== "—" ? '<dt>조건</dt><dd>' + esc(p.cond) + '</dd>' : '') +
-      (p.school ? '<dt>학교</dt><dd>' + esc(p.school) + '</dd>' : '') +
-      '<dt>시기</dt><dd>' + esc(p.when) + '</dd><dt>문의</dt><dd>' + esc(p.contact) + '</dd></dl>' +
+      (p.cond && p.cond !== "—" ? '<dt class="x">조건</dt><dd class="x">' + esc(p.cond) + '</dd>' : '') +
+      (p.school ? '<dt class="x">학교</dt><dd class="x">' + esc(p.school) + '</dd>' : '') +
+      '<dt class="x">시기</dt><dd class="x">' + esc(p.when) + '</dd><dt class="x">문의</dt><dd class="x">' + esc(p.contact) + '</dd></dl>' +
+      '<button type="button" class="pg-more" onclick="this.closest(\'.pg\').classList.add(\'open\')">조건·시기·문의 더 보기 ⌄</button>' +
       '<div class="pg-foot"><a class="btn soft" href="' + p.url + '" target="_blank" rel="noopener">공고·안내 보기 ↗</a>' +
       '<span class="pg-src">출처: ' + (p.src||[]).map(function(s){ return '<a href="' + s[1] + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>'; }).join(", ") + '</span></div></article>';
   }).join("") || '<div class="card" style="text-align:center;color:var(--ink-3);padding:30px">이 조건의 프로그램이 없어요.</div>';

@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106n">
+<link rel="stylesheet" href="assets/style.css?v=20261106o">
 </head>
 <body data-active="community">
 
@@ -68,14 +68,14 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261106n"></script>
-<script src="assets/db.js?v=20261106n"></script>
-<script src="assets/notify.js?v=20261106n"></script>
-<script src="assets/seed-trade.js?v=20261106n"></script>
-<script src="assets/seed-extra.js?v=20261106n"></script>
-<script src="assets/seed-new.js?v=20261106n"></script>
-<script src="assets/seed-comments.js?v=20261106n"></script>
-<script src="assets/admin-data.js?v=20261106n"></script>
+<script src="assets/common.js?v=20261106o"></script>
+<script src="assets/db.js?v=20261106o"></script>
+<script src="assets/notify.js?v=20261106o"></script>
+<script src="assets/seed-trade.js?v=20261106o"></script>
+<script src="assets/seed-extra.js?v=20261106o"></script>
+<script src="assets/seed-new.js?v=20261106o"></script>
+<script src="assets/seed-comments.js?v=20261106o"></script>
+<script src="assets/admin-data.js?v=20261106o"></script>
 <script>
 var params = new URLSearchParams(location.search);
 var board = params.get("board");
@@ -153,8 +153,14 @@ function render() {
   // 페이지네이션
   var pages = Math.max(1, Math.ceil(list.length / PER));
   var pg = "";
-  for (var n = 1; n <= pages; n++) {
-    pg += '<a href="#" class="' + (n === page ? "on" : "") + '" onclick="page=' + n + ';render();return false">' + n + '</a>';
+  function pl(n, t, c){ return '<a href="#" class="' + (c || "") + '" onclick="page=' + n + ';render();scrollTo(0,document.querySelector(\'table.post\').getBoundingClientRect().top+scrollY-120);return false">' + t + '</a>'; }
+  if (pages > 1) {
+    var win = innerWidth < 680 ? 2 : 4, a = Math.max(1, page - win), z = Math.min(pages, page + win);
+    if (page > 1) pg += pl(page - 1, "‹", "pg-arrow");
+    if (a > 1) pg += pl(1, "1") + (a > 2 ? '<span class="pg-gap">…</span>' : "");
+    for (var n = a; n <= z; n++) pg += pl(n, n, n === page ? "on" : "");
+    if (z < pages) pg += (z < pages - 1 ? '<span class="pg-gap">…</span>' : "") + pl(pages, pages);
+    if (page < pages) pg += pl(page + 1, "›", "pg-arrow");
   }
   document.getElementById("pager").innerHTML = pg;
 }
