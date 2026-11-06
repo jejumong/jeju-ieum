@@ -6,9 +6,8 @@ jobs:
     steps:
       - env: { P: "${{ secrets.CAFE24_FTP_PASSWORD }}" }
         run: |
-          echo "== FTP root"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/ | head -20
-          echo "== FTP www/jeju/api"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/www/jeju/api/ | head
-          echo "== FTP www/www?"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/www/www/ | head -5
-          for u in "jeju/api/?a=ping" "jeju/api/index.php?a=ping" "jeju/api/config.sample.php" "www/jeju/api/index.php?a=ping"; do
-            echo "== https://andend07.mycafe24.com/$u"; curl -s -m 15 -o /tmp/o -w "%{http_code}\n" "https://andend07.mycafe24.com/$u"; head -c 200 /tmp/o; echo; done
-          echo "== root htaccess"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/www/.htaccess | head -30
+          H=ftp://andend07.mycafe24.com
+          echo "== before"; curl -s -m 20 --user "andend07:$P" $H/www/jeju/api/ || true
+          curl -s -m 30 --user "andend07:$P" $H/ -Q "DELE www/jeju/api/.ftp-deploy-sync-state.json" -Q "DELE www/jeju/api/config.php" -Q "DELE www/jeju/api/config.sample.php" -Q "DELE www/jeju/api/index.php" -Q "DELE www/jeju/api/lib.php" -Q "RMD www/jeju/api" -Q "RMD www/jeju" -Q "RMD www" -o /dev/null && echo cleaned
+          echo "== after (www folder should be gone)"; curl -s -m 20 --user "andend07:$P" $H/ | grep -E " www$| jeju$" || echo "none"
+          echo "== ping"; curl -s -m 15 "https://andend07.mycafe24.com/jeju/api/?a=ping"

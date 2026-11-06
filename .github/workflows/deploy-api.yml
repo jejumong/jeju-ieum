@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.CAFE24_FTP_PASSWORD }}
           protocol: ftp
           local-dir: ./deploy/
-          server-dir: www/jeju/api/
+          server-dir: jeju/api/
 
       - name: 서버 응답 확인
         run: |
