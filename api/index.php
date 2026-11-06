@@ -25,6 +25,11 @@ function post_out($r) {
     'author' => $r['author'], 'author_nick' => $r['author_nick'], 'views' => (int)$r['views'],
     'created_at' => iso($r['created_at']), 'updated_at' => iso($r['updated_at'])];
 }
+function likes_map() {
+  $m = [];
+  foreach (all("SELECT post_id, COUNT(*) n FROM ji_likes WHERE active = 1 GROUP BY post_id") as $r) $m[$r['post_id']] = (int)$r['n'];
+  return $m ?: new stdClass();
+}
 function cmt_out($c) {
   return ['id' => $c['id'], 'post_id' => $c['post_id'], 'author' => $c['author'], 'author_nick' => $c['author_nick'],
     'text' => $c['text'], 'edited' => (bool)$c['edited'], 'created_at' => iso($c['created_at'])];
@@ -210,6 +215,7 @@ case 'post_delete': {
   q("DELETE FROM ji_club_notices WHERE club_id = ?", [$id]);
   q("DELETE FROM ji_comments WHERE post_id = ?", [$id]);
   foreach (all("SELECT path FROM ji_uploads WHERE post_id = ?", [$id]) as $o) remove_upload($o['path']);
+  q("DELETE FROM ji_likes WHERE post_id = ?", [$id]);
   out(true);
 }
 
@@ -219,7 +225,8 @@ case 'feed': {
   $counts = [];
   foreach (all("SELECT post_id, COUNT(*) n FROM ji_comments GROUP BY post_id") as $c) $counts[$c['post_id']] = (int)$c['n'];
   out(['posts' => array_map('post_out', $rows), 'counts' => $counts ?: new stdClass(),
-       'site' => ['admin_ov' => setting('admin_ov', new stdClass()) ?: new stdClass(), 'notices' => setting('notices', [])]]);
+       'site' => ['admin_ov' => setting('admin_ov', new stdClass()) ?: new stdClass(), 'notices' => setting('notices', [])],
+       'likes' => likes_map(), 'my_likes' => ($fu = me($R, false)) ? array_column(all("SELECT post_id FROM ji_likes WHERE user_id = ? AND active = 1", [$fu['id']]), 'post_id') : []]);
 }
 
 /* ───────── 댓글 (예시 글에도 달 수 있게 post_id 는 아무 글 id) ───────── */
@@ -329,6 +336,25 @@ case 'seller_request': {
   foreach (all("SELECT id FROM ji_users WHERE role IN ('admin','staff')") as $ad)
     notify($ad['id'], 'seller_request', '새 입점·공구 요청', $u['nick'] . '님이 ' . $b . ' 승인을 요청했어요.', 'admin/index.html');
   out(true);
+}
+
+/* ───────── 좋아요 (예시 글에도 누를 수 있게 post_id 는 아무 글 id) ───────── */
+case 'like_toggle': {
+  $u = me($R); $pid = str($R['post_id'] ?? '', 40); if ($pid === '') fail('글을 찾을 수 없어요');
+  $row = one("SELECT active FROM ji_likes WHERE post_id = ? AND user_id = ?", [$pid, $u['id']]);
+  if (!$row) {
+    q("INSERT INTO ji_likes (post_id, user_id, active, created_at) VALUES (?,?,1,?)", [$pid, $u['id'], now()]);
+    $liked = true;
+    // 처음 누를 때만 글쓴이에게 알림 (눌렀다 취소를 반복해도 알림은 한 번)
+    $p = is_uuid($pid) ? one("SELECT author, title FROM ji_posts WHERE id = ?", [$pid]) : null;
+    if ($p && $p['author'] !== $u['id'])
+      notify($p['author'], 'like', '♥ 좋아요', $u['nick'] . '님이 「' . mb_substr($p['title'], 0, 40) . '」 글을 좋아해요.', 'view.html?id=' . $pid,
+        '제주이음 · ♥ 좋아요', $u['nick'] . '님이 「' . mb_substr($p['title'], 0, 30) . '」 글을 좋아해요.');
+  } else {
+    $liked = !$row['active'];
+    q("UPDATE ji_likes SET active = ? WHERE post_id = ? AND user_id = ?", [$liked ? 1 : 0, $pid, $u['id']]);
+  }
+  out(['liked' => $liked, 'count' => (int)one("SELECT COUNT(*) n FROM ji_likes WHERE post_id = ? AND active = 1", [$pid])['n']]);
 }
 
 /* ───────── 문의·신청 (로그인 없이 보낼 수 있음) ───────── */

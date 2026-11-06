@@ -80,7 +80,10 @@ function photoFor(p) {
 }
 
 var AVA_COLORS = ["#2b8ce6", "#0e1621", "#e2700a", "#17a06a", "#6b5bd6", "#d94a6b", "#3b6e8f", "#8a6a3b"];
-function likesOf(p) { return (_hash("like" + p.id) % 23) + (p.views > 300 ? 4 : 0); }
+function likesOf(p) {
+  if (typeof isUserPost === "function" && isUserPost(p)) return realLikes(p.id);   // 회원 글: 실제로 누른 수만
+  return (_hash("like" + p.id) % 23) + (p.views > 300 ? 4 : 0) + (typeof realLikes === "function" ? realLikes(p.id) : 0);   // 예시 글: 예시 숫자 + 실제
+}
 
 var ICON_HEART = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 var ICON_EYE = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';

@@ -63,11 +63,14 @@ function noticesFor(board) {
 /* ── 좋아요 ── */
 (function () {
   var base = typeof likesOf === "function" ? likesOf : function (p) {
+    var real = typeof realLikes === "function" ? realLikes(p.id) : 0;
+    if (typeof isUserPost === "function" && isUserPost(p)) return real;   // 회원 글: 실제로 누른 수만
     var h = 2166136261, s = "like" + p.id;
     for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
-    return ((h >>> 0) % 23) + (p.views > 300 ? 4 : 0);
+    return ((h >>> 0) % 23) + (p.views > 300 ? 4 : 0) + real;
   };
-  likesOf = function (p) { return p && p.likes !== undefined && p.likes !== null && p.likes !== "" ? +p.likes : base(p); };
+  // 관리자가 숫자를 정한 예시 글은 그 숫자 (회원 글은 항상 실제 숫자)
+  likesOf = function (p) { return p && !(typeof isUserPost === "function" && isUserPost(p)) && p.likes !== undefined && p.likes !== null && p.likes !== "" ? +p.likes : base(p); };
 })();
 
 /* ── 프리미엄 ── */

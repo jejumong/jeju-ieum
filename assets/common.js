@@ -244,6 +244,10 @@ function sendSellerRequest(board, message, details) {
 /* 회원이 쓴 글: 서버에 저장된 글(캐시) + 예전에 이 브라우저에만 저장된 글 */
 function dbPosts() { return JI.get("dbposts", []); }
 function localPosts() { return dbPosts().concat(JI.get("posts", [])); }
+/* 좋아요: 서버에서 받은 실제 숫자 (window._JL 에 잠깐 보관) */
+function _likeCache() { if (!window._JL) window._JL = { n: JI.get("dblikes", {}), mine: JI.get("mylikes", []) }; return window._JL; }
+function realLikes(id) { return _likeCache().n[id] || 0; }
+function likedByMe(id) { return _likeCache().mine.indexOf(id) > -1; }
 function isUserPost(p) { return !!(p && (p.db || (p.id && p.id.charAt(0) === "u"))); }
 function allPosts() {
   return localPosts().concat(SEED_POSTS);

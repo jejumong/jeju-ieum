@@ -83,6 +83,7 @@ var JIDB = (function () {
       var ov = site.admin_ov || {}, ns = site.notices || [];
       var before = JSON.stringify([JI.get("dbposts", []), JI.get("dbcounts", {}), JI.get("admin_ov", {}), JI.get("notices", [])]);
       JI.set("dbposts", posts); JI.set("dbcounts", counts);
+      JI.set("dblikes", r.likes || {}); JI.set("mylikes", r.my_likes || []); window._JL = null;
       // 관리자가 정한 공지·프리미엄·숨김은 모든 방문자에게 같게
       JI.set("admin_ov", Array.isArray(ov) ? {} : ov); JI.set("notices", ns);
       if (before === JSON.stringify([posts, counts, JI.get("admin_ov", {}), ns])) return false;
@@ -189,6 +190,15 @@ var JIDB = (function () {
     });
   }
 
+  /* ── 좋아요 ── */
+  function toggleLike(postId) {
+    return call("like_toggle", { post_id: postId }).then(function (r) {
+      var m = JI.get("dblikes", {}); m[postId] = r.count; JI.set("dblikes", m);
+      var mine = JI.get("mylikes", []).filter(function (x) { return x !== postId; }); if (r.liked) mine.push(postId); JI.set("mylikes", mine);
+      window._JL = null; return r;
+    });
+  }
+
   /* ── 쪽지 ── */
   function sendMessage(to, body) { return call("msg_send", JIDB.isUuid(to) ? { to: to, body: body } : { to_nick: to, body: body }); }
   function messages(box) { return me() ? call("msg_list", { box: box || "in" }) : Promise.resolve([]); }
@@ -236,7 +246,7 @@ var JIDB = (function () {
     decideJoin: decideJoin, joinCount: joinCount,
     clubNotices: clubNotices, addNotice: addNotice, deleteNotice: deleteNotice, clubMembers: clubMembers,
     sendSellerRequest: sendSellerRequest, syncFeed: syncFeed,
-    uploadPhoto: uploadPhoto, shrinkImage: shrinkImage, sendMessage: sendMessage, messages: messages, readMessage: readMessage, deleteMessage: deleteMessage, unreadMessages: unreadMessages,
+    toggleLike: toggleLike, uploadPhoto: uploadPhoto, shrinkImage: shrinkImage, sendMessage: sendMessage, messages: messages, readMessage: readMessage, deleteMessage: deleteMessage, unreadMessages: unreadMessages,
     comments: comments, addComment: addComment, myComments: myComments, changePassword: changePassword, deleteAccount: deleteAccount, updateComment: updateComment, deleteComment: deleteComment,
     notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead
   };

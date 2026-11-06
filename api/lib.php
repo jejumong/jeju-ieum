@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 5;
+const JI_SCHEMA = 6;
 
 /* ── 응답 ── */
 function cors() {
@@ -107,6 +107,9 @@ function migrate($pdo) {
     id CHAR(36) PRIMARY KEY, user_id CHAR(36) NOT NULL, path VARCHAR(120) NOT NULL UNIQUE, bytes INT NOT NULL DEFAULT 0,
     w INT NOT NULL DEFAULT 0, h INT NOT NULL DEFAULT 0, post_id CHAR(36) NULL, created_at DATETIME NOT NULL,
     INDEX (user_id, created_at), INDEX (post_id))$T");
+  $pdo->exec("CREATE TABLE IF NOT EXISTS ji_likes (
+    post_id VARCHAR(40) NOT NULL, user_id CHAR(36) NOT NULL, active TINYINT(1) NOT NULL DEFAULT 1, created_at DATETIME NOT NULL,
+    PRIMARY KEY (post_id, user_id), INDEX (user_id))$T");
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_login_fails (
     ip VARCHAR(45) NOT NULL, at DATETIME NOT NULL, INDEX (ip, at))$T");
   // 버전별 정리

@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107a">
+<link rel="stylesheet" href="assets/style.css?v=20261107b">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -61,15 +61,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107a"></script>
-<script src="assets/common.js?v=20261107a"></script>
-<script src="assets/db.js?v=20261107a"></script>
-<script src="assets/notify.js?v=20261107a"></script>
-<script src="assets/seed-trade.js?v=20261107a"></script>
-<script src="assets/seed-extra.js?v=20261107a"></script>
-<script src="assets/seed-new.js?v=20261107a"></script>
-<script src="assets/seed-comments.js?v=20261107a"></script>
-<script src="assets/admin-data.js?v=20261107a"></script>
+<script src="assets/kmap.js?v=20261107b"></script>
+<script src="assets/common.js?v=20261107b"></script>
+<script src="assets/db.js?v=20261107b"></script>
+<script src="assets/notify.js?v=20261107b"></script>
+<script src="assets/seed-trade.js?v=20261107b"></script>
+<script src="assets/seed-extra.js?v=20261107b"></script>
+<script src="assets/seed-new.js?v=20261107b"></script>
+<script src="assets/seed-comments.js?v=20261107b"></script>
+<script src="assets/admin-data.js?v=20261107b"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -144,7 +144,7 @@ if (!post) {
     '<div class="pv-board">' + esc(post.board) + (post.head && post.head !== post.board ? ' · ' + esc(post.head) : '') + '</div>' +
     '<h1 class="pv-title">' + (post.head === "채용완료" ? '<span class="closed-tag">채용완료</span>' : '') + esc(post.title) + '</h1>' +
     '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : msgLink(post.authorId, post.author)) + '</span>' +
-    '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
+    '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span>' + likeBtnHtml(post) + '</div>' +
     extra +
     galleryHtml(post) +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
@@ -262,6 +262,23 @@ function drawClubJoin() {
     if (c) c.onclick = function () { if (confirm("가입 신청을 취소할까요?")) JIDB.cancelJoin(j.id).then(drawClubJoin); };
     if (j.status === "approved") { box.insertAdjacentHTML("beforeend", '<div id="club-notices"></div>'); drawNotices(false); }
   });
+}
+
+/* 좋아요 버튼 */
+function likeBtnHtml(p) {
+  var on = typeof likedByMe === "function" && likedByMe(p.id);
+  return '<button type="button" class="pv-like' + (on ? ' on' : '') + '" id="pv-like" onclick="toggleLikeBtn()" aria-pressed="' + on + '" title="' + (on ? '좋아요 취소' : '좋아요') + '">' +
+    '<span class="hz">' + (on ? '♥' : '♡') + '</span> <b id="pv-like-n">' + likesOf(p).toLocaleString() + '</b></button>';
+}
+function toggleLikeBtn() {
+  if (!(window.JIDB && JIDB.enabled)) return;
+  var u = currentUser();
+  if (!u || !u.id) { if (confirm("로그인하면 좋아요를 누를 수 있어요. 로그인할까요?")) location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); return; }
+  var b = document.getElementById("pv-like"); b.disabled = true;
+  JIDB.toggleLike(post.id).then(function (r) {
+    b.outerHTML = likeBtnHtml(post);
+    if (r.liked) { var nb = document.getElementById("pv-like"); nb.classList.add("pop"); }
+  }, function (e) { b.disabled = false; alert(e.message || e); });
 }
 
 /* 글 사진 보기 */
