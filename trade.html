@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106i">
+<link rel="stylesheet" href="assets/style.css?v=20261106j">
 </head>
 <body data-active="trade">
 
@@ -33,18 +33,19 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261106i"></script>
-<script src="assets/db.js?v=20261106i"></script>
-<script src="assets/notify.js?v=20261106i"></script>
-<script src="assets/seed-trade.js?v=20261106i"></script>
-<script src="assets/seed-extra.js?v=20261106i"></script>
-<script src="assets/seed-new.js?v=20261106i"></script>
-<script src="assets/seed-comments.js?v=20261106i"></script>
-<script src="assets/admin-data.js?v=20261106i"></script>
+<script src="assets/common.js?v=20261106j"></script>
+<script src="assets/db.js?v=20261106j"></script>
+<script src="assets/notify.js?v=20261106j"></script>
+<script src="assets/seed-trade.js?v=20261106j"></script>
+<script src="assets/seed-extra.js?v=20261106j"></script>
+<script src="assets/seed-new.js?v=20261106j"></script>
+<script src="assets/seed-comments.js?v=20261106j"></script>
+<script src="assets/admin-data.js?v=20261106j"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
   var BOARDS = [
+    ["부동산", "realestate.html", "🏡", "매물·연세·월세", "m-only"],
     ["구인구직", "jobs.html", "💼", "제주 일자리와 인재"],
     ["중고사고팔기", "market.html", "📦", "동네 직거래"],
     ["제주상점", "shops.html", "🏪", "이웃이 검증한 가게"],
@@ -68,7 +69,7 @@
       return '<li>' + (isPremium(p) ? '<span class="chip new">AD</span>' : (p.loc ? '<span class="chip region">' + esc(String(p.loc).split(" ")[0]) + '</span>' : '')) +
         '<a href="view.html?id=' + p.id + '">' + esc(p.title) + '</a>' + (pr ? '<span class="price">' + pr + '</span>' : '<span class="meta">' + fmtDate(p.date) + '</span>') + '</li>';
     }).join("");
-    return '<section class="card"><div class="card-head"><h2><span class="ti">' + b[2] + '</span>' + b[0] + ' <span class="tc">' + list.length + '</span></h2>' +
+    return '<section class="card' + (b[4] ? " " + b[4] : "") + '"><div class="card-head"><h2><span class="ti">' + b[2] + '</span>' + b[0] + ' <span class="tc">' + list.length + '</span></h2>' +
       '<a href="' + b[1] + '" class="more">전체 보기 +</a></div>' +
       '<p style="font-size:13px;color:var(--ink-4);margin:-4px 0 6px">' + b[3] + '</p>' +
       '<ul>' + (items || '<li style="color:var(--ink-4)">아직 글이 없어요</li>') + '</ul></section>';

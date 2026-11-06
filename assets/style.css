@@ -1692,3 +1692,17 @@ a.act-item:hover{border-color:var(--sea-200)}
   .footer-bottom .footer-inner{padding:10px var(--gutter) 14px!important;gap:4px!important;font-size:11.5px;flex-direction:column;align-items:flex-start}
   .footer-links a{font-size:11.5px;margin-right:10px}
 }
+
+/* 휴대폰 전용 메뉴 5개 */
+.gnb-m{display:none}
+.m-only,.m-only-nav{display:none!important}
+@media (max-width:680px){
+  nav.gnb{display:none!important}
+  .gnb-m{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:8px var(--gutter) 10px}
+  .gnb-m a{text-align:center;padding:9px 0;border-radius:10px;font-size:13.5px;font-weight:800;color:var(--ink-2);background:var(--bg-2);text-decoration:none;white-space:nowrap;letter-spacing:-.03em}
+  .gnb-m a.on{background:var(--ink);color:#fff}
+  .subnav a.m-only{display:inline-flex!important}
+  nav.subnav.m-only-nav{display:block!important}
+  .trade-hub .card.m-only{display:block!important}
+}
+@media (max-width:350px){.gnb-m a{font-size:12px}}
