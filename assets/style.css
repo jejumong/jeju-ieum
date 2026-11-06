@@ -1737,3 +1737,8 @@ a.act-item:hover{border-color:var(--sea-200)}
   .grid-cards .item-card.pc .pc-st{gap:7px;font-size:11px}
   .grid-cards .item-card.pc .pc-st svg{width:12px;height:12px}
 }
+
+/* ── 모바일: 위쪽 검색창은 메인화면에서만 ── */
+@media (max-width:680px){
+  body:not([data-active="home"]) header.site .search{display:none!important}
+}
