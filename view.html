@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107j">
+<link rel="stylesheet" href="assets/style.css?v=20261107k">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -19,6 +19,15 @@
 .pv-back:empty{display:none}
 .pv-back a{display:inline-flex;align-items:center;gap:2px;padding:7px 14px 7px 11px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:700;color:var(--ink-2);text-decoration:none}
 .pv-back a:hover{border-color:var(--sea-200);color:var(--sea-700);background:var(--sea-50)}
+.pv-back .pb-more{display:none}
+@media (min-width:681px){   /* PC 만: 눈에 띄는 돌아가기 버튼 */
+  .pv-back{margin-bottom:14px}
+  .pv-back a{gap:6px;padding:10px 20px 10px 15px;font-size:15px;font-weight:800;color:var(--sea-700);background:var(--sea-50);border:1.5px solid var(--sea-200);box-shadow:0 2px 8px rgba(26,111,203,.12);transition:background .15s,color .15s,transform .15s,box-shadow .15s}
+  .pv-back a .pb-arr{font-size:19px;line-height:1;margin-top:-2px}
+  .pv-back .pb-more{display:inline;font-weight:700;opacity:.8}
+  .pv-back a:hover{background:var(--sea-600);border-color:var(--sea-600);color:#fff;transform:translateX(-2px);box-shadow:0 4px 12px rgba(26,111,203,.22)}
+  .pv-back a:hover .pb-more{opacity:1}
+}
 .pv-title{font-size:25px;font-weight:800;letter-spacing:-0.045em;line-height:1.38;color:var(--ink)}
 .pv-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:13px;color:var(--muted);margin:10px 0 18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
 .pv-meta>span{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
@@ -67,15 +76,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107j"></script>
-<script src="assets/common.js?v=20261107j"></script>
-<script src="assets/db.js?v=20261107j"></script>
-<script src="assets/notify.js?v=20261107j"></script>
-<script src="assets/seed-trade.js?v=20261107j"></script>
-<script src="assets/seed-extra.js?v=20261107j"></script>
-<script src="assets/seed-new.js?v=20261107j"></script>
-<script src="assets/seed-comments.js?v=20261107j"></script>
-<script src="assets/admin-data.js?v=20261107j"></script>
+<script src="assets/kmap.js?v=20261107k"></script>
+<script src="assets/common.js?v=20261107k"></script>
+<script src="assets/db.js?v=20261107k"></script>
+<script src="assets/notify.js?v=20261107k"></script>
+<script src="assets/seed-trade.js?v=20261107k"></script>
+<script src="assets/seed-extra.js?v=20261107k"></script>
+<script src="assets/seed-new.js?v=20261107k"></script>
+<script src="assets/seed-comments.js?v=20261107k"></script>
+<script src="assets/admin-data.js?v=20261107k"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -148,7 +157,7 @@ if (!post) {
 
   var backName = post.board && post.board !== "공지" ? post.board : "커뮤니티";
   var backEl = document.getElementById("pv-back");
-  backEl.innerHTML = '<a href="' + backHref + '" onclick="return goBackList(this)">‹ ' + esc(backName) + '</a>';
+  backEl.innerHTML = '<a href="' + backHref + '" onclick="return goBackList(this)"><span class="pb-arr">‹</span> ' + esc(backName) + '<span class="pb-more"> 목록으로</span></a>';
   document.getElementById("pv").innerHTML =
     '<div class="pv-board"><a href="' + backHref + '" onclick="return goBackList(this)">' + esc(post.board) + '</a>' + (post.head && post.head !== post.board ? ' · ' + esc(post.head) : '') + '</div>' +
     '<h1 class="pv-title">' + (post.head === "채용완료" ? '<span class="closed-tag">채용완료</span>' : '') + esc(post.title) + '</h1>' +
