@@ -222,6 +222,8 @@ case 'post_delete': {
 /* ───────── 전체 새 글 + 댓글 수 (화면 캐시용) ───────── */
 case 'feed': {
   $rows = all("SELECT * FROM ji_posts ORDER BY created_at DESC LIMIT 600");
+  foreach ($rows as &$r) if (mb_strlen($r['content']) > 400) $r['content'] = mb_substr($r['content'], 0, 400) . '…';   // 목록용: 앞부분만 (전문은 글 화면에서)
+  unset($r);
   $counts = [];
   foreach (all("SELECT post_id, COUNT(*) n FROM ji_comments GROUP BY post_id") as $c) $counts[$c['post_id']] = (int)$c['n'];
   out(['posts' => array_map('post_out', $rows), 'counts' => $counts ?: new stdClass(),

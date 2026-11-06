@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107e">
+<link rel="stylesheet" href="assets/style.css?v=20261107f">
 <style>
 .me-card{max-width:640px;margin:0 auto}
 .me-top{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;flex-wrap:wrap;box-shadow:var(--sh-2)}
@@ -120,7 +120,7 @@
           <option>제주남쪽</option><option>도외 (이주 준비 중)</option>
         </select>
       </div>
-      <div class="check-line">
+      <div class="check-line" id="noti-line">
         <input type="checkbox" id="noti"><label for="noti">동네 소식·공구 알림 수신</label>
       </div>
       <div class="form-actions">
@@ -159,14 +159,14 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261107e"></script>
-<script src="assets/db.js?v=20261107e"></script>
-<script src="assets/notify.js?v=20261107e"></script>
-<script src="assets/seed-trade.js?v=20261107e"></script>
-<script src="assets/seed-extra.js?v=20261107e"></script>
-<script src="assets/seed-new.js?v=20261107e"></script>
-<script src="assets/seed-comments.js?v=20261107e"></script>
-<script src="assets/admin-data.js?v=20261107e"></script>
+<script src="assets/common.js?v=20261107f"></script>
+<script src="assets/db.js?v=20261107f"></script>
+<script src="assets/notify.js?v=20261107f"></script>
+<script src="assets/seed-trade.js?v=20261107f"></script>
+<script src="assets/seed-extra.js?v=20261107f"></script>
+<script src="assets/seed-new.js?v=20261107f"></script>
+<script src="assets/seed-comments.js?v=20261107f"></script>
+<script src="assets/admin-data.js?v=20261107f"></script>
 <script>
 var user = currentUser();
 if (!user) {
@@ -180,8 +180,9 @@ function myIndex(){ return users().findIndex(function(u){ return u.email === use
 /* ── 내 활동 수집 ── */
 var SRV = !!(window.JIDB && JIDB.enabled && user && user.id);   // 서버 회원이면 서버 데이터 사용
 var MY_DB_CMTS = [];
+if (SRV) { var _nl = document.getElementById("noti-line"); if (_nl) _nl.style.display = "none"; }   // 알림은 🔔 페이지에서 켜기
 if (SRV) JIDB.ready.then(function(){ return JIDB.myComments(); }).then(function(l){
-  MY_DB_CMTS = l; if (curTab === "cmts") reloadCmts();
+  MY_DB_CMTS = l; fill(); if (curTab === "cmts") reloadCmts();   // 댓글 수 다시 세기
 }, function(){});
 function myPosts(){
   return localPosts().filter(function(p){ return isMyPost(p) || (!p.db && p.author === user.nick); });

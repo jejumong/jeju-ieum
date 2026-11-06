@@ -1835,3 +1835,6 @@ a.act-item:hover{border-color:var(--sea-200)}
 .cmt-like{margin-left:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:1px 9px;font:inherit;font-size:12px;color:var(--ink-4);cursor:pointer;line-height:1.6;white-space:nowrap}
 .cmt-like:hover{border-color:#f3b4c0;color:#d94a6b}
 .cmt-like.on{border-color:#f3b4c0;background:#fff1f4;color:#d94a6b;font-weight:700}
+
+/* 휴대폰: 위쪽 글쓰기 버튼은 숨겨 머리 부분을 한 줄로 (글쓰기는 각 게시판 안의 버튼으로) */
+@media (max-width:680px){ .header-actions .hb-write{display:none!important} }

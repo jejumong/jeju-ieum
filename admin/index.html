@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>제주이음 관리자 콘솔</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261107e">
+<link rel="stylesheet" href="../assets/style.css?v=20261107f">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -131,14 +131,14 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261107e"></script>
-<script src="../assets/db.js?v=20261107e"></script>
-<script src="../assets/seed-trade.js?v=20261107e"></script>
-<script src="../assets/seed-extra.js?v=20261107e"></script>
-<script src="../assets/seed-new.js?v=20261107e"></script>
-<script src="../assets/seed-comments.js?v=20261107e"></script>
-<script src="../assets/photos.js?v=20261107e"></script>
-<script src="../assets/admin-data.js?v=20261107e"></script>
+<script src="../assets/common.js?v=20261107f"></script>
+<script src="../assets/db.js?v=20261107f"></script>
+<script src="../assets/seed-trade.js?v=20261107f"></script>
+<script src="../assets/seed-extra.js?v=20261107f"></script>
+<script src="../assets/seed-new.js?v=20261107f"></script>
+<script src="../assets/seed-comments.js?v=20261107f"></script>
+<script src="../assets/photos.js?v=20261107f"></script>
+<script src="../assets/admin-data.js?v=20261107f"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -591,6 +591,14 @@ if (SRV) {
   restorePost = pushOn(restorePost);
   saveNotice = pushOn(saveNotice); delNotice = pushOn(delNotice); setNotice = pushOn(setNotice);
   if (typeof togglePm === "function") togglePm = pushOn(togglePm);
+
+  /* 서버 글 수정: 목록에는 본문 앞부분만 있으니 전문을 불러온 뒤 수정 창 열기 */
+  var _openEdit = openEdit;
+  openEdit = function(id){
+    var p = findAny(id);
+    if (p && p.db) { JIDB.getPost(id).then(function(full){ if (full) _openEdit(id); else toast("삭제된 글이에요"); }, function(e){ alert(e.message); }); return; }
+    return _openEdit(id);
+  };
 
   /* 문의·제보 */
   newIq = function(){ return STATS ? STATS.inquiries_new : 0; };
