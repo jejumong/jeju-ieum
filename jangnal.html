@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107l">
+<link rel="stylesheet" href="assets/style.css?v=20261107m">
 <style>
 .jn-today{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .jn-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh-1)}
@@ -22,7 +22,6 @@
 .jn-mk a{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-size:14.5px;font-weight:800;color:var(--ink-2);text-decoration:none}
 .jn-mk a:hover{border-color:var(--sea-200);background:var(--sea-50)}
 .jn-mk a i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
-.jn-mk a.fav::after{content:"★";color:var(--citrus);font-size:12px}
 .jn-none{margin-top:12px;font-size:14px;color:var(--ink-3)}
 
 .jn-cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:30px 0 12px;flex-wrap:wrap}
@@ -33,9 +32,10 @@
 .jn-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .jn-filter button{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;font-weight:700;color:var(--ink-3);cursor:pointer}
 .jn-filter button i{width:9px;height:9px;border-radius:50%}
-.jn-filter button.off{opacity:.4}
-.jn-filter button.off i{background:var(--ink-5)!important}
-.jn-filter .jn-all{color:var(--sea-700);border-color:var(--sea-200)}
+.jn-filter button:hover{border-color:var(--ink-5)}
+.jn-filter button.on{background:var(--c);border-color:var(--c);color:#fff}
+.jn-filter button.on i{background:#fff!important}
+.jn-filter .jn-all.on{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
 
 .jn-grid{display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
 .jn-grid .wd{padding:9px 0;text-align:center;font-size:12.5px;font-weight:800;color:var(--ink-3);background:var(--bg-2);border-bottom:1px solid var(--line)}
@@ -63,8 +63,6 @@
 .jn-card .acts{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
 .jn-card .acts a{font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2);text-decoration:none;background:var(--bg-2)}
 .jn-card .acts a:hover{border-color:var(--sea-200);color:var(--sea-700)}
-.jn-star{border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:var(--ink-5);padding:0 2px}
-.jn-star.on{color:var(--citrus)}
 .jn-pick{display:none}
 .jn-day{cursor:pointer}
 .jn-note{margin-top:22px;font-size:13px;color:var(--ink-3);line-height:1.75;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r);padding:14px 18px}
@@ -94,7 +92,7 @@
   <div>
     <div class="crumb"><a href="index.html">홈</a> › <a href="tools.html">생활도구</a> › 오일장 달력</div>
     <h1>제주 오일장 달력</h1>
-    <p>오늘·내일 열리는 장과 이번 달 장날을 한눈에. ☆를 눌러 자주 가는 장을 표시해 두세요.</p>
+    <p>오늘·내일 열리는 장과 이번 달 장날을 한눈에. 지역을 누르면 그 장날만 달력에 보여요.</p>
   </div>
 </div></div>
 
@@ -124,9 +122,9 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261107l"></script>
-<script src="assets/db.js?v=20261107l"></script>
-<script src="assets/notify.js?v=20261107l"></script>
+<script src="assets/common.js?v=20261107m"></script>
+<script src="assets/db.js?v=20261107m"></script>
+<script src="assets/notify.js?v=20261107m"></script>
 <script>
 (function(){
   /* 장날 = 날짜 끝자리(d). 10·20·30일은 끝자리 0 → "10" 으로 표기 */
@@ -143,8 +141,8 @@
   ];
   var WD = ["일","월","화","수","목","금","토"];
   function ls(k, v){ try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch(e){ return null; } }
-  var FAV = ls("ji_jn_fav") || [];
-  var OFF = ls("ji_jn_off") || [];
+  var SEL = "";   /* 빈 값 = 전체, 아니면 고른 장 하나만 */
+  function shownM(){ return SEL ? M.filter(function(m){ return m.k === SEL; }) : M; }
 
   /* 한국 시간 기준 오늘 */
   function kstToday(){ var n = new Date(Date.now() + 9*3600e3); return new Date(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()); }
@@ -163,15 +161,14 @@
   function fmt(dt){ return (dt.getMonth()+1) + "월 " + dt.getDate() + "일 (" + WD[dt.getDay()] + ")"; }
   function addDays(dt, n){ return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
-  function sorted(list){ return list.slice().sort(function(a,b){ return (FAV.indexOf(b.k) > -1) - (FAV.indexOf(a.k) > -1); }); }
 
   function todayBox(n, el, dl){
     var dt = addDays(TODAY, n);
     document.getElementById(dl).textContent = fmt(dt);
-    var open = sorted(M.filter(function(m){ return state(m, dt) === 1; }));
+    var open = M.filter(function(m){ return state(m, dt) === 1; });
     var q = M.filter(function(m){ return state(m, dt) === 2; });
     document.getElementById(el).innerHTML = open.length
-      ? '<div class="jn-mk">' + open.map(function(m){ return '<a href="#m-' + m.k + '" class="' + (FAV.indexOf(m.k) > -1 ? "fav" : "") + '" onclick="return jnFocus(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n) + '</a>'; }).join("") + '</div>'
+      ? '<div class="jn-mk">' + open.map(function(m){ return '<a href="#m-' + m.k + '" onclick="return jnFocus(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n) + '</a>'; }).join("") + '</div>'
       : '<p class="jn-none">' + (q.length ? q.map(function(m){ return m.n; }).join(", ") + "은(는) 31일에 열리는지 확인이 필요해요." : "이날은 열리는 오일장이 없어요. 아래 달력에서 가까운 장날을 찾아보세요.") + '</p>';
   }
 
@@ -182,15 +179,15 @@
 
   function drawFilter(){
     document.getElementById("jn-filter").innerHTML =
-      '<button type="button" class="jn-all" onclick="jnAll()">' + (OFF.length ? "모두 보기" : "즐겨찾기만") + '</button>' +
-      sorted(M).map(function(m){ return '<button type="button" class="' + (OFF.indexOf(m.k) > -1 ? "off" : "") + '" onclick="jnToggle(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n.replace(/ (민속|향토)?오일장/, "")) + (FAV.indexOf(m.k) > -1 ? " ★" : "") + '</button>'; }).join("");
+      '<button type="button" class="jn-all' + (SEL ? "" : " on") + '" onclick="jnSel(\'\')">전체</button>' +
+      M.map(function(m){ return '<button type="button" class="' + (SEL === m.k ? "on" : "") + '" style="--c:' + m.c + '" aria-pressed="' + (SEL === m.k) + '" onclick="jnSel(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n.replace(/ (민속|향토)?오일장/, "")) + '</button>'; }).join("");
   }
 
   function drawCal(){
     var y = view.getFullYear(), mo = view.getMonth();
     document.getElementById("jn-title").textContent = y + "년 " + (mo+1) + "월 장날";
     var first = new Date(y, mo, 1).getDay(), dim = new Date(y, mo+1, 0).getDate();
-    var shown = sorted(M.filter(function(m){ return OFF.indexOf(m.k) < 0; }));
+    var shown = shownM();
     var h = WD.map(function(w, i){ return '<div class="wd' + (i === 0 ? " sun" : i === 6 ? " sat" : "") + '">' + w + '</div>'; }).join("");
     for (var b = 0; b < first; b++) h += '<div class="jn-day blank"></div>';
     for (var d = 1; d <= dim; d++){
@@ -213,19 +210,17 @@
     var dt = new Date(view.getFullYear(), view.getMonth(), d);
     document.querySelectorAll(".jn-day.sel").forEach(function(x){ x.classList.remove("sel"); });
     var c = document.querySelector('.jn-day[data-d="' + d + '"]'); c && c.classList.add("sel");
-    var open = sorted(M.filter(function(m){ return OFF.indexOf(m.k) < 0 && state(m, dt) === 1; }));
-    var q = M.filter(function(m){ return OFF.indexOf(m.k) < 0 && state(m, dt) === 2; });
+    var open = shownM().filter(function(m){ return state(m, dt) === 1; });
+    var q = shownM().filter(function(m){ return state(m, dt) === 2; });
     document.getElementById("jn-pick").innerHTML = '<b>' + fmt(dt) + '</b> ' + (open.length ? '' : '열리는 장이 없어요') +
       (open.length ? '<div class="jn-mk">' + open.map(function(m){ return '<a href="#m-' + m.k + '" onclick="return jnFocus(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n) + '</a>'; }).join("") + '</div>' : '') +
       (q.length ? '<div style="margin-top:6px;font-size:12.5px">확인 필요: ' + q.map(function(m){ return esc(m.n); }).join(", ") + '</div>' : '');
   };
 
   function drawList(){
-    document.getElementById("jn-list").innerHTML = sorted(M).map(function(m){
-      var fav = FAV.indexOf(m.k) > -1;
+    document.getElementById("jn-list").innerHTML = M.map(function(m){
       return '<div class="jn-card" id="m-' + m.k + '" style="--c:' + m.c + '">' +
-        '<div class="t"><div><b>' + esc(m.n) + '</b><div class="days">' + daysLabel(m) + ' · ' + esc(m.s) + '</div></div>' +
-        '<button type="button" class="jn-star' + (fav ? " on" : "") + '" aria-label="자주 가는 장으로 표시" title="자주 가는 장" onclick="jnFav(\'' + m.k + '\')">' + (fav ? "★" : "☆") + '</button></div>' +
+        '<div class="t"><div><b>' + esc(m.n) + '</b><div class="days">' + daysLabel(m) + ' · ' + esc(m.s) + '</div></div>' + '</div>' +
         '<div class="next">' + nextOpen(m) + '</div>' +
         '<div class="addr">📍 ' + esc(m.addr) + '</div>' +
         '<div class="acts"><a href="https://map.kakao.com/link/search/' + encodeURIComponent(m.q) + '" target="_blank" rel="noopener">카카오맵</a>' +
@@ -236,14 +231,7 @@
 
   function all(){ todayBox(0, "jn-t0", "jn-d0"); todayBox(1, "jn-t1", "jn-d1"); drawFilter(); drawCal(); drawList(); }
 
-  window.jnFav = function(k){ var i = FAV.indexOf(k); if (i > -1) FAV.splice(i, 1); else FAV.push(k); ls("ji_jn_fav", FAV); all(); };
-  window.jnToggle = function(k){ var i = OFF.indexOf(k); if (i > -1) OFF.splice(i, 1); else OFF.push(k); ls("ji_jn_off", OFF); drawFilter(); drawCal(); };
-  window.jnAll = function(){
-    if (OFF.length) OFF = [];
-    else { if (!FAV.length) { alertSoft("☆를 눌러 자주 가는 장을 먼저 표시해 주세요."); return; } OFF = M.filter(function(m){ return FAV.indexOf(m.k) < 0; }).map(function(m){ return m.k; }); }
-    ls("ji_jn_off", OFF); drawFilter(); drawCal();
-  };
-  function alertSoft(t){ var f = document.getElementById("jn-filter"), sp = document.createElement("span"); sp.textContent = t; sp.style.cssText = "font-size:13px;color:var(--citrus-700);font-weight:700;align-self:center"; f.appendChild(sp); setTimeout(function(){ sp.remove(); }, 2500); }
+  window.jnSel = function(k){ SEL = (SEL === k) ? "" : k; drawFilter(); drawCal(); };
   window.jnFocus = function(k){
     var el = document.getElementById("m-" + k); if (!el) return false;
     el.scrollIntoView({ behavior:"smooth", block:"center" });
