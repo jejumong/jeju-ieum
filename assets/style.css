@@ -1775,3 +1775,9 @@ a.act-item:hover{border-color:var(--sea-200)}
 
 /* 긴 글·띄어쓰기 없는 글(주소, 링크 등)도 칸 안에서 줄바꿈 */
 .msg-item .msg-body,.msg-item .msg-prev,.pv-content,.cmt-item p,.act-item p{overflow-wrap:anywhere;word-break:break-word}
+
+/* 휴대폰: 커뮤니티 각 게시판 안에서는 글쓰기 버튼 보이기 (커뮤니티 첫 화면은 숨김 유지) */
+@media (max-width:680px){
+  body.board-on .page-head .pg-write{display:flex!important;width:100%;justify-content:center;margin-top:12px;padding:12px;font-size:15px}
+  body.board-on .page-head .inner{flex-wrap:wrap}
+}
