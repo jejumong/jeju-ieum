@@ -178,6 +178,15 @@ case 'post_create': {
   if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
   if (!can_write_board($u, $b)) fail('승인된 ' . ($b === '제주상점' ? '상점판매자' : '공구판매자') . '만 올릴 수 있어요', 403);
   $title = str($R['title'] ?? '', 120); if ($title === '') fail('제목을 입력해 주세요.');
+  if ($b === '부동산') {
+    if ($u['role'] === 'realtor') {
+      $ag = $R['extra']['agency'] ?? [];
+      if (!is_array($ag) || trim($ag['name'] ?? '') === '' || trim($ag['reg'] ?? '') === '') fail('중개사무소 이름과 등록번호를 적어 주세요.');
+    } elseif (!is_mod($u)) {
+      $n = one("SELECT COUNT(*) n FROM ji_posts WHERE author = ? AND board = '부동산'", [$u['id']])['n'];
+      if ($n >= 3) fail('일반 회원은 매물을 동시에 3건까지 올릴 수 있어요. 지난 매물을 정리한 뒤 올려 주세요.');
+    }
+  }
   $recent = one("SELECT COUNT(*) n FROM ji_posts WHERE author = ? AND created_at > (NOW() - INTERVAL 1 MINUTE)", [$u['id']])['n'];
   if ($recent >= 3) fail('글을 너무 빨리 올리고 있어요. 잠시 후 다시 해 주세요.', 429);
   $id = uuid(); $t = now();

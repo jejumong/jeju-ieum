@@ -1839,17 +1839,46 @@ a.act-item:hover{border-color:var(--sea-200)}
 /* 휴대폰: 위쪽 글쓰기 버튼은 숨겨 머리 부분을 한 줄로 (글쓰기는 각 게시판 안의 버튼으로) */
 @media (max-width:680px){ .header-actions .hb-write{display:none!important} }
 
-/* ── 글쓴이 역할 표시 (공인중개사·상점·공구판매·운영진) ── */
-.role-badge{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:800;line-height:1;padding:4px 8px;border-radius:6px;white-space:nowrap;letter-spacing:-.01em;vertical-align:1px}
-.rb-realtor{background:#e6f6f1;color:#0b7a5c;border:1px solid #b9e6d6}
-.rb-shop{background:#fff3e3;color:#b35a00;border:1px solid #ffd9a8}
-.rb-dealer{background:#fdeef6;color:#b0306f;border:1px solid #f6c3dc}
-.rb-staff{background:#eaf3ff;color:#1f64b8;border:1px solid #c3dbf8}
-.pc-role{margin:0 0 6px}
-.item-card.pc.pro{border-color:#cfe3dc}
-.item-card.pc.pro:has(.rb-shop){border-color:#f5dcc0}
-.item-card.pc.pro:has(.rb-dealer){border-color:#f3d2e3}
-@media (max-width:680px){ .grid-cards .item-card.pc .pc-role{margin:0 0 3px} .grid-cards .item-card.pc .pc-role .role-badge{font-size:10.5px;padding:3px 6px} }
+/* ── 글쓴이 역할 표시 (공인중개사·상점·공구판매·운영진·직거래) ── */
+.role-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;line-height:1;padding:5px 9px;border-radius:7px;white-space:nowrap;letter-spacing:-.01em;vertical-align:1px;box-shadow:0 1px 2px rgba(16,24,40,.06)}
+.rb-realtor{background:#d9f3ea;color:#05664b;border:1px solid #8fd6bc}
+.rb-shop{background:#ffead0;color:#a24f00;border:1px solid #ffc27a}
+.rb-dealer{background:#fde2ef;color:#a3205f;border:1px solid #f2a6c9}
+.rb-staff{background:#ddeaff;color:#1a58a6;border:1px solid #9fc3f2}
+.rb-direct{background:#f1efe9;color:#5b4a2f;border:1px solid #d9cfbd}
+.pc-role{margin:0 0 7px}
+.item-card.pc.pro{border-color:#a9dcc9}
+.item-card.pc.pro:has(.rb-shop){border-color:#ffd09a}
+.item-card.pc.pro:has(.rb-dealer){border-color:#f4bdd6}
+.item-card.pc.pro:has(.rb-staff){border-color:#b9d3f5}
+.item-card.pc.pro:has(.rb-direct){border-color:#e6e8ec}
+@media (max-width:680px){ .grid-cards .item-card.pc .pc-role{margin:0 0 3px} .grid-cards .item-card.pc .pc-role .role-badge{font-size:11px;padding:3px 7px} }
+/* 카드 안 사진·본문이 어떤 경우에도 눌려 사라지지 않게 */
+.item-card.pc .pc-ph{flex:0 0 auto}
+.item-card.pc .pc-body{flex:1 0 auto}
+@media (max-width:680px){ .grid-cards .item-card.pc .pc-ph{flex:0 0 104px} .grid-cards .item-card.pc .pc-body{flex:1 1 auto} }
 /* 글쓰기: 승인제 게시판 안내 */
 .board-lock-note{margin:6px 0 0;font-size:12.5px;color:var(--ink-4)}
 .board-lock-note a{font-weight:700;color:var(--sea-700)}
+
+/* ── 부동산: 중개사·직거래 입력 칸과 표시 ── */
+.re-box{border:1px solid #cfe3dc;background:#f6fbf9;border-radius:14px;padding:16px 16px 8px;margin:4px 0 18px}
+.re-box.direct{border-color:#e4dccd;background:#fbf9f5}
+.re-box h4{margin:0 0 12px;font-size:15px;font-weight:800;color:var(--ink)}
+.re-box h4 small{display:block;font-size:12.5px;font-weight:500;color:var(--ink-4);margin-top:3px}
+.re-radio{display:flex;flex-wrap:wrap;gap:8px}
+.re-radio label{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:14px;cursor:pointer;font-weight:600}
+.re-radio label:has(input:checked){border-color:var(--sea);background:var(--sea-50);color:var(--sea-700)}
+.re-note{font-size:12.5px;color:var(--ink-4);margin:4px 0 8px;line-height:1.6}
+.re-info{border-radius:12px;padding:14px 16px;margin:0 0 18px;font-size:14px}
+.re-info.agent{background:#f1faf6;border:1px solid #b9e3d3}
+.re-info .ri-h{font-weight:800;color:#05664b;margin-bottom:8px}
+.re-info dl{display:grid;grid-template-columns:76px 1fr;gap:5px 10px;margin:0}
+.re-info dt{color:var(--ink-4);font-weight:600}
+.re-info dd{margin:0;color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.re-info.direct{background:#fbf8f2;border:1px solid #e6dcc8;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;color:var(--ink-3)}
+.re-info.direct b{color:#5b4a2f}
+.re-info.direct span:last-child{flex-basis:100%;font-size:12.5px;color:var(--ink-4)}
+.re-who{margin-top:8px}
+.re-radio input[type=radio]{width:auto!important;height:auto;margin:0;flex:none;accent-color:var(--sea)}
+.re-radio label{white-space:nowrap}

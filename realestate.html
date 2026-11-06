@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107g">
+<link rel="stylesheet" href="assets/style.css?v=20261107h">
 </head>
 <body data-active="realestate">
 
@@ -41,6 +41,13 @@
           <button type="button" data-filter="일년살이" onclick="applyChip(this)">일년살이</button>
         </div>
       </div>
+      <div class="shf-r re-who"><span class="ref-l">올린 사람</span>
+        <div class="seg" id="who-bar" role="group" aria-label="올린 사람">
+          <button type="button" class="on" data-who="all" onclick="applyWho(this)">전체</button>
+          <button type="button" data-who="realtor" onclick="applyWho(this)">🏢 중개사</button>
+          <button type="button" data-who="direct" onclick="applyWho(this)">🏠 직거래</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -49,17 +56,17 @@
 
 </main>
 
-<script src="assets/common.js?v=20261107g"></script>
-<script src="assets/db.js?v=20261107g"></script>
-<script src="assets/notify.js?v=20261107g"></script>
-<script src="assets/seed-trade.js?v=20261107g"></script>
-<script src="assets/seed-extra.js?v=20261107g"></script>
-<script src="assets/seed-new.js?v=20261107g"></script>
-<script src="assets/seed-comments.js?v=20261107g"></script>
-<script src="assets/photos.js?v=20261107g"></script>
-<script src="assets/cards.js?v=20261107g"></script>
-<script src="assets/admin-data.js?v=20261107g"></script>
-<script src="assets/programs-data.js?v=20261107g"></script>
+<script src="assets/common.js?v=20261107h"></script>
+<script src="assets/db.js?v=20261107h"></script>
+<script src="assets/notify.js?v=20261107h"></script>
+<script src="assets/seed-trade.js?v=20261107h"></script>
+<script src="assets/seed-extra.js?v=20261107h"></script>
+<script src="assets/seed-new.js?v=20261107h"></script>
+<script src="assets/seed-comments.js?v=20261107h"></script>
+<script src="assets/photos.js?v=20261107h"></script>
+<script src="assets/cards.js?v=20261107h"></script>
+<script src="assets/admin-data.js?v=20261107h"></script>
+<script src="assets/programs-data.js?v=20261107h"></script>
 <script>
 
 
@@ -78,6 +85,11 @@ function htypeOf(p){
   return "전원·단독주택";
 }
 function allRe(){ return userPostsOf("부동산").concat(TRADE_SEEDS.filter(function(p){ return p.board === "부동산"; })); }
+var whoFilter = "all";
+function applyWho(el){
+  el.parentElement.querySelectorAll("button").forEach(function(c){ c.classList.remove("on"); });
+  el.classList.add("on"); whoFilter = el.dataset.who; render();
+}
 function applyHt(el){
   el.parentElement.querySelectorAll("button").forEach(function(c){ c.classList.remove("on"); });
   el.classList.add("on"); htFilter = el.dataset.ht; render();
@@ -116,6 +128,7 @@ function render(){
   var list = allRe();
   list = list.filter(function(p){ return typeFilter === "all" || (p.head || "") === typeFilter; });
   list = list.filter(function(p){ return htFilter === "all" || htypeOf(p) === htFilter; });
+  list = list.filter(function(p){ if (whoFilter === "all") return true; var r = authorRoleOf(p); return whoFilter === "realtor" ? r === "realtor" : r === "direct"; });
   if (reQ) list = list.filter(function(p){ return ((p.title||"") + " " + (p.content||"") + " " + (p.loc||"")).indexOf(reQ) > -1; });
   document.getElementById("shown-count").textContent = list.length;
   renderSections({

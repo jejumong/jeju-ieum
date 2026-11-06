@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107g">
+<link rel="stylesheet" href="assets/style.css?v=20261107h">
 </head>
 <body data-active="">
 
@@ -66,6 +66,31 @@
         <p class="hint" style="font-size:12.5px;color:var(--ink-4);margin-top:6px">번지까지 적으면 정확한 위치에 핀이, 동·리까지만 적으면 대략적인 범위가 표시돼요.</p>
         <div id="addr-map" style="margin-top:8px"></div>
       </div>
+      <div class="re-box" id="re-agent" style="display:none">
+        <h4>🏢 중개사무소 정보 <small>공인중개사 매물에는 아래 정보가 함께 표시돼요</small></h4>
+        <div class="field-row">
+          <div class="field"><label for="ag-name">중개사무소 이름 <span class="req">*</span></label><input type="text" id="ag-name" maxlength="40" placeholder="예: 한동공인중개사사무소"></div>
+          <div class="field"><label for="ag-reg">중개사무소 등록번호 <span class="req">*</span></label><input type="text" id="ag-reg" maxlength="40" placeholder="예: 50110-2020-00000"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="ag-rep">대표 공인중개사 <span class="req">*</span></label><input type="text" id="ag-rep" maxlength="20" placeholder="예: 김제주"></div>
+          <div class="field"><label for="ag-tel">사무소 전화 <span class="req">*</span></label><input type="text" id="ag-tel" maxlength="20" inputmode="tel" placeholder="예: 064-000-0000"></div>
+        </div>
+        <div class="field"><label for="ag-addr">사무소 주소</label><input type="text" id="ag-addr" maxlength="80" placeholder="예: 제주시 구좌읍 ○○로 12"></div>
+        <p class="re-note">공인중개사법에 따라 매물 광고에는 중개사무소 정보를 표시해야 해요. 한 번 적으면 다음 매물에 자동으로 채워져요.</p>
+      </div>
+      <div class="re-box direct" id="re-owner" style="display:none">
+        <h4>🏠 직거래 매물 확인 <small>일반 회원 매물은 '직거래 · 중개수수료 없음'으로 표시돼요</small></h4>
+        <div class="field"><label>올리는 분 <span class="req">*</span></label>
+          <div class="re-radio">
+            <label><input type="radio" name="ow-type" value="집주인"> 집주인(소유자)</label>
+            <label><input type="radio" name="ow-type" value="세입자"> 세입자(양도·전대)</label>
+            <label><input type="radio" name="ow-type" value="가족·대리"> 가족·대리인</label>
+          </div>
+        </div>
+        <div class="check-line"><input type="checkbox" id="ow-agree"><label for="ow-agree">[필수] 중개업자가 아니며, 직접 거래하는 매물이에요</label></div>
+        <p class="re-note">일반 회원은 매물을 동시에 3건까지 올릴 수 있어요. 중개업을 하신다면 <a href="contact.html?type=%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC%20%EC%9D%B8%EC%A6%9D">공인중개사 인증을 요청</a>해 주세요.</p>
+      </div>
       <div class="field-row" id="pay-row" style="display:none">
         <div class="field">
           <label for="paytype">급여 형태 <span class="req">*</span></label>
@@ -113,15 +138,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107g"></script>
-<script src="assets/common.js?v=20261107g"></script>
-<script src="assets/db.js?v=20261107g"></script>
-<script src="assets/notify.js?v=20261107g"></script>
-<script src="assets/seed-trade.js?v=20261107g"></script>
-<script src="assets/seed-extra.js?v=20261107g"></script>
-<script src="assets/seed-new.js?v=20261107g"></script>
-<script src="assets/seed-comments.js?v=20261107g"></script>
-<script src="assets/admin-data.js?v=20261107g"></script>
+<script src="assets/kmap.js?v=20261107h"></script>
+<script src="assets/common.js?v=20261107h"></script>
+<script src="assets/db.js?v=20261107h"></script>
+<script src="assets/notify.js?v=20261107h"></script>
+<script src="assets/seed-trade.js?v=20261107h"></script>
+<script src="assets/seed-extra.js?v=20261107h"></script>
+<script src="assets/seed-new.js?v=20261107h"></script>
+<script src="assets/seed-comments.js?v=20261107h"></script>
+<script src="assets/admin-data.js?v=20261107h"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -266,6 +291,18 @@ function toggleExtra() {
   document.getElementById("addr-label").textContent = job ? "근무지 주소" : "매물 주소";
   document.getElementById("addr").placeholder = job ? "예: 제주시 구좌읍 해맞이해안로 1234 (근무하는 곳)" : "예: 제주시 구좌읍 한동로1길 15 (동·리까지만 적어도 돼요)";
   document.getElementById("pay-row").style.display = job ? "flex" : "none";
+  // 부동산: 공인중개사와 일반 회원은 다른 입력 칸
+  var me = currentUser() || {}, isAgent = me.role === "realtor";
+  document.getElementById("re-agent").style.display = v === "부동산" && isAgent ? "block" : "none";
+  document.getElementById("re-owner").style.display = v === "부동산" && !isAgent ? "block" : "none";
+  if (v === "부동산" && isAgent && !document.getElementById("ag-name").value) {
+    var ag = (typeof editing !== "undefined" && editing && editing.extra && editing.extra.agency) || JI.get("agency", null);
+    if (ag) ["name", "reg", "rep", "tel", "addr"].forEach(function (k) { document.getElementById("ag-" + k).value = ag[k] || ""; });
+  }
+  if (v === "부동산" && !isAgent && typeof editing !== "undefined" && editing && editing.extra && editing.extra.owner) {
+    var r = document.querySelector('input[name="ow-type"][value="' + editing.extra.owner + '"]'); if (r) r.checked = true;
+    document.getElementById("ow-agree").checked = true;
+  }
   document.getElementById("price-row").style.display = job ? "none" : "flex";
   var hs = document.getElementById("head"), cur = hs.value;
   if (!toggleExtra.done && typeof editing !== "undefined" && editing && editing.head) cur = editing.head;
@@ -349,9 +386,22 @@ function submitPost() {
   // 서버가 연결되어 있으면 모든 게시판 글을 서버에 저장 (예전에 이 브라우저에만 저장된 글을 고칠 때만 예외)
   if (window.JIDB && JIDB.enabled && !(editing && !editing.db)) {
     if (!user.id) { alert("새 회원 시스템으로 다시 로그인해 주세요."); location.href = "login.html?next=" + encodeURIComponent("write.html" + location.search); return; }
-    var btn = document.getElementById("submit-btn"); btn.disabled = true;
     if (PH_BUSY) { alert("사진을 올리는 중이에요. 다 올라간 뒤 등록해 주세요."); return; }
     var extra = Object.assign({}, (editing && editing.extra) || {});
+    if (board === "부동산") {
+      if (user.role === "realtor") {
+        var ag = {}; ["name", "reg", "rep", "tel", "addr"].forEach(function (k) { ag[k] = (document.getElementById("ag-" + k).value || "").trim(); });
+        var miss = [["name", "중개사무소 이름"], ["reg", "등록번호"], ["rep", "대표 공인중개사"], ["tel", "사무소 전화"]].filter(function (f) { return !ag[f[0]]; })[0];
+        if (miss) { alert(miss[1] + "을(를) 적어 주세요."); document.getElementById("ag-" + miss[0]).focus(); return; }
+        extra.agency = ag; delete extra.owner; JI.set("agency", ag);
+      } else {
+        var ow = document.querySelector('input[name="ow-type"]:checked');
+        if (!ow) { alert("올리는 분(집주인·세입자·대리인)을 골라 주세요."); return; }
+        if (!document.getElementById("ow-agree").checked) { alert("직거래 매물 확인에 체크해 주세요."); return; }
+        extra.owner = ow.value; delete extra.agency;
+      }
+    }
+    var btn = document.getElementById("submit-btn"); btn.disabled = true;
     extra.htype = htype; extra.addr = addr; extra.payType = payType; extra.pay = pay;
     extra.photos = PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; });
     var data = { board: board, head: head === "선택 안 함" ? "" : head, title: title, content: content, price: price, loc: loc, meta: (editing && editing.meta) || "", extra: extra };
