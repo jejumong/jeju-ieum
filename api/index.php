@@ -347,7 +347,7 @@ case 'admin_inquiries': {
     all("SELECT i.*, u.nick FROM ji_inquiries i LEFT JOIN ji_users u ON u.id = i.user_id ORDER BY i.created_at DESC LIMIT 500")));
 }
 case 'admin_inquiry_set': {
-  admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
+  admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'seen', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
   q("UPDATE ji_inquiries SET status = ? WHERE id = ?", [$st, $R['id'] ?? '']); out(true);
 }
 case 'admin_inquiry_delete': { admin($R); q("DELETE FROM ji_inquiries WHERE id = ?", [$R['id'] ?? '']); out(true); }

@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>제주이음 관리자 콘솔</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261106u">
+<link rel="stylesheet" href="../assets/style.css?v=20261106v">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -116,6 +116,10 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
 .iq-dl th{text-align:left;width:96px;color:var(--ink-3);font-weight:700;padding:6px 8px 6px 0;vertical-align:top}
 .iq-dl td{padding:6px 0;border-bottom:1px solid #f0f2f5;white-space:pre-wrap}
 .iq-msg{white-space:pre-wrap;line-height:1.75;background:#f8fafc;border:1px solid #e6e9ee;border-radius:10px;padding:14px 16px;max-height:50vh;overflow:auto;margin-bottom:14px;font-size:14.5px}
+tr.iq-new td{background:#fff6ea}
+tr.iq-new td:first-child{box-shadow:inset 4px 0 0 #ff9a2e}
+tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
+.iq-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff7a00;margin-right:6px;vertical-align:1px}
 </style>
 </head>
 <body data-admin>
@@ -124,14 +128,14 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261106u"></script>
-<script src="../assets/db.js?v=20261106u"></script>
-<script src="../assets/seed-trade.js?v=20261106u"></script>
-<script src="../assets/seed-extra.js?v=20261106u"></script>
-<script src="../assets/seed-new.js?v=20261106u"></script>
-<script src="../assets/seed-comments.js?v=20261106u"></script>
-<script src="../assets/photos.js?v=20261106u"></script>
-<script src="../assets/admin-data.js?v=20261106u"></script>
+<script src="../assets/common.js?v=20261106v"></script>
+<script src="../assets/db.js?v=20261106v"></script>
+<script src="../assets/seed-trade.js?v=20261106v"></script>
+<script src="../assets/seed-extra.js?v=20261106v"></script>
+<script src="../assets/seed-new.js?v=20261106v"></script>
+<script src="../assets/seed-comments.js?v=20261106v"></script>
+<script src="../assets/photos.js?v=20261106v"></script>
+<script src="../assets/admin-data.js?v=20261106v"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -240,7 +244,7 @@ function M(){ return document.getElementById("main"); }
 /* ── 문의·제보 (contact.html 신청서) ──
    ※ SITE_CFG.inquiryEndpoint 를 설정하지 않으면, 방문자가 남긴 신청서는 그 방문자 브라우저에만 저장됩니다.
      실제 운영 전에 Formspree·구글 폼 같은 수신 주소를 assets/common.js 의 SITE_CFG 에 넣어 주세요. */
-var IQ_ST = { "new": "새 신청", "contacted": "연락함", "done": "완료" };
+var IQ_ST = { "new": "새 신청", "seen": "확인함", "contacted": "연락함", "done": "완료" };
 function newIq(){ return JI.get("inquiries", []).filter(function(q){ return q.status === "new"; }).length; }
 function drawInquiries(){
   var list = JI.get("inquiries", []).slice().reverse();
@@ -606,7 +610,8 @@ if (SRV) {
     };
   };
   var IQ_HELP = '<div class="panel role-help"><b>상태는 운영자끼리 처리 상황을 표시하는 용도예요.</b> 회원에게는 보이지 않아요.<ul>' +
-    '<li><b>새 신청</b> — 아직 아무도 확인하지 않음 (메뉴에 숫자로 표시)</li><li><b>연락함</b> — 전화·쪽지 등으로 연락했지만 처리 중</li>' +
+    '<li><b>새 신청</b> — 아직 아무도 안 읽음 (주황 바탕 + 메뉴에 숫자로 표시). <b>자세히 보기</b>를 열면 <b>확인함</b>으로 바뀌어요</li>' +
+    '<li><b>확인함</b> — 읽었지만 아직 처리 전</li><li><b>연락함</b> — 전화·쪽지 등으로 연락했지만 처리 중</li>' +
     '<li><b>완료</b> — 처리 끝. <b>답장하기</b>로 쪽지를 보내면 자동으로 완료가 돼요</li></ul>' +
     '로그인한 회원이 보낸 문의에만 쪽지로 답할 수 있어요. 로그인하지 않고 보낸 문의는 남긴 연락처로 연락해 주세요.</div>';
   drawInquiries = function(){
@@ -614,7 +619,7 @@ if (SRV) {
     M().innerHTML = '<h1>문의·제보</h1><p class="sub">정보 정정 요청, 가이드 제보, 입점·제휴 문의가 모입니다.</p>' + IQ_HELP +
       '<div class="panel">' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>날짜</th><th>종류</th><th>보낸 사람</th><th>내용</th><th>상태</th><th></th></tr></thead><tbody>' +
         list.map(function(q){
-          return '<tr><td style="white-space:nowrap">' + esc(q.date) + '</td><td><span class="bd">' + esc(q.type || q.service || "문의") + '</span></td>' +
+          return '<tr class="iq-row' + (q.status === "new" ? ' iq-new' : '') + '" data-iq="' + q.id + '"><td style="white-space:nowrap">' + (q.status === "new" ? '<span class="iq-dot" title="안 읽음"></span>' : '') + esc(q.date) + '</td><td><span class="bd">' + esc(q.type || q.service || "문의") + '</span></td>' +
             '<td><b>' + esc(q.name) + '</b>' + (q.user_nick ? ' <span class="bd user">회원 ' + esc(q.user_nick) + '</span>' : ' <small>(비회원)</small>') + '<br><small>' + esc(q.contact) + '</small></td>' +
             '<td class="ttl iq-cell" onclick="showIq(\'' + q.id + '\')" title="눌러서 자세히 보기"><small>' + esc([q.stage, q.when].filter(Boolean).join(" · ")) + '</small><div class="iq-clamp">' + esc(q.msg) + '</div>' +
               '<span class="iq-more">자세히 보기 ›</span>' + (q.replied_at ? ' <small style="color:var(--sea-700)">✉️ ' + esc(q.replied_at) + ' 답장함</small>' : '') + '</td>' +
@@ -626,8 +631,21 @@ if (SRV) {
 
   /* 문의 상세 보기 */
   var IQ_FIELDS = [["type","종류"],["service","신청 서비스"],["name","이름"],["contact","연락처"],["stage","상황"],["when","시기"],["email","이메일"],["region","지역"],["people","인원"],["budget","예산"]];
+  /* 자세히 보기를 열면 '확인함' 으로 — 메뉴 숫자와 주황 표시가 사라짐 */
+  function markSeen(q){
+    if (q.status !== "new") return;
+    q.status = "seen";
+    var l = JI.get("inquiries", []); l.forEach(function(x){ if (x.id === q.id) x.status = "seen"; }); _set.call(JI, "inquiries", l);
+    if (STATS && STATS.inquiries_new > 0) STATS.inquiries_new--;
+    var row = document.querySelector('tr[data-iq="' + q.id + '"]');
+    if (row) { row.classList.remove("iq-new"); var d = row.querySelector(".iq-dot"); if (d) d.remove(); var sel = row.querySelector("select"); if (sel) sel.value = "seen"; }
+    var btn = document.querySelector('.side button[data-v="inquiries"] .cnt');
+    if (btn) { if (STATS.inquiries_new > 0) btn.textContent = STATS.inquiries_new; else btn.remove(); }
+    JIDB.call("admin_inquiry_set", { id: q.id, status: "seen" }).catch(function(e){ console.warn(e); });
+  }
   window.showIq = function(id){
     var q = JI.get("inquiries", []).filter(function(x){ return x.id === id; })[0]; if (!q) return;
+    markSeen(q);
     var known = { id:1, status:1, date:1, user_id:1, user_nick:1, replied_at:1, msg:1, agree:1 };
     IQ_FIELDS.forEach(function(f){ known[f[0]] = 1; });
     var rows = IQ_FIELDS.filter(function(f){ return q[f[0]]; }).map(function(f){ return [f[1], q[f[0]]]; })
