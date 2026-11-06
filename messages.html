@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>쪽지함 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css?v=20261106s">
+</head>
+<body data-active="">
+
+<main class="wrap" style="max-width:860px;padding-top:28px">
+  <div class="crumb"><a href="index.html">홈</a> › 쪽지함</div>
+  <h1 class="hp-h1">✉️ 쪽지함</h1>
+
+  <div class="sh-tabs act-tabs" role="tablist" id="m-tabs">
+    <button type="button" data-t="in" class="on"><span class="st-i">📥</span><span class="st-t"><b>받은 쪽지 <small id="n-in"></small></b></span></button>
+    <button type="button" data-t="sent"><span class="st-i">📤</span><span class="st-t"><b>보낸 쪽지</b></span></button>
+    <button type="button" data-t="write"><span class="st-i">✏️</span><span class="st-t"><b>쪽지 쓰기</b></span></button>
+  </div>
+
+  <section class="act-panel on" id="p-in"><div class="act-list" id="l-in"></div></section>
+  <section class="act-panel" id="p-sent"><div class="act-list" id="l-sent"></div></section>
+  <section class="act-panel" id="p-write">
+    <div class="msg-form">
+      <label for="m-to">받는 사람 (닉네임)</label>
+      <input id="m-to" type="text" maxlength="20" placeholder="예: 한동리이웃" autocomplete="off">
+      <label for="m-body">내용</label>
+      <textarea id="m-body" maxlength="2000" rows="7" placeholder="이웃에게 보낼 내용을 적어 주세요. 연락처를 주고받을 때는 조심해 주세요."></textarea>
+      <div class="msg-form-foot"><span id="m-len">0 / 2000</span><button type="button" class="btn primary" id="m-send">보내기</button></div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/common.js?v=20261106s"></script>
+<script src="assets/db.js?v=20261106s"></script>
+<script src="assets/notify.js?v=20261106s"></script>
+<script>
+(function(){
+  function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
+  function $(id){ return document.getElementById(id); }
+  function when(t){ var d = new Date(t); return (d.getMonth()+1) + "." + d.getDate() + " " + d.toTimeString().slice(0,5); }
+  var empty = function(t){ return '<div class="act-empty">' + t + '</div>'; };
+  var P = new URLSearchParams(location.search), TO_ID = P.get("to_id") || "";
+  var BOX = { "in": [], sent: [] };
+
+  if (!JIDB.enabled) { document.querySelector("main").insertAdjacentHTML("beforeend", empty("회원 시스템 준비 중이에요.")); $("m-tabs").style.display = "none"; return; }
+
+  function show(t){
+    document.querySelectorAll("#m-tabs button").forEach(function(b){ b.classList.toggle("on", b.dataset.t === t); });
+    document.querySelectorAll(".act-panel").forEach(function(p){ p.classList.toggle("on", p.id === "p-" + t); });
+    if (t === "write") setTimeout(function(){ ($("m-to").value ? $("m-body") : $("m-to")).focus(); }, 50);
+  }
+  $("m-tabs").addEventListener("click", function(e){ var b = e.target.closest("button[data-t]"); if (b) show(b.dataset.t); });
+
+  function compose(nick, id, quote){
+    $("m-to").value = nick || ""; TO_ID = id || "";
+    $("m-body").value = quote ? "\n\n----- 받은 쪽지 -----\n" + quote : "";
+    $("m-len").textContent = $("m-body").value.length + " / 2000";
+    show("write"); $("m-body").setSelectionRange(0, 0);
+  }
+  $("m-to").addEventListener("input", function(){ TO_ID = ""; });
+  $("m-body").addEventListener("input", function(){ $("m-len").textContent = this.value.length + " / 2000"; });
+
+  function item(m, box){
+    var who = box === "in" ? m.from_nick : m.to_nick, op = m.from_nick === "제주이음 운영자";
+    return '<div class="act-item msg-item' + (box === "in" && !m.read ? " unread" : "") + (op ? " msg-op" : "") + '" data-id="' + m.id + '" data-box="' + box + '">' +
+      '<div class="ai-t"><b>' + (box === "in" ? "" : "→ ") + esc(who) + (op ? ' <span class="msg-badge">운영자</span>' : '') + '</b><span>' + when(m.created_at) + (box === "sent" ? (m.read ? " · 읽음" : " · 안 읽음") : "") + '</span></div>' +
+      '<p class="msg-prev">' + esc(m.body.split("\n")[0].slice(0, 80)) + '</p>' +
+      '<div class="msg-full" hidden><p class="msg-body">' + esc(m.body) + '</p><div class="ai-btns">' +
+        (box === "in" ? '<button type="button" class="btn primary" data-reply="' + m.id + '">답장</button>' : '') +
+        '<button type="button" class="btn ghost" data-del="' + m.id + '">삭제</button></div></div></div>';
+  }
+  function draw(box){
+    var l = BOX[box];
+    if (box === "in") { var n = l.filter(function(m){ return !m.read; }).length; $("n-in").textContent = n || ""; }
+    $("l-" + box).innerHTML = l.length ? l.map(function(m){ return item(m, box); }).join("")
+      : empty(box === "in" ? "받은 쪽지가 없어요." : "보낸 쪽지가 없어요. 글쓴이 이름 옆 <b>✉️ 쪽지</b> 버튼이나 '쪽지 쓰기'로 보낼 수 있어요.");
+  }
+  function load(box){ return JIDB.messages(box).then(function(l){ BOX[box] = l; draw(box); }); }
+
+  function open(el){
+    var full = el.querySelector(".msg-full"), opening = full.hidden;
+    document.querySelectorAll(".msg-full").forEach(function(f){ f.hidden = true; });
+    full.hidden = !opening;
+    var id = el.dataset.id, box = el.dataset.box, m = BOX[box].filter(function(x){ return x.id === id; })[0];
+    if (opening && box === "in" && m && !m.read) {
+      JIDB.readMessage(id).then(function(){ m.read = true; el.classList.remove("unread"); var n = BOX["in"].filter(function(x){ return !x.read; }).length; $("n-in").textContent = n || "";
+        var b = document.querySelector("#hd-msg .hd-bell-n"); if (b) { if (n) b.textContent = n; else b.hidden = true; } });
+    }
+  }
+  document.querySelector("main").addEventListener("click", function(e){
+    var r = e.target.closest("[data-reply]"), d = e.target.closest("[data-del]");
+    if (r) { var m = BOX["in"].filter(function(x){ return x.id === r.dataset.reply; })[0]; if (m) compose(m.from_nick, m.from, m.body); return; }
+    if (d) {
+      if (!confirm("이 쪽지를 삭제할까요?")) return;
+      JIDB.deleteMessage(d.dataset.del).then(function(){ load("in"); load("sent"); }); return;
+    }
+    var it = e.target.closest(".msg-item"); if (it && !e.target.closest("button")) open(it);
+  });
+
+  $("m-send").onclick = function(){
+    var to = $("m-to").value.trim(), body = $("m-body").value.trim();
+    if (!to) { alert("받는 사람 닉네임을 적어 주세요."); $("m-to").focus(); return; }
+    if (!body) { alert("내용을 적어 주세요."); $("m-body").focus(); return; }
+    var btn = this; btn.disabled = true;
+    JIDB.sendMessage(TO_ID || to, body).then(function(){
+      btn.disabled = false; $("m-body").value = ""; $("m-len").textContent = "0 / 2000";
+      alert(to + "님에게 쪽지를 보냈어요."); load("sent").then(function(){ show("sent"); });
+    }, function(e){ btn.disabled = false; alert(e.message || e); });
+  };
+
+  JIDB.ready.then(function(){
+    if (!JIDB.me()) { location.href = "login.html?next=" + encodeURIComponent("messages.html" + location.search); return; }
+    Promise.all([load("in"), load("sent")]).then(function(){
+      var o = P.get("open"); if (o) { var el = document.querySelector('.msg-item[data-id="' + o + '"]'); if (el) { open(el); el.scrollIntoView({ block: "center" }); } }
+    });
+    if (P.get("to") || TO_ID) compose(P.get("to") || "", TO_ID);
+  });
+})();
+</script>
+</body>
+</html>

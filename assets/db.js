@@ -164,6 +164,13 @@ var JIDB = (function () {
   function changePassword(cur, nw) { return call("password_change", { cur: cur, "new": nw }); }
   function deleteAccount(pw) { return call("account_delete", { pw: pw }).then(function () { return signOut(); }); }
 
+  /* ── 쪽지 ── */
+  function sendMessage(to, body) { return call("msg_send", JIDB.isUuid(to) ? { to: to, body: body } : { to_nick: to, body: body }); }
+  function messages(box) { return me() ? call("msg_list", { box: box || "in" }) : Promise.resolve([]); }
+  function readMessage(id) { return call("msg_read", { id: id }); }
+  function deleteMessage(id) { return call("msg_delete", { id: id }); }
+  function unreadMessages() { return me() ? call("msg_unread").catch(function () { return 0; }) : Promise.resolve(0); }
+
   /* ── 알림함 ── */
   function notifications() { return me() ? call("notis") : Promise.resolve([]); }
   function unreadCount() { return me() ? call("noti_unread").catch(function () { return 0; }) : Promise.resolve(0); }
@@ -180,9 +187,17 @@ var JIDB = (function () {
       a.id = "hd-bell"; a.href = "activity.html"; a.className = "hd-bell"; a.title = "알림"; a.setAttribute("aria-label", "알림");
       a.innerHTML = '<span aria-hidden="true">🔔</span><b class="hd-bell-n" hidden></b>';
       acts.insertBefore(a, acts.firstChild);
+      var m = document.createElement("a");
+      m.id = "hd-msg"; m.href = "messages.html"; m.className = "hd-bell"; m.title = "쪽지"; m.setAttribute("aria-label", "쪽지");
+      m.innerHTML = '<span aria-hidden="true">✉️</span><b class="hd-bell-n" hidden></b>';
+      acts.insertBefore(m, acts.firstChild);
     }
+    unreadMessages().then(function (n) {
+      var b = document.querySelector("#hd-msg .hd-bell-n"); if (!b) return;
+      if (n > 0) { b.textContent = n > 99 ? "99+" : n; b.hidden = false; } else b.hidden = true;
+    });
     unreadCount().then(function (n) {
-      var b = document.querySelector(".hd-bell-n"); if (!b) return;
+      var b = document.querySelector("#hd-bell .hd-bell-n"); if (!b) return;
       if (n > 0) { b.textContent = n > 99 ? "99+" : n; b.hidden = false; } else b.hidden = true;
     });
     linkPush();
@@ -196,6 +211,7 @@ var JIDB = (function () {
     decideJoin: decideJoin, joinCount: joinCount,
     clubNotices: clubNotices, addNotice: addNotice, deleteNotice: deleteNotice, clubMembers: clubMembers,
     sendSellerRequest: sendSellerRequest, syncFeed: syncFeed,
+    sendMessage: sendMessage, messages: messages, readMessage: readMessage, deleteMessage: deleteMessage, unreadMessages: unreadMessages,
     comments: comments, addComment: addComment, myComments: myComments, changePassword: changePassword, deleteAccount: deleteAccount, updateComment: updateComment, deleteComment: deleteComment,
     notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead
   };

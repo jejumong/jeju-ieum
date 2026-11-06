@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106r">
+<link rel="stylesheet" href="assets/style.css?v=20261106s">
 </head>
 <body data-active="">
 
@@ -31,9 +31,9 @@
   <section class="act-panel" id="p-sent"><div class="act-list" id="l-sent"></div></section>
 </main>
 
-<script src="assets/common.js?v=20261106r"></script>
-<script src="assets/db.js?v=20261106r"></script>
-<script src="assets/notify.js?v=20261106r"></script>
+<script src="assets/common.js?v=20261106s"></script>
+<script src="assets/db.js?v=20261106s"></script>
+<script src="assets/notify.js?v=20261106s"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
@@ -83,7 +83,7 @@
       $("l-noti").innerHTML = list.length ? list.map(function(n){
         return '<a class="act-item' + (n.read ? "" : " unread") + '" href="' + esc(n.link || "#") + '"><div class="ai-t"><b>' + esc(n.title) + '</b><span>' + when(n.created_at) + '</span></div><p>' + esc(n.body) + '</p></a>';
       }).join("") : empty("아직 알림이 없어요.");
-      if (unread) JIDB.markAllRead().then(function(){ var b = document.querySelector(".hd-bell-n"); if (b) b.hidden = true; });
+      if (unread) JIDB.markAllRead().then(function(){ var b = document.querySelector("#hd-bell .hd-bell-n"); if (b) b.hidden = true; });
     });
 
     // 받은 가입 신청 (내가 만든 모임)

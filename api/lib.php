@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 3;
+const JI_SCHEMA = 4;
 
 /* ── 응답 ── */
 function cors() {
@@ -98,8 +98,18 @@ function migrate($pdo) {
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_inquiries (
     id CHAR(36) PRIMARY KEY, data TEXT NOT NULL, status VARCHAR(10) NOT NULL DEFAULT 'new', ip VARCHAR(45) NOT NULL DEFAULT '',
     created_at DATETIME NOT NULL, INDEX (created_at))$T");
+  $pdo->exec("CREATE TABLE IF NOT EXISTS ji_messages (
+    id CHAR(36) PRIMARY KEY, sender CHAR(36) NOT NULL, sender_nick VARCHAR(30) NOT NULL, receiver CHAR(36) NOT NULL, receiver_nick VARCHAR(30) NOT NULL,
+    body VARCHAR(2000) NOT NULL, kind VARCHAR(20) NOT NULL DEFAULT 'dm', ref VARCHAR(40) NOT NULL DEFAULT '',
+    read_at DATETIME NULL, del_s TINYINT(1) NOT NULL DEFAULT 0, del_r TINYINT(1) NOT NULL DEFAULT 0, created_at DATETIME NOT NULL,
+    INDEX (receiver, created_at), INDEX (sender, created_at))$T");
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_login_fails (
     ip VARCHAR(45) NOT NULL, at DATETIME NOT NULL, INDEX (ip, at))$T");
+  // 버전별 정리
+  if ($v < 4) {
+    try { $pdo->exec("ALTER TABLE ji_inquiries ADD COLUMN user_id CHAR(36) NULL, ADD COLUMN replied_at DATETIME NULL"); } catch (Throwable $e) {}
+    $pdo->exec("UPDATE ji_users SET role = 'shop' WHERE role = 'seller'");
+  }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }
 
@@ -136,7 +146,21 @@ function me($req, $need = true) {
   if (!$u && $need) fail('로그인이 필요해요', 401);
   return $u;
 }
-function admin($req) { $u = me($req); if (($u['role'] ?? '') !== 'admin') fail('관리자만 할 수 있어요', 403); return $u; }
+/* 역할: user 일반 · realtor 부동산 중개인 · shop 상점판매자 · dealer 공구판매자 · staff 스텝 · admin 관리자 */
+const JI_ROLES = ['user', 'realtor', 'shop', 'dealer', 'staff', 'admin'];
+function is_mod($u) { return in_array($u['role'] ?? '', ['admin', 'staff'], true); }   // 글·댓글 관리 가능
+/* 관리자 페이지: 스텝도 들어올 수 있음. $strict 이면 관리자만 (역할 바꾸기 등) */
+function admin($req, $strict = false) {
+  $u = me($req);
+  if (!(($u['role'] ?? '') === 'admin' || (!$strict && ($u['role'] ?? '') === 'staff'))) fail($strict ? '관리자만 할 수 있어요' : '관리자·스텝만 할 수 있어요', 403);
+  return $u;
+}
+function can_write_board($u, $b) {
+  if (is_mod($u)) return true;
+  if ($b === '제주상점') return ($u['role'] ?? '') === 'shop';
+  if ($b === '특가공구') return ($u['role'] ?? '') === 'dealer';
+  return true;
+}
 function setting($k, $def) { $r = one("SELECT v FROM ji_settings WHERE k = ?", [$k]); return $r ? json_decode($r['v'], true) : $def; }
 function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user']; }
 

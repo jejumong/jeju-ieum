@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>제주이음 관리자 콘솔</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261106r">
+<link rel="stylesheet" href="../assets/style.css?v=20261106s">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -101,6 +101,8 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
   .pm-grid,.row2{grid-template-columns:1fr}
   .tbl-wrap{overflow-x:auto}
 }
+.role-help{background:#f7fbff;border:1px solid #dbe9fb;font-size:13.5px;color:var(--ink-2);line-height:1.7}
+.role-help ul{margin:6px 0 4px;padding-left:18px}
 </style>
 </head>
 <body data-admin>
@@ -109,14 +111,14 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261106r"></script>
-<script src="../assets/db.js?v=20261106r"></script>
-<script src="../assets/seed-trade.js?v=20261106r"></script>
-<script src="../assets/seed-extra.js?v=20261106r"></script>
-<script src="../assets/seed-new.js?v=20261106r"></script>
-<script src="../assets/seed-comments.js?v=20261106r"></script>
-<script src="../assets/photos.js?v=20261106r"></script>
-<script src="../assets/admin-data.js?v=20261106r"></script>
+<script src="../assets/common.js?v=20261106s"></script>
+<script src="../assets/db.js?v=20261106s"></script>
+<script src="../assets/seed-trade.js?v=20261106s"></script>
+<script src="../assets/seed-extra.js?v=20261106s"></script>
+<script src="../assets/seed-new.js?v=20261106s"></script>
+<script src="../assets/seed-comments.js?v=20261106s"></script>
+<script src="../assets/photos.js?v=20261106s"></script>
+<script src="../assets/admin-data.js?v=20261106s"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -575,10 +577,44 @@ if (SRV) {
   setIq = function(id, st){ JIDB.call("admin_inquiry_set", { id: id, status: st }).then(function(){ toast("상태를 바꿨어요"); reloadAll(); }, function(e){ alert(e.message); }); };
   delIq = function(id){ if (!confirm("이 신청을 삭제할까요?")) return; JIDB.call("admin_inquiry_delete", { id: id }).then(function(){ toast("삭제했어요"); reloadAll(); }); };
 
+  /* 운영자 이름으로 쪽지 보내기 (문의 답장·회원에게) */
+  window.msgTo = function(uid, nick, inquiryId){
+    showModal('<h3>✉️ ' + esc(nick) + '님에게 ' + (inquiryId ? '답장' : '쪽지') + '</h3>' +
+      '<p style="margin:0 0 10px;color:var(--ink-3);font-size:13.5px">' + (inquiryId ? '"제주이음 운영자" 이름으로 쪽지가 가고, 알림·휴대폰 푸시로도 알려 줘요. 보내면 상태가 <b>완료</b>로 바뀌어요.' : '이 쪽지는 내 닉네임으로 보내져요.') + '</p>' +
+      '<div class="fld"><textarea id="r-body" rows="7" maxlength="2000" placeholder="보낼 내용을 적어 주세요"></textarea></div>' +
+      '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" id="r-send">보내기</button></div>');
+    var t = document.getElementById("r-body"); t.focus();
+    document.getElementById("r-send").onclick = function(){
+      var body = t.value.trim(); if (!body) { alert("내용을 적어 주세요."); return; }
+      this.disabled = true;
+      (inquiryId ? JIDB.call("admin_inquiry_reply", { id: inquiryId, body: body }) : JIDB.sendMessage(uid, body)).then(function(){
+        closeModal(); toast("보냈어요"); if (inquiryId) reloadAll();
+      }, function(e){ alert(e.message || e); document.getElementById("r-send").disabled = false; });
+    };
+  };
+  var IQ_HELP = '<div class="panel role-help"><b>상태는 운영자끼리 처리 상황을 표시하는 용도예요.</b> 회원에게는 보이지 않아요.<ul>' +
+    '<li><b>새 신청</b> — 아직 아무도 확인하지 않음 (메뉴에 숫자로 표시)</li><li><b>연락함</b> — 전화·쪽지 등으로 연락했지만 처리 중</li>' +
+    '<li><b>완료</b> — 처리 끝. <b>답장하기</b>로 쪽지를 보내면 자동으로 완료가 돼요</li></ul>' +
+    '로그인한 회원이 보낸 문의에만 쪽지로 답할 수 있어요. 로그인하지 않고 보낸 문의는 남긴 연락처로 연락해 주세요.</div>';
+  drawInquiries = function(){
+    var list = JI.get("inquiries", []).slice().reverse();
+    M().innerHTML = '<h1>문의·제보</h1><p class="sub">정보 정정 요청, 가이드 제보, 입점·제휴 문의가 모입니다.</p>' + IQ_HELP +
+      '<div class="panel">' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>날짜</th><th>종류</th><th>보낸 사람</th><th>내용</th><th>상태</th><th></th></tr></thead><tbody>' +
+        list.map(function(q){
+          return '<tr><td style="white-space:nowrap">' + esc(q.date) + '</td><td><span class="bd">' + esc(q.type || q.service || "문의") + '</span></td>' +
+            '<td><b>' + esc(q.name) + '</b>' + (q.user_nick ? ' <span class="bd user">회원 ' + esc(q.user_nick) + '</span>' : ' <small>(비회원)</small>') + '<br><small>' + esc(q.contact) + '</small></td>' +
+            '<td class="ttl"><small>' + esc([q.stage, q.when].filter(Boolean).join(" · ")) + '</small><div style="white-space:pre-wrap;max-width:420px">' + esc(q.msg) + '</div>' +
+              (q.replied_at ? '<small style="color:var(--sea-700)">✉️ ' + esc(q.replied_at) + ' 답장함</small>' : '') + '</td>' +
+            '<td><select onchange="setIq(\'' + q.id + '\',this.value)">' + Object.keys(IQ_ST).map(function(k){ return '<option value="' + k + '"' + (q.status===k?" selected":"") + '>' + IQ_ST[k] + '</option>'; }).join("") + '</select></td>' +
+            '<td><div class="acts">' + (q.user_id ? '<button class="mb pri" onclick="msgTo(\'' + q.user_id + '\',\'' + esc(q.user_nick || q.name).replace(/'/g, "") + '\',\'' + q.id + '\')">답장하기</button>' : '') +
+            '<button class="mb" onclick="delIq(\'' + q.id + '\')">삭제</button></div></td></tr>';
+        }).join("") + '</tbody></table></div>' : '<div class="empty">아직 들어온 신청이 없습니다.</div>') + '</div>';
+  };
+
   /* 판매자 승인 */
   decide = function(id, status){
     JIDB.call("admin_seller_decide", { id: id, status: status }).then(function(){
-      toast(status === "approved" ? "승인했습니다 — 신청자에게 알림이 갔어요" : "반려했습니다"); reloadAll();
+      toast(status === "approved" ? "승인했습니다 — 역할이 상점·공구판매자로 바뀌고 알림이 갔어요" : "반려했습니다"); reloadAll();
     }, function(e){ alert(e.message); });
   };
 
@@ -587,13 +623,26 @@ if (SRV) {
   var _draw = draw;
   draw = function(){ if (view === "members") return drawMembers(); if (view === "settings") view = "members"; return _draw(); };
   window.drawMembers = function(){
-    var R = { user: "일반", seller: "판매자", admin: "관리자" };
-    M().innerHTML = '<h1>회원 관리</h1><p class="sub">가입한 회원 ' + USERS.length + '명. 역할을 바꾸면 다음 접속부터 반영돼요. (판매자: 제주상점·특가공구 글쓰기 가능)</p>' +
-      '<div class="panel">' + (USERS.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>가입일</th><th>최근 로그인</th><th>역할</th></tr></thead><tbody>' +
+    var R = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝" };
+    var me = JIDB.me(), boss = me && me.role === "admin";
+    var cnt = {}; USERS.forEach(function(u){ cnt[u.role] = (cnt[u.role] || 0) + 1; });
+    M().innerHTML = '<h1>회원 관리</h1><p class="sub">가입한 회원 ' + USERS.length + '명 · ' + Object.keys(ROLE_LABEL).filter(function(k){ return cnt[k]; }).map(function(k){ return ROLE_LABEL[k] + ' ' + cnt[k]; }).join(" · ") + '</p>' +
+      '<div class="panel role-help"><b>역할별 권한</b><ul>' +
+        '<li><b>일반</b> — 커뮤니티·거래 글쓰기, 댓글, 쪽지</li>' +
+        '<li><b>부동산 중개인</b> — 일반 권한 + 중개인으로 구분 (부동산 글은 누구나 쓸 수 있어요)</li>' +
+        '<li><b>상점판매자</b> — 제주상점 글쓰기 · <b>공구판매자</b> — 특가공구 글쓰기</li>' +
+        '<li><b>스텝</b> — 관리자 페이지 이용, 남의 글·댓글 정리 (회원 역할은 못 바꿈)</li>' +
+        '<li><b>관리자</b> — 모든 권한. GitHub Secrets 의 ADMIN_EMAILS 로만 정해져요</li></ul></div>' +
+      '<div class="panel">' + (USERS.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>댓글</th><th>가입일</th><th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
         USERS.map(function(u){
-          return '<tr><td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td><td>' + u.posts + '</td>' +
+          var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
+            : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
+            : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
+          return '<tr><td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td>' +
+            '<td>' + u.posts + '</td><td>' + u.comments + '</td>' +
             '<td style="white-space:nowrap">' + esc((u.created_at||"").slice(0,10)) + '</td><td style="white-space:nowrap">' + esc((u.last_login||"").slice(0,10)) + '</td>' +
-            '<td><select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select></td></tr>';
+            '<td>' + roleCell + '</td>' +
+            '<td>' + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</td></tr>';
         }).join("") + '</tbody></table></div>' : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
       '<div class="panel"><h2>관리자 비밀번호</h2><p style="margin:0;color:var(--ink-3)">관리자 페이지는 사이트 회원 계정으로 들어와요. 비밀번호는 사이트의 <a href="' + SITE + 'profile.html" target="_blank">내 정보</a>에서 바꿀 수 있어요.</p></div>';
   };
@@ -631,7 +680,7 @@ if (SRV) {
   JIDB.ready.then(function(){
     var u = JIDB.me();
     if (!u) { location.href = SITE + "login.html?next=" + encodeURIComponent("admin/index.html"); return; }
-    if (u.role !== "admin") {
+    if (u.role !== "admin" && u.role !== "staff") {
       document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>관리자만 들어올 수 있어요</h2>' +
         '<p>' + esc(u.nick) + '님은 관리자 계정이 아니에요.<br>GitHub Secrets 의 ADMIN_EMAILS 에 넣은 이메일로 가입·로그인해 주세요.</p>' +
         '<a class="btn primary block" href="' + SITE + 'index.html">사이트로 돌아가기</a></div></div>';

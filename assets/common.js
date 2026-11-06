@@ -150,6 +150,8 @@ function toggleJobClosed(id) {
   }
   return null;
 }
+var ROLE_LABEL = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝", admin: "관리자" };
+function isMod() { var u = currentUser(); return !!(u && (u.role === "admin" || u.role === "staff")); }
 function isMyPost(p) {
   var u = currentUser();
   if (p && p.db) return !!(u && u.id && p.authorId === u.id);
@@ -205,7 +207,10 @@ function isRestrictedBoard(board) {
 function isApprovedSeller(board) {
   var u = currentUser();
   if (!u) return false;
-  if (u.role === "admin" || u.role === "seller") return true;   // 서버에서 승인된 회원
+  // 서버 역할: 제주상점은 상점판매자, 특가공구는 공구판매자 (관리자·스텝은 모두 가능)
+  if (u.role === "admin" || u.role === "staff") return true;
+  if (board === "제주상점" && u.role === "shop") return true;
+  if (board === "특가공구" && u.role === "dealer") return true;
   var approved = JI.get("approved_sellers", {});
   return (approved[board] || []).indexOf(u.email) > -1;
 }

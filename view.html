@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106r">
+<link rel="stylesheet" href="assets/style.css?v=20261106s">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -59,15 +59,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106r"></script>
-<script src="assets/common.js?v=20261106r"></script>
-<script src="assets/db.js?v=20261106r"></script>
-<script src="assets/notify.js?v=20261106r"></script>
-<script src="assets/seed-trade.js?v=20261106r"></script>
-<script src="assets/seed-extra.js?v=20261106r"></script>
-<script src="assets/seed-new.js?v=20261106r"></script>
-<script src="assets/seed-comments.js?v=20261106r"></script>
-<script src="assets/admin-data.js?v=20261106r"></script>
+<script src="assets/kmap.js?v=20261106s"></script>
+<script src="assets/common.js?v=20261106s"></script>
+<script src="assets/db.js?v=20261106s"></script>
+<script src="assets/notify.js?v=20261106s"></script>
+<script src="assets/seed-trade.js?v=20261106s"></script>
+<script src="assets/seed-extra.js?v=20261106s"></script>
+<script src="assets/seed-new.js?v=20261106s"></script>
+<script src="assets/seed-comments.js?v=20261106s"></script>
+<script src="assets/admin-data.js?v=20261106s"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -141,7 +141,7 @@ if (!post) {
   document.getElementById("pv").innerHTML =
     '<div class="pv-board">' + esc(post.board) + (post.head && post.head !== post.board ? ' · ' + esc(post.head) : '') + '</div>' +
     '<h1 class="pv-title">' + (post.head === "채용완료" ? '<span class="closed-tag">채용완료</span>' : '') + esc(post.title) + '</h1>' +
-    '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : '') + '</span>' +
+    '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : msgLink(post.authorId, post.author)) + '</span>' +
     '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span><span>♡ ' + likesOf(post).toLocaleString() + '</span></div>' +
     extra +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)") + '</div>' +
@@ -261,6 +261,12 @@ function drawClubJoin() {
   });
 }
 
+/* 회원에게 쪽지 보내기 링크 (서버 회원 글·댓글에만) */
+function msgLink(uid, nick) {
+  if (!uid || !(window.JIDB && JIDB.enabled)) return "";
+  var u = currentUser(); if (u && u.id === uid) return "";
+  return ' <a class="pv-msg" href="messages.html?to_id=' + encodeURIComponent(uid) + '&to=' + encodeURIComponent(nick || "") + '" title="' + esc(nick) + '님에게 쪽지">✉️ 쪽지</a>';
+}
 var DB_CMTS = [], dbCmtLoaded = false;
 function loadDbComments() {
   if (!(window.JIDB && JIDB.enabled)) return;
@@ -272,10 +278,11 @@ function dbCmtHtml() {
     var own = u && u.id && c.authorId === u.id;
     var isAuthor = post && post.authorId && c.authorId === post.authorId;
     return '<div class="cmt-item" id="dcmt-' + i + '"><div style="display:flex;align-items:center">' +
-      '<span class="who">' + esc(c.author) + (isAuthor ? ' <span class="own-tag">작성자</span>' : '') + '</span>' +
+      '<span class="who">' + esc(c.author) + (isAuthor ? ' <span class="own-tag">작성자</span>' : '') + (own ? '' : msgLink(c.authorId, c.author)) + '</span>' +
       '<span class="when">' + esc(c.date) + (c.edited ? ' (수정됨)' : '') + '</span>' +
       (own ? '<div class="own-actions"><button class="mini-btn" onclick="startEditDbCmt(' + i + ')">수정</button>' +
-        '<button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')">삭제</button></div>' : '') +
+        '<button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')">삭제</button></div>'
+        : (isMod() ? '<div class="own-actions"><button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')" title="관리자·스텝 권한">삭제</button></div>' : '')) +
       '</div><p id="dcmt-text-' + i + '">' + esc(c.text) + '</p></div>';
   }).join("");
 }
