@@ -1772,3 +1772,6 @@ a.act-item:hover{border-color:var(--sea-200)}
 .pv-msg{display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:2px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:700;color:var(--sea-700);background:#fff;text-decoration:none;vertical-align:1px}
 .pv-msg:hover{border-color:var(--sea-200);background:var(--sea-50)}
 @media (max-width:680px){ .header-actions .hd-bell{width:34px;height:34px;font-size:15px} }
+
+/* 긴 글·띄어쓰기 없는 글(주소, 링크 등)도 칸 안에서 줄바꿈 */
+.msg-item .msg-body,.msg-item .msg-prev,.pv-content,.cmt-item p,.act-item p{overflow-wrap:anywhere;word-break:break-word}

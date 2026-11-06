@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>제주이음 관리자 콘솔</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261106v">
+<link rel="stylesheet" href="../assets/style.css?v=20261106w">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -120,6 +120,9 @@ tr.iq-new td{background:#fff6ea}
 tr.iq-new td:first-child{box-shadow:inset 4px 0 0 #ff9a2e}
 tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 .iq-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff7a00;margin-right:6px;vertical-align:1px}
+/* 긴 글·띄어쓰기 없는 글도 칸 안에서 줄바꿈 */
+.iq-msg,.iq-dl td,.iq-clamp,.adm-t td,.modal .box{overflow-wrap:anywhere;word-break:break-word}
+.iq-msg{white-space:pre-wrap!important;max-width:100%}
 </style>
 </head>
 <body data-admin>
@@ -128,14 +131,14 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261106v"></script>
-<script src="../assets/db.js?v=20261106v"></script>
-<script src="../assets/seed-trade.js?v=20261106v"></script>
-<script src="../assets/seed-extra.js?v=20261106v"></script>
-<script src="../assets/seed-new.js?v=20261106v"></script>
-<script src="../assets/seed-comments.js?v=20261106v"></script>
-<script src="../assets/photos.js?v=20261106v"></script>
-<script src="../assets/admin-data.js?v=20261106v"></script>
+<script src="../assets/common.js?v=20261106w"></script>
+<script src="../assets/db.js?v=20261106w"></script>
+<script src="../assets/seed-trade.js?v=20261106w"></script>
+<script src="../assets/seed-extra.js?v=20261106w"></script>
+<script src="../assets/seed-new.js?v=20261106w"></script>
+<script src="../assets/seed-comments.js?v=20261106w"></script>
+<script src="../assets/photos.js?v=20261106w"></script>
+<script src="../assets/admin-data.js?v=20261106w"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
