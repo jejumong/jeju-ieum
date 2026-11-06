@@ -4,10 +4,7 @@ jobs:
   d:
     runs-on: ubuntu-latest
     steps:
-      - env: { P: "${{ secrets.CAFE24_FTP_PASSWORD }}" }
-        run: |
-          H=ftp://andend07.mycafe24.com
-          echo "== before"; curl -s -m 20 --user "andend07:$P" $H/www/jeju/api/ || true
-          curl -s -m 30 --user "andend07:$P" $H/ -Q "DELE www/jeju/api/.ftp-deploy-sync-state.json" -Q "DELE www/jeju/api/config.php" -Q "DELE www/jeju/api/config.sample.php" -Q "DELE www/jeju/api/index.php" -Q "DELE www/jeju/api/lib.php" -Q "RMD www/jeju/api" -Q "RMD www/jeju" -Q "RMD www" -o /dev/null && echo cleaned
-          echo "== after (www folder should be gone)"; curl -s -m 20 --user "andend07:$P" $H/ | grep -E " www$| jeju$" || echo "none"
-          echo "== ping"; curl -s -m 15 "https://andend07.mycafe24.com/jeju/api/?a=ping"
+      - run: |
+          curl -s -i -m 15 -H "Origin: https://jeju.hintdaily.com" -H "Content-Type: text/plain" "https://andend07.mycafe24.com/jeju/api/?a=post_list" -d '{"board":"동호회"}' | grep -iE "^HTTP|access-control|ok"
+          echo; curl -s -m 15 -o /dev/null -w "config.php direct: %{http_code} size=%{size_download}\n" "https://andend07.mycafe24.com/jeju/api/config.php"
+          curl -s -m 15 -H "Content-Type: text/plain" "https://andend07.mycafe24.com/jeju/api/?a=login" -d '{"email":"nobody@x.kr","pw":"x <script>alert(1)</script> select * from"}'
