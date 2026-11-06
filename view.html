@@ -10,12 +10,14 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106z">
+<link rel="stylesheet" href="assets/style.css?v=20261107a">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
 .pv-title{font-size:25px;font-weight:800;letter-spacing:-0.045em;line-height:1.38;color:var(--ink)}
-.pv-meta{display:flex;gap:14px;font-size:13px;color:var(--muted);margin:10px 0 18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.pv-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:13px;color:var(--muted);margin:10px 0 18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.pv-meta>span{white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.pv-meta .own-tag,.pv-meta .pv-msg{white-space:nowrap;flex:0 0 auto}
 .pv-extra{background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r);padding:14px 18px;font-size:14px;margin-bottom:20px;display:flex;gap:28px;flex-wrap:wrap;color:var(--ink-3)}
 .pv-extra b{color:var(--ink);font-weight:800;letter-spacing:-0.02em}
 .pv-content{font-size:16px;line-height:1.85;white-space:pre-wrap;min-height:130px;color:var(--ink-2);letter-spacing:-0.015em}
@@ -59,15 +61,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106z"></script>
-<script src="assets/common.js?v=20261106z"></script>
-<script src="assets/db.js?v=20261106z"></script>
-<script src="assets/notify.js?v=20261106z"></script>
-<script src="assets/seed-trade.js?v=20261106z"></script>
-<script src="assets/seed-extra.js?v=20261106z"></script>
-<script src="assets/seed-new.js?v=20261106z"></script>
-<script src="assets/seed-comments.js?v=20261106z"></script>
-<script src="assets/admin-data.js?v=20261106z"></script>
+<script src="assets/kmap.js?v=20261107a"></script>
+<script src="assets/common.js?v=20261107a"></script>
+<script src="assets/db.js?v=20261107a"></script>
+<script src="assets/notify.js?v=20261107a"></script>
+<script src="assets/seed-trade.js?v=20261107a"></script>
+<script src="assets/seed-extra.js?v=20261107a"></script>
+<script src="assets/seed-new.js?v=20261107a"></script>
+<script src="assets/seed-comments.js?v=20261107a"></script>
+<script src="assets/admin-data.js?v=20261107a"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
