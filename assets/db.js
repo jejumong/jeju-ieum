@@ -1,192 +1,137 @@
 /* ============================================================
-   제주이음 · Supabase 연결 (회원·동호회·가입 신청·알림)
-   - SITE_CFG.supabaseUrl / supabaseKey 가 비어 있으면 아무것도 하지 않고,
-     예전처럼 브라우저 저장 방식으로만 동작합니다.
-   - 로그인 상태는 JI 'session' 에도 같이 적어 두어, 기존 화면 코드(currentUser)가 그대로 동작합니다.
+   제주이음 · 카페24 서버 연결 (회원·글·동호회 가입 신청·알림)
+   - SITE_CFG.apiUrl 이 비어 있으면 아무것도 하지 않고 예전처럼 브라우저 저장 방식으로만 동작
+   - 로그인 상태는 JI 'session' 에도 같이 적어 두어, 기존 화면 코드(currentUser)가 그대로 동작
+   - 로그인 토큰은 JI 'auth' 에 보관
    ============================================================ */
 var JIDB = (function () {
   var cfg = window.SITE_CFG || {};
-  var enabled = !!(cfg.supabaseUrl && cfg.supabaseKey);
-  var client = null, ready;
+  var API = (cfg.apiUrl || "").replace(/\/?$/, "/");
+  var enabled = !!cfg.apiUrl;
 
-  function loadLib() {
-    return new Promise(function (resolve, reject) {
-      if (window.supabase && window.supabase.createClient) return resolve();
-      var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.js";
-      s.onload = function () { resolve(); };
-      s.onerror = function () { reject(new Error("supabase load failed")); };
-      document.head.appendChild(s);
-    });
-  }
+  function token() { return JI.get("auth", "") || ""; }
 
-  /* 로그인 상태를 JI session 과 맞추기 */
-  function syncSession(session) {
-    var cur = JI.get("session", null);
-    if (!session) {
-      if (cur && cur.id) { JI.set("session", null); return true; }      // DB 계정이 로그아웃됨
-      if (cur && !cur.id) { JI.set("session", null); return true; }     // 예전 브라우저 전용 계정은 정리
-      return false;
-    }
-    return client.from("profiles").select("nick,region").eq("id", session.user.id).maybeSingle().then(function (r) {
-      var p = r.data || {};
-      var meta = session.user.user_metadata || {};
-      var next = { id: session.user.id, email: session.user.email, nick: p.nick || meta.nick || "이웃", region: p.region || meta.region || "" };
-      var changed = !cur || cur.id !== next.id || cur.nick !== next.nick || cur.region !== next.region;
-      if (changed) JI.set("session", next);
-      return changed;
-    });
-  }
-
-  if (enabled) {
-    ready = loadLib().then(function () {
-      client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-      });
-      return client.auth.getSession();
+  /* 서버 호출: text/plain 으로 보내 브라우저 사전 확인(OPTIONS)을 건너뜀 */
+  function call(action, body) {
+    if (!enabled) return Promise.reject(new Error("서버가 연결되지 않았어요"));
+    body = body || {}; var t = token(); if (t) body._t = t;
+    return fetch(API + "?a=" + action, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body)
     }).then(function (r) {
-      return Promise.resolve(syncSession(r.data.session)).then(function (changed) {
+      return r.json().catch(function () { throw new Error("서버 응답을 읽지 못했어요 (" + r.status + ")"); });
+    }, function () { throw new Error("서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요."); })
+      .then(function (j) {
+        if (!j.ok) {
+          if (j.error === "로그인이 필요해요" && t) { JI.set("auth", ""); JI.set("session", null); }
+          throw new Error(j.error || "요청을 처리하지 못했어요");
+        }
+        return j.data;
+      });
+  }
+
+  /* 로그인 상태를 JI session 과 맞추기 → 바뀌었으면 true */
+  function setUser(u) {
+    var cur = JI.get("session", null);
+    if (!u) { JI.set("auth", ""); if (cur) { JI.set("session", null); return true; } return false; }
+    var next = { id: u.id, email: u.email, nick: u.nick, region: u.region || "", role: u.role || "user" };
+    var changed = !cur || cur.id !== next.id || cur.nick !== next.nick || cur.region !== next.region || cur.role !== next.role;
+    if (changed) JI.set("session", next);
+    return changed;
+  }
+
+  var ready;
+  if (enabled) {
+    var cur = JI.get("session", null);
+    if (cur && !token()) { JI.set("session", null); cur = null; }   // 예전 방식(Supabase·브라우저 전용) 로그인 정리
+    ready = (token() ? call("me").then(setUser, function () { return false; })   /* 일시적인 연결 오류면 로그인 유지 (만료는 call 안에서 정리) */ : Promise.resolve(setUser(null)))
+      .then(function (changed) {
         // 다른 탭·기기에서 로그인 상태가 바뀌었으면 화면을 한 번 새로 그림
-        if (changed && !sessionStorage.getItem("ji_resync")) { sessionStorage.setItem("ji_resync", "1"); location.reload(); return; }
+        if (changed && cur && !sessionStorage.getItem("ji_resync")) { sessionStorage.setItem("ji_resync", "1"); location.reload(); return new Promise(function () {}); }
         sessionStorage.removeItem("ji_resync");
         afterReady();
         return true;
-      });
-    }).catch(function (e) { console.warn("[JIDB]", e); return false; });
+      }).catch(function (e) { console.warn("[JIDB]", e); return false; });
   } else {
     ready = Promise.resolve(false);
   }
 
-  function me() { var u = JI.get("session", null); return u && u.id ? u : null; }
-  function need() { if (!client) throw new Error("데이터베이스에 연결되지 않았어요"); }
-  function err(r) { if (r.error) throw r.error; return r.data; }
+  function me() { var u = JI.get("session", null); return u && u.id && token() ? u : null; }
   function isUuid(s) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s || ""); }
 
-  /* DB 글 → 화면에서 쓰는 글 모양으로 */
+  /* 서버 글 → 화면에서 쓰는 글 모양으로 */
   function toPost(r) {
+    var d = new Date(r.created_at);
     return {
       id: r.id, board: r.board, head: r.head || "", title: r.title, content: r.content || "", loc: r.loc || "", meta: r.meta || "",
       price: r.price || "", author: r.author_nick, authorId: r.author, date: (r.created_at || "").slice(0, 10),
-      time: new Date(r.created_at).toTimeString().slice(0, 5), views: 0, db: true, extra: r.extra || {}
+      time: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2), views: r.views || 0, db: true, extra: r.extra || {}
     };
   }
 
   /* ── 회원 ── */
   function signUp(email, pw, nick, region) {
-    need();
-    return client.from("profiles").select("id").eq("nick", nick).maybeSingle().then(function (r) {
-      if (r.data) throw new Error("이미 사용 중인 닉네임입니다.");
-      return client.auth.signUp({ email: email, password: pw, options: { data: { nick: nick, region: region }, emailRedirectTo: location.origin + "/login.html" } });
-    }).then(function (r) {
-      if (r.error) throw r.error;
-      return { needConfirm: !r.data.session };
+    return call("signup", { email: email, pw: pw, nick: nick, region: region }).then(function (r) {
+      JI.set("auth", r.token); setUser(r.user); linkPush(); return { needConfirm: false };
     });
   }
   function signIn(email, pw) {
-    need();
-    return client.auth.signInWithPassword({ email: email, password: pw }).then(function (r) {
-      if (r.error) throw r.error;
-      return syncSession(r.data.session);
-    });
+    return call("login", { email: email, pw: pw }).then(function (r) { JI.set("auth", r.token); setUser(r.user); linkPush(); return true; });
   }
   function signOut() {
-    JI.set("session", null);
-    if (!client) return Promise.resolve();
+    var p = token() ? call("logout").catch(function () {}) : Promise.resolve();
+    JI.set("auth", ""); JI.set("session", null);
     try { if (window.OneSignal && OneSignal.logout) OneSignal.logout(); } catch (e) {}
-    return client.auth.signOut().catch(function () {});
+    return p;
   }
   function updateProfile(fields) {
-    need(); var u = me(); if (!u) return Promise.reject(new Error("로그인이 필요해요"));
-    return client.from("profiles").update(fields).eq("id", u.id).then(err).then(function () {
-      var s = JI.get("session", {}); Object.keys(fields).forEach(function (k) { s[k] = fields[k]; }); JI.set("session", s);
+    return call("profile_update", fields).then(function (r) {
+      var s = JI.get("session", {}); s.nick = r.nick; s.region = r.region; JI.set("session", s);
     });
   }
 
   /* ── 글 ── */
   function createPost(p) {
-    need(); var u = me(); if (!u) return Promise.reject(new Error("로그인이 필요해요"));
-    return client.from("posts").insert({
-      board: p.board, head: p.head || "", title: p.title, content: p.content || "", loc: p.loc || "", meta: p.meta || "",
-      price: p.price || "", extra: p.extra || {}, author: u.id, author_nick: u.nick
-    }).select().single().then(err).then(toPost);
+    return call("post_create", { board: p.board, head: p.head || "", title: p.title, content: p.content || "", loc: p.loc || "",
+      meta: p.meta || "", price: p.price || "", extra: p.extra || {} }).then(toPost);
   }
   function updatePost(id, p) {
-    need();
-    return client.from("posts").update({ head: p.head, title: p.title, content: p.content, loc: p.loc, meta: p.meta, price: p.price, updated_at: new Date().toISOString() })
-      .eq("id", id).select().single().then(err).then(toPost);
+    var b = { id: id }; ["head", "title", "content", "loc", "meta", "price", "extra"].forEach(function (k) { if (p[k] !== undefined) b[k] = p[k]; });
+    return call("post_update", b).then(toPost);
   }
-  function deletePost(id) { need(); return client.from("posts").delete().eq("id", id).then(err); }
-  function getPost(id) {
-    if (!isUuid(id)) return Promise.resolve(null);
-    return ready.then(function () { if (!client) return null; return client.from("posts").select("*").eq("id", id).maybeSingle().then(err).then(function (r) { return r ? toPost(r) : null; }); });
+  function deletePost(id) { return call("post_delete", { id: id }); }
+  function getPost(id, countView) {
+    if (!isUuid(id) || !enabled) return Promise.resolve(null);
+    return ready.then(function () { return call("post_get", { id: id, view: !!countView }); }).then(function (r) { return r ? toPost(r) : null; });
   }
   function listPosts(board) {
-    return ready.then(function () {
-      if (!client) return [];
-      return client.from("posts").select("*").eq("board", board).order("created_at", { ascending: false }).limit(200).then(err).then(function (rows) { return rows.map(toPost); });
-    });
+    if (!enabled) return Promise.resolve([]);
+    return ready.then(function () { return call("post_list", { board: board }); }).then(function (rows) { return rows.map(toPost); });
   }
 
   /* ── 동호회 가입 신청 ── */
-  function myJoin(clubId) {
-    var u = me(); if (!client || !u) return Promise.resolve(null);
-    return client.from("club_joins").select("*").eq("club_id", clubId).eq("applicant", u.id).maybeSingle().then(err);
-  }
-  function requestJoin(club, message) {
-    need(); var u = me(); if (!u) return Promise.reject(new Error("로그인이 필요해요"));
-    return client.from("club_joins").insert({
-      club_id: club.id, club_title: club.title, owner: club.authorId, applicant: u.id, applicant_nick: u.nick, message: message || ""
-    }).select().single().then(err);
-  }
-  function cancelJoin(joinId) { need(); return client.from("club_joins").delete().eq("id", joinId).then(err); }
-  function receivedJoins() {
-    var u = me(); if (!client || !u) return Promise.resolve([]);
-    return client.from("club_joins").select("*").eq("owner", u.id).order("created_at", { ascending: false }).then(err);
-  }
-  function sentJoins() {
-    var u = me(); if (!client || !u) return Promise.resolve([]);
-    return client.from("club_joins").select("*").eq("applicant", u.id).order("created_at", { ascending: false }).then(err);
-  }
-  function decideJoin(joinId, status) { need(); return client.from("club_joins").update({ status: status }).eq("id", joinId).select().single().then(err); }
-  function joinCount(clubId) {
-    if (!client) return Promise.resolve(null);
-    return client.from("club_joins").select("id", { count: "exact", head: true }).eq("club_id", clubId).eq("status", "pending").then(function (r) { return r.count || 0; });
-  }
+  function myJoin(clubId) { return me() ? call("join_my", { club_id: clubId }) : Promise.resolve(null); }
+  function requestJoin(club, message) { return call("join_request", { club_id: club.id, message: message || "" }); }
+  function cancelJoin(joinId) { return call("join_cancel", { id: joinId }); }
+  function receivedJoins() { return me() ? call("joins_received") : Promise.resolve([]); }
+  function sentJoins() { return me() ? call("joins_sent") : Promise.resolve([]); }
+  function decideJoin(joinId, status) { return call("join_decide", { id: joinId, status: status }); }
+  function joinCount(clubId) { return enabled ? call("join_count", { club_id: clubId }).catch(function () { return null; }) : Promise.resolve(null); }
 
   /* ── 모임 공지 · 회원 목록 ── */
-  function clubNotices(clubId) {
-    if (!client) return Promise.resolve([]);
-    return client.from("club_notices").select("*").eq("club_id", clubId).order("created_at", { ascending: false }).limit(50).then(err);
-  }
-  function addNotice(club, body) {
-    need(); var u = me(); if (!u) return Promise.reject(new Error("로그인이 필요해요"));
-    return client.from("club_notices").insert({ club_id: club.id, club_title: club.title, owner: u.id, body: body }).select().single().then(err);
-  }
-  function deleteNotice(id) { need(); return client.from("club_notices").delete().eq("id", id).then(err); }
-  function clubMembers(clubId) {
-    if (!client) return Promise.resolve([]);
-    return client.from("club_joins").select("id,applicant_nick,status,decided_at,created_at").eq("club_id", clubId).order("created_at").then(err);
-  }
+  function clubNotices(clubId) { return me() ? call("notices", { club_id: clubId }) : Promise.resolve([]); }
+  function addNotice(club, body) { return call("notice_add", { club_id: club.id, body: body }); }
+  function deleteNotice(id) { return call("notice_delete", { id: id }); }
+  function clubMembers(clubId) { return me() ? call("club_members", { club_id: clubId }) : Promise.resolve([]); }
 
   /* ── 상점·공구 승인 요청 (관리자만 봄) ── */
-  function sendSellerRequest(board, details, message) {
-    need(); var u = me(); if (!u) return Promise.reject(new Error("로그인이 필요해요"));
-    return client.from("seller_requests").insert({ board: board, applicant: u.id, applicant_nick: u.nick, details: details, message: message || "" }).then(err);
-  }
+  function sendSellerRequest(board, details, message) { return call("seller_request", { board: board, details: details, message: message || "" }); }
 
   /* ── 알림함 ── */
-  function notifications() {
-    var u = me(); if (!client || !u) return Promise.resolve([]);
-    return client.from("notifications").select("*").eq("user_id", u.id).order("created_at", { ascending: false }).limit(50).then(err);
-  }
-  function unreadCount() {
-    var u = me(); if (!client || !u) return Promise.resolve(0);
-    return client.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", u.id).eq("read", false).then(function (r) { return r.count || 0; });
-  }
-  function markAllRead() {
-    var u = me(); if (!client || !u) return Promise.resolve();
-    return client.from("notifications").update({ read: true }).eq("user_id", u.id).eq("read", false).then(err);
-  }
+  function notifications() { return me() ? call("notis") : Promise.resolve([]); }
+  function unreadCount() { return me() ? call("noti_unread").catch(function () { return 0; }) : Promise.resolve(0); }
+  function markAllRead() { return me() ? call("noti_read_all") : Promise.resolve(); }
+
+  function linkPush() { try { if (window.JINotify && JINotify.accountPushOn && JINotify.accountPushOn()) JINotify.linkAccount(); } catch (e) {} }
 
   /* 준비되면: 위쪽에 알림 종, 휴대폰 알림 계정 연결 */
   function afterReady() {
@@ -202,12 +147,11 @@ var JIDB = (function () {
       var b = document.querySelector(".hd-bell-n"); if (!b) return;
       if (n > 0) { b.textContent = n > 99 ? "99+" : n; b.hidden = false; } else b.hidden = true;
     });
-    // 이 기기에서 이미 알림을 허용했다면 회원 계정과 연결
-    try { if (window.JINotify && JINotify.accountPushOn && JINotify.accountPushOn()) JINotify.linkAccount(); } catch (e) {}
+    linkPush();
   }
 
   return {
-    enabled: enabled, ready: ready, isUuid: isUuid, me: me, client: function () { return client; },
+    enabled: enabled, ready: ready, isUuid: isUuid, me: me, call: call,
     signUp: signUp, signIn: signIn, signOut: signOut, updateProfile: updateProfile,
     createPost: createPost, updatePost: updatePost, deletePost: deletePost, getPost: getPost, listPosts: listPosts,
     myJoin: myJoin, requestJoin: requestJoin, cancelJoin: cancelJoin, receivedJoins: receivedJoins, sentJoins: sentJoins,

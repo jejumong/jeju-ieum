@@ -1,0 +1,60 @@
+name: 카페24 서버(api) 올리기
+
+on:
+  push:
+    branches: [main]
+    paths: ["api/**", ".github/workflows/deploy-api.yml"]
+  workflow_dispatch:
+
+concurrency: { group: deploy-api, cancel-in-progress: false }
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 비밀값 확인
+        env:
+          FTP_PW: ${{ secrets.CAFE24_FTP_PASSWORD }}
+          DB_PW: ${{ secrets.CAFE24_DB_PASSWORD }}
+        run: |
+          if [ -z "$FTP_PW" ] || [ -z "$DB_PW" ]; then
+            echo "::error::GitHub Secrets 에 CAFE24_FTP_PASSWORD 와 CAFE24_DB_PASSWORD 를 먼저 넣어 주세요."; exit 1; fi
+
+      - name: 설정 파일(config.php) 만들기
+        env:
+          DB_NAME: ${{ secrets.CAFE24_DB_NAME || 'andend07' }}
+          DB_USER: ${{ secrets.CAFE24_DB_USER || 'andend07' }}
+          DB_PASS: ${{ secrets.CAFE24_DB_PASSWORD }}
+          OS_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+          ADMINS: ${{ secrets.ADMIN_EMAILS }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://jeju.hintdaily.com/' }}
+        run: |
+          mkdir -p deploy && cp -r api/. deploy/ && rm -f deploy/config.php
+          php -r '
+            $site = rtrim(getenv("SITE_URL"), "/") . "/";
+            $origins = array_values(array_unique([rtrim($site, "/"), "https://jeju.hintdaily.com", "https://jejuieum.com", "https://www.jejuieum.com", "https://jejumong.github.io"]));
+            $admins = array_values(array_filter(array_map(fn($x) => strtolower(trim($x)), explode(",", (string)getenv("ADMINS")))));
+            $c = ["db_host" => "localhost", "db_name" => getenv("DB_NAME"), "db_user" => getenv("DB_USER"), "db_pass" => getenv("DB_PASS"),
+                  "site_url" => $site, "origins" => $origins, "admins" => $admins,
+                  "onesignal_app" => "c7fd4d45-3d1b-4157-9230-d29e4676f659", "onesignal_key" => (string)getenv("OS_KEY")];
+            file_put_contents("deploy/config.php", "<?php\nreturn " . var_export($c, true) . ";\n");
+          '
+          php -l deploy/config.php && php -l deploy/index.php && php -l deploy/lib.php
+
+      - name: 카페24로 올리기 (FTP)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ vars.CAFE24_FTP_HOST || 'andend07.mycafe24.com' }}
+          username: ${{ vars.CAFE24_FTP_USER || 'andend07' }}
+          password: ${{ secrets.CAFE24_FTP_PASSWORD }}
+          protocol: ftp
+          local-dir: ./deploy/
+          server-dir: www/jeju/api/
+
+      - name: 서버 응답 확인
+        run: |
+          sleep 3
+          curl -sS --max-time 20 "https://andend07.mycafe24.com/jeju/api/?a=ping" | tee /tmp/ping.json
+          grep -q '"pong":true' /tmp/ping.json || { echo "::error::서버가 응답하지 않아요. DB 이름·아이디·비밀번호를 확인해 주세요."; exit 1; }
