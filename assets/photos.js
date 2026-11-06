@@ -109,7 +109,7 @@ function photoCard(p, o) {
   var views = typeof viewsOf === "function" ? viewsOf(p) : (p.views || 0);
   var cm = typeof commentCountOf === "function" ? commentCountOf(p.id) : 0;
   var rb = typeof roleBadgeHtml === "function" ? roleBadgeHtml(p) : "";
-  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed ? " closed" : "") + (rb ? " pro" : "") + '" href="view.html?id=' + p.id + '">' +
+  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed ? " closed" : "") + (rb ? " pro pro-" + (typeof authorRoleOf === "function" ? authorRoleOf(p).replace("admin", "staff") : "x") : "") + '" href="view.html?id=' + p.id + '">' +
     '<div class="pc-ph">' + cardImage(p) +
       (o.pm ? '<span class="pm-tag">⭐ 프리미엄</span>' : '') +
       (o.mine ? '<span class="mine-tag">' + (o.mine.indexOf("모임") > -1 ? "👑 " : "✍️ ") + e(o.mine) + '</span>' : '') +

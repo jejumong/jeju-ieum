@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107h">
+<link rel="stylesheet" href="assets/style.css?v=20261107i">
 </head>
 <body data-active="">
 
@@ -88,6 +88,7 @@
             <label><input type="radio" name="ow-type" value="가족·대리"> 가족·대리인</label>
           </div>
         </div>
+        <script>document.querySelectorAll('input[name="ow-type"]').forEach(function(r){ r.addEventListener("change", function(){ document.querySelectorAll(".re-radio label").forEach(function(l){ l.classList.toggle("on", l.contains(document.querySelector('input[name="ow-type"]:checked'))); }); }); });</script>
         <div class="check-line"><input type="checkbox" id="ow-agree"><label for="ow-agree">[필수] 중개업자가 아니며, 직접 거래하는 매물이에요</label></div>
         <p class="re-note">일반 회원은 매물을 동시에 3건까지 올릴 수 있어요. 중개업을 하신다면 <a href="contact.html?type=%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC%20%EC%9D%B8%EC%A6%9D">공인중개사 인증을 요청</a>해 주세요.</p>
       </div>
@@ -138,15 +139,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107h"></script>
-<script src="assets/common.js?v=20261107h"></script>
-<script src="assets/db.js?v=20261107h"></script>
-<script src="assets/notify.js?v=20261107h"></script>
-<script src="assets/seed-trade.js?v=20261107h"></script>
-<script src="assets/seed-extra.js?v=20261107h"></script>
-<script src="assets/seed-new.js?v=20261107h"></script>
-<script src="assets/seed-comments.js?v=20261107h"></script>
-<script src="assets/admin-data.js?v=20261107h"></script>
+<script src="assets/kmap.js?v=20261107i"></script>
+<script src="assets/common.js?v=20261107i"></script>
+<script src="assets/db.js?v=20261107i"></script>
+<script src="assets/notify.js?v=20261107i"></script>
+<script src="assets/seed-trade.js?v=20261107i"></script>
+<script src="assets/seed-extra.js?v=20261107i"></script>
+<script src="assets/seed-new.js?v=20261107i"></script>
+<script src="assets/seed-comments.js?v=20261107i"></script>
+<script src="assets/admin-data.js?v=20261107i"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -300,7 +301,7 @@ function toggleExtra() {
     if (ag) ["name", "reg", "rep", "tel", "addr"].forEach(function (k) { document.getElementById("ag-" + k).value = ag[k] || ""; });
   }
   if (v === "부동산" && !isAgent && typeof editing !== "undefined" && editing && editing.extra && editing.extra.owner) {
-    var r = document.querySelector('input[name="ow-type"][value="' + editing.extra.owner + '"]'); if (r) r.checked = true;
+    var r = document.querySelector('input[name="ow-type"][value="' + editing.extra.owner + '"]'); if (r) { r.checked = true; r.closest("label").classList.add("on"); }
     document.getElementById("ow-agree").checked = true;
   }
   document.getElementById("price-row").style.display = job ? "none" : "flex";

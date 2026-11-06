@@ -1847,16 +1847,15 @@ a.act-item:hover{border-color:var(--sea-200)}
 .rb-staff{background:#ddeaff;color:#1a58a6;border:1px solid #9fc3f2}
 .rb-direct{background:#f1efe9;color:#5b4a2f;border:1px solid #d9cfbd}
 .pc-role{margin:0 0 7px}
-.item-card.pc.pro{border-color:#a9dcc9}
-.item-card.pc.pro:has(.rb-shop){border-color:#ffd09a}
-.item-card.pc.pro:has(.rb-dealer){border-color:#f4bdd6}
-.item-card.pc.pro:has(.rb-staff){border-color:#b9d3f5}
-.item-card.pc.pro:has(.rb-direct){border-color:#e6e8ec}
+/* 카드 테두리 색 (:has() 를 쓰지 않음 — 일부 크롬에서 카드 높이가 무너지는 문제) */
+.item-card.pc.pro-realtor{border-color:#a9dcc9}
+.item-card.pc.pro-shop{border-color:#ffd09a}
+.item-card.pc.pro-dealer{border-color:#f4bdd6}
+.item-card.pc.pro-staff{border-color:#b9d3f5}
 @media (max-width:680px){ .grid-cards .item-card.pc .pc-role{margin:0 0 3px} .grid-cards .item-card.pc .pc-role .role-badge{font-size:11px;padding:3px 7px} }
 /* 카드 안 사진·본문이 어떤 경우에도 눌려 사라지지 않게 */
-.item-card.pc .pc-ph{flex:0 0 auto}
-.item-card.pc .pc-body{flex:1 0 auto}
-@media (max-width:680px){ .grid-cards .item-card.pc .pc-ph{flex:0 0 104px} .grid-cards .item-card.pc .pc-body{flex:1 1 auto} }
+.item-card.pc .pc-ph{flex-shrink:0}
+@media (max-width:680px){ .grid-cards .item-card.pc .pc-ph{flex:0 0 104px} }
 /* 글쓰기: 승인제 게시판 안내 */
 .board-lock-note{margin:6px 0 0;font-size:12.5px;color:var(--ink-4)}
 .board-lock-note a{font-weight:700;color:var(--sea-700)}
@@ -1868,7 +1867,7 @@ a.act-item:hover{border-color:var(--sea-200)}
 .re-box h4 small{display:block;font-size:12.5px;font-weight:500;color:var(--ink-4);margin-top:3px}
 .re-radio{display:flex;flex-wrap:wrap;gap:8px}
 .re-radio label{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:14px;cursor:pointer;font-weight:600}
-.re-radio label:has(input:checked){border-color:var(--sea);background:var(--sea-50);color:var(--sea-700)}
+.re-radio label.on{border-color:var(--sea);background:var(--sea-50);color:var(--sea-700)}
 .re-note{font-size:12.5px;color:var(--ink-4);margin:4px 0 8px;line-height:1.6}
 .re-info{border-radius:12px;padding:14px 16px;margin:0 0 18px;font-size:14px}
 .re-info.agent{background:#f1faf6;border:1px solid #b9e3d3}
