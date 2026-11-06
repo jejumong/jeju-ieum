@@ -218,7 +218,7 @@ wr("program/index.html", page({
 const today = new Date().toISOString().slice(0, 10);
 const urls = [
   ["", today, "1.0"], ["guide.html", today, "0.9"], ["stay.html", PROGRAMS_CHECKED, "0.9"], ["realestate.html", today, "0.8"],
-  ["school.html", SCHOOL_HOUSES_CHECKED, "0.9"], ["tools.html", today, "0.6"], ["trade.html", today, "0.6"],
+  ["school.html", SCHOOL_HOUSES_CHECKED, "0.9"], ["tools.html", today, "0.6"], ["jangnal.html", today, "0.7"], ["trade.html", today, "0.6"],
   ["community.html", today, "0.6"], ["about.html", today, "0.4"], ["contact.html", today, "0.3"],
   ["house/index.html", SCHOOL_HOUSES_CHECKED, "0.8"], ["program/index.html", PROGRAMS_CHECKED, "0.8"],
   ...GUIDES.map((g) => [`guide/${g.id}.html`, g.updated, "0.8"]),

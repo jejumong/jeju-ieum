@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제주 오일장 달력 — 제주이음</title>
+<meta name="description" content="오늘 열리는 제주 오일장은 어디? 제주시·서귀포·함덕·세화·한림·대정·중문·표선·고성 오일장 장날을 달력으로 한눈에.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css?v=20261107l">
+<style>
+.jn-today{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.jn-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--sh-1)}
+.jn-box h2{font-size:17px;font-weight:800;letter-spacing:-0.03em;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.jn-box h2 small{font-size:13px;font-weight:600;color:var(--ink-4)}
+.jn-box.now{background:linear-gradient(140deg,var(--citrus-50),#fff);border-color:var(--citrus-100)}
+.jn-mk{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.jn-mk a{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-size:14.5px;font-weight:800;color:var(--ink-2);text-decoration:none}
+.jn-mk a:hover{border-color:var(--sea-200);background:var(--sea-50)}
+.jn-mk a i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.jn-mk a.fav::after{content:"★";color:var(--citrus);font-size:12px}
+.jn-none{margin-top:12px;font-size:14px;color:var(--ink-3)}
+
+.jn-cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:30px 0 12px;flex-wrap:wrap}
+.jn-cal-head h2{font-size:22px;font-weight:800;letter-spacing:-0.04em}
+.jn-nav{display:flex;gap:6px}
+.jn-nav button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;font-weight:700;color:var(--ink-2);cursor:pointer}
+.jn-nav button:hover{background:var(--bg-2)}
+.jn-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.jn-filter button{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:inherit;font-size:13.5px;font-weight:700;color:var(--ink-3);cursor:pointer}
+.jn-filter button i{width:9px;height:9px;border-radius:50%}
+.jn-filter button.off{opacity:.4}
+.jn-filter button.off i{background:var(--ink-5)!important}
+.jn-filter .jn-all{color:var(--sea-700);border-color:var(--sea-200)}
+
+.jn-grid{display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.jn-grid .wd{padding:9px 0;text-align:center;font-size:12.5px;font-weight:800;color:var(--ink-3);background:var(--bg-2);border-bottom:1px solid var(--line)}
+.jn-grid .wd.sun{color:#d6453d}.jn-grid .wd.sat{color:var(--sea-600)}
+.jn-day{min-height:104px;padding:7px 7px 9px;border-right:1px solid var(--line-2);border-bottom:1px solid var(--line-2);display:flex;flex-direction:column;gap:3px}
+.jn-day:nth-child(7n){border-right:0}
+.jn-day.blank{background:var(--bg-2)}
+.jn-day .dn{font-size:13px;font-weight:800;color:var(--ink-2);margin-bottom:2px}
+.jn-day.sun .dn{color:#d6453d}.jn-day.sat .dn{color:var(--sea-600)}
+.jn-day.today{background:var(--citrus-50);box-shadow:inset 0 0 0 2px var(--citrus)}
+.jn-day.today .dn::after{content:" 오늘";font-size:11px;color:var(--citrus-700)}
+.jn-day.past{opacity:.5}
+.jn-chip{display:block;font-size:12px;font-weight:700;line-height:1.35;padding:2px 6px;border-radius:6px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.jn-chip.q{background:repeating-linear-gradient(135deg,#fff,#fff 4px,var(--bg-2) 4px,var(--bg-2) 8px)!important;color:var(--ink-3);border:1px dashed var(--ink-5)}
+
+.jn-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.jn-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;border-top:5px solid var(--c)}
+.jn-card.hl{box-shadow:0 0 0 3px var(--sea-200)}
+.jn-card .t{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.jn-card b{font-size:16.5px;font-weight:800;letter-spacing:-0.03em;color:var(--ink)}
+.jn-card .days{font-size:14px;font-weight:800;color:var(--c);margin-top:3px}
+.jn-card .next{font-size:13px;color:var(--ink-3);margin-top:2px}
+.jn-card .next b{font-size:13px;color:var(--citrus-700)}
+.jn-card .addr{font-size:13px;color:var(--ink-3);margin-top:9px;line-height:1.5}
+.jn-card .acts{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+.jn-card .acts a{font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2);text-decoration:none;background:var(--bg-2)}
+.jn-card .acts a:hover{border-color:var(--sea-200);color:var(--sea-700)}
+.jn-star{border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:var(--ink-5);padding:0 2px}
+.jn-star.on{color:var(--citrus)}
+.jn-pick{display:none}
+.jn-day{cursor:pointer}
+.jn-note{margin-top:22px;font-size:13px;color:var(--ink-3);line-height:1.75;background:var(--bg-2);border:1px solid var(--line-2);border-radius:var(--r);padding:14px 18px}
+.jn-note b{color:var(--ink-2)}
+.jn-note a{color:var(--sea-700)}
+
+@media (max-width:960px){.jn-list{grid-template-columns:1fr 1fr}}
+@media (max-width:680px){
+  .jn-today{grid-template-columns:1fr}
+  .jn-list{grid-template-columns:1fr}
+  .jn-day{min-height:70px;padding:4px 3px 5px;gap:2px}
+  .jn-day .dn{font-size:12px}
+  .jn-day.today .dn::after{content:""}
+  .jn-chip{font-size:0;height:7px;padding:0;border-radius:4px}
+  .jn-chip.q{height:7px}
+  .jn-cal-head h2{font-size:19px}
+  .jn-pick{display:block;margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:14px;color:var(--ink-3)}
+  .jn-pick b{color:var(--ink);font-weight:800}
+  .jn-pick .jn-mk{margin-top:8px}
+  .jn-day.sel{box-shadow:inset 0 0 0 2px var(--sea)}
+}
+</style>
+</head>
+<body data-active="tools">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › <a href="tools.html">생활도구</a> › 오일장 달력</div>
+    <h1>제주 오일장 달력</h1>
+    <p>오늘·내일 열리는 장과 이번 달 장날을 한눈에. ☆를 눌러 자주 가는 장을 표시해 두세요.</p>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <div class="jn-today">
+    <div class="jn-box now"><h2>🧺 오늘 열리는 장 <small id="jn-d0"></small></h2><div id="jn-t0"></div></div>
+    <div class="jn-box"><h2>내일 열리는 장 <small id="jn-d1"></small></h2><div id="jn-t1"></div></div>
+  </div>
+
+  <div class="jn-cal-head">
+    <h2 id="jn-title"></h2>
+    <div class="jn-nav"><button type="button" id="jn-prev">‹ 이전 달</button><button type="button" id="jn-now">이번 달</button><button type="button" id="jn-next">다음 달 ›</button></div>
+  </div>
+  <div class="jn-filter" id="jn-filter"></div>
+  <div class="jn-grid" id="jn-grid"></div>
+  <div class="jn-pick" id="jn-pick"></div>
+
+  <div class="sec-title"><div><div class="st-eb">MARKETS</div><h2>제주 오일장 한눈에</h2></div></div>
+  <div class="jn-list" id="jn-list"></div>
+
+  <div class="jn-note">
+    <b>장날 읽는 법</b> — "2·7일장"은 날짜 끝자리가 2나 7인 날(2·7·12·17·22·27일)에 열려요. "5·10일장"은 5·10·15·20·25·30일.<br>
+    <b>빗금 칸</b> — 31일은 1·6일장이 열리는지 자료마다 달라서 따로 표시했어요. 2월처럼 30일이 없는 달의 5·10일장도 가기 전에 확인해 주세요.<br>
+    <b>꼭 확인</b> — 명절(설·추석) 앞뒤나 태풍 때는 장날이 바뀌거나 쉴 수 있어요. 여는 시간도 시장마다 달라요(표선은 오전 8시~오후 2시로 안내됨). 멀리 갈 땐 시장에 전화해 보세요.<br>
+    <b>마지막 확인</b> 2026년 11월 6일 · 출처: <a href="https://5jangnal.com/market/140.html" target="_blank" rel="noopener">5jangnal.com 시장별 정보</a>(소상공인시장진흥공단 전통시장 현황 바탕), <a href="https://www.ktriptips.com/kor/shopping/132160" target="_blank" rel="noopener">표선 5일시장 안내</a>, <a href="https://goon.mandooya.com/entry/%EC%A0%9C%EC%A3%BC%EB%8F%84-5%EC%9D%BC%EC%9E%A5-%EC%9D%BC%EC%A0%95%ED%91%9C-%EC%A0%9C%EC%A3%BC-%EC%98%A4%EC%9D%BC%EC%9E%A5-%EC%9E%A5%EB%82%A0%ED%91%9C-%EB%82%A0%EC%A7%9C-%EC%A3%BC%EC%86%8C" target="_blank" rel="noopener">제주도 5일장 일정표</a>.
+    장날이 바뀌었거나 빠진 장이 있으면 <a href="contact.html?type=%EC%A0%95%EB%B3%B4%20%EC%88%98%EC%A0%95">알려 주세요</a>.
+  </div>
+</main>
+
+<script src="assets/common.js?v=20261107l"></script>
+<script src="assets/db.js?v=20261107l"></script>
+<script src="assets/notify.js?v=20261107l"></script>
+<script>
+(function(){
+  /* 장날 = 날짜 끝자리(d). 10·20·30일은 끝자리 0 → "10" 으로 표기 */
+  var M = [
+    { k:"jeju",   n:"제주시 민속오일장",   s:"제주시", d:[2,7], c:"#1a6fcb", addr:"제주시 오일장서길 26 (도두일동 1212)", tel:"064-743-5985", q:"제주시민속오일시장" },
+    { k:"hamdeok",n:"함덕 민속오일장",     s:"제주시 동쪽", d:[1,6], c:"#0f9d8a", addr:"제주시 조천읍 함덕리 1004-5 일대", tel:"", q:"함덕오일장" },
+    { k:"sehwa",  n:"세화 민속오일장",     s:"제주시 동쪽", d:[5,10], c:"#7a4fd6", addr:"제주시 구좌읍 세평항로 68 (세화리 1500-5)", tel:"064-782-0520", q:"세화민속오일시장" },
+    { k:"hallim", n:"한림 민속오일장",     s:"제주시 서쪽", d:[4,9], c:"#d4552b", addr:"제주시 한림읍 한림상로 55 (대림리 1698-4)", tel:"064-796-8830", q:"한림민속오일시장" },
+    { k:"sgp",    n:"서귀포 향토오일장",   s:"서귀포시", d:[4,9], c:"#e08a00", addr:"서귀포시 중산간동로7894번길 18-5 (동홍동)", tel:"064-763-0965", q:"서귀포향토오일시장" },
+    { k:"jungmun",n:"중문 향토오일장",     s:"서귀포 서쪽", d:[3,8], c:"#c2389a", addr:"서귀포시 천제연로188번길 17 (중문동)", tel:"", q:"중문향토오일시장" },
+    { k:"daejeong",n:"대정 오일장",       s:"서귀포 서쪽", d:[1,6], c:"#5b7a1e", addr:"서귀포시 대정읍 하모리 1089-15", tel:"", q:"대정오일시장" },
+    { k:"pyoseon",n:"표선 민속오일장",     s:"서귀포 동쪽", d:[2,7], c:"#2b8ce6", addr:"서귀포시 표선면 표선리 1001-1", tel:"064-760-4471", q:"표선민속오일시장" },
+    { k:"goseong",n:"고성 오일장 (성산)", s:"서귀포 동쪽", d:[4,9], c:"#8a5a2b", addr:"서귀포시 성산읍 고성오조로 80 (고성리)", tel:"064-760-4281", q:"고성오일시장" }
+  ];
+  var WD = ["일","월","화","수","목","금","토"];
+  function ls(k, v){ try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch(e){ return null; } }
+  var FAV = ls("ji_jn_fav") || [];
+  var OFF = ls("ji_jn_off") || [];
+
+  /* 한국 시간 기준 오늘 */
+  function kstToday(){ var n = new Date(Date.now() + 9*3600e3); return new Date(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()); }
+  var TODAY = kstToday();
+  var view = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1);
+
+  /* 그날 장 상태: 0 없음, 1 열림, 2 확인 필요 */
+  function state(m, dt){
+    var day = dt.getDate(), last = day % 10, dim = new Date(dt.getFullYear(), dt.getMonth()+1, 0).getDate();
+    if (day === 31) return m.d.indexOf(1) > -1 ? 2 : 0;
+    if (m.d.indexOf(10) > -1 && dim < 30 && day === dim) return 2;   // 2월 말 5·10일장
+    var hit = m.d.some(function(x){ return x % 10 === last; });
+    return hit ? 1 : 0;
+  }
+  function daysLabel(m){ return m.d.map(function(x){ return x; }).join("·") + "일장"; }
+  function fmt(dt){ return (dt.getMonth()+1) + "월 " + dt.getDate() + "일 (" + WD[dt.getDay()] + ")"; }
+  function addDays(dt, n){ return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + n); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function sorted(list){ return list.slice().sort(function(a,b){ return (FAV.indexOf(b.k) > -1) - (FAV.indexOf(a.k) > -1); }); }
+
+  function todayBox(n, el, dl){
+    var dt = addDays(TODAY, n);
+    document.getElementById(dl).textContent = fmt(dt);
+    var open = sorted(M.filter(function(m){ return state(m, dt) === 1; }));
+    var q = M.filter(function(m){ return state(m, dt) === 2; });
+    document.getElementById(el).innerHTML = open.length
+      ? '<div class="jn-mk">' + open.map(function(m){ return '<a href="#m-' + m.k + '" class="' + (FAV.indexOf(m.k) > -1 ? "fav" : "") + '" onclick="return jnFocus(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n) + '</a>'; }).join("") + '</div>'
+      : '<p class="jn-none">' + (q.length ? q.map(function(m){ return m.n; }).join(", ") + "은(는) 31일에 열리는지 확인이 필요해요." : "이날은 열리는 오일장이 없어요. 아래 달력에서 가까운 장날을 찾아보세요.") + '</p>';
+  }
+
+  function nextOpen(m){
+    for (var i = 0; i < 40; i++){ var dt = addDays(TODAY, i); if (state(m, dt) === 1) return i === 0 ? "<b>오늘 열려요</b>" : i === 1 ? "<b>내일</b> 열려요" : "다음 장: " + fmt(dt) + " · " + i + "일 뒤"; }
+    return "";
+  }
+
+  function drawFilter(){
+    document.getElementById("jn-filter").innerHTML =
+      '<button type="button" class="jn-all" onclick="jnAll()">' + (OFF.length ? "모두 보기" : "즐겨찾기만") + '</button>' +
+      sorted(M).map(function(m){ return '<button type="button" class="' + (OFF.indexOf(m.k) > -1 ? "off" : "") + '" onclick="jnToggle(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n.replace(/ (민속|향토)?오일장/, "")) + (FAV.indexOf(m.k) > -1 ? " ★" : "") + '</button>'; }).join("");
+  }
+
+  function drawCal(){
+    var y = view.getFullYear(), mo = view.getMonth();
+    document.getElementById("jn-title").textContent = y + "년 " + (mo+1) + "월 장날";
+    var first = new Date(y, mo, 1).getDay(), dim = new Date(y, mo+1, 0).getDate();
+    var shown = sorted(M.filter(function(m){ return OFF.indexOf(m.k) < 0; }));
+    var h = WD.map(function(w, i){ return '<div class="wd' + (i === 0 ? " sun" : i === 6 ? " sat" : "") + '">' + w + '</div>'; }).join("");
+    for (var b = 0; b < first; b++) h += '<div class="jn-day blank"></div>';
+    for (var d = 1; d <= dim; d++){
+      var dt = new Date(y, mo, d), wd = dt.getDay();
+      var cls = "jn-day" + (wd === 0 ? " sun" : wd === 6 ? " sat" : "") + (+dt === +TODAY ? " today" : dt < TODAY ? " past" : "");
+      var chips = shown.map(function(m){
+        var s = state(m, dt); if (!s) return "";
+        var nm = m.n.replace(/ (민속|향토)?오일장/, "").replace(" (성산)", "");
+        return '<span class="jn-chip' + (s === 2 ? " q" : "") + '" style="background:' + m.c + '" title="' + esc(m.n) + (s === 2 ? " — 열리는지 확인 필요" : "") + '" onclick="jnFocus(\'' + m.k + '\')">' + esc(nm) + (s === 2 ? "?" : "") + '</span>';
+      }).join("");
+      h += '<div class="' + cls + '" data-d="' + d + '" onclick="jnPick(' + d + ')"><div class="dn">' + d + '</div>' + chips + '</div>';
+    }
+    var tail = (7 - (first + dim) % 7) % 7;
+    for (var t = 0; t < tail; t++) h += '<div class="jn-day blank"></div>';
+    document.getElementById("jn-grid").innerHTML = h;
+    jnPick(view.getMonth() === TODAY.getMonth() && view.getFullYear() === TODAY.getFullYear() ? TODAY.getDate() : 1);
+  }
+  /* 휴대폰에서는 칸이 좁아 색 막대만 보이므로, 누른 날의 장 이름을 달력 아래에 보여 줌 */
+  window.jnPick = function(d){
+    var dt = new Date(view.getFullYear(), view.getMonth(), d);
+    document.querySelectorAll(".jn-day.sel").forEach(function(x){ x.classList.remove("sel"); });
+    var c = document.querySelector('.jn-day[data-d="' + d + '"]'); c && c.classList.add("sel");
+    var open = sorted(M.filter(function(m){ return OFF.indexOf(m.k) < 0 && state(m, dt) === 1; }));
+    var q = M.filter(function(m){ return OFF.indexOf(m.k) < 0 && state(m, dt) === 2; });
+    document.getElementById("jn-pick").innerHTML = '<b>' + fmt(dt) + '</b> ' + (open.length ? '' : '열리는 장이 없어요') +
+      (open.length ? '<div class="jn-mk">' + open.map(function(m){ return '<a href="#m-' + m.k + '" onclick="return jnFocus(\'' + m.k + '\')"><i style="background:' + m.c + '"></i>' + esc(m.n) + '</a>'; }).join("") + '</div>' : '') +
+      (q.length ? '<div style="margin-top:6px;font-size:12.5px">확인 필요: ' + q.map(function(m){ return esc(m.n); }).join(", ") + '</div>' : '');
+  };
+
+  function drawList(){
+    document.getElementById("jn-list").innerHTML = sorted(M).map(function(m){
+      var fav = FAV.indexOf(m.k) > -1;
+      return '<div class="jn-card" id="m-' + m.k + '" style="--c:' + m.c + '">' +
+        '<div class="t"><div><b>' + esc(m.n) + '</b><div class="days">' + daysLabel(m) + ' · ' + esc(m.s) + '</div></div>' +
+        '<button type="button" class="jn-star' + (fav ? " on" : "") + '" aria-label="자주 가는 장으로 표시" title="자주 가는 장" onclick="jnFav(\'' + m.k + '\')">' + (fav ? "★" : "☆") + '</button></div>' +
+        '<div class="next">' + nextOpen(m) + '</div>' +
+        '<div class="addr">📍 ' + esc(m.addr) + '</div>' +
+        '<div class="acts"><a href="https://map.kakao.com/link/search/' + encodeURIComponent(m.q) + '" target="_blank" rel="noopener">카카오맵</a>' +
+        '<a href="https://map.naver.com/p/search/' + encodeURIComponent(m.q) + '" target="_blank" rel="noopener">네이버지도</a>' +
+        (m.tel ? '<a href="tel:' + m.tel + '">📞 ' + m.tel + '</a>' : '') + '</div></div>';
+    }).join("");
+  }
+
+  function all(){ todayBox(0, "jn-t0", "jn-d0"); todayBox(1, "jn-t1", "jn-d1"); drawFilter(); drawCal(); drawList(); }
+
+  window.jnFav = function(k){ var i = FAV.indexOf(k); if (i > -1) FAV.splice(i, 1); else FAV.push(k); ls("ji_jn_fav", FAV); all(); };
+  window.jnToggle = function(k){ var i = OFF.indexOf(k); if (i > -1) OFF.splice(i, 1); else OFF.push(k); ls("ji_jn_off", OFF); drawFilter(); drawCal(); };
+  window.jnAll = function(){
+    if (OFF.length) OFF = [];
+    else { if (!FAV.length) { alertSoft("☆를 눌러 자주 가는 장을 먼저 표시해 주세요."); return; } OFF = M.filter(function(m){ return FAV.indexOf(m.k) < 0; }).map(function(m){ return m.k; }); }
+    ls("ji_jn_off", OFF); drawFilter(); drawCal();
+  };
+  function alertSoft(t){ var f = document.getElementById("jn-filter"), sp = document.createElement("span"); sp.textContent = t; sp.style.cssText = "font-size:13px;color:var(--citrus-700);font-weight:700;align-self:center"; f.appendChild(sp); setTimeout(function(){ sp.remove(); }, 2500); }
+  window.jnFocus = function(k){
+    var el = document.getElementById("m-" + k); if (!el) return false;
+    el.scrollIntoView({ behavior:"smooth", block:"center" });
+    document.querySelectorAll(".jn-card.hl").forEach(function(x){ x.classList.remove("hl"); });
+    el.classList.add("hl"); setTimeout(function(){ el.classList.remove("hl"); }, 1800);
+    return false;
+  };
+  document.getElementById("jn-prev").onclick = function(){ view = new Date(view.getFullYear(), view.getMonth()-1, 1); drawCal(); };
+  document.getElementById("jn-next").onclick = function(){ view = new Date(view.getFullYear(), view.getMonth()+1, 1); drawCal(); };
+  document.getElementById("jn-now").onclick = function(){ view = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1); drawCal(); };
+  all();
+})();
+</script>
+</body>
+</html>
