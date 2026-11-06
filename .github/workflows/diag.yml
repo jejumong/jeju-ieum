@@ -1,0 +1,15 @@
+name: diag
+on: workflow_dispatch
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          A="https://andend07.mycafe24.com/jeju/api/"
+          python3 -c "from PIL import Image; Image.new('RGB',(800,600),(30,140,200)).save('t.jpg',quality=80)" 2>/dev/null || convert -size 800x600 xc:skyblue t.jpg
+          E="diag$(date +%s)@test.invalid"
+          T=$(curl -s -H "Content-Type: text/plain" "$A?a=signup" -d "{\"email\":\"$E\",\"pw\":\"diagpass123\",\"nick\":\"점검$RANDOM\"}" | python3 -c "import json,sys;print(json.load(sys.stdin)['data']['token'])")
+          echo "== upload"; R=$(curl -s -F "_t=$T" -F "file=@t.jpg;type=image/jpeg" "$A?a=upload"); echo "$R"
+          U=$(echo "$R" | python3 -c "import json,sys;print(json.load(sys.stdin)['data']['url'])")
+          echo "== fetch image"; curl -s -o /dev/null -w "%{http_code} %{content_type} %{size_download}\n" "$U"
+          echo "== delete test account"; curl -s -H "Content-Type: text/plain" "$A?a=account_delete" -d "{\"_t\":\"$T\",\"pw\":\"diagpass123\"}"
