@@ -292,7 +292,9 @@ case 'inquiry_add': {
   $who = me($R, false);
   q("INSERT INTO ji_inquiries (id, data, ip, user_id, created_at) VALUES (?,?,?,?,?)", [uuid(), $js, ip(), $who ? $who['id'] : null, now()]);
   foreach (all("SELECT id FROM ji_users WHERE role IN ('admin','staff')") as $ad)
-    notify($ad['id'], 'inquiry', '새 문의·신청', mb_substr((string)($d['type'] ?? $d['service'] ?? '문의'), 0, 40) . ' · ' . mb_substr((string)($d['name'] ?? ''), 0, 20), 'admin/index.html');
+    notify($ad['id'], 'inquiry', '📮 새 문의 · ' . mb_substr((string)($d['type'] ?? $d['service'] ?? '문의'), 0, 30),
+      mb_substr((string)($d['name'] ?? ''), 0, 20) . ($who ? ' (회원 ' . $who['nick'] . ')' : ' (비회원)') . ': ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 70),
+      'admin/index.html#inquiries', '제주이음 · 새 문의가 왔어요', mb_substr((string)($d['type'] ?? '문의'), 0, 30) . ' · ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 60));
   out(true);
 }
 
