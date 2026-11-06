@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106p">
+<link rel="stylesheet" href="assets/style.css?v=20261106q">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -59,15 +59,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261106p"></script>
-<script src="assets/common.js?v=20261106p"></script>
-<script src="assets/db.js?v=20261106p"></script>
-<script src="assets/notify.js?v=20261106p"></script>
-<script src="assets/seed-trade.js?v=20261106p"></script>
-<script src="assets/seed-extra.js?v=20261106p"></script>
-<script src="assets/seed-new.js?v=20261106p"></script>
-<script src="assets/seed-comments.js?v=20261106p"></script>
-<script src="assets/admin-data.js?v=20261106p"></script>
+<script src="assets/kmap.js?v=20261106q"></script>
+<script src="assets/common.js?v=20261106q"></script>
+<script src="assets/db.js?v=20261106q"></script>
+<script src="assets/notify.js?v=20261106q"></script>
+<script src="assets/seed-trade.js?v=20261106q"></script>
+<script src="assets/seed-extra.js?v=20261106q"></script>
+<script src="assets/seed-new.js?v=20261106q"></script>
+<script src="assets/seed-comments.js?v=20261106q"></script>
+<script src="assets/admin-data.js?v=20261106q"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -178,7 +178,14 @@ if (!post) {
 if (!post && window.JIDB && JIDB.enabled && JIDB.isUuid(id)) {
   document.getElementById("pv").innerHTML = '<p style="padding:30px;text-align:center;color:var(--muted)">불러오는 중…</p>';
   JIDB.getPost(id, true).then(function (p) { post = p; renderPost(); }, function () { renderPost(); });
-} else renderPost();
+} else {
+  renderPost();
+  // 서버 글이면 최신 내용 확인 + 조회수 올리기
+  if (post && post.db && window.JIDB && JIDB.enabled) JIDB.getPost(id, true).then(function (p) {
+    if (!p) { alert("삭제된 글입니다."); history.back(); return; }
+    if (p.title !== post.title || p.content !== post.content || p.head !== post.head) { post = p; renderPost(); }
+  }, function () {});
+}
 
 /* ── 모임 공지 (모임장·승인 회원만) ── */
 function drawNotices(isOwner) {
@@ -254,11 +261,46 @@ function drawClubJoin() {
   });
 }
 
+var DB_CMTS = [], dbCmtLoaded = false;
+function loadDbComments() {
+  if (!(window.JIDB && JIDB.enabled)) return;
+  JIDB.comments(id).then(function (l) { DB_CMTS = l; dbCmtLoaded = true; renderComments(); }, function () {});
+}
+function dbCmtHtml() {
+  var u = currentUser();
+  return DB_CMTS.map(function (c, i) {
+    var own = u && u.id && c.authorId === u.id;
+    var isAuthor = post && post.authorId && c.authorId === post.authorId;
+    return '<div class="cmt-item" id="dcmt-' + i + '"><div style="display:flex;align-items:center">' +
+      '<span class="who">' + esc(c.author) + (isAuthor ? ' <span class="own-tag">작성자</span>' : '') + '</span>' +
+      '<span class="when">' + esc(c.date) + (c.edited ? ' (수정됨)' : '') + '</span>' +
+      (own ? '<div class="own-actions"><button class="mini-btn" onclick="startEditDbCmt(' + i + ')">수정</button>' +
+        '<button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')">삭제</button></div>' : '') +
+      '</div><p id="dcmt-text-' + i + '">' + esc(c.text) + '</p></div>';
+  }).join("");
+}
+function startEditDbCmt(i) {
+  var c = DB_CMTS[i]; if (!c) return;
+  document.getElementById("dcmt-text-" + i).outerHTML = '<div class="edit-box" id="dcmt-text-' + i + '"><input type="text" id="dcmt-edit-' + i + '" maxlength="300">' +
+    '<button class="btn primary" onclick="saveDbCmt(' + i + ')">저장</button><button class="btn ghost" onclick="renderComments()">취소</button></div>';
+  var inp = document.getElementById("dcmt-edit-" + i); inp.value = c.text; inp.focus();
+  inp.addEventListener("keydown", function (e) { if (e.key === "Enter") saveDbCmt(i); });
+}
+function saveDbCmt(i) {
+  var t = document.getElementById("dcmt-edit-" + i).value.trim(); if (!t) { alert("댓글 내용을 입력해주세요."); return; }
+  JIDB.updateComment(DB_CMTS[i].id, t).then(function (c) { DB_CMTS[i] = c; renderComments(); }, function (e) { alert(e.message || e); });
+}
+function removeDbCmt(i) {
+  if (!confirm("이 댓글을 삭제할까요?")) return;
+  JIDB.deleteComment(DB_CMTS[i].id).then(function () { DB_CMTS.splice(i, 1); renderComments(); }, function (e) { alert(e.message || e); });
+}
 function renderComments() {
+  if (!DB_CMTS) DB_CMTS = [];   // 글을 그리는 코드가 이 선언보다 먼저 실행될 때 대비
+  if (!dbCmtLoaded && window.JIDB && JIDB.enabled) { dbCmtLoaded = true; loadDbComments(); }
   var all = JI.get("comments", {});
   var list = all[id] || [];
   var seeds = seedCommentsOf(id);
-  document.getElementById("cmt-count").textContent = seeds.length + list.length;
+  document.getElementById("cmt-count").textContent = seeds.length + list.length + DB_CMTS.length;
   var seedHtml = seeds.map(function(c){
     var isAuthor = post && c.author === post.author;
     var isReply = c.reply !== undefined && seeds[c.reply];
@@ -283,7 +325,7 @@ function renderComments() {
           '<button class="mini-btn danger-btn" onclick="removeCmt(' + i + ')">삭제</button></div>' : '') +
       '</div>' +
       '<p id="cmt-text-' + i + '">' + esc(c.text) + '</p></div>';
-  }).join("");
+  }).join("") + dbCmtHtml();
 
   var u = currentUser();
   document.getElementById("cmt-input").innerHTML = u
@@ -297,7 +339,9 @@ function renderComments() {
 function closeJob(){
   var closing = post.head !== "채용완료";
   if (!confirm(closing ? "이 공고를 채용완료로 바꿀까요?\n목록에 '채용완료'로 표시돼요." : "채용완료를 취소하고 다시 모집할까요?")) return;
-  var p = toggleJobClosed(post.id); if (p) location.reload();
+  var p = toggleJobClosed(post.id);
+  if (p && typeof p.then === "function") p.then(function(){ location.reload(); }, function(e){ alert("바꾸지 못했어요: " + (e.message || e)); });
+  else if (p) location.reload();
 }
 function editPost(){ location.href = "write.html?edit=" + post.id; }
 function removePost(){
@@ -344,6 +388,13 @@ function addComment() {
   var inp = document.getElementById("cmt-text");
   var text = inp.value.trim();
   if (!text) { alert("댓글 내용을 입력해주세요."); return; }
+  if (window.JIDB && JIDB.enabled) {
+    if (!u.id) { alert("다시 로그인해 주세요."); return; }
+    inp.disabled = true;
+    JIDB.addComment(id, text).then(function (c) { DB_CMTS.push(c); renderComments(); },
+      function (e) { inp.disabled = false; alert("댓글을 등록하지 못했어요: " + (e.message || e)); });
+    return;
+  }
   var all = JI.get("comments", {});
   if (!all[id]) all[id] = [];
   all[id].push({

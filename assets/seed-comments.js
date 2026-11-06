@@ -369,7 +369,7 @@
     /* 직접 써 둔 댓글 문구는 다른 글에서 다시 쓰이지 않게 먼저 표시 */
     posts.forEach(function (p) { if (p.cm) p.cm.forEach(function (c) { USED[c[0]] = 1; }); });
     posts.forEach(function (p) {
-      if (!p.id || p.id.charAt(0) === "u") return;          /* 회원이 쓴 글은 제외 */
+      if (!p.id || isUserPost(p)) return;          /* 회원이 쓴 글은 제외 */
       var r = rng(seedOf(p.id));
       if (p.cm) { ALL[p.id] = buildCustom(p, r); return; }
       if (/^z\d\dn/.test(p.id)) { ALL[p.id] = []; return; } /* 새 글 중 댓글 없는 글 */
@@ -385,6 +385,6 @@
     return ALL[id] || [];
   };
   window.commentCountOf = function (id) {
-    return seedCommentsOf(id).length + (JI.get("comments", {})[id] || []).length;
+    return seedCommentsOf(id).length + (JI.get("comments", {})[id] || []).length + (JI.get("dbcounts", {})[id] || 0);
   };
 })();

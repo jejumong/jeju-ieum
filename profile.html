@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106p">
+<link rel="stylesheet" href="assets/style.css?v=20261106q">
 <style>
 .me-card{max-width:640px;margin:0 auto}
 .me-top{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;flex-wrap:wrap;box-shadow:var(--sh-2)}
@@ -159,14 +159,14 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261106p"></script>
-<script src="assets/db.js?v=20261106p"></script>
-<script src="assets/notify.js?v=20261106p"></script>
-<script src="assets/seed-trade.js?v=20261106p"></script>
-<script src="assets/seed-extra.js?v=20261106p"></script>
-<script src="assets/seed-new.js?v=20261106p"></script>
-<script src="assets/seed-comments.js?v=20261106p"></script>
-<script src="assets/admin-data.js?v=20261106p"></script>
+<script src="assets/common.js?v=20261106q"></script>
+<script src="assets/db.js?v=20261106q"></script>
+<script src="assets/notify.js?v=20261106q"></script>
+<script src="assets/seed-trade.js?v=20261106q"></script>
+<script src="assets/seed-extra.js?v=20261106q"></script>
+<script src="assets/seed-new.js?v=20261106q"></script>
+<script src="assets/seed-comments.js?v=20261106q"></script>
+<script src="assets/admin-data.js?v=20261106q"></script>
 <script>
 var user = currentUser();
 if (!user) {
@@ -178,11 +178,21 @@ function users(){ return JI.get("users", []); }
 function myIndex(){ return users().findIndex(function(u){ return u.email === user.email; }); }
 
 /* ── 내 활동 수집 ── */
+var SRV = !!(window.JIDB && JIDB.enabled && user && user.id);   // 서버 회원이면 서버 데이터 사용
+var MY_DB_CMTS = [];
+if (SRV) JIDB.ready.then(function(){ return JIDB.myComments(); }).then(function(l){
+  MY_DB_CMTS = l; if (curTab === "cmts") reloadCmts();
+}, function(){});
 function myPosts(){
-  return JI.get("posts", []).filter(function(p){ return p.author === user.nick; });
+  return localPosts().filter(function(p){ return isMyPost(p) || (!p.db && p.author === user.nick); });
 }
 function myComments(){
   var cm = JI.get("comments", {}), out = [];
+  MY_DB_CMTS.forEach(function(c){
+    var p = findPost(c.postId);
+    out.push({ text: c.text, date: c.date, edited: c.edited, postId: c.postId, idx: -1, dbId: c.id,
+      postTitle: p ? p.title : "삭제된 글", board: p ? p.board : "" });
+  });
   Object.keys(cm).forEach(function(pid){
     cm[pid].forEach(function(c, idx){
       if (c.author === user.nick) {
@@ -325,7 +335,7 @@ function closePanel(){
 function postsHtml(){
   var list = myPosts();
   var rows = list.map(function(p){
-    var cm = (JI.get("comments", {})[p.id] || []).length;
+    var cm = commentCountOf(p.id);
     return '<div class="act-row">' +
       '<div class="rtop">' +
         '<a class="rt" href="view.html?id=' + p.id + '">' + esc(p.title) + '</a>' +
@@ -375,6 +385,8 @@ function joinsHtml(){
 function editPost(id){ location.href = "write.html?edit=" + id; }
 function removePost(id){
   if (!confirm("이 글을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.")) return;
+  var dp = findPost(id);
+  if (dp && dp.db) { JIDB.deletePost(id).then(function(){ fill(); document.getElementById("panel").innerHTML = postsHtml(); }, function(e){ alert(e.message || e); }); return; }
   if (deleteMyPost(id)) {
     fill();
     document.getElementById("panel").innerHTML = postsHtml();
@@ -397,12 +409,14 @@ function saveCmt(i){
   var c = myComments()[i];
   var t = document.getElementById("myc-edit-" + i).value.trim();
   if (!t) { alert("댓글 내용을 입력해주세요."); return; }
+  if (c.dbId) { JIDB.updateComment(c.dbId, t).then(function(){ MY_DB_CMTS.forEach(function(x){ if (x.id === c.dbId) { x.text = t; x.edited = true; } }); reloadCmts(); }, function(e){ alert(e.message || e); }); return; }
   if (updateMyComment(c.postId, c.idx, t)) reloadCmts();
 }
 function removeCmt(i){
   var c = myComments()[i];
   if (!c) return;
   if (!confirm("이 댓글을 삭제할까요?")) return;
+  if (c.dbId) { JIDB.deleteComment(c.dbId).then(function(){ MY_DB_CMTS = MY_DB_CMTS.filter(function(x){ return x.id !== c.dbId; }); reloadCmts(); }, function(e){ alert(e.message || e); }); return; }
   if (deleteMyComment(c.postId, c.idx)) { fill(); reloadCmts(); }
 }
 function reloadCmts(){ document.getElementById("panel").innerHTML = cmtsHtml(); }
@@ -413,6 +427,10 @@ function saveBasic(){
   var region = document.getElementById("region").value;
   var noti = document.getElementById("noti").checked;
   if (nick.length < 2) { alert("닉네임은 2자 이상 입력해주세요."); return; }
+  if (SRV) {
+    JIDB.updateProfile({ nick: nick, region: region }).then(function(){ alert("회원정보가 저장되었습니다."); location.reload(); }, function(e){ alert(e.message || e); });
+    return;
+  }
 
   var all = users(), idx = myIndex();
   if (idx < 0) { alert("회원 정보를 찾을 수 없습니다."); return; }
@@ -443,6 +461,15 @@ function savePw(){
   var cur = document.getElementById("cur").value;
   var n1 = document.getElementById("new1").value;
   var n2 = document.getElementById("new2").value;
+  if (SRV) {
+    if (n1.length < 8) { alert("새 비밀번호는 8자 이상이어야 합니다."); return; }
+    if (n1 !== n2) { alert("새 비밀번호가 서로 일치하지 않습니다."); return; }
+    JIDB.changePassword(cur, n1).then(function(){
+      ["cur","new1","new2"].forEach(function(k){ document.getElementById(k).value = ""; });
+      alert("비밀번호가 변경되었습니다. 다른 기기에서는 다시 로그인해야 해요.");
+    }, function(e){ alert(e.message || e); });
+    return;
+  }
   var all = users(), idx = myIndex();
   if (idx < 0) return;
   if (all[idx].pw !== cur) { alert("현재 비밀번호가 올바르지 않습니다."); return; }
@@ -458,6 +485,11 @@ function savePw(){
 
 function leave(){
   if (!confirm("정말 탈퇴하시겠습니까?\n작성한 글과 댓글은 삭제되지 않습니다.")) return;
+  if (SRV) {
+    var pw = prompt("확인을 위해 비밀번호를 입력해 주세요."); if (!pw) return;
+    JIDB.deleteAccount(pw).then(function(){ setMyPhoto(null); alert("탈퇴 처리되었습니다. 이용해주셔서 감사합니다."); location.href = "index.html"; }, function(e){ alert(e.message || e); });
+    return;
+  }
   setMyPhoto(null);
   JI.set("users", users().filter(function(u){ return u.email !== user.email; }));
   JI.set("session", null);

@@ -22,6 +22,10 @@ function post_out($r) {
     'author' => $r['author'], 'author_nick' => $r['author_nick'], 'views' => (int)$r['views'],
     'created_at' => iso($r['created_at']), 'updated_at' => iso($r['updated_at'])];
 }
+function cmt_out($c) {
+  return ['id' => $c['id'], 'post_id' => $c['post_id'], 'author' => $c['author'], 'author_nick' => $c['author_nick'],
+    'text' => $c['text'], 'edited' => (bool)$c['edited'], 'created_at' => iso($c['created_at'])];
+}
 function join_out($j) {
   $j['created_at'] = iso($j['created_at']); $j['decided_at'] = iso($j['decided_at'] ?? null); return $j;
 }
@@ -81,6 +85,28 @@ case 'profile_update': {
   out(['nick' => $nick, 'region' => $region]);
 }
 
+case 'password_change': {
+  $u = me($R); $row = one("SELECT pass FROM ji_users WHERE id = ?", [$u['id']]);
+  if (!password_verify((string)($R['cur'] ?? ''), $row['pass'])) fail('현재 비밀번호가 올바르지 않습니다.');
+  $n = (string)($R['new'] ?? ''); if (strlen($n) < 8) fail('새 비밀번호는 8자 이상이어야 합니다.');
+  q("UPDATE ji_users SET pass = ? WHERE id = ?", [password_hash($n, PASSWORD_DEFAULT), $u['id']]);
+  q("DELETE FROM ji_sessions WHERE user_id = ? AND token <> ?", [$u['id'], token_hash($R['_t'])]);   // 다른 기기는 로그아웃
+  out(true);
+}
+case 'account_delete': {
+  $u = me($R); $row = one("SELECT pass FROM ji_users WHERE id = ?", [$u['id']]);
+  if (!password_verify((string)($R['pw'] ?? ''), $row['pass'])) fail('비밀번호가 올바르지 않습니다.');
+  q("DELETE FROM ji_sessions WHERE user_id = ?", [$u['id']]);
+  q("DELETE FROM ji_notifications WHERE user_id = ?", [$u['id']]);
+  q("DELETE FROM ji_club_joins WHERE applicant = ?", [$u['id']]);
+  q("DELETE FROM ji_users WHERE id = ?", [$u['id']]);
+  out(true);
+}
+case 'my_comments': {
+  $u = me($R);
+  out(array_map('cmt_out', all("SELECT * FROM ji_comments WHERE author = ? ORDER BY created_at DESC LIMIT 300", [$u['id']])));
+}
+
 /* ───────── 글 ───────── */
 case 'post_list': {
   $b = str($R['board'] ?? '', 30); if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
@@ -123,7 +149,45 @@ case 'post_delete': {
   q("DELETE FROM ji_posts WHERE id = ?", [$id]);
   q("DELETE FROM ji_club_joins WHERE club_id = ?", [$id]);
   q("DELETE FROM ji_club_notices WHERE club_id = ?", [$id]);
+  q("DELETE FROM ji_comments WHERE post_id = ?", [$id]);
   out(true);
+}
+
+/* ───────── 전체 새 글 + 댓글 수 (화면 캐시용) ───────── */
+case 'feed': {
+  $rows = all("SELECT * FROM ji_posts ORDER BY created_at DESC LIMIT 600");
+  $counts = [];
+  foreach (all("SELECT post_id, COUNT(*) n FROM ji_comments GROUP BY post_id") as $c) $counts[$c['post_id']] = (int)$c['n'];
+  out(['posts' => array_map('post_out', $rows), 'counts' => $counts ?: new stdClass()]);
+}
+
+/* ───────── 댓글 (예시 글에도 달 수 있게 post_id 는 아무 글 id) ───────── */
+case 'comments': {
+  $pid = str($R['post_id'] ?? '', 40); if ($pid === '') out([]);
+  out(array_map('cmt_out', all("SELECT * FROM ji_comments WHERE post_id = ? ORDER BY created_at, id LIMIT 500", [$pid])));
+}
+case 'comment_add': {
+  $u = me($R); $pid = str($R['post_id'] ?? '', 40); $text = str($R['text'] ?? '', 1000);
+  if ($pid === '' || $text === '') fail('댓글 내용을 입력해 주세요.');
+  $recent = one("SELECT COUNT(*) n FROM ji_comments WHERE author = ? AND created_at > (NOW() - INTERVAL 1 MINUTE)", [$u['id']])['n'];
+  if ($recent >= 6) fail('댓글을 너무 빨리 달고 있어요. 잠시 후 다시 해 주세요.', 429);
+  $id = uuid(); q("INSERT INTO ji_comments (id, post_id, author, author_nick, text, created_at) VALUES (?,?,?,?,?,?)", [$id, $pid, $u['id'], $u['nick'], $text, now()]);
+  $p = is_uuid($pid) ? one("SELECT author, title FROM ji_posts WHERE id = ?", [$pid]) : null;
+  if ($p && $p['author'] !== $u['id'])
+    notify($p['author'], 'comment', '새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60), 'view.html?id=' . $pid . '#cmt-list', '제주이음 · 「' . mb_substr($p['title'], 0, 30) . '」 새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60));
+  out(cmt_out(one("SELECT * FROM ji_comments WHERE id = ?", [$id])));
+}
+case 'comment_update': {
+  $u = me($R); $text = str($R['text'] ?? '', 1000); if ($text === '') fail('댓글 내용을 입력해 주세요.');
+  $c = one("SELECT * FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
+  if ($c['author'] !== $u['id']) fail('내가 쓴 댓글만 고칠 수 있어요', 403);
+  q("UPDATE ji_comments SET text = ?, edited = 1 WHERE id = ?", [$text, $c['id']]);
+  out(cmt_out(one("SELECT * FROM ji_comments WHERE id = ?", [$c['id']])));
+}
+case 'comment_delete': {
+  $u = me($R); $c = one("SELECT author FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
+  if ($c['author'] !== $u['id'] && $u['role'] !== 'admin') fail('내가 쓴 댓글만 지울 수 있어요', 403);
+  q("DELETE FROM ji_comments WHERE id = ?", [$R['id']]); out(true);
 }
 
 /* ───────── 동호회 가입 신청 ───────── */

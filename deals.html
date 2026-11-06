@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106p">
+<link rel="stylesheet" href="assets/style.css?v=20261106q">
 </head>
 <body data-active="deals">
 
@@ -35,16 +35,16 @@
   <div class="grid-cards" id="deal-grid"></div>
 </main>
 
-<script src="assets/common.js?v=20261106p"></script>
-<script src="assets/db.js?v=20261106p"></script>
-<script src="assets/notify.js?v=20261106p"></script>
-<script src="assets/seed-trade.js?v=20261106p"></script>
-<script src="assets/seed-extra.js?v=20261106p"></script>
-<script src="assets/seed-new.js?v=20261106p"></script>
-<script src="assets/seed-comments.js?v=20261106p"></script>
-<script src="assets/photos.js?v=20261106p"></script>
-<script src="assets/cards.js?v=20261106p"></script>
-<script src="assets/admin-data.js?v=20261106p"></script>
+<script src="assets/common.js?v=20261106q"></script>
+<script src="assets/db.js?v=20261106q"></script>
+<script src="assets/notify.js?v=20261106q"></script>
+<script src="assets/seed-trade.js?v=20261106q"></script>
+<script src="assets/seed-extra.js?v=20261106q"></script>
+<script src="assets/seed-new.js?v=20261106q"></script>
+<script src="assets/seed-comments.js?v=20261106q"></script>
+<script src="assets/photos.js?v=20261106q"></script>
+<script src="assets/cards.js?v=20261106q"></script>
+<script src="assets/admin-data.js?v=20261106q"></script>
 <script>
 var META = {
   "td1":{e:"🍊",warm:1,unit:"명"}, "td2":{e:"🥩",warm:1,unit:"명"}, "td3":{e:"🪟",unit:"명"},
@@ -73,7 +73,7 @@ function render(){
   document.getElementById("shown-count").textContent = list.length;
   document.getElementById("deal-grid").innerHTML = pageSlice(list).map(function(p){
     var m = META[p.id] || { unit:"명" };
-    var isMine = p.id.charAt(0) === "u";
+    var isUser = isUserPost(p), isMine = isMyPost(p);
     var jid = "deal-" + p.id;
     var pct = (p.cur && p.goal) ? Math.min(100, Math.round(p.cur / p.goal * 100)) : 0;
     var bar = (p.cur && p.goal)
@@ -94,6 +94,7 @@ document.addEventListener("DOMContentLoaded", function(){
   var btn = document.getElementById("deal-write-btn");
   if (btn && isApprovedSeller("특가공구")) btn.href = "write.html?board=특가공구";
 });
+window.onJIData = render;   // 서버에서 새 글을 받아오면 목록을 다시 그림
 </script>
 </body>
 </html>

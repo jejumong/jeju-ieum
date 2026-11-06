@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106p">
+<link rel="stylesheet" href="assets/style.css?v=20261106q">
 <style>.mk-cmt{color:var(--citrus-600,#d5710b);font-weight:800;margin-right:6px}</style>
 </head>
 <body data-active="market">
@@ -38,16 +38,16 @@
   <div class="grid-cards" id="mk-grid"></div>
 </main>
 
-<script src="assets/common.js?v=20261106p"></script>
-<script src="assets/db.js?v=20261106p"></script>
-<script src="assets/notify.js?v=20261106p"></script>
-<script src="assets/seed-trade.js?v=20261106p"></script>
-<script src="assets/seed-extra.js?v=20261106p"></script>
-<script src="assets/seed-new.js?v=20261106p"></script>
-<script src="assets/seed-comments.js?v=20261106p"></script>
-<script src="assets/photos.js?v=20261106p"></script>
-<script src="assets/cards.js?v=20261106p"></script>
-<script src="assets/admin-data.js?v=20261106p"></script>
+<script src="assets/common.js?v=20261106q"></script>
+<script src="assets/db.js?v=20261106q"></script>
+<script src="assets/notify.js?v=20261106q"></script>
+<script src="assets/seed-trade.js?v=20261106q"></script>
+<script src="assets/seed-extra.js?v=20261106q"></script>
+<script src="assets/seed-new.js?v=20261106q"></script>
+<script src="assets/seed-comments.js?v=20261106q"></script>
+<script src="assets/photos.js?v=20261106q"></script>
+<script src="assets/cards.js?v=20261106q"></script>
+<script src="assets/admin-data.js?v=20261106q"></script>
 <script>
 var META = {
   "tm1":{e:"🪚",c:"공구",warm:1}, "tm2":{e:"🍼",c:"유아"}, "tm3":{e:"🏄",c:"레저"},
@@ -78,14 +78,15 @@ function render(){
   document.getElementById("shown-count").textContent = list.length;
   document.getElementById("mk-grid").innerHTML = pageSlice(list).map(function(p){
     var m = META[p.id] || { c: p.cat || "기타" };
-    var isMine = p.id.charAt(0) === "u";
-    return photoCard(p, { pm: isPremium(p), badge: { text: (p.id.charAt(0) === "u" && p.head) ? p.head : (CAT_LABEL[m.c] || "기타") },
+    var isUser = isUserPost(p), isMine = isMyPost(p);
+    return photoCard(p, { pm: isPremium(p), badge: { text: (isUser && p.head) ? p.head : (CAT_LABEL[m.c] || "기타") },
       info: '<b>' + escHtml(fmtPrice(p.price)) + '</b><span>' + escHtml(p.loc || "") + ' · 직거래</span>',
       mine: isMine ? "내 글" : "" });
   }).join("") || '<p style="color:var(--muted);padding:24px">조건에 맞는 물건이 없습니다.</p>';
   renderPager("mk-grid", list.length);
 }
 render();
+window.onJIData = render;   // 서버에서 새 글을 받아오면 목록을 다시 그림
 </script>
 </body>
 </html>

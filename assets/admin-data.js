@@ -76,7 +76,7 @@ function _defaultPremiumIds() {
   if (_defaultPm) return _defaultPm;
   _defaultPm = {};
   PREMIUM_DEFAULT_BOARDS.forEach(function (b) {
-    var raw = JI.get("posts", []).filter(function (p) { return p.board === b; })
+    var raw = localPosts().filter(function (p) { return p.board === b; })
       .concat((typeof TRADE_SEEDS !== "undefined" ? TRADE_SEEDS : []).filter(function (p) { return p.board === b; }));
     raw.slice(0, 8).forEach(function (p) { _defaultPm[p.id] = 1; });
   });

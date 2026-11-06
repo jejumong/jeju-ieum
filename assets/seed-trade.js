@@ -180,5 +180,5 @@ function fmtPeriod(s, e) {
 
 /* 회원이 쓴 글을 각 거래 페이지에 끼워넣기 */
 function userPostsOf(board) {
-  return JI.get("posts", []).filter(function (p) { return p.board === board; });
+  return localPosts().filter(function (p) { return p.board === board; });
 }

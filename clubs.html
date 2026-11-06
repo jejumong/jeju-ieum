@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261106p">
+<link rel="stylesheet" href="assets/style.css?v=20261106q">
 </head>
 <body data-active="clubs">
 
@@ -44,16 +44,16 @@
   <div class="grid-cards" id="club-grid"></div>
 </main>
 
-<script src="assets/common.js?v=20261106p"></script>
-<script src="assets/db.js?v=20261106p"></script>
-<script src="assets/notify.js?v=20261106p"></script>
-<script src="assets/seed-trade.js?v=20261106p"></script>
-<script src="assets/seed-extra.js?v=20261106p"></script>
-<script src="assets/seed-new.js?v=20261106p"></script>
-<script src="assets/seed-comments.js?v=20261106p"></script>
-<script src="assets/photos.js?v=20261106p"></script>
-<script src="assets/cards.js?v=20261106p"></script>
-<script src="assets/admin-data.js?v=20261106p"></script>
+<script src="assets/common.js?v=20261106q"></script>
+<script src="assets/db.js?v=20261106q"></script>
+<script src="assets/notify.js?v=20261106q"></script>
+<script src="assets/seed-trade.js?v=20261106q"></script>
+<script src="assets/seed-extra.js?v=20261106q"></script>
+<script src="assets/seed-new.js?v=20261106q"></script>
+<script src="assets/seed-comments.js?v=20261106q"></script>
+<script src="assets/photos.js?v=20261106q"></script>
+<script src="assets/cards.js?v=20261106q"></script>
+<script src="assets/admin-data.js?v=20261106q"></script>
 <script>
 var META = {
   "tc1":{e:"🏄"}, "tc2":{e:"⛰️",warm:1}, "tc3":{e:"📖"},
@@ -70,7 +70,7 @@ function applyChip(el){
 }
 function render(){
   var rg = document.getElementById("region-sel").value;
-  var list = DB_CLUBS.concat(userPostsOf("동호회"), TRADE_SEEDS.filter(function(p){ return p.board === "동호회"; }));
+  var list = userPostsOf("동호회").concat( TRADE_SEEDS.filter(function(p){ return p.board === "동호회"; }));
   list = list.filter(function(p){
     var okC = catFilter === "all" || (p.head || "") === catFilter;
     var okR = rg === "all" || (p.loc || "전역") === rg;
@@ -88,7 +88,8 @@ function render(){
   paintAllJoinBtns();
 }
 render();
-if (window.JIDB && JIDB.enabled) JIDB.listPosts("동호회").then(function(rows){ DB_CLUBS = rows; if (rows.length) render(); }, function(e){ console.warn("[clubs]", e.message); });
+
+window.onJIData = render;   // 서버에서 새 글을 받아오면 목록을 다시 그림
 </script>
 </body>
 </html>

@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 1;
+const JI_SCHEMA = 2;
 
 /* ── 응답 ── */
 function cors() {
@@ -90,6 +90,10 @@ function migrate($pdo) {
     id CHAR(36) PRIMARY KEY, board VARCHAR(20) NOT NULL, applicant CHAR(36) NOT NULL, applicant_nick VARCHAR(20) NOT NULL,
     details TEXT NOT NULL, message VARCHAR(1000) NOT NULL DEFAULT '', status VARCHAR(10) NOT NULL DEFAULT 'pending',
     created_at DATETIME NOT NULL)$T");
+  $pdo->exec("CREATE TABLE IF NOT EXISTS ji_comments (
+    id CHAR(36) PRIMARY KEY, post_id VARCHAR(40) NOT NULL, author CHAR(36) NOT NULL, author_nick VARCHAR(20) NOT NULL,
+    text VARCHAR(1000) NOT NULL, edited TINYINT(1) NOT NULL DEFAULT 0, created_at DATETIME NOT NULL,
+    INDEX (post_id, created_at), INDEX (author))$T");
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_login_fails (
     ip VARCHAR(45) NOT NULL, at DATETIME NOT NULL, INDEX (ip, at))$T");
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);

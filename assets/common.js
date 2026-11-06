@@ -134,6 +134,13 @@ function payText(p) {
 }
 /* 채용완료 표시 전환 (내 구인 글) */
 function toggleJobClosed(id) {
+  var dp = dbPosts().filter(function (p) { return p.id === id; })[0];
+  if (dp && window.JIDB && JIDB.enabled) {          // 서버 글은 서버에서 바꿈 (Promise 를 돌려줌)
+    if (!isMyPost(dp)) return null;
+    var closing = dp.head !== "채용완료";
+    var extra = Object.assign({}, dp.extra || {}, { headPrev: closing ? (dp.head || "구인") : "" });
+    return JIDB.updatePost(id, { head: closing ? "채용완료" : (dp.headPrev || "구인"), extra: extra });
+  }
   var posts = JI.get("posts", []);
   for (var i = 0; i < posts.length; i++) if (posts[i].id === id) {
     if (!isMyPost(posts[i])) return null;
@@ -198,6 +205,7 @@ function isRestrictedBoard(board) {
 function isApprovedSeller(board) {
   var u = currentUser();
   if (!u) return false;
+  if (u.role === "admin" || u.role === "seller") return true;   // 서버에서 승인된 회원
   var approved = JI.get("approved_sellers", {});
   return (approved[board] || []).indexOf(u.email) > -1;
 }
@@ -228,9 +236,12 @@ function sendSellerRequest(board, message, details) {
 }
 
 /* ── 게시글 데이터 접근 ── */
+/* 회원이 쓴 글: 서버에 저장된 글(캐시) + 예전에 이 브라우저에만 저장된 글 */
+function dbPosts() { return JI.get("dbposts", []); }
+function localPosts() { return dbPosts().concat(JI.get("posts", [])); }
+function isUserPost(p) { return !!(p && (p.db || (p.id && p.id.charAt(0) === "u"))); }
 function allPosts() {
-  var mine = JI.get("posts", []);
-  return mine.concat(SEED_POSTS);
+  return localPosts().concat(SEED_POSTS);
 }
 function findPost(id) {
   if (id === "n1") return NOTICE;

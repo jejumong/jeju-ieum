@@ -49,6 +49,7 @@ var JIDB = (function () {
         if (changed && cur && !sessionStorage.getItem("ji_resync")) { sessionStorage.setItem("ji_resync", "1"); location.reload(); return new Promise(function () {}); }
         sessionStorage.removeItem("ji_resync");
         afterReady();
+        syncFeed();
         return true;
       }).catch(function (e) { console.warn("[JIDB]", e); return false; });
   } else {
@@ -60,12 +61,32 @@ var JIDB = (function () {
 
   /* 서버 글 → 화면에서 쓰는 글 모양으로 */
   function toPost(r) {
-    var d = new Date(r.created_at);
+    var d = new Date(r.created_at), x = r.extra || {};
     return {
       id: r.id, board: r.board, head: r.head || "", title: r.title, content: r.content || "", loc: r.loc || "", meta: r.meta || "",
       price: r.price || "", author: r.author_nick, authorId: r.author, date: (r.created_at || "").slice(0, 10),
-      time: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2), views: r.views || 0, db: true, extra: r.extra || {}
+      time: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2), views: r.views || 0, db: true, extra: r.extra || {},
+      // 게시판별 추가 정보 (부동산 집 종류·주소, 구인 급여 등)
+      htype: x.htype || "", addr: x.addr || "", payType: x.payType || "", pay: x.pay || "", headPrev: x.headPrev || "", editedAt: r.updated_at !== r.created_at ? (r.updated_at || "").slice(0, 10) : ""
     };
+  }
+
+  /* ── 화면용 캐시: 서버의 새 글·댓글 수를 브라우저에 보관 → allPosts() 가 함께 보여 줌 ── */
+  function cachePut(p) {
+    var list = JI.get("dbposts", []).filter(function (x) { return x.id !== p.id; });
+    list.unshift(p); JI.set("dbposts", list);
+  }
+  function cacheDrop(id) { JI.set("dbposts", JI.get("dbposts", []).filter(function (x) { return x.id !== id; })); }
+  function syncFeed() {
+    return call("feed").then(function (r) {
+      var posts = r.posts.map(toPost), counts = r.counts || {};
+      var before = JSON.stringify([JI.get("dbposts", []), JI.get("dbcounts", {})]);
+      JI.set("dbposts", posts); JI.set("dbcounts", counts);
+      if (before === JSON.stringify([posts, counts])) return false;
+      // 바뀌었으면 목록을 다시 그림 (페이지가 window.onJIData 를 정해 두었을 때)
+      try { if (typeof window.onJIData === "function") window.onJIData(); } catch (e) { console.warn(e); }
+      return true;
+    }).catch(function (e) { console.warn("[JIDB feed]", e.message); return false; });
   }
 
   /* ── 회원 ── */
@@ -92,16 +113,16 @@ var JIDB = (function () {
   /* ── 글 ── */
   function createPost(p) {
     return call("post_create", { board: p.board, head: p.head || "", title: p.title, content: p.content || "", loc: p.loc || "",
-      meta: p.meta || "", price: p.price || "", extra: p.extra || {} }).then(toPost);
+      meta: p.meta || "", price: p.price || "", extra: p.extra || {} }).then(function (r) { var q = toPost(r); cachePut(q); return q; });
   }
   function updatePost(id, p) {
     var b = { id: id }; ["head", "title", "content", "loc", "meta", "price", "extra"].forEach(function (k) { if (p[k] !== undefined) b[k] = p[k]; });
-    return call("post_update", b).then(toPost);
+    return call("post_update", b).then(function (r) { var q = toPost(r); cachePut(q); return q; });
   }
-  function deletePost(id) { return call("post_delete", { id: id }); }
+  function deletePost(id) { return call("post_delete", { id: id }).then(function () { cacheDrop(id); }); }
   function getPost(id, countView) {
     if (!isUuid(id) || !enabled) return Promise.resolve(null);
-    return ready.then(function () { return call("post_get", { id: id, view: !!countView }); }).then(function (r) { return r ? toPost(r) : null; });
+    return ready.then(function () { return call("post_get", { id: id, view: !!countView }); }).then(function (r) { if (!r) { cacheDrop(id); return null; } var q = toPost(r); cachePut(q); return q; });
   }
   function listPosts(board) {
     if (!enabled) return Promise.resolve([]);
@@ -125,6 +146,20 @@ var JIDB = (function () {
 
   /* ── 상점·공구 승인 요청 (관리자만 봄) ── */
   function sendSellerRequest(board, details, message) { return call("seller_request", { board: board, details: details, message: message || "" }); }
+
+  /* ── 댓글 ── */
+  function toCmt(c) { return { id: c.id, author: c.author_nick, authorId: c.author, text: c.text, edited: c.edited, date: (c.created_at || "").slice(0, 10), db: true }; }
+  function setCount(postId, n) { var m = JI.get("dbcounts", {}); m[postId] = n; JI.set("dbcounts", m); }
+  function comments(postId) {
+    if (!enabled) return Promise.resolve([]);
+    return call("comments", { post_id: postId }).then(function (l) { var r = l.map(toCmt); setCount(postId, r.length); return r; });
+  }
+  function addComment(postId, text) { return call("comment_add", { post_id: postId, text: text }).then(toCmt); }
+  function updateComment(id, text) { return call("comment_update", { id: id, text: text }).then(toCmt); }
+  function deleteComment(id) { return call("comment_delete", { id: id }); }
+  function myComments() { return me() ? call("my_comments").then(function (l) { return l.map(function (c) { var o = toCmt(c); o.postId = c.post_id; return o; }); }) : Promise.resolve([]); }
+  function changePassword(cur, nw) { return call("password_change", { cur: cur, "new": nw }); }
+  function deleteAccount(pw) { return call("account_delete", { pw: pw }).then(function () { return signOut(); }); }
 
   /* ── 알림함 ── */
   function notifications() { return me() ? call("notis") : Promise.resolve([]); }
@@ -157,7 +192,8 @@ var JIDB = (function () {
     myJoin: myJoin, requestJoin: requestJoin, cancelJoin: cancelJoin, receivedJoins: receivedJoins, sentJoins: sentJoins,
     decideJoin: decideJoin, joinCount: joinCount,
     clubNotices: clubNotices, addNotice: addNotice, deleteNotice: deleteNotice, clubMembers: clubMembers,
-    sendSellerRequest: sendSellerRequest,
+    sendSellerRequest: sendSellerRequest, syncFeed: syncFeed,
+    comments: comments, addComment: addComment, myComments: myComments, changePassword: changePassword, deleteAccount: deleteAccount, updateComment: updateComment, deleteComment: deleteComment,
     notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead
   };
 })();
