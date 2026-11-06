@@ -108,13 +108,14 @@ function photoCard(p, o) {
   var col = AVA_COLORS[_hash(au) % AVA_COLORS.length];
   var views = typeof viewsOf === "function" ? viewsOf(p) : (p.views || 0);
   var cm = typeof commentCountOf === "function" ? commentCountOf(p.id) : 0;
-  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed ? " closed" : "") + '" href="view.html?id=' + p.id + '">' +
+  var rb = typeof roleBadgeHtml === "function" ? roleBadgeHtml(p) : "";
+  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed ? " closed" : "") + (rb ? " pro" : "") + '" href="view.html?id=' + p.id + '">' +
     '<div class="pc-ph">' + cardImage(p) +
       (o.pm ? '<span class="pm-tag">⭐ 프리미엄</span>' : '') +
       (o.mine ? '<span class="mine-tag">' + (o.mine.indexOf("모임") > -1 ? "👑 " : "✍️ ") + e(o.mine) + '</span>' : '') +
       (o.badge ? '<span class="pc-badge ' + (o.badge.cls || "") + '">' + e(o.badge.text) + '</span>' : '') +
     '</div>' +
-    '<div class="pc-body">' +
+    '<div class="pc-body">' + (rb ? '<div class="pc-role">' + rb + '</div>' : '') +
       '<h3 class="pc-title">' + e(o.title || p.title) + '</h3>' +
       (o.info ? '<div class="pc-info">' + o.info + '</div>' : '') +
       (o.extra || '') +

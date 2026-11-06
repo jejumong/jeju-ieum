@@ -22,7 +22,7 @@ function post_out($r) {
   $x = json_decode($r['extra'] ?: '{}', true);
   return ['id' => $r['id'], 'board' => $r['board'], 'head' => $r['head'], 'title' => $r['title'], 'content' => $r['content'],
     'loc' => $r['loc'], 'meta' => $r['meta'], 'price' => $r['price'], 'extra' => $x ?: new stdClass(),
-    'author' => $r['author'], 'author_nick' => $r['author_nick'], 'views' => (int)$r['views'],
+    'author' => $r['author'], 'author_nick' => $r['author_nick'], 'author_role' => $r['author_role'] ?? 'user', 'views' => (int)$r['views'],
     'created_at' => iso($r['created_at']), 'updated_at' => iso($r['updated_at'])];
 }
 function likes_map() {
@@ -165,11 +165,11 @@ case 'upload': {
 /* ───────── 글 ───────── */
 case 'post_list': {
   $b = str($R['board'] ?? '', 30); if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
-  out(array_map('post_out', all("SELECT * FROM ji_posts WHERE board = ? ORDER BY created_at DESC LIMIT 300", [$b])));
+  out(array_map('post_out', all("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.board = ? ORDER BY p.created_at DESC LIMIT 300", [$b])));
 }
 case 'post_get': {
   $id = $R['id'] ?? ''; if (!is_uuid($id)) out(null);
-  $r = one("SELECT * FROM ji_posts WHERE id = ?", [$id]); if (!$r) out(null);
+  $r = one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id]); if (!$r) out(null);
   if (!empty($R['view'])) { q("UPDATE ji_posts SET views = views + 1 WHERE id = ?", [$id]); $r['views']++; }
   out(post_out($r));
 }
@@ -188,7 +188,7 @@ case 'post_create': {
     $x = $R['extra']; $x['photos'] = attach_photos($id, $u['id'], $x['photos']);
     q("UPDATE ji_posts SET extra = ? WHERE id = ?", [json_encode($x, JSON_UNESCAPED_UNICODE), $id]);
   }
-  out(post_out(one("SELECT * FROM ji_posts WHERE id = ?", [$id])));
+  out(post_out(one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
 }
 case 'post_update': {
   $u = me($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT * FROM ji_posts WHERE id = ?", [$id]) : null;
@@ -204,7 +204,7 @@ case 'post_update': {
   q("UPDATE ji_posts SET head = ?, title = ?, content = ?, loc = ?, meta = ?, price = ?, extra = ?, updated_at = ? WHERE id = ?",
     [str($R['head'] ?? $r['head'], 30), $title, str($R['content'] ?? $r['content'], 20000), str($R['loc'] ?? $r['loc'], 100),
      str($R['meta'] ?? $r['meta'], 255), str($R['price'] ?? $r['price'], 60), $extra, now(), $id]);
-  out(post_out(one("SELECT * FROM ji_posts WHERE id = ?", [$id])));
+  out(post_out(one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
 }
 case 'post_delete': {
   $u = me($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT author FROM ji_posts WHERE id = ?", [$id]) : null;
@@ -221,7 +221,7 @@ case 'post_delete': {
 
 /* ───────── 전체 새 글 + 댓글 수 (화면 캐시용) ───────── */
 case 'feed': {
-  $rows = all("SELECT * FROM ji_posts ORDER BY created_at DESC LIMIT 600");
+  $rows = all("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author ORDER BY p.created_at DESC LIMIT 600");
   foreach ($rows as &$r) if (mb_strlen($r['content']) > 400) $r['content'] = mb_substr($r['content'], 0, 400) . '…';   // 목록용: 앞부분만 (전문은 글 화면에서)
   unset($r);
   $counts = [];

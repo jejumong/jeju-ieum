@@ -64,7 +64,7 @@ var JIDB = (function () {
     var d = new Date(r.created_at), x = r.extra || {};
     return {
       id: r.id, board: r.board, head: r.head || "", title: r.title, content: r.content || "", loc: r.loc || "", meta: r.meta || "",
-      price: r.price || "", author: r.author_nick, authorId: r.author, date: (r.created_at || "").slice(0, 10),
+      price: r.price || "", author: r.author_nick, authorId: r.author, authorRole: r.author_role || "user", date: (r.created_at || "").slice(0, 10),
       time: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2), views: r.views || 0, db: true, extra: r.extra || {},
       // 게시판별 추가 정보 (부동산 집 종류·주소, 구인 급여 등)
       htype: x.htype || "", addr: x.addr || "", payType: x.payType || "", pay: x.pay || "", headPrev: x.headPrev || "", editedAt: r.updated_at !== r.created_at ? (r.updated_at || "").slice(0, 10) : ""

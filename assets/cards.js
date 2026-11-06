@@ -40,7 +40,7 @@ function renderSections(opts) {
   }
   if (gnShown.length) {
     html +=
-      '<div class="sec-head' + (pmShown.length ? ' sec-gap' : '') + '"><h2>일반 등록</h2><span class="sec-note">' + gn.length + "건</span><span class=\"line\"></span></div>" +
+      '<div class="sec-head' + (pmShown.length ? ' sec-gap' : '') + '"><h2>' + (pm.length ? "일반 등록" : (opts.allLabel || "전체 등록")) + '</h2><span class="sec-note">' + gn.length + "건</span><span class=\"line\"></span></div>" +
       '<div class="grid-cards">' + gnShown.map(function (p) { return opts.card(p, false); }).join("") + "</div>";
   }
   grid.innerHTML = html;

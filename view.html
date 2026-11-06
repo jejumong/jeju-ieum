@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107f">
+<link rel="stylesheet" href="assets/style.css?v=20261107g">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -67,15 +67,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107f"></script>
-<script src="assets/common.js?v=20261107f"></script>
-<script src="assets/db.js?v=20261107f"></script>
-<script src="assets/notify.js?v=20261107f"></script>
-<script src="assets/seed-trade.js?v=20261107f"></script>
-<script src="assets/seed-extra.js?v=20261107f"></script>
-<script src="assets/seed-new.js?v=20261107f"></script>
-<script src="assets/seed-comments.js?v=20261107f"></script>
-<script src="assets/admin-data.js?v=20261107f"></script>
+<script src="assets/kmap.js?v=20261107g"></script>
+<script src="assets/common.js?v=20261107g"></script>
+<script src="assets/db.js?v=20261107g"></script>
+<script src="assets/notify.js?v=20261107g"></script>
+<script src="assets/seed-trade.js?v=20261107g"></script>
+<script src="assets/seed-extra.js?v=20261107g"></script>
+<script src="assets/seed-new.js?v=20261107g"></script>
+<script src="assets/seed-comments.js?v=20261107g"></script>
+<script src="assets/admin-data.js?v=20261107g"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -137,7 +137,7 @@ if (!post) {
   } else if (post.price || post.loc || post.period) {
     extra = '<div class="pv-extra">' +
       (post.period ? '<span>기간 <b>' + esc(post.period) + '</b></span>' : '') +
-      (post.price ? '<span>가격 <b>' + esc(post.price) + '원</b></span>' : '') +
+      (post.price ? '<span>가격 <b>' + esc(/^\d+$/.test(String(post.price)) ? (+post.price).toLocaleString() : post.price) + (/원$/.test(post.price) ? '' : '원') + '</b></span>' : '') +
       (post.loc ? '<span>' + (post.period ? '장소' : '지역') + ' <b>' + esc(post.loc) + '</b></span>' : '') +
       (post.addr ? '<span>주소 <b>' + esc(post.addr) + '</b></span>' : '') +
       '</div>';
@@ -152,7 +152,7 @@ if (!post) {
   document.getElementById("pv").innerHTML =
     '<div class="pv-board"><a href="' + backHref + '" onclick="return goBackList(this)">' + esc(post.board) + '</a>' + (post.head && post.head !== post.board ? ' · ' + esc(post.head) : '') + '</div>' +
     '<h1 class="pv-title">' + (post.head === "채용완료" ? '<span class="closed-tag">채용완료</span>' : '') + esc(post.title) + '</h1>' +
-    '<div class="pv-meta"><span>✍️ ' + esc(post.author) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : msgLink(post.authorId, post.author)) + '</span>' +
+    '<div class="pv-meta"><span>✍️ ' + esc(post.author) + ' ' + roleBadgeHtml(post) + (isMyPost(post) ? ' <span class="own-tag big">' + (post.board === "동호회" ? "👑 내 모임" : "✍️ 내 글") + '</span>' : msgLink(post.authorId, post.author)) + '</span>' +
     '<span>🕐 ' + esc(post.date) + (post.time ? ' ' + esc(post.time) : '') + '</span><span>👁 ' + viewsOf(post).toLocaleString() + '</span>' + likeBtnHtml(post) + '</div>' +
     extra +
     galleryHtml(post) +

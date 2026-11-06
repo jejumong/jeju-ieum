@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107f">
+<link rel="stylesheet" href="assets/style.css?v=20261107g">
 </head>
 <body data-active="">
 
@@ -39,8 +39,8 @@
             <option>동호회</option><option>축제정보</option>
           </optgroup>
           <optgroup label="승인제 게시판" id="restricted-group">
-            <option id="opt-제주상점">🔒 제주상점 (승인 필요)</option>
-            <option id="opt-특가공구">🔒 특가공구 (승인 필요)</option>
+            <option id="opt-제주상점" value="제주상점" disabled>🔒 제주상점 (승인된 상점판매자만)</option>
+            <option id="opt-특가공구" value="특가공구" disabled>🔒 특가공구 (승인된 공구판매자만)</option>
           </optgroup>
         </select>
         <div class="hint" id="restrict-hint" style="display:none">제주상점·특가공구는 관리자 승인을 받은 회원만 글을 쓸 수 있어요.</div>
@@ -48,7 +48,7 @@
       <div class="field">
         <label for="head" id="head-label">말머리</label>
         <select id="head">
-          <option>선택 안 함</option><option>질문</option><option>정보</option><option>후기</option><option>나눔</option><option>모집</option>
+          <option>선택 안 함</option><option>자유</option><option>질문</option><option>정보</option><option>후기</option><option>나눔</option>
         </select>
         <div class="hint" id="head-hint" style="display:none">농어촌유학·작은학교 가까운 집이면 '학교근처', 1년 단위 집이면 '일년살이'를 골라 주세요. 본문에 가까운 학교 이름을 적으면 학교별로 찾을 수 있어요.</div>
       </div>
@@ -113,15 +113,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107f"></script>
-<script src="assets/common.js?v=20261107f"></script>
-<script src="assets/db.js?v=20261107f"></script>
-<script src="assets/notify.js?v=20261107f"></script>
-<script src="assets/seed-trade.js?v=20261107f"></script>
-<script src="assets/seed-extra.js?v=20261107f"></script>
-<script src="assets/seed-new.js?v=20261107f"></script>
-<script src="assets/seed-comments.js?v=20261107f"></script>
-<script src="assets/admin-data.js?v=20261107f"></script>
+<script src="assets/kmap.js?v=20261107g"></script>
+<script src="assets/common.js?v=20261107g"></script>
+<script src="assets/db.js?v=20261107g"></script>
+<script src="assets/notify.js?v=20261107g"></script>
+<script src="assets/seed-trade.js?v=20261107g"></script>
+<script src="assets/seed-extra.js?v=20261107g"></script>
+<script src="assets/seed-new.js?v=20261107g"></script>
+<script src="assets/seed-comments.js?v=20261107g"></script>
+<script src="assets/admin-data.js?v=20261107g"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -135,12 +135,17 @@ if (!user) {
   }
 }
 
-/* 제한 게시판 옵션에 승인 상태 반영 (승인된 회원은 정상 옵션으로) */
+/* 제한 게시판: 승인된 판매자만 고를 수 있음 (일반 회원은 선택 자체가 안 됨) */
 if (user) {
+  var _lock = [];
   RESTRICTED_BOARDS.forEach(function (b) {
-    var opt = document.getElementById("opt-" + b);
-    if (opt && isApprovedSeller(b)) { opt.disabled = false; opt.textContent = b; }
+    var opt = document.getElementById("opt-" + b); if (!opt) return;
+    if (isApprovedSeller(b)) { opt.disabled = false; opt.textContent = b; } else { opt.disabled = true; _lock.push(b); }
   });
+  if (_lock.length) {
+    var _bs = document.getElementById("board");
+    _bs.insertAdjacentHTML("afterend", '<p class="board-lock-note">🔒 ' + _lock.sort().join("·") + '은 승인된 판매자만 쓸 수 있어요. <a href="seller-request.html?board=' + encodeURIComponent(_lock[0]) + '">판매자 승인 요청 →</a></p>');
+  }
 }
 
 /* 승인 없이 제한 게시판을 쓰려 하면 신청 페이지로 안내 */

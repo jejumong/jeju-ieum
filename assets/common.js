@@ -151,6 +151,23 @@ function toggleJobClosed(id) {
   return null;
 }
 var ROLE_LABEL = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝", admin: "관리자" };
+/* 글쓴이 표시: 공인중개사·상점·공구판매자·운영진은 눈에 띄는 표시 */
+var ROLE_BADGE = { realtor: ["🏢", "공인중개사", "rb-realtor"], shop: ["🏪", "제주상점", "rb-shop"], dealer: ["🎁", "공구판매", "rb-dealer"],
+  admin: ["🍊", "운영진", "rb-staff"], staff: ["🍊", "운영진", "rb-staff"] };
+function authorRoleOf(p) {
+  if (!p) return "user";
+  if (p.authorRole) return p.authorRole;
+  if (p.db) return "user";
+  // 예시 글: 게시판·이름으로 추정
+  if (p.board === "제주상점") return "shop";
+  if (p.board === "특가공구") return "dealer";
+  if (p.board === "부동산" && /공인|부동산|중개|토지|하우스/.test(p.author || "")) return "realtor";
+  return "user";
+}
+function roleBadgeHtml(p) {
+  var b = ROLE_BADGE[authorRoleOf(p)]; if (!b) return "";
+  return '<span class="role-badge ' + b[2] + '" title="' + b[1] + ' 회원">' + b[0] + ' ' + b[1] + '</span>';
+}
 function isMod() { var u = currentUser(); return !!(u && (u.role === "admin" || u.role === "staff")); }
 function isMyPost(p) {
   var u = currentUser();
