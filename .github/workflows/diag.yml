@@ -1,0 +1,14 @@
+name: diag
+on: workflow_dispatch
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - env: { P: "${{ secrets.CAFE24_FTP_PASSWORD }}" }
+        run: |
+          echo "== FTP root"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/ | head -20
+          echo "== FTP www/jeju/api"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/www/jeju/api/ | head
+          echo "== FTP www/www?"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/www/www/ | head -5
+          for u in "jeju/api/?a=ping" "jeju/api/index.php?a=ping" "jeju/api/config.sample.php" "www/jeju/api/index.php?a=ping"; do
+            echo "== https://andend07.mycafe24.com/$u"; curl -s -m 15 -o /tmp/o -w "%{http_code}\n" "https://andend07.mycafe24.com/$u"; head -c 200 /tmp/o; echo; done
+          echo "== root htaccess"; curl -s -m 20 --user "andend07:$P" ftp://andend07.mycafe24.com/www/.htaccess | head -30
