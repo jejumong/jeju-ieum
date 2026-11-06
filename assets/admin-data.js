@@ -84,6 +84,8 @@ function _defaultPremiumIds() {
 }
 function isPremium(p) {
   if (!p || PREMIUM_BOARDS.indexOf(p.board) < 0) return false;
+  var o = p.db ? adminOv()[p.id] : null;   // 서버 글의 프리미엄은 관리자 설정(admin_ov)에 저장
+  if (o && o.premium !== undefined && o.premium !== null) return !!o.premium;
   if (p.premium !== undefined && p.premium !== null) return !!p.premium;
   return !!_defaultPremiumIds()[p.id];
 }

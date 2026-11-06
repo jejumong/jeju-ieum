@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>제주이음 관리자 콘솔</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261106q">
+<link rel="stylesheet" href="../assets/style.css?v=20261106r">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -109,14 +109,14 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261106q"></script>
-<script src="../assets/db.js?v=20261106q"></script>
-<script src="../assets/seed-trade.js?v=20261106q"></script>
-<script src="../assets/seed-extra.js?v=20261106q"></script>
-<script src="../assets/seed-new.js?v=20261106q"></script>
-<script src="../assets/seed-comments.js?v=20261106q"></script>
-<script src="../assets/photos.js?v=20261106q"></script>
-<script src="../assets/admin-data.js?v=20261106q"></script>
+<script src="../assets/common.js?v=20261106r"></script>
+<script src="../assets/db.js?v=20261106r"></script>
+<script src="../assets/seed-trade.js?v=20261106r"></script>
+<script src="../assets/seed-extra.js?v=20261106r"></script>
+<script src="../assets/seed-new.js?v=20261106r"></script>
+<script src="../assets/seed-comments.js?v=20261106r"></script>
+<script src="../assets/photos.js?v=20261106r"></script>
+<script src="../assets/admin-data.js?v=20261106r"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -229,7 +229,7 @@ var IQ_ST = { "new": "새 신청", "contacted": "연락함", "done": "완료" };
 function newIq(){ return JI.get("inquiries", []).filter(function(q){ return q.status === "new"; }).length; }
 function drawInquiries(){
   var list = JI.get("inquiries", []).slice().reverse();
-  var warn = (typeof SITE_CFG !== "undefined" && SITE_CFG.inquiryEndpoint) ? "" :
+  var warn = (SRV || (typeof SITE_CFG !== "undefined" && SITE_CFG.inquiryEndpoint)) ? "" :
     '<div class="panel" style="border:1px solid #ffe2c2;background:#fff8f0"><b>온라인 접수 주소가 아직 없어요.</b> 지금은 이 브라우저에서 남긴 신청서만 보입니다. ' +
     'assets/common.js 의 SITE_CFG.inquiryEndpoint(또는 contactEmail)를 채우면 실제 방문자 신청을 받을 수 있어요.</div>';
   M().innerHTML = '<h1>문의·제보</h1><p class="sub">정보 정정 요청, 가이드 제보, 입점·제휴 문의가 모입니다.</p>' + warn +
@@ -530,7 +530,119 @@ function changePw(){
   JI.set("admin_pw", n); toast("비밀번호를 바꿨습니다"); drawSettings();
 }
 
-if (sessionStorage.getItem("ji_admin_ok") === "1") boot(); else gate();
+/* ═════════════════════════════════════════════
+   카페24 서버 모드 — 사이트 관리자 계정(ADMIN_EMAILS)으로 로그인하면 서버 데이터를 직접 관리
+   ═════════════════════════════════════════════ */
+var SRV = !!(window.JIDB && JIDB.enabled), STATS = null, USERS = [];
+if (SRV) {
+  isUserPost = function(p){ return !!(p && (p.db || (p.id && p.id.charAt(0) === "u"))); };
+  userPosts = function(){ return localPosts(); };
+  everyPost = function(){ return localPosts().concat(SEED_POSTS); };
+
+  /* 관리자 설정(공지·프리미엄·숨김)은 서버에 저장 → 모든 방문자에게 반영 */
+  var _set = JI.set;
+  JI.set = function(k, v){
+    _set.call(JI, k, v);
+    if ((k === "admin_ov" || k === "notices") && JI._push) {
+      JIDB.call("admin_set", { k: k, v: v }).catch(function(e){ alert("서버에 저장하지 못했어요: " + e.message); });
+    }
+  };
+  function pushOn(fn){ return function(){ var prev = JI._push; JI._push = true; try { return fn.apply(this, arguments); } finally { JI._push = prev; } }; }
+
+  var _setFields = setFields;
+  setFields = function(p, obj){
+    if (p.db) {
+      var post = {}, ov = {};
+      Object.keys(obj).forEach(function(k){ (["title","content","head","price","loc"].indexOf(k) > -1 ? post : ov)[k] = obj[k]; });
+      if (Object.keys(post).length) JIDB.updatePost(p.id, post).then(function(){ draw(); }, function(e){ alert("수정하지 못했어요: " + e.message); });
+      if (Object.keys(ov).length) { var all = adminOv(); all[p.id] = Object.assign(all[p.id] || {}, ov); JI.set("admin_ov", all); }
+      for (var k in obj) p[k] = obj[k]; _defaultPm = null; return;
+    }
+    return _setFields(p, obj);
+  };
+  setFields = pushOn(setFields);
+  var _deletePost = deletePost;
+  deletePost = pushOn(function(p){
+    if (p.db) { JIDB.deletePost(p.id).then(function(){ draw(); }, function(e){ alert("삭제하지 못했어요: " + e.message); }); return; }
+    return _deletePost(p);
+  });
+  restorePost = pushOn(restorePost);
+  saveNotice = pushOn(saveNotice); delNotice = pushOn(delNotice); setNotice = pushOn(setNotice);
+  if (typeof togglePm === "function") togglePm = pushOn(togglePm);
+
+  /* 문의·제보 */
+  newIq = function(){ return STATS ? STATS.inquiries_new : 0; };
+  setIq = function(id, st){ JIDB.call("admin_inquiry_set", { id: id, status: st }).then(function(){ toast("상태를 바꿨어요"); reloadAll(); }, function(e){ alert(e.message); }); };
+  delIq = function(id){ if (!confirm("이 신청을 삭제할까요?")) return; JIDB.call("admin_inquiry_delete", { id: id }).then(function(){ toast("삭제했어요"); reloadAll(); }); };
+
+  /* 판매자 승인 */
+  decide = function(id, status){
+    JIDB.call("admin_seller_decide", { id: id, status: status }).then(function(){
+      toast(status === "approved" ? "승인했습니다 — 신청자에게 알림이 갔어요" : "반려했습니다"); reloadAll();
+    }, function(e){ alert(e.message); });
+  };
+
+  /* 회원 관리 (서버 모드에서만) */
+  MENU.splice(MENU.length - 1, 1, ["members", "회원 관리"]);
+  var _draw = draw;
+  draw = function(){ if (view === "members") return drawMembers(); if (view === "settings") view = "members"; return _draw(); };
+  window.drawMembers = function(){
+    var R = { user: "일반", seller: "판매자", admin: "관리자" };
+    M().innerHTML = '<h1>회원 관리</h1><p class="sub">가입한 회원 ' + USERS.length + '명. 역할을 바꾸면 다음 접속부터 반영돼요. (판매자: 제주상점·특가공구 글쓰기 가능)</p>' +
+      '<div class="panel">' + (USERS.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>가입일</th><th>최근 로그인</th><th>역할</th></tr></thead><tbody>' +
+        USERS.map(function(u){
+          return '<tr><td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td><td>' + u.posts + '</td>' +
+            '<td style="white-space:nowrap">' + esc((u.created_at||"").slice(0,10)) + '</td><td style="white-space:nowrap">' + esc((u.last_login||"").slice(0,10)) + '</td>' +
+            '<td><select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select></td></tr>';
+        }).join("") + '</tbody></table></div>' : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
+      '<div class="panel"><h2>관리자 비밀번호</h2><p style="margin:0;color:var(--ink-3)">관리자 페이지는 사이트 회원 계정으로 들어와요. 비밀번호는 사이트의 <a href="' + SITE + 'profile.html" target="_blank">내 정보</a>에서 바꿀 수 있어요.</p></div>';
+  };
+  window.setRole = function(id, role){ JIDB.call("admin_set_role", { id: id, role: role }).then(function(){ toast("역할을 바꿨어요"); reloadAll(); }, function(e){ alert(e.message); reloadAll(); }); };
+
+  /* 대시보드 숫자: 회원 수는 서버 기준 */
+  var _drawDash = drawDash;
+  drawDash = function(){
+    _drawDash();
+    if (STATS) { var vs = M().querySelectorAll(".stat .v"); if (vs[2]) vs[2].textContent = STATS.users.toLocaleString() + (STATS.users_week ? " (+" + STATS.users_week + ")" : ""); }
+  };
+
+  logoutAdmin = function(){ location.href = SITE + "index.html"; };
+
+  /* 서버에서 모두 불러와 브라우저 캐시에 채운 뒤 화면 그리기 */
+  window.reloadAll = function(){
+    return Promise.all([
+      JIDB.syncFeed().then(function(changed){
+        // 처음 여는 기기면 서버 설정(숨긴 글 등)을 반영하려고 한 번 새로 고침
+        if (changed && !sessionStorage.getItem("ji_admin_synced")) { sessionStorage.setItem("ji_admin_synced", "1"); location.reload(); }
+      }),
+      JIDB.call("admin_overview").then(function(r){ STATS = r; }),
+      JIDB.call("admin_inquiries").then(function(l){ _set.call(JI, "inquiries", l.reverse()); }),
+      JIDB.call("admin_sellers").then(function(l){
+        _set.call(JI, "seller_requests", l.reverse().map(function(r){
+          var det = r.details && typeof r.details === "object" ? Object.keys(r.details).map(function(k){ return k + ": " + r.details[k]; }).join("\n") : "";
+          return { id: r.id, board: r.board, nick: r.applicant_nick, email: r.email, region: r.region, status: r.status,
+            date: (r.created_at || "").slice(0, 10), message: (det ? det + "\n" : "") + (r.message || "") };
+        }));
+      }),
+      JIDB.call("admin_users").then(function(l){ USERS = l; })
+    ]).then(function(){ boot(); });
+  };
+
+  JIDB.ready.then(function(){
+    var u = JIDB.me();
+    if (!u) { location.href = SITE + "login.html?next=" + encodeURIComponent("admin/index.html"); return; }
+    if (u.role !== "admin") {
+      document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>관리자만 들어올 수 있어요</h2>' +
+        '<p>' + esc(u.nick) + '님은 관리자 계정이 아니에요.<br>GitHub Secrets 의 ADMIN_EMAILS 에 넣은 이메일로 가입·로그인해 주세요.</p>' +
+        '<a class="btn primary block" href="' + SITE + 'index.html">사이트로 돌아가기</a></div></div>';
+      return;
+    }
+    document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>불러오는 중…</h2></div></div>';
+    reloadAll().catch(function(e){ alert("관리자 데이터를 불러오지 못했어요: " + e.message); });
+  });
+} else {
+  if (sessionStorage.getItem("ji_admin_ok") === "1") boot(); else gate();
+}
 </script>
 </body>
 </html>

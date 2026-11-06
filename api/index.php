@@ -158,7 +158,8 @@ case 'feed': {
   $rows = all("SELECT * FROM ji_posts ORDER BY created_at DESC LIMIT 600");
   $counts = [];
   foreach (all("SELECT post_id, COUNT(*) n FROM ji_comments GROUP BY post_id") as $c) $counts[$c['post_id']] = (int)$c['n'];
-  out(['posts' => array_map('post_out', $rows), 'counts' => $counts ?: new stdClass()]);
+  out(['posts' => array_map('post_out', $rows), 'counts' => $counts ?: new stdClass(),
+       'site' => ['admin_ov' => setting('admin_ov', new stdClass()) ?: new stdClass(), 'notices' => setting('notices', [])]]);
 }
 
 /* ───────── 댓글 (예시 글에도 달 수 있게 post_id 는 아무 글 id) ───────── */
@@ -267,6 +268,74 @@ case 'seller_request': {
     [uuid(), $b, $u['id'], $u['nick'], json_encode($R['details'] ?? new stdClass(), JSON_UNESCAPED_UNICODE), str($R['message'] ?? '', 1000), now()]);
   foreach (all("SELECT id FROM ji_users WHERE role = 'admin'") as $ad)
     notify($ad['id'], 'seller_request', '새 입점·공구 요청', $u['nick'] . '님이 ' . $b . ' 승인을 요청했어요.', 'admin/index.html');
+  out(true);
+}
+
+/* ───────── 문의·신청 (로그인 없이 보낼 수 있음) ───────── */
+case 'inquiry_add': {
+  $d = $R['data'] ?? null; if (!is_array($d)) fail('내용이 비어 있어요');
+  $n = one("SELECT COUNT(*) n FROM ji_inquiries WHERE ip = ? AND created_at > (NOW() - INTERVAL 10 MINUTE)", [ip()])['n'];
+  if ($n >= 5) fail('잠시 후 다시 보내 주세요.', 429);
+  $js = json_encode($d, JSON_UNESCAPED_UNICODE); if (strlen($js) > 8000) fail('내용이 너무 길어요');
+  q("INSERT INTO ji_inquiries (id, data, ip, created_at) VALUES (?,?,?,?)", [uuid(), $js, ip(), now()]);
+  foreach (all("SELECT id FROM ji_users WHERE role = 'admin'") as $ad)
+    notify($ad['id'], 'inquiry', '새 문의·신청', mb_substr((string)($d['type'] ?? $d['service'] ?? '문의'), 0, 40) . ' · ' . mb_substr((string)($d['name'] ?? ''), 0, 20), 'admin/index.html');
+  out(true);
+}
+
+/* ───────── 관리자 ───────── */
+case 'admin_overview': {
+  admin($R);
+  out(['users' => (int)one("SELECT COUNT(*) n FROM ji_users")['n'],
+       'users_week' => (int)one("SELECT COUNT(*) n FROM ji_users WHERE created_at > (NOW() - INTERVAL 7 DAY)")['n'],
+       'posts' => (int)one("SELECT COUNT(*) n FROM ji_posts")['n'],
+       'comments' => (int)one("SELECT COUNT(*) n FROM ji_comments")['n'],
+       'inquiries_new' => (int)one("SELECT COUNT(*) n FROM ji_inquiries WHERE status = 'new'")['n'],
+       'sellers_pending' => (int)one("SELECT COUNT(*) n FROM ji_seller_requests WHERE status = 'pending'")['n']]);
+}
+case 'admin_users': {
+  admin($R);
+  out(array_map(function ($u) { $u['created_at'] = iso($u['created_at']); $u['last_login'] = iso($u['last_login']); return $u; },
+    all("SELECT u.id, u.email, u.nick, u.region, u.role, u.created_at, u.last_login,
+         (SELECT COUNT(*) FROM ji_posts p WHERE p.author = u.id) posts FROM ji_users u ORDER BY u.created_at DESC LIMIT 500")));
+}
+case 'admin_set_role': {
+  $a = admin($R); $role = $R['role'] ?? '';
+  if (!in_array($role, ['user', 'seller', 'admin'], true)) fail('역할이 올바르지 않아요');
+  if (($R['id'] ?? '') === $a['id'] && $role !== 'admin') fail('내 관리자 권한은 내릴 수 없어요');
+  q("UPDATE ji_users SET role = ? WHERE id = ?", [$role, $R['id'] ?? '']); out(true);
+}
+case 'admin_set': {
+  admin($R); $k = $R['k'] ?? '';
+  if (!in_array($k, ['admin_ov', 'notices'], true)) fail('저장할 수 없는 항목이에요');
+  $v = json_encode($R['v'] ?? null, JSON_UNESCAPED_UNICODE); if (strlen($v) > 2000000) fail('너무 커요');
+  q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", [$k, $v, now()]); out(true);
+}
+case 'admin_inquiries': {
+  admin($R);
+  out(array_map(function ($r) { $d = json_decode($r['data'], true) ?: []; $d['id'] = $r['id']; $d['status'] = $r['status'];
+    $d['date'] = date('Y-m-d H:i', strtotime($r['created_at'])); return $d; },
+    all("SELECT * FROM ji_inquiries ORDER BY created_at DESC LIMIT 500")));
+}
+case 'admin_inquiry_set': {
+  admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
+  q("UPDATE ji_inquiries SET status = ? WHERE id = ?", [$st, $R['id'] ?? '']); out(true);
+}
+case 'admin_inquiry_delete': { admin($R); q("DELETE FROM ji_inquiries WHERE id = ?", [$R['id'] ?? '']); out(true); }
+case 'admin_sellers': {
+  admin($R);
+  out(array_map(function ($r) { $r['details'] = json_decode($r['details'], true); $r['created_at'] = iso($r['created_at']);
+    $u = one("SELECT email, region FROM ji_users WHERE id = ?", [$r['applicant']]); $r['email'] = $u['email'] ?? ''; $r['region'] = $u['region'] ?? ''; return $r; },
+    all("SELECT * FROM ji_seller_requests ORDER BY created_at DESC LIMIT 300")));
+}
+case 'admin_seller_decide': {
+  admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['approved', 'rejected'], true)) fail('처리 방법이 올바르지 않아요');
+  $r = one("SELECT * FROM ji_seller_requests WHERE id = ?", [$R['id'] ?? '']); if (!$r) fail('요청을 찾을 수 없어요', 404);
+  q("UPDATE ji_seller_requests SET status = ? WHERE id = ?", [$st, $r['id']]);
+  if ($st === 'approved') q("UPDATE ji_users SET role = 'seller' WHERE id = ? AND role = 'user'", [$r['applicant']]);
+  $link = $r['board'] === '제주상점' ? 'shops.html' : 'deals.html';
+  notify($r['applicant'], 'seller_' . $st, $st === 'approved' ? $r['board'] . ' 승인 완료 🎉' : $r['board'] . ' 요청 결과',
+    $st === 'approved' ? '이제 ' . $r['board'] . '에 글을 올릴 수 있어요. (사이트를 새로고침하면 바로 반영돼요)' : '이번에는 승인이 어렵다는 답을 받았어요. 자세한 내용은 문의해 주세요.', $link);
   out(true);
 }
 

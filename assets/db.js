@@ -79,10 +79,13 @@ var JIDB = (function () {
   function cacheDrop(id) { JI.set("dbposts", JI.get("dbposts", []).filter(function (x) { return x.id !== id; })); }
   function syncFeed() {
     return call("feed").then(function (r) {
-      var posts = r.posts.map(toPost), counts = r.counts || {};
-      var before = JSON.stringify([JI.get("dbposts", []), JI.get("dbcounts", {})]);
+      var posts = r.posts.map(toPost), counts = r.counts || {}, site = r.site || {};
+      var ov = site.admin_ov || {}, ns = site.notices || [];
+      var before = JSON.stringify([JI.get("dbposts", []), JI.get("dbcounts", {}), JI.get("admin_ov", {}), JI.get("notices", [])]);
       JI.set("dbposts", posts); JI.set("dbcounts", counts);
-      if (before === JSON.stringify([posts, counts])) return false;
+      // 관리자가 정한 공지·프리미엄·숨김은 모든 방문자에게 같게
+      JI.set("admin_ov", Array.isArray(ov) ? {} : ov); JI.set("notices", ns);
+      if (before === JSON.stringify([posts, counts, JI.get("admin_ov", {}), ns])) return false;
       // 바뀌었으면 목록을 다시 그림 (페이지가 window.onJIData 를 정해 두었을 때)
       try { if (typeof window.onJIData === "function") window.onJIData(); } catch (e) { console.warn(e); }
       return true;

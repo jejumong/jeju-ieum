@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 2;
+const JI_SCHEMA = 3;
 
 /* ── 응답 ── */
 function cors() {
@@ -94,6 +94,10 @@ function migrate($pdo) {
     id CHAR(36) PRIMARY KEY, post_id VARCHAR(40) NOT NULL, author CHAR(36) NOT NULL, author_nick VARCHAR(20) NOT NULL,
     text VARCHAR(1000) NOT NULL, edited TINYINT(1) NOT NULL DEFAULT 0, created_at DATETIME NOT NULL,
     INDEX (post_id, created_at), INDEX (author))$T");
+  $pdo->exec("CREATE TABLE IF NOT EXISTS ji_settings (k VARCHAR(40) PRIMARY KEY, v MEDIUMTEXT NOT NULL, updated_at DATETIME NOT NULL)$T");
+  $pdo->exec("CREATE TABLE IF NOT EXISTS ji_inquiries (
+    id CHAR(36) PRIMARY KEY, data TEXT NOT NULL, status VARCHAR(10) NOT NULL DEFAULT 'new', ip VARCHAR(45) NOT NULL DEFAULT '',
+    created_at DATETIME NOT NULL, INDEX (created_at))$T");
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_login_fails (
     ip VARCHAR(45) NOT NULL, at DATETIME NOT NULL, INDEX (ip, at))$T");
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
@@ -132,6 +136,8 @@ function me($req, $need = true) {
   if (!$u && $need) fail('로그인이 필요해요', 401);
   return $u;
 }
+function admin($req) { $u = me($req); if (($u['role'] ?? '') !== 'admin') fail('관리자만 할 수 있어요', 403); return $u; }
+function setting($k, $def) { $r = one("SELECT v FROM ji_settings WHERE k = ?", [$k]); return $r ? json_decode($r['v'], true) : $def; }
 function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user']; }
 
 /* ── 알림 + 휴대폰 푸시 (OneSignal) ── */

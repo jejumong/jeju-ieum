@@ -51,6 +51,11 @@ function saveInquiry(data, done) {
   var list = JI.get("inquiries", []);
   list.push(data);
   JI.set("inquiries", list);
+  // 카페24 서버가 연결되어 있으면 서버로 보냄 (관리자 페이지 '문의·제보'에서 확인)
+  if (window.JIDB && JIDB.enabled) {
+    JIDB.call("inquiry_add", { data: data }).then(function () { done && done(true); }, function (e) { console.warn(e); done && done(false); });
+    return;
+  }
   if (typeof SITE_CFG !== "undefined" && SITE_CFG.inquiryEndpoint) {
     try {
       fetch(SITE_CFG.inquiryEndpoint, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(data) })
