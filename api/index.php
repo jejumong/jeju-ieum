@@ -313,6 +313,16 @@ case 'admin_users': {
          (SELECT COUNT(*) FROM ji_posts p WHERE p.author = u.id) posts,
          (SELECT COUNT(*) FROM ji_comments c WHERE c.author = u.id) comments FROM ji_users u ORDER BY u.created_at DESC LIMIT 1000")));
 }
+case 'admin_user_activity': {
+  admin($R); $id = $R['id'] ?? ''; if (!is_uuid($id)) fail('회원을 찾을 수 없어요', 404);
+  $posts = array_map(function ($r) { return ['id' => $r['id'], 'board' => $r['board'], 'head' => $r['head'], 'title' => $r['title'],
+      'views' => (int)$r['views'], 'created_at' => iso($r['created_at'])]; },
+    all("SELECT id, board, head, title, views, created_at FROM ji_posts WHERE author = ? ORDER BY created_at DESC LIMIT 500", [$id]));
+  $cmts = array_map(function ($c) { return ['id' => $c['id'], 'post_id' => $c['post_id'], 'post_title' => $c['title'], 'post_board' => $c['board'],
+      'text' => $c['text'], 'edited' => (bool)$c['edited'], 'created_at' => iso($c['created_at'])]; },
+    all("SELECT c.*, p.title, p.board FROM ji_comments c LEFT JOIN ji_posts p ON p.id = c.post_id WHERE c.author = ? ORDER BY c.created_at DESC LIMIT 500", [$id]));
+  out(['posts' => $posts, 'comments' => $cmts]);
+}
 case 'admin_set_role': {
   $a = admin($R, true); $role = $R['role'] ?? '';
   if (!in_array($role, ['user', 'realtor', 'shop', 'dealer', 'staff'], true)) fail('역할이 올바르지 않아요');

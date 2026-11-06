@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>제주이음 관리자 콘솔</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261106s">
+<link rel="stylesheet" href="../assets/style.css?v=20261106t">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -103,6 +103,19 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
 }
 .role-help{background:#f7fbff;border:1px solid #dbe9fb;font-size:13.5px;color:var(--ink-2);line-height:1.7}
 .role-help ul{margin:6px 0 4px;padding-left:18px}
+.cnt-link{border:0;background:none;padding:2px 6px;border-radius:6px;font:inherit;font-weight:800;color:var(--sea-700);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.cnt-link:hover{background:var(--sea-50)}
+.act-scroll{max-height:60vh;overflow:auto;margin-bottom:12px}
+.act-t td,.act-t th{font-size:13.5px}
+.iq-cell{cursor:pointer}
+.iq-cell:hover .iq-more{text-decoration:underline}
+.iq-clamp{max-width:420px;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.iq-more{font-size:12px;font-weight:700;color:var(--sea-700)}
+.iq-meta{font-size:13px;color:var(--ink-3);margin:-4px 0 12px}
+.iq-dl{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:14px}
+.iq-dl th{text-align:left;width:96px;color:var(--ink-3);font-weight:700;padding:6px 8px 6px 0;vertical-align:top}
+.iq-dl td{padding:6px 0;border-bottom:1px solid #f0f2f5;white-space:pre-wrap}
+.iq-msg{white-space:pre-wrap;line-height:1.75;background:#f8fafc;border:1px solid #e6e9ee;border-radius:10px;padding:14px 16px;max-height:50vh;overflow:auto;margin-bottom:14px;font-size:14.5px}
 </style>
 </head>
 <body data-admin>
@@ -111,14 +124,14 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261106s"></script>
-<script src="../assets/db.js?v=20261106s"></script>
-<script src="../assets/seed-trade.js?v=20261106s"></script>
-<script src="../assets/seed-extra.js?v=20261106s"></script>
-<script src="../assets/seed-new.js?v=20261106s"></script>
-<script src="../assets/seed-comments.js?v=20261106s"></script>
-<script src="../assets/photos.js?v=20261106s"></script>
-<script src="../assets/admin-data.js?v=20261106s"></script>
+<script src="../assets/common.js?v=20261106t"></script>
+<script src="../assets/db.js?v=20261106t"></script>
+<script src="../assets/seed-trade.js?v=20261106t"></script>
+<script src="../assets/seed-extra.js?v=20261106t"></script>
+<script src="../assets/seed-new.js?v=20261106t"></script>
+<script src="../assets/seed-comments.js?v=20261106t"></script>
+<script src="../assets/photos.js?v=20261106t"></script>
+<script src="../assets/admin-data.js?v=20261106t"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -603,12 +616,32 @@ if (SRV) {
         list.map(function(q){
           return '<tr><td style="white-space:nowrap">' + esc(q.date) + '</td><td><span class="bd">' + esc(q.type || q.service || "문의") + '</span></td>' +
             '<td><b>' + esc(q.name) + '</b>' + (q.user_nick ? ' <span class="bd user">회원 ' + esc(q.user_nick) + '</span>' : ' <small>(비회원)</small>') + '<br><small>' + esc(q.contact) + '</small></td>' +
-            '<td class="ttl"><small>' + esc([q.stage, q.when].filter(Boolean).join(" · ")) + '</small><div style="white-space:pre-wrap;max-width:420px">' + esc(q.msg) + '</div>' +
-              (q.replied_at ? '<small style="color:var(--sea-700)">✉️ ' + esc(q.replied_at) + ' 답장함</small>' : '') + '</td>' +
+            '<td class="ttl iq-cell" onclick="showIq(\'' + q.id + '\')" title="눌러서 자세히 보기"><small>' + esc([q.stage, q.when].filter(Boolean).join(" · ")) + '</small><div class="iq-clamp">' + esc(q.msg) + '</div>' +
+              '<span class="iq-more">자세히 보기 ›</span>' + (q.replied_at ? ' <small style="color:var(--sea-700)">✉️ ' + esc(q.replied_at) + ' 답장함</small>' : '') + '</td>' +
             '<td><select onchange="setIq(\'' + q.id + '\',this.value)">' + Object.keys(IQ_ST).map(function(k){ return '<option value="' + k + '"' + (q.status===k?" selected":"") + '>' + IQ_ST[k] + '</option>'; }).join("") + '</select></td>' +
-            '<td><div class="acts">' + (q.user_id ? '<button class="mb pri" onclick="msgTo(\'' + q.user_id + '\',\'' + esc(q.user_nick || q.name).replace(/'/g, "") + '\',\'' + q.id + '\')">답장하기</button>' : '') +
+            '<td><div class="acts">' + (q.user_id ? '<button class="mb pri" onclick="msgTo(\'' + q.user_id + '\',\'' + esc(q.user_nick || q.name).replace(/'/g, "") + '\',\'' + q.id + '\')">답장하기</button>' +
+              '<button class="mb" onclick="msgTo(\'' + q.user_id + '\',\'' + esc(q.user_nick || q.name).replace(/'/g, "") + '\')">✉️ 쪽지</button>' : '') +
             '<button class="mb" onclick="delIq(\'' + q.id + '\')">삭제</button></div></td></tr>';
         }).join("") + '</tbody></table></div>' : '<div class="empty">아직 들어온 신청이 없습니다.</div>') + '</div>';
+  };
+
+  /* 문의 상세 보기 */
+  var IQ_FIELDS = [["type","종류"],["service","신청 서비스"],["name","이름"],["contact","연락처"],["stage","상황"],["when","시기"],["email","이메일"],["region","지역"],["people","인원"],["budget","예산"]];
+  window.showIq = function(id){
+    var q = JI.get("inquiries", []).filter(function(x){ return x.id === id; })[0]; if (!q) return;
+    var known = { id:1, status:1, date:1, user_id:1, user_nick:1, replied_at:1, msg:1, agree:1 };
+    IQ_FIELDS.forEach(function(f){ known[f[0]] = 1; });
+    var rows = IQ_FIELDS.filter(function(f){ return q[f[0]]; }).map(function(f){ return [f[1], q[f[0]]]; })
+      .concat(Object.keys(q).filter(function(k){ return !known[k] && q[k] !== "" && q[k] != null && typeof q[k] !== "object"; }).map(function(k){ return [k, q[k]]; }));
+    var nick = esc(q.user_nick || q.name).replace(/'/g, "");
+    showModal('<h3>문의 상세 <span class="bd">' + esc(q.type || q.service || "문의") + '</span></h3>' +
+      '<div class="iq-meta">' + esc(q.date) + ' · ' + (q.user_nick ? '회원 <b>' + esc(q.user_nick) + '</b>' : '비회원') + ' · 상태 <b>' + esc(IQ_ST[q.status] || q.status) + '</b>' +
+        (q.replied_at ? ' · ✉️ ' + esc(q.replied_at) + ' 답장함' : '') + '</div>' +
+      '<table class="iq-dl">' + rows.map(function(r){ return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join("") + '</table>' +
+      '<div class="iq-msg">' + (esc(q.msg) || '<span style="color:var(--ink-4)">내용 없음</span>') + '</div>' +
+      '<div class="bt">' + (q.user_id ? '<button class="mb pri" onclick="msgTo(\'' + q.user_id + '\',\'' + nick + '\',\'' + q.id + '\')">답장하기</button>' +
+        '<button class="mb" onclick="msgTo(\'' + q.user_id + '\',\'' + nick + '\')">✉️ 쪽지</button>' : '<span style="margin-right:auto;color:var(--ink-4);font-size:13px">비회원 문의 — 연락처로 연락해 주세요</span>') +
+        '<button class="mb" onclick="closeModal()">닫기</button></div>');
   };
 
   /* 판매자 승인 */
@@ -639,12 +672,40 @@ if (SRV) {
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
             : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
           return '<tr><td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td>' +
-            '<td>' + u.posts + '</td><td>' + u.comments + '</td>' +
+            '<td>' + (u.posts ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'posts\')">' + u.posts + '</button>' : '0') + '</td>' +
+            '<td>' + (u.comments ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'comments\')">' + u.comments + '</button>' : '0') + '</td>' +
             '<td style="white-space:nowrap">' + esc((u.created_at||"").slice(0,10)) + '</td><td style="white-space:nowrap">' + esc((u.last_login||"").slice(0,10)) + '</td>' +
             '<td>' + roleCell + '</td>' +
             '<td>' + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</td></tr>';
         }).join("") + '</tbody></table></div>' : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
       '<div class="panel"><h2>관리자 비밀번호</h2><p style="margin:0;color:var(--ink-3)">관리자 페이지는 사이트 회원 계정으로 들어와요. 비밀번호는 사이트의 <a href="' + SITE + 'profile.html" target="_blank">내 정보</a>에서 바꿀 수 있어요.</p></div>';
+  };
+  /* 회원이 쓴 글·댓글 목록 */
+  window.showActivity = function(uid, kind){
+    var u = USERS.filter(function(x){ return x.id === uid; })[0] || { nick: "" };
+    showModal('<h3>' + esc(u.nick) + '님의 ' + (kind === "posts" ? "글" : "댓글") + '</h3><div class="empty">불러오는 중…</div>');
+    JIDB.call("admin_user_activity", { id: uid }).then(function(r){
+      function tabs(){ return '<div class="toolbar" style="margin:0 0 10px">' +
+        '<button class="mb' + (kind === "posts" ? " pri" : "") + '" onclick="showActivity(\'' + uid + '\',\'posts\')">글 ' + r.posts.length + '</button>' +
+        '<button class="mb' + (kind === "comments" ? " pri" : "") + '" onclick="showActivity(\'' + uid + '\',\'comments\')">댓글 ' + r.comments.length + '</button></div>'; }
+      var body;
+      if (kind === "posts") {
+        body = r.posts.length ? '<table class="adm-t act-t"><thead><tr><th>게시판</th><th>제목</th><th>조회</th><th>날짜</th></tr></thead><tbody>' + r.posts.map(function(p){
+          return '<tr><td><span class="bd user">' + esc(p.board) + '</span></td><td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank">' + (p.head ? '[' + esc(p.head) + '] ' : '') + esc(p.title) + '</a></td>' +
+            '<td>' + p.views + '</td><td style="white-space:nowrap">' + esc((p.created_at || "").slice(0, 10)) + '</td></tr>';
+        }).join("") + '</tbody></table>' : '<div class="empty">쓴 글이 없어요.</div>';
+      } else {
+        body = r.comments.length ? '<table class="adm-t act-t"><thead><tr><th>댓글</th><th>달린 글</th><th>날짜</th></tr></thead><tbody>' + r.comments.map(function(c){
+          var fp = !c.post_title && typeof findPost === "function" ? findPost(c.post_id) : null;
+          var title = c.post_title || (fp ? fp.title : "삭제된 글"), board = c.post_board || (fp ? fp.board : "");
+          return '<tr><td style="max-width:320px;white-space:pre-wrap">' + esc(c.text) + (c.edited ? ' <small>(수정됨)</small>' : '') + '</td>' +
+            '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(c.post_id) + '#cmt-list" target="_blank">' + esc(title) + '</a>' + (board ? '<small>' + esc(board) + '</small>' : '') + '</td>' +
+            '<td style="white-space:nowrap">' + esc((c.created_at || "").slice(0, 10)) + '</td></tr>';
+        }).join("") + '</tbody></table>' : '<div class="empty">쓴 댓글이 없어요.</div>';
+      }
+      showModal('<h3>' + esc(u.nick) + '님의 활동 <small style="font-weight:600;color:var(--ink-4)">' + esc(u.email || "") + '</small></h3>' + tabs() +
+        '<div class="act-scroll">' + body + '</div><div class="bt"><button class="mb" onclick="closeModal()">닫기</button></div>');
+    }, function(e){ alert(e.message || e); closeModal(); });
   };
   window.setRole = function(id, role){ JIDB.call("admin_set_role", { id: id, role: role }).then(function(){ toast("역할을 바꿨어요"); reloadAll(); }, function(e){ alert(e.message); reloadAll(); }); };
 
