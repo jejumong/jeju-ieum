@@ -1,5 +1,0 @@
-# 설정·공통 파일은 바깥에서 직접 열 수 없게
-<FilesMatch "^(config|config\.sample|lib)\.php$">
-  Require all denied
-</FilesMatch>
-Options -Indexes

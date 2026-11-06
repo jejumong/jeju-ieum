@@ -31,7 +31,7 @@ jobs:
           ADMINS: ${{ secrets.ADMIN_EMAILS }}
           SITE_URL: ${{ vars.SITE_URL || 'https://jeju.hintdaily.com/' }}
         run: |
-          mkdir -p deploy && cp -r api/. deploy/ && rm -f deploy/config.php
+          mkdir -p deploy && cp -r api/. deploy/ && rm -f deploy/config.php deploy/.htaccess
           php -r '
             $site = rtrim(getenv("SITE_URL"), "/") . "/";
             $origins = array_values(array_unique([rtrim($site, "/"), "https://jeju.hintdaily.com", "https://jejuieum.com", "https://www.jejuieum.com", "https://jejumong.github.io"]));
