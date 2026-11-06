@@ -1824,3 +1824,14 @@ a.act-item:hover{border-color:var(--sea-200)}
 .pv-like.on{border-color:#f3b4c0;background:#fff1f4;color:#d94a6b}
 .pv-like.pop .hz{animation:likepop .35s ease}
 @keyframes likepop{0%{transform:scale(1)}50%{transform:scale(1.45)}100%{transform:scale(1)}}
+
+/* 좋아요: PC 에서 살짝 더 눈에 띄게 */
+@media (min-width:681px){
+  .pv-like{border-color:#f6c9d3;color:#d94a6b;background:#fffafb;padding:4px 13px;font-size:13.5px;box-shadow:0 1px 3px rgba(217,74,107,.08)}
+  .pv-like .hz{font-size:16px}
+  .pv-like:hover{background:#fff1f4;border-color:#eda3b4}
+}
+/* 댓글 좋아요 */
+.cmt-like{margin-left:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:1px 9px;font:inherit;font-size:12px;color:var(--ink-4);cursor:pointer;line-height:1.6;white-space:nowrap}
+.cmt-like:hover{border-color:#f3b4c0;color:#d94a6b}
+.cmt-like.on{border-color:#f3b4c0;background:#fff1f4;color:#d94a6b;font-weight:700}

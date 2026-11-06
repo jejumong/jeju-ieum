@@ -232,7 +232,15 @@ case 'feed': {
 /* ───────── 댓글 (예시 글에도 달 수 있게 post_id 는 아무 글 id) ───────── */
 case 'comments': {
   $pid = str($R['post_id'] ?? '', 40); if ($pid === '') out([]);
-  out(array_map('cmt_out', all("SELECT * FROM ji_comments WHERE post_id = ? ORDER BY created_at, id LIMIT 500", [$pid])));
+  $rows = all("SELECT * FROM ji_comments WHERE post_id = ? ORDER BY created_at, id LIMIT 500", [$pid]);
+  // 댓글 좋아요 수와 내가 눌렀는지 (좋아요 키는 'c:댓글id')
+  $cnt = []; $mine = []; $me = me($R, false);
+  if ($rows) {
+    $keys = array_map(function ($c) { return 'c:' . $c['id']; }, $rows); $in = implode(',', array_fill(0, count($keys), '?'));
+    foreach (all("SELECT post_id, COUNT(*) n FROM ji_likes WHERE active = 1 AND post_id IN ($in) GROUP BY post_id", $keys) as $r) $cnt[$r['post_id']] = (int)$r['n'];
+    if ($me) foreach (all("SELECT post_id FROM ji_likes WHERE active = 1 AND user_id = ? AND post_id IN ($in)", array_merge([$me['id']], $keys)) as $r) $mine[$r['post_id']] = true;
+  }
+  out(array_map(function ($c) use ($cnt, $mine) { $o = cmt_out($c); $o['likes'] = $cnt['c:' . $c['id']] ?? 0; $o['liked'] = !empty($mine['c:' . $c['id']]); return $o; }, $rows));
 }
 case 'comment_add': {
   $u = me($R); $pid = str($R['post_id'] ?? '', 40); $text = str($R['text'] ?? '', 1000);
@@ -255,7 +263,7 @@ case 'comment_update': {
 case 'comment_delete': {
   $u = me($R); $c = one("SELECT author FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
   if ($c['author'] !== $u['id'] && !is_mod($u)) fail('내가 쓴 댓글만 지울 수 있어요', 403);
-  q("DELETE FROM ji_comments WHERE id = ?", [$R['id']]); out(true);
+  q("DELETE FROM ji_comments WHERE id = ?", [$R['id']]); q("DELETE FROM ji_likes WHERE post_id = ?", ['c:' . $R['id']]); out(true);
 }
 
 /* ───────── 동호회 가입 신청 ───────── */
@@ -346,7 +354,13 @@ case 'like_toggle': {
     q("INSERT INTO ji_likes (post_id, user_id, active, created_at) VALUES (?,?,1,?)", [$pid, $u['id'], now()]);
     $liked = true;
     // 처음 누를 때만 글쓴이에게 알림 (눌렀다 취소를 반복해도 알림은 한 번)
-    $p = is_uuid($pid) ? one("SELECT author, title FROM ji_posts WHERE id = ?", [$pid]) : null;
+    if (strpos($pid, 'c:') === 0) {
+      $c = one("SELECT author, post_id, text FROM ji_comments WHERE id = ?", [substr($pid, 2)]);
+      if ($c && $c['author'] !== $u['id'])
+        notify($c['author'], 'like', '♥ 댓글 좋아요', $u['nick'] . '님이 내 댓글 「' . mb_substr($c['text'], 0, 30) . '」을 좋아해요.', 'view.html?id=' . $c['post_id'] . '#cmt-list',
+          '제주이음 · ♥ 댓글 좋아요', $u['nick'] . '님이 내 댓글을 좋아해요: ' . mb_substr($c['text'], 0, 30));
+      $p = null;
+    } else $p = is_uuid($pid) ? one("SELECT author, title FROM ji_posts WHERE id = ?", [$pid]) : null;
     if ($p && $p['author'] !== $u['id'])
       notify($p['author'], 'like', '♥ 좋아요', $u['nick'] . '님이 「' . mb_substr($p['title'], 0, 40) . '」 글을 좋아해요.', 'view.html?id=' . $pid,
         '제주이음 · ♥ 좋아요', $u['nick'] . '님이 「' . mb_substr($p['title'], 0, 30) . '」 글을 좋아해요.');

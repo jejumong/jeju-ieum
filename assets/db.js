@@ -152,7 +152,7 @@ var JIDB = (function () {
   function sendSellerRequest(board, details, message) { return call("seller_request", { board: board, details: details, message: message || "" }); }
 
   /* ── 댓글 ── */
-  function toCmt(c) { return { id: c.id, author: c.author_nick, authorId: c.author, text: c.text, edited: c.edited, date: (c.created_at || "").slice(0, 10), db: true }; }
+  function toCmt(c) { return { id: c.id, author: c.author_nick, authorId: c.author, text: c.text, edited: c.edited, date: (c.created_at || "").slice(0, 10), db: true, likes: c.likes || 0, liked: !!c.liked }; }
   function setCount(postId, n) { var m = JI.get("dbcounts", {}); m[postId] = n; JI.set("dbcounts", m); }
   function comments(postId) {
     if (!enabled) return Promise.resolve([]);

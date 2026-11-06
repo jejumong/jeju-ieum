@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107b">
+<link rel="stylesheet" href="assets/style.css?v=20261107c">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -61,15 +61,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107b"></script>
-<script src="assets/common.js?v=20261107b"></script>
-<script src="assets/db.js?v=20261107b"></script>
-<script src="assets/notify.js?v=20261107b"></script>
-<script src="assets/seed-trade.js?v=20261107b"></script>
-<script src="assets/seed-extra.js?v=20261107b"></script>
-<script src="assets/seed-new.js?v=20261107b"></script>
-<script src="assets/seed-comments.js?v=20261107b"></script>
-<script src="assets/admin-data.js?v=20261107b"></script>
+<script src="assets/kmap.js?v=20261107c"></script>
+<script src="assets/common.js?v=20261107c"></script>
+<script src="assets/db.js?v=20261107c"></script>
+<script src="assets/notify.js?v=20261107c"></script>
+<script src="assets/seed-trade.js?v=20261107c"></script>
+<script src="assets/seed-extra.js?v=20261107c"></script>
+<script src="assets/seed-new.js?v=20261107c"></script>
+<script src="assets/seed-comments.js?v=20261107c"></script>
+<script src="assets/admin-data.js?v=20261107c"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -319,11 +319,18 @@ function dbCmtHtml() {
     return '<div class="cmt-item" id="dcmt-' + i + '"><div style="display:flex;align-items:center">' +
       '<span class="who">' + esc(c.author) + (isAuthor ? ' <span class="own-tag">작성자</span>' : '') + (own ? '' : msgLink(c.authorId, c.author)) + '</span>' +
       '<span class="when">' + esc(c.date) + (c.edited ? ' (수정됨)' : '') + '</span>' +
+      '<button type="button" class="cmt-like' + (c.liked ? ' on' : '') + '" onclick="likeDbCmt(' + i + ')" aria-pressed="' + !!c.liked + '" title="' + (c.liked ? '좋아요 취소' : '좋아요') + '">' + (c.liked ? '♥' : '♡') + (c.likes ? ' ' + c.likes : '') + '</button>' +
       (own ? '<div class="own-actions"><button class="mini-btn" onclick="startEditDbCmt(' + i + ')">수정</button>' +
         '<button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')">삭제</button></div>'
         : (isMod() ? '<div class="own-actions"><button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')" title="관리자·스텝 권한">삭제</button></div>' : '')) +
       '</div><p id="dcmt-text-' + i + '">' + esc(c.text) + '</p></div>';
   }).join("");
+}
+function likeDbCmt(i) {
+  var c = DB_CMTS[i]; if (!c) return;
+  var u = currentUser();
+  if (!u || !u.id) { if (confirm("로그인하면 좋아요를 누를 수 있어요. 로그인할까요?")) location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); return; }
+  JIDB.toggleLike("c:" + c.id).then(function (r) { c.liked = r.liked; c.likes = r.count; renderComments(); }, function (e) { alert(e.message || e); });
 }
 function startEditDbCmt(i) {
   var c = DB_CMTS[i]; if (!c) return;
