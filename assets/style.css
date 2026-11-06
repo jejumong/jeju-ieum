@@ -1612,3 +1612,66 @@ a.act-item:hover{border-color:var(--sea-200)}
 .job-status .btn{flex:none;padding:11px 18px;font-size:15px}
 .job-status.done{background:var(--bg-2);border-color:var(--line)}
 @media (max-width:600px){.job-status{flex-direction:column;align-items:stretch}}
+
+/* ── 휴대폰 메인: 한 화면에 덜 담기 ── */
+@media (max-width:680px){
+  .hx-hero{text-align:left;padding:18px 0 14px}
+  .hx-eb{font-size:11.5px;padding:4px 10px}
+  .hx-hero h1{font-size:23px;margin-top:10px;word-break:keep-all}
+  .hx-hero p{font-size:14px;margin-top:6px}
+  .hx-hero p br,.hx-hero p br ~ *{display:none}
+  /* 4개 입구: 아이콘 + 이름 + 숫자만 */
+  .hx-doors{gap:8px}
+  .hx-door{padding:14px 14px 12px;gap:2px}
+  .hx-door .d-ico{font-size:22px;margin-bottom:4px}
+  .hx-door b{font-size:15px}
+  .hx-door .d-sub{display:none}
+  .hx-door .d-meta{padding-top:4px;font-size:12px}
+  .hx #home-notice{margin-top:12px}
+  .hx-sec{margin-top:30px}
+  .hx-head{margin-bottom:10px}
+  .hx-head h2{font-size:18px}
+  .hx-head a{font-size:13px}
+  /* 읽는 순서: 옆으로 넘기는 한 줄 */
+  .hx-path{display:flex;overflow-x:auto;gap:8px;scroll-snap-type:x mandatory;margin:0 calc(-1*var(--gutter));padding:0 var(--gutter) 4px;scrollbar-width:none}
+  .hx-path::-webkit-scrollbar{display:none}
+  .hx-path li{flex:0 0 64%;scroll-snap-align:start}
+  .hx-path a{padding:14px}
+  .hx-path a::after{display:none!important}
+  .hx-path .p-n{width:24px;height:24px;font-size:12px;margin-bottom:4px}
+  .hx-path b{font-size:15px}
+  /* 지원 프로그램 3개, 이번 달은 2줄만 */
+  .hx-two{gap:10px}
+  .hx-box{padding:16px 16px 8px}
+  .hx-box .hx-head h2{font-size:16px}
+  #hx-programs li:nth-child(n+4){display:none}
+  .hx-list a{padding:10px 0}
+  .hx-list .l-t{font-size:14px}
+  .hx-mt{font-size:14.5px;margin-bottom:4px}
+  .hx-dots li{font-size:13.5px;padding:4px 0 4px 14px}
+  .hx-dots li:nth-child(n+3){display:none}
+  .hx-dots li::before{top:11px}
+  /* 생활도구: 아이콘 4개 한 줄 */
+  .hx-tools{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .hx-tools a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;text-align:center}
+  .hx-tools span{font-size:22px}
+  .hx-tools b{font-size:12.5px;white-space:nowrap}
+  .hx-tools small{display:none}
+  /* 동네 소식 4개 */
+  .hx-feed{padding:14px 14px 6px}
+  #hx-feed li:nth-child(n+5){display:none}
+  .hx-tabs button{padding:6px 11px;font-size:13px}
+  /* 신뢰 4줄은 휴대폰에선 숨김 (푸터 '정보 운영 원칙'으로) */
+  .hx-trust{display:none}
+  /* 푸터 간단히 */
+  footer.site{margin-top:40px}
+  .footer-top{gap:18px!important}
+  .footer-brand p{font-size:12.5px}
+  .footer-col h4{margin-bottom:6px}
+  .footer-col a{display:inline-block;margin-right:12px;padding:2px 0;font-size:12.5px}
+}
+@media (max-width:680px){
+  .hx-path{margin:0 -16px!important;padding:0 16px 4px!important;scroll-padding-left:16px}
+  .hx-path li:last-child{margin-right:16px}
+  .hx-head h2{font-size:17px;word-break:keep-all}
+}
