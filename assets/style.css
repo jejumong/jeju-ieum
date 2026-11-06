@@ -1706,3 +1706,4 @@ a.act-item:hover{border-color:var(--sea-200)}
   .trade-hub .card.m-only{display:block!important}
 }
 @media (max-width:350px){.gnb-m a{font-size:12px}}
+@media (max-width:680px){.page-head .pg-write{display:none!important}}
