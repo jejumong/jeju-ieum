@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107c">
+<link rel="stylesheet" href="assets/style.css?v=20261107d">
 </head>
 <body data-active="community">
 
@@ -68,20 +68,21 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261107c"></script>
-<script src="assets/db.js?v=20261107c"></script>
-<script src="assets/notify.js?v=20261107c"></script>
-<script src="assets/seed-trade.js?v=20261107c"></script>
-<script src="assets/seed-extra.js?v=20261107c"></script>
-<script src="assets/seed-new.js?v=20261107c"></script>
-<script src="assets/seed-comments.js?v=20261107c"></script>
-<script src="assets/admin-data.js?v=20261107c"></script>
+<script src="assets/common.js?v=20261107d"></script>
+<script src="assets/db.js?v=20261107d"></script>
+<script src="assets/notify.js?v=20261107d"></script>
+<script src="assets/seed-trade.js?v=20261107d"></script>
+<script src="assets/seed-extra.js?v=20261107d"></script>
+<script src="assets/seed-new.js?v=20261107d"></script>
+<script src="assets/seed-comments.js?v=20261107d"></script>
+<script src="assets/admin-data.js?v=20261107d"></script>
 <script>
 var params = new URLSearchParams(location.search);
 var board = params.get("board");
 var q = params.get("q");
 var mode = "all";
-var page = 1, PER = 12;
+var page = Math.max(1, parseInt(new URLSearchParams(location.search).get("page"), 10) || 1), PER = 12;   // 글 보고 돌아와도 보던 페이지 유지
+function keepPage() { try { var u = new URL(location.href); if (page > 1) u.searchParams.set("page", page); else u.searchParams.delete("page"); history.replaceState(null, "", u.pathname.split("/").pop() + u.search); } catch (e) {} }
 
 // 헤더 문구
 if (board) {
@@ -118,6 +119,8 @@ function esc(s){ var d=document.createElement("div"); d.textContent=s; return d.
 
 function render() {
   var list = getList();
+  page = Math.min(page, Math.max(1, Math.ceil(list.length / PER)));
+  keepPage();
   document.getElementById("total-count").textContent = list.length.toLocaleString();
   var start = (page-1)*PER;
   var pageList = list.slice(start, start+PER);
