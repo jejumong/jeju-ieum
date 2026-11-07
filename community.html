@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107q">
+<link rel="stylesheet" href="assets/style.css?v=20261107r">
 </head>
 <body data-active="community">
 
@@ -28,10 +28,10 @@
     <aside class="side" id="side-nav">
       <h3>주제 게시판</h3>
       <a href="?board=자유게시판">자유게시판</a>
-      <a href="?board=고민상담실">고민상담실</a>
-      <a href="?board=생활정보">생활정보</a>
+      <a href="?board=질문하기">질문하기</a>
       <a href="?board=최신뉴스">최신뉴스</a>
-      <a href="?board=취미여행">취미여행</a>
+      <a href="?board=생활정보">생활정보</a>
+      <a href="?board=취미.여행">취미.여행</a>
       <a href="?board=교육">교육</a>
       <a href="?board=건강웰빙">건강웰빙</a>
       <h3>지역 게시판</h3>
@@ -68,17 +68,18 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261107q"></script>
-<script src="assets/db.js?v=20261107q"></script>
-<script src="assets/notify.js?v=20261107q"></script>
-<script src="assets/seed-trade.js?v=20261107q"></script>
-<script src="assets/seed-extra.js?v=20261107q"></script>
-<script src="assets/seed-new.js?v=20261107q"></script>
-<script src="assets/seed-comments.js?v=20261107q"></script>
-<script src="assets/admin-data.js?v=20261107q"></script>
+<script src="assets/common.js?v=20261107r"></script>
+<script src="assets/db.js?v=20261107r"></script>
+<script src="assets/notify.js?v=20261107r"></script>
+<script src="assets/seed-trade.js?v=20261107r"></script>
+<script src="assets/seed-extra.js?v=20261107r"></script>
+<script src="assets/seed-new.js?v=20261107r"></script>
+<script src="assets/seed-comments.js?v=20261107r"></script>
+<script src="assets/admin-data.js?v=20261107r"></script>
 <script>
 var params = new URLSearchParams(location.search);
 var board = params.get("board");
+board = ({ "고민상담실": "질문하기", "취미여행": "취미.여행" })[board] || board;   // 예전 게시판 이름 주소도 열리게
 var q = params.get("q");
 var mode = "all";
 var page = Math.max(1, parseInt(new URLSearchParams(location.search).get("page"), 10) || 1), PER = 12;   // 글 보고 돌아와도 보던 페이지 유지

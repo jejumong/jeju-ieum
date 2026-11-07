@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107q">
+<link rel="stylesheet" href="assets/style.css?v=20261107r">
 </head>
 <body data-active="">
 
@@ -29,7 +29,7 @@
         <label for="board">게시판 선택 <span class="req">*</span></label>
         <select id="board">
           <optgroup label="커뮤니티 — 주제">
-            <option selected>자유게시판</option><option>고민상담실</option><option>생활정보</option><option>최신뉴스</option><option>취미여행</option><option>교육</option><option>건강웰빙</option>
+            <option selected>자유게시판</option><option>질문하기</option><option>최신뉴스</option><option>생활정보</option><option>취미.여행</option><option>교육</option><option>건강웰빙</option>
           </optgroup>
           <optgroup label="커뮤니티 — 지역">
             <option>제주북쪽</option><option>제주동쪽</option><option>제주서쪽</option><option>제주남쪽</option>
@@ -139,15 +139,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107q"></script>
-<script src="assets/common.js?v=20261107q"></script>
-<script src="assets/db.js?v=20261107q"></script>
-<script src="assets/notify.js?v=20261107q"></script>
-<script src="assets/seed-trade.js?v=20261107q"></script>
-<script src="assets/seed-extra.js?v=20261107q"></script>
-<script src="assets/seed-new.js?v=20261107q"></script>
-<script src="assets/seed-comments.js?v=20261107q"></script>
-<script src="assets/admin-data.js?v=20261107q"></script>
+<script src="assets/kmap.js?v=20261107r"></script>
+<script src="assets/common.js?v=20261107r"></script>
+<script src="assets/db.js?v=20261107r"></script>
+<script src="assets/notify.js?v=20261107r"></script>
+<script src="assets/seed-trade.js?v=20261107r"></script>
+<script src="assets/seed-extra.js?v=20261107r"></script>
+<script src="assets/seed-new.js?v=20261107r"></script>
+<script src="assets/seed-comments.js?v=20261107r"></script>
+<script src="assets/admin-data.js?v=20261107r"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -231,6 +231,7 @@ if (user && editId && window.JIDB && JIDB.enabled && JIDB.isUuid(editId)) {
 
 // ?board= 값으로 게시판 미리 선택 (새 글일 때만) — 제한 게시판이면 즉시 안내
 var pre = new URLSearchParams(location.search).get("board");
+pre = ({ "고민상담실": "질문하기", "취미여행": "취미.여행" })[pre] || pre;
 if (pre && !editing) {
   var sel = document.getElementById("board");
   for (var k = 0; k < sel.options.length; k++) {
