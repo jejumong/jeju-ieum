@@ -232,20 +232,48 @@ function notify($uid, $kind, $title, $body, $link, $pushTitle = null, $pushBody 
 }
 
 
-/* 메일 보내기 (카페24 서버의 기본 메일 기능 사용) */
+/* 메일 보내기
+   ① smtp_user·smtp_pass 가 설정돼 있으면 네이버 메일 서버(SMTP)로 보냄 → 스팸으로 잘 가지 않음
+   ② 없거나 실패하면 카페24 서버의 기본 mail() 로 보냄 */
 function send_mail($to, $subject, $text) {
   global $CFG;
   if (!empty($CFG['mail_log'])) { @file_put_contents($CFG['mail_log'], "TO: $to\n$subject\n$text\n---\n", FILE_APPEND); return true; }   // 개발용
-  if (!function_exists('mail')) return false;
-  $from = $CFG['mail_from'] ?? ('noreply@' . (parse_url($CFG['site_url'] ?? '', PHP_URL_HOST) ?: 'jejuieum.com'));
-  $reply = $CFG['mail_reply'] ?? 'jejumong2@naver.com';
   $enc = function ($t) { return '=?UTF-8?B?' . base64_encode($t) . '?='; };
-  $headers = implode("\r\n", [
+  $su = (string)($CFG['smtp_user'] ?? ''); $sp = (string)($CFG['smtp_pass'] ?? '');
+  $from = $su ?: ($CFG['mail_from'] ?? ('noreply@' . (parse_url($CFG['site_url'] ?? '', PHP_URL_HOST) ?: 'jejuieum.com')));
+  $host = parse_url($CFG['site_url'] ?? '', PHP_URL_HOST) ?: 'jejuieum.com';
+  $head = [
+    'Date: ' . date('r'),
     'From: ' . $enc('제주이음') . ' <' . $from . '>',
-    'Reply-To: ' . $reply,
+    'To: <' . $to . '>',
+    'Reply-To: ' . ($CFG['mail_reply'] ?? 'jejumong2@naver.com'),
+    'Subject: ' . $enc($subject),
+    'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . $host . '>',
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=UTF-8',
     'Content-Transfer-Encoding: base64',
-  ]);
-  return @mail($to, $enc($subject), chunk_split(base64_encode($text)), $headers, '-f' . $from);
+  ];
+  $body = chunk_split(base64_encode($text));
+  if ($su && $sp && smtp_send($CFG['smtp_host'] ?? 'smtp.naver.com', (int)($CFG['smtp_port'] ?? 465), $su, $sp, $from, $to, implode("\r\n", $head) . "\r\n\r\n" . $body)) return true;
+  if (!function_exists('mail')) return false;
+  $h2 = array_values(array_filter($head, function ($l) { return strpos($l, 'To:') !== 0 && strpos($l, 'Subject:') !== 0; }));
+  return @mail($to, $enc($subject), $body, implode("\r\n", $h2), '-f' . $from);
+}
+function smtp_send($host, $port, $user, $pass, $from, $to, $data) {
+  $fp = @stream_socket_client('ssl://' . $host . ':' . $port, $en, $es, 10);
+  if (!$fp) { error_log("[jeju] smtp connect fail: $es"); return false; }
+  stream_set_timeout($fp, 10);
+  $read = function () use ($fp) { $r = ''; while (($l = fgets($fp, 1024)) !== false) { $r .= $l; if (strlen($l) < 4 || $l[3] === ' ') break; } return $r; };
+  $cmd = function ($c, $ok) use ($fp, $read) { if ($c !== null) fwrite($fp, $c . "\r\n"); $r = $read(); if ((int)substr($r, 0, 3) !== $ok) throw new Exception(trim($r)); return $r; };
+  try {
+    $cmd(null, 220);
+    $cmd('EHLO jejuieum.com', 250);
+    $cmd('AUTH LOGIN', 334); $cmd(base64_encode($user), 334); $cmd(base64_encode($pass), 235);
+    $cmd('MAIL FROM:<' . $from . '>', 250);
+    $cmd('RCPT TO:<' . $to . '>', 250);
+    $cmd('DATA', 354);
+    $cmd(preg_replace('/^\./m', '..', $data) . "\r\n.", 250);
+    $cmd('QUIT', 221);
+    fclose($fp); return true;
+  } catch (Throwable $e) { error_log('[jeju] smtp fail: ' . $e->getMessage()); @fclose($fp); return false; }
 }

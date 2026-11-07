@@ -16,7 +16,7 @@ else {
   $R = $raw ? json_decode($raw, true) : [];
   if (!is_array($R)) $R = [];
 }
-if ($a === '' || $a === 'ping') out(['pong' => true, 'time' => iso(now()), 'schema' => (int)(one("SELECT v FROM ji_meta WHERE k='schema'")['v'] ?? 0), 'mail' => function_exists('mail')]);
+if ($a === '' || $a === 'ping') out(['pong' => true, 'time' => iso(now()), 'schema' => (int)(one("SELECT v FROM ji_meta WHERE k='schema'")['v'] ?? 0), 'mail' => function_exists('mail'), 'smtp' => !empty($CFG['smtp_user']) && !empty($CFG['smtp_pass'])]);
 
 function post_out($r) {
   $x = json_decode($r['extra'] ?: '{}', true);
