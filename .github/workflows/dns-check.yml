@@ -8,11 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for s in 8.8.8.8 1.1.1.1 ns1.cafe24.com; do
-            echo "== server $s"
-            dig +short @$s jejuieum.com A || true
-            dig +short @$s www.jejuieum.com || true
-          done
-          echo "== NS"; dig +short jejuieum.com NS
-          echo "== HTTP"; curl -sSI -m 15 http://jejuieum.com/ | head -5 || true
-# run 1
+          echo "== A"; dig +short jejuieum.com A; dig +short www.jejuieum.com
+          for u in http://jejuieum.com/ https://jejuieum.com/ https://www.jejuieum.com/ https://jeju.hintdaily.com/ https://jejuieum.com/jangnal.html; do
+            echo "== $u"; curl -sS -o /dev/null -m 20 -w "%{http_code} -> %{redirect_url}\n" "$u" || true; done
+          echo "== cert"; echo | openssl s_client -connect jejuieum.com:443 -servername jejuieum.com 2>/dev/null | openssl x509 -noout -subject -issuer -dates || true
+          echo "== api cors"; curl -sS -m 20 -D - -o /tmp/b -H "Origin: https://jejuieum.com" -H "Content-Type: text/plain" --data '{}' "https://andend07.mycafe24.com/jeju/api/?a=ping" | grep -i "access-control-allow-origin\|HTTP/"; cat /tmp/b; echo
+# run 2
