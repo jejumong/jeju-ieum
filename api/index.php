@@ -16,7 +16,7 @@ else {
   $R = $raw ? json_decode($raw, true) : [];
   if (!is_array($R)) $R = [];
 }
-if ($a === '' || $a === 'ping') out(['pong' => true, 'time' => iso(now()), 'schema' => (int)(one("SELECT v FROM ji_meta WHERE k='schema'")['v'] ?? 0)]);
+if ($a === '' || $a === 'ping') out(['pong' => true, 'time' => iso(now()), 'schema' => (int)(one("SELECT v FROM ji_meta WHERE k='schema'")['v'] ?? 0), 'mail' => function_exists('mail')]);
 
 function post_out($r) {
   $x = json_decode($r['extra'] ?: '{}', true);
@@ -120,6 +120,44 @@ case 'account_delete': {
   q("DELETE FROM ji_notifications WHERE user_id = ?", [$u['id']]);
   q("DELETE FROM ji_club_joins WHERE applicant = ?", [$u['id']]);
   q("DELETE FROM ji_users WHERE id = ?", [$u['id']]);
+  out(true);
+}
+/* 비밀번호 찾기: 이메일로 재설정 링크 보내기 (가입 여부는 알려 주지 않음) */
+case 'pw_reset_request': {
+  $email = strtolower(str($R['email'] ?? '', 190));
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL)) fail('올바른 이메일 형식이 아닙니다.');
+  q("DELETE FROM ji_resets WHERE created_at < (NOW() - INTERVAL 1 DAY)");
+  $byIp = one("SELECT COUNT(*) n FROM ji_resets WHERE ip = ? AND created_at > (NOW() - INTERVAL 1 HOUR)", [ip()])['n'];
+  $byMail = one("SELECT COUNT(*) n FROM ji_resets WHERE email = ? AND created_at > (NOW() - INTERVAL 1 HOUR)", [$email])['n'];
+  if ($byIp >= 5 || $byMail >= 3) fail('요청이 너무 많아요. 1시간 뒤에 다시 해 주세요.', 429);
+  $u = one("SELECT id, nick FROM ji_users WHERE email = ?", [$email]);
+  if ($u) {
+    $tok = bin2hex(random_bytes(32));
+    q("INSERT INTO ji_resets (token, user_id, email, ip, expires_at, created_at) VALUES (?,?,?,?,?,?)",
+      [token_hash($tok), $u['id'], $email, ip(), date('Y-m-d H:i:s', time() + 1800), now()]);
+    $link = rtrim($CFG['site_url'], '/') . '/reset.html#t=' . $tok;
+    $sent = send_mail($email, '[제주이음] 비밀번호 재설정 안내',
+      $u['nick'] . "님, 안녕하세요. 제주이음입니다.\n\n" .
+      "아래 링크를 눌러 새 비밀번호를 정해 주세요. 링크는 30분 동안, 한 번만 쓸 수 있어요.\n\n" . $link . "\n\n" .
+      "직접 요청하지 않으셨다면 이 메일은 무시하셔도 됩니다. 비밀번호는 바뀌지 않아요.\n\n" .
+      "— 제주이음 (jejuieum.com)\n문의: jejumong2@naver.com");
+    if (!$sent) error_log('[jeju] reset mail failed: ' . $email);
+  } else {
+    q("INSERT INTO ji_resets (token, user_id, email, ip, expires_at, used_at, created_at) VALUES (?,?,?,?,?,?,?)",
+      [token_hash(bin2hex(random_bytes(32))), '', $email, ip(), now(), now(), now()]);   // 횟수 제한용 기록만
+  }
+  out(true);
+}
+case 'pw_reset': {
+  $tok = (string)($R['t'] ?? ''); $pw = (string)($R['pw'] ?? '');
+  if (!preg_match('/^[a-f0-9]{64}$/', $tok)) fail('링크가 올바르지 않아요. 비밀번호 찾기를 다시 해 주세요.');
+  if (strlen($pw) < 8) fail('비밀번호는 8자 이상이어야 합니다.');
+  $r = one("SELECT * FROM ji_resets WHERE token = ?", [token_hash($tok)]);
+  if (!$r || $r['used_at'] || strtotime($r['expires_at']) < time() || !$r['user_id']) fail('링크가 만료되었거나 이미 사용됐어요. 비밀번호 찾기를 다시 해 주세요.');
+  q("UPDATE ji_users SET pass = ? WHERE id = ?", [password_hash($pw, PASSWORD_DEFAULT), $r['user_id']]);
+  q("UPDATE ji_resets SET used_at = ? WHERE user_id = ? AND used_at IS NULL", [now(), $r['user_id']]);
+  q("DELETE FROM ji_sessions WHERE user_id = ?", [$r['user_id']]);   // 모든 기기에서 로그아웃
+  q("DELETE FROM ji_login_fails WHERE ip = ?", [ip()]);
   out(true);
 }
 case 'my_comments': {
@@ -440,6 +478,7 @@ case 'admin_set': {
 }
 case 'admin_inquiries': {
   admin($R);
+  q("DELETE FROM ji_inquiries WHERE created_at < (NOW() - INTERVAL 12 MONTH)");   // 개인정보처리방침: 접수 후 1년 보관
   out(array_map(function ($r) { $d = json_decode($r['data'], true) ?: []; $d['id'] = $r['id']; $d['status'] = $r['status'];
     $d['date'] = date('Y-m-d H:i', strtotime($r['created_at'])); $d['user_id'] = $r['user_id']; $d['user_nick'] = $r['nick'];
     $d['replied_at'] = $r['replied_at'] ? date('Y-m-d H:i', strtotime($r['replied_at'])) : null; return $d; },

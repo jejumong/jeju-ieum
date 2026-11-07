@@ -403,8 +403,8 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
       '<div class="footer-bottom"><div class="footer-inner">' +
         '<div>© 2026 제주이음 · 제주특별자치도 제주시</div>' +
         '<div class="footer-links">' +
-          '<a href="#" onclick="return info()">이용약관</a>' +
-          '<a href="#" onclick="return info()">개인정보처리방침</a>' +
+          '<a href="terms.html">이용약관</a>' +
+          '<a href="privacy.html"><b>개인정보처리방침</b></a>' +
           '<a href="contact.html?type=' + encodeURIComponent("입점·제휴 문의") + '">제휴문의</a>' +
         '</div>' +
       '</div></div>' +

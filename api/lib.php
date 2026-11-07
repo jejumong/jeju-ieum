@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 8;
+const JI_SCHEMA = 9;
 
 /* ── 응답 ── */
 function cors() {
@@ -110,6 +110,9 @@ function migrate($pdo) {
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_likes (
     post_id VARCHAR(40) NOT NULL, user_id CHAR(36) NOT NULL, active TINYINT(1) NOT NULL DEFAULT 1, created_at DATETIME NOT NULL,
     PRIMARY KEY (post_id, user_id), INDEX (user_id))$T");
+  $pdo->exec("CREATE TABLE IF NOT EXISTS ji_resets (
+    token CHAR(64) PRIMARY KEY, user_id CHAR(36) NOT NULL, email VARCHAR(190) NOT NULL, ip VARCHAR(45) NOT NULL,
+    expires_at DATETIME NOT NULL, used_at DATETIME NULL, created_at DATETIME NOT NULL, INDEX (user_id), INDEX (ip, created_at), INDEX (email, created_at))$T");
   $pdo->exec("CREATE TABLE IF NOT EXISTS ji_login_fails (
     ip VARCHAR(45) NOT NULL, at DATETIME NOT NULL, INDEX (ip, at))$T");
   // 버전별 정리
@@ -226,4 +229,23 @@ function notify($uid, $kind, $title, $body, $link, $pushTitle = null, $pushBody 
     CURLOPT_CONNECTTIMEOUT => 3, CURLOPT_TIMEOUT => 4,
     CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Key ' . $CFG['onesignal_key']]]);
   @curl_exec($c); @curl_close($c);   // 푸시가 실패해도 알림함에는 남음
+}
+
+
+/* 메일 보내기 (카페24 서버의 기본 메일 기능 사용) */
+function send_mail($to, $subject, $text) {
+  global $CFG;
+  if (!empty($CFG['mail_log'])) { @file_put_contents($CFG['mail_log'], "TO: $to\n$subject\n$text\n---\n", FILE_APPEND); return true; }   // 개발용
+  if (!function_exists('mail')) return false;
+  $from = $CFG['mail_from'] ?? ('noreply@' . (parse_url($CFG['site_url'] ?? '', PHP_URL_HOST) ?: 'jejuieum.com'));
+  $reply = $CFG['mail_reply'] ?? 'jejumong2@naver.com';
+  $enc = function ($t) { return '=?UTF-8?B?' . base64_encode($t) . '?='; };
+  $headers = implode("\r\n", [
+    'From: ' . $enc('제주이음') . ' <' . $from . '>',
+    'Reply-To: ' . $reply,
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding: base64',
+  ]);
+  return @mail($to, $enc($subject), chunk_split(base64_encode($text)), $headers, '-f' . $from);
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>새 비밀번호 정하기 — 제주이음</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="stylesheet" href="assets/style.css?v=20261107t">
+</head>
+<body data-active="">
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>새 비밀번호 정하기</h1>
+    <p class="sub-t">앞으로 로그인할 때 쓸 비밀번호를 정해 주세요.</p>
+    <div id="r-form">
+      <div class="field">
+        <label for="pw">새 비밀번호</label>
+        <input type="password" id="pw" placeholder="8자 이상" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="pw2">새 비밀번호 확인</label>
+        <input type="password" id="pw2" placeholder="한 번 더 입력" autocomplete="new-password">
+      </div>
+      <button class="btn primary block" id="r-btn" onclick="doReset()">비밀번호 바꾸기</button>
+    </div>
+    <div id="r-bad" hidden style="font-size:14.5px;line-height:1.7;color:var(--ink-2)">링크가 올바르지 않아요. 메일의 링크를 다시 눌러 주시거나 <a href="forgot.html">비밀번호 찾기</a>를 다시 해 주세요.</div>
+    <div id="r-done" hidden style="font-size:14.5px;line-height:1.7;color:var(--ink-2)">✅ 비밀번호를 바꿨어요. 보안을 위해 모든 기기에서 로그아웃됐어요.<br><a class="btn primary block" style="margin-top:14px" href="login.html">새 비밀번호로 로그인</a></div>
+  </div>
+</div>
+
+<script src="assets/common.js?v=20261107t"></script>
+<script src="assets/db.js?v=20261107t"></script>
+<script>
+var T = (location.hash.match(/t=([a-f0-9]{64})/) || [])[1] || "";
+if (T) history.replaceState(null, "", location.pathname);   // 주소창에서 링크 값 지우기
+else { document.getElementById("r-form").hidden = true; document.getElementById("r-bad").hidden = false; }
+function doReset() {
+  var pw = document.getElementById("pw").value, pw2 = document.getElementById("pw2").value, btn = document.getElementById("r-btn");
+  if (pw.length < 8) { alert("비밀번호는 8자 이상이어야 합니다."); return; }
+  if (pw !== pw2) { alert("두 비밀번호가 서로 달라요."); return; }
+  btn.disabled = true; btn.textContent = "바꾸는 중…";
+  JIDB.call("pw_reset", { t: T, pw: pw }).then(function(){
+    try { JIDB.signOut && JIDB.signOut(); } catch (e) {}
+    document.getElementById("r-form").hidden = true; document.getElementById("r-done").hidden = false;
+  }, function(e){
+    alert((e && e.message) || "잠시 후 다시 시도해 주세요.");
+    btn.disabled = false; btn.textContent = "비밀번호 바꾸기";
+  });
+}
+</script>
+</body>
+</html>
