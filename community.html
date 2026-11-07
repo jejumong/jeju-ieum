@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107p">
+<link rel="stylesheet" href="assets/style.css?v=20261107q">
 </head>
 <body data-active="community">
 
@@ -63,19 +63,19 @@
         </table>
       </div>
 
-      <div class="pagination" id="pager"></div>
+      <div class="pg-row"><div class="pagination" id="pager"></div><a class="btn accent pg-write2" id="write-link2" href="write.html">✏️ 글쓰기</a></div>
     </section>
   </div>
 </main>
 
-<script src="assets/common.js?v=20261107p"></script>
-<script src="assets/db.js?v=20261107p"></script>
-<script src="assets/notify.js?v=20261107p"></script>
-<script src="assets/seed-trade.js?v=20261107p"></script>
-<script src="assets/seed-extra.js?v=20261107p"></script>
-<script src="assets/seed-new.js?v=20261107p"></script>
-<script src="assets/seed-comments.js?v=20261107p"></script>
-<script src="assets/admin-data.js?v=20261107p"></script>
+<script src="assets/common.js?v=20261107q"></script>
+<script src="assets/db.js?v=20261107q"></script>
+<script src="assets/notify.js?v=20261107q"></script>
+<script src="assets/seed-trade.js?v=20261107q"></script>
+<script src="assets/seed-extra.js?v=20261107q"></script>
+<script src="assets/seed-new.js?v=20261107q"></script>
+<script src="assets/seed-comments.js?v=20261107q"></script>
+<script src="assets/admin-data.js?v=20261107q"></script>
 <script>
 var params = new URLSearchParams(location.search);
 var board = params.get("board");
@@ -93,6 +93,7 @@ if (board) {
   });
   document.getElementById("write-link").href = "write.html?board=" + encodeURIComponent(board);
   document.getElementById("write-link").textContent = "✏️ " + board + " 글쓰기";
+  document.getElementById("write-link2").href = "write.html?board=" + encodeURIComponent(board);
   document.body.classList.add("board-on");   // 휴대폰에서도 게시판 안에서는 글쓰기 버튼 보이기
 }
 if (q) {

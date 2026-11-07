@@ -1881,3 +1881,13 @@ a.act-item:hover{border-color:var(--sea-200)}
 .re-who{margin-top:8px}
 .re-radio input[type=radio]{width:auto!important;height:auto;margin:0;flex:none;accent-color:var(--sea)}
 .re-radio label{white-space:nowrap}
+
+/* 커뮤니티: 목록 아래 페이지 번호 오른쪽 글쓰기 버튼 */
+.pg-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-top:28px}
+.pg-row .pagination{grid-column:2;margin-top:0}
+.pg-row .pg-write2{grid-column:3;justify-self:end;white-space:nowrap}
+@media (max-width:680px){
+  .pg-row{grid-template-columns:1fr;margin-top:20px}
+  .pg-row .pagination{grid-column:1}
+  .pg-row .pg-write2{grid-column:1;justify-self:stretch;text-align:center}
+}
