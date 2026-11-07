@@ -1,0 +1,18 @@
+name: 도메인 DNS 확인
+on:
+  push:
+    paths: [".github/workflows/dns-check.yml"]
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for s in 8.8.8.8 1.1.1.1 ns1.cafe24.com; do
+            echo "== server $s"
+            dig +short @$s jejuieum.com A || true
+            dig +short @$s www.jejuieum.com || true
+          done
+          echo "== NS"; dig +short jejuieum.com NS
+          echo "== HTTP"; curl -sSI -m 15 http://jejuieum.com/ | head -5 || true
+# run 1
