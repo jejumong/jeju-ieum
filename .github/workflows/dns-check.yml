@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
+          for n in ns1.cafe24.com ns2.cafe24.com ns1.cafe24.co.kr ns2.cafe24.co.kr; do echo "## $n"; dig +short +tcp @$n jejuieum.com TXT; done
           for s in ns1.cafe24.com 8.8.8.8; do
             echo "=== $s"
             echo "-- TXT root"; dig +short @$s jejuieum.com TXT
@@ -18,4 +19,4 @@ jobs:
             echo "-- A"; dig +short @$s jejuieum.com A; dig +short @$s www.jejuieum.com
             echo "-- wildcard"; dig +short @$s zzz.jejuieum.com
           done
-# r4
+# r5
