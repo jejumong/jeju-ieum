@@ -91,7 +91,7 @@ var ICON_CMT = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="tru
 
 /* 카드 대표 사진: 회원이 올린 첫 사진 → 없으면 회원 글은 게시판 아이콘, 예시 글은 예시 사진 */
 var BOARD_ICON = { "구인구직": "💼", "중고사고팔기": "🛍️", "부동산": "🏠", "제주상점": "🏪", "동호회": "🏄", "특가공구": "🎁", "축제정보": "🎉",
-  "자유게시판": "💬", "질문하기": "🤝", "생활정보": "📌", "최신뉴스": "📰", "취미.여행": "🧭", "교육": "📚", "건강웰빙": "🌿" };
+  "자유게시판": "💬", "질문하기": "🤝", "생활정보": "📌", "최신뉴스": "📰", "취미·여행": "🧭", "교육": "📚", "건강웰빙": "🌿" };
 function postPhotos(p) { return (p && p.extra && Array.isArray(p.extra.photos)) ? p.extra.photos : []; }
 function cardImage(p) {
   var ph = postPhotos(p);

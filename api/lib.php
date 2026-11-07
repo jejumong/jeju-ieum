@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 7;
+const JI_SCHEMA = 8;
 
 /* ── 응답 ── */
 function cors() {
@@ -119,7 +119,9 @@ function migrate($pdo) {
   }
   if ($v < 7) {   // 게시판 이름 변경: 고민상담실 → 질문하기, 취미여행 → 취미.여행
     $pdo->exec("UPDATE ji_posts SET board = '질문하기' WHERE board = '고민상담실'");
-    $pdo->exec("UPDATE ji_posts SET board = '취미.여행' WHERE board = '취미여행'");
+  }
+  if ($v < 8) {   // 취미여행·취미.여행 → 취미·여행 (가운데 점)
+    $pdo->exec("UPDATE ji_posts SET board = '취미·여행' WHERE board IN ('취미여행', '취미.여행')");
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }
