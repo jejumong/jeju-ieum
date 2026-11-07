@@ -1,0 +1,17 @@
+name: 도메인 DNS 확인
+on:
+  push:
+    paths: [".github/workflows/dns-check.yml"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for s in ns1.cafe24.com 8.8.8.8; do
+            echo "=== $s"
+            echo "-- MX"; dig +short @$s jejuieum.com MX
+            echo "-- TXT root"; dig +short @$s jejuieum.com TXT
+            echo "-- DKIM"; dig +short @$s zmail._domainkey.jejuieum.com TXT
+            echo "-- A"; dig +short @$s jejuieum.com A
+          done
+# r1
