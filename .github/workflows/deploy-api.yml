@@ -45,7 +45,8 @@ jobs:
                   "site_url" => $site, "origins" => $origins, "admins" => $admins,
                   "onesignal_app" => "c7fd4d45-3d1b-4157-9230-d29e4676f659", "onesignal_key" => (string)getenv("OS_KEY"),
                   "smtp_user" => trim((string)getenv("SMTP_USER")), "smtp_pass" => trim((string)getenv("SMTP_PASS")),
-                  "smtp_host" => trim((string)getenv("SMTP_HOST")), "mail_from" => trim((string)getenv("MAIL_FROM")), "mail_reply" => trim((string)getenv("MAIL_REPLY"))];
+                  "smtp_host" => trim((string)getenv("SMTP_HOST")), "mail_from" => trim((string)getenv("MAIL_FROM")), "mail_reply" => trim((string)getenv("MAIL_REPLY")),
+                  "cron_key" => hash("sha256", "jeju-cron|" . getenv("DB_PASS"))];
             file_put_contents("deploy/config.php", "<?php\nreturn " . var_export($c, true) . ";\n");
           '
           php -l deploy/config.php && php -l deploy/index.php && php -l deploy/lib.php

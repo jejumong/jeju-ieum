@@ -16,7 +16,7 @@ else {
   $R = $raw ? json_decode($raw, true) : [];
   if (!is_array($R)) $R = [];
 }
-if ($a === '' || $a === 'ping') out(['pong' => true, 'time' => iso(now()), 'schema' => (int)(one("SELECT v FROM ji_meta WHERE k='schema'")['v'] ?? 0), 'mail' => function_exists('mail'), 'smtp' => !empty($CFG['smtp_user']) && !empty($CFG['smtp_pass'])]);
+if ($a === '' || $a === 'ping') out(['pong' => true, 'time' => iso(now()), 'schema' => (int)(one("SELECT v FROM ji_meta WHERE k='schema'")['v'] ?? 0), 'mail' => function_exists('mail'), 'smtp' => !empty($CFG['smtp_user']) && !empty($CFG['smtp_pass']), 'smtp_host' => (string)($CFG['smtp_host'] ?? '')]);
 
 function post_out($r) {
   $x = json_decode($r['extra'] ?: '{}', true);
@@ -140,7 +140,7 @@ case 'pw_reset_request': {
       $u['nick'] . "님, 안녕하세요. 제주이음입니다.\n\n" .
       "아래 링크를 눌러 새 비밀번호를 정해 주세요. 링크는 30분 동안, 한 번만 쓸 수 있어요.\n\n" . $link . "\n\n" .
       "직접 요청하지 않으셨다면 이 메일은 무시하셔도 됩니다. 비밀번호는 바뀌지 않아요.\n\n" .
-      "— 제주이음 (jejuieum.com)\n문의: jejumong2@naver.com");
+      "— 제주이음 (jejuieum.com)\n문의: help@jejuieum.com");
     if (!$sent) error_log('[jeju] reset mail failed: ' . $email);
   } else {
     q("INSERT INTO ji_resets (token, user_id, email, ip, expires_at, used_at, created_at) VALUES (?,?,?,?,?,?,?)",
@@ -159,6 +159,14 @@ case 'pw_reset': {
   q("DELETE FROM ji_sessions WHERE user_id = ?", [$r['user_id']]);   // 모든 기기에서 로그아웃
   q("DELETE FROM ji_login_fails WHERE ip = ?", [ip()]);
   out(true);
+}
+/* 메일 발송 점검: GitHub 매달 자동 실행 → help@ 로 점검 메일 (Brevo 키가 90일 안 쓰면 만료되는 것 방지) */
+case 'mail_check': {
+  $k = (string)($R['key'] ?? ''); $want = (string)($CFG['cron_key'] ?? '');
+  if ($want === '' || !hash_equals($want, $k)) fail('권한이 없어요', 403);
+  $to = !empty($CFG['mail_reply']) ? $CFG['mail_reply'] : 'jejumong2@naver.com';
+  $ok = send_mail($to, '[제주이음] 메일 발송 점검', "제주이음 서버의 자동 메일 점검입니다.\n\n이 메일이 왔다면 비밀번호 찾기 메일도 정상으로 나가고 있어요.\n매달 1번 자동으로 보내집니다.\n\n보낸 시각: " . date('Y-m-d H:i'));
+  out(['sent' => (bool)$ok, 'via' => (!empty($CFG['smtp_user']) ? ($CFG['smtp_host'] ?? 'smtp') : 'mail()'), 'to' => $to]);
 }
 case 'my_comments': {
   $u = me($R);
