@@ -9,9 +9,13 @@ jobs:
       - run: |
           for s in ns1.cafe24.com 8.8.8.8; do
             echo "=== $s"
-            echo "-- MX"; dig +short @$s jejuieum.com MX
             echo "-- TXT root"; dig +short @$s jejuieum.com TXT
-            echo "-- DKIM"; dig +short @$s zmail._domainkey.jejuieum.com TXT
-            echo "-- A"; dig +short @$s jejuieum.com A
+            echo "-- brevo1"; dig +short @$s brevo1._domainkey.jejuieum.com CNAME
+            echo "-- brevo2"; dig +short @$s brevo2._domainkey.jejuieum.com CNAME
+            echo "-- dmarc"; dig +short @$s _dmarc.jejuieum.com TXT
+            echo "-- zmail"; dig +short @$s zmail._domainkey.jejuieum.com TXT | cut -c1-40
+            echo "-- MX"; dig +short @$s jejuieum.com MX
+            echo "-- A"; dig +short @$s jejuieum.com A; dig +short @$s www.jejuieum.com
+            echo "-- wildcard"; dig +short @$s zzz.jejuieum.com
           done
-# r2
+# r3
