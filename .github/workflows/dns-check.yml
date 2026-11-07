@@ -14,4 +14,4 @@ jobs:
             echo "-- DKIM"; dig +short @$s zmail._domainkey.jejuieum.com TXT
             echo "-- A"; dig +short @$s jejuieum.com A
           done
-# r1
+# r2
