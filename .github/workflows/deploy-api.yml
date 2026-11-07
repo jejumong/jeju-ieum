@@ -31,6 +31,9 @@ jobs:
           ADMINS: ${{ secrets.ADMIN_EMAILS }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_REPLY: ${{ secrets.MAIL_REPLY }}
           SITE_URL: ${{ vars.SITE_URL || 'https://jejuieum.com/' }}
         run: |
           mkdir -p deploy && cp -r api/. deploy/ && rm -f deploy/config.php deploy/.htaccess
@@ -41,7 +44,8 @@ jobs:
             $c = ["db_host" => "localhost", "db_name" => getenv("DB_NAME"), "db_user" => getenv("DB_USER"), "db_pass" => getenv("DB_PASS"),
                   "site_url" => $site, "origins" => $origins, "admins" => $admins,
                   "onesignal_app" => "c7fd4d45-3d1b-4157-9230-d29e4676f659", "onesignal_key" => (string)getenv("OS_KEY"),
-                  "smtp_user" => trim((string)getenv("SMTP_USER")), "smtp_pass" => trim((string)getenv("SMTP_PASS"))];
+                  "smtp_user" => trim((string)getenv("SMTP_USER")), "smtp_pass" => trim((string)getenv("SMTP_PASS")),
+                  "smtp_host" => trim((string)getenv("SMTP_HOST")), "mail_from" => trim((string)getenv("MAIL_FROM")), "mail_reply" => trim((string)getenv("MAIL_REPLY"))];
             file_put_contents("deploy/config.php", "<?php\nreturn " . var_export($c, true) . ";\n");
           '
           php -l deploy/config.php && php -l deploy/index.php && php -l deploy/lib.php

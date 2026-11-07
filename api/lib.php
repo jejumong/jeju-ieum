@@ -240,13 +240,13 @@ function send_mail($to, $subject, $text) {
   if (!empty($CFG['mail_log'])) { @file_put_contents($CFG['mail_log'], "TO: $to\n$subject\n$text\n---\n", FILE_APPEND); return true; }   // 개발용
   $enc = function ($t) { return '=?UTF-8?B?' . base64_encode($t) . '?='; };
   $su = (string)($CFG['smtp_user'] ?? ''); $sp = (string)($CFG['smtp_pass'] ?? '');
-  $from = $su ?: ($CFG['mail_from'] ?? ('noreply@' . (parse_url($CFG['site_url'] ?? '', PHP_URL_HOST) ?: 'jejuieum.com')));
+  $from = !empty($CFG['mail_from']) ? $CFG['mail_from'] : ($su && strpos($su, '@naver.com') ? $su : ('noreply@' . (parse_url($CFG['site_url'] ?? '', PHP_URL_HOST) ?: 'jejuieum.com')));
   $host = parse_url($CFG['site_url'] ?? '', PHP_URL_HOST) ?: 'jejuieum.com';
   $head = [
     'Date: ' . date('r'),
     'From: ' . $enc('제주이음') . ' <' . $from . '>',
     'To: <' . $to . '>',
-    'Reply-To: ' . ($CFG['mail_reply'] ?? 'jejumong2@naver.com'),
+    'Reply-To: ' . (!empty($CFG['mail_reply']) ? $CFG['mail_reply'] : 'jejumong2@naver.com'),
     'Subject: ' . $enc($subject),
     'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . $host . '>',
     'MIME-Version: 1.0',
@@ -254,7 +254,7 @@ function send_mail($to, $subject, $text) {
     'Content-Transfer-Encoding: base64',
   ];
   $body = chunk_split(base64_encode($text));
-  if ($su && $sp && smtp_send($CFG['smtp_host'] ?? 'smtp.naver.com', (int)($CFG['smtp_port'] ?? 465), $su, $sp, $from, $to, implode("\r\n", $head) . "\r\n\r\n" . $body)) return true;
+  if ($su && $sp && smtp_send(!empty($CFG['smtp_host']) ? $CFG['smtp_host'] : 'smtp.naver.com', (int)(!empty($CFG['smtp_port']) ? $CFG['smtp_port'] : 465), $su, $sp, $from, $to, implode("\r\n", $head) . "\r\n\r\n" . $body)) return true;
   if (!function_exists('mail')) return false;
   $h2 = array_values(array_filter($head, function ($l) { return strpos($l, 'To:') !== 0 && strpos($l, 'Subject:') !== 0; }));
   return @mail($to, $enc($subject), $body, implode("\r\n", $h2), '-f' . $from);
