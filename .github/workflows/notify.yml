@@ -29,5 +29,5 @@ jobs:
         env:
           ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID || 'c7fd4d45-3d1b-4157-9230-d29e4676f659' }}
           ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
-          SITE_URL: ${{ vars.SITE_URL || 'https://jeju.hintdaily.com/' }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://jejuieum.com/' }}
         run: node scripts/notify-changes.mjs

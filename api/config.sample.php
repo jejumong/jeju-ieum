@@ -6,8 +6,8 @@ return [
   'db_name' => 'DB이름',
   'db_user' => 'DB아이디',
   'db_pass' => 'DB비밀번호',
-  'site_url' => 'https://jeju.hintdaily.com/',
-  'origins' => ['https://jeju.hintdaily.com', 'https://jejumong.github.io'],
+  'site_url' => 'https://jejuieum.com/',
+  'origins' => ['https://jejuieum.com', 'https://www.jejuieum.com', 'https://jeju.hintdaily.com', 'https://jejumong.github.io'],
   'admins' => [],                 // 관리자 이메일 (소문자)
   'onesignal_app' => 'c7fd4d45-3d1b-4157-9230-d29e4676f659',
   'onesignal_key' => '',          // OneSignal REST API 키 (비우면 휴대폰 푸시 없이 알림함만)

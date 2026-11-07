@@ -29,7 +29,7 @@ jobs:
           DB_PASS: ${{ secrets.CAFE24_DB_PASSWORD }}
           OS_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
           ADMINS: ${{ secrets.ADMIN_EMAILS }}
-          SITE_URL: ${{ vars.SITE_URL || 'https://jeju.hintdaily.com/' }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://jejuieum.com/' }}
         run: |
           mkdir -p deploy && cp -r api/. deploy/ && rm -f deploy/config.php deploy/.htaccess
           php -r '

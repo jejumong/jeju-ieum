@@ -15,7 +15,7 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..")
 const rd = (f) => fs.readFileSync(path.join(ROOT, f), "utf8");
 const wr = (f, s) => { const p = path.join(ROOT, f); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, s); };
 
-let host = "jeju.hintdaily.com";
+let host = "jejuieum.com";
 try { host = rd("CNAME").trim() || host; } catch (e) {}
 const SITE = "https://" + host + "/";
 

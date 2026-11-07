@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /write.html
 Disallow: /mypage.html
 
-Sitemap: https://jeju.hintdaily.com/sitemap.xml
+Sitemap: https://jejuieum.com/sitemap.xml
