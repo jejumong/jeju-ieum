@@ -1,15 +1,20 @@
-# 매달 1일 오전 9시(한국 시간) 서버가 help@jejuieum.com 으로 점검 메일을 보냅니다.
-# Brevo SMTP 키는 90일 동안 안 쓰면 만료되므로, 매달 한 번 써서 살려 둡니다.
+# 매달 1일 오전 9시(한국 시간)에 자동으로 실행됩니다.
+#  ① 서버가 help@jejuieum.com 으로 점검 메일을 보냄 (Brevo SMTP 키는 90일 안 쓰면 만료되므로 매달 써서 살려 둠)
+#  ② 저장소에 실행 기록(.github/keepalive.txt)을 남김
+#     → GitHub 는 60일 동안 저장소에 변화가 없으면 정기 작업을 멈추므로, 매달 기록을 남겨 계속 돌아가게 함
 name: 메일 발송 점검
 on:
   schedule:
     - cron: "0 0 1 * *"
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - name: 점검 메일 보내기
+        id: mail
         env:
           DB_PASS: ${{ secrets.CAFE24_DB_PASSWORD }}
         run: |
@@ -17,3 +22,15 @@ jobs:
           R=$(curl -sS --max-time 40 -H "Content-Type: text/plain" --data "{\"key\":\"$KEY\"}" "https://andend07.mycafe24.com/jeju/api/?a=mail_check")
           echo "$R"
           echo "$R" | grep -q '"sent":true' || { echo "::error::메일을 보내지 못했어요. Brevo SMTP 설정을 확인해 주세요."; exit 1; }
+
+      - uses: actions/checkout@v4
+        if: always()
+      - name: 저장소에 실행 기록 남기기 (60일 멈춤 방지)
+        if: always()
+        run: |
+          echo "마지막 자동 점검: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') · 메일: ${{ steps.mail.outcome }}" > .github/keepalive.txt
+          git config user.name "jeju-ieum-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/keepalive.txt
+          git commit -m "자동 점검 기록" || exit 0
+          git pull --rebase origin main && git push
