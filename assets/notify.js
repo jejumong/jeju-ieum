@@ -154,6 +154,58 @@ var JINotify = (function () {
     document.addEventListener("keydown", function k(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", k); } });
   }
 
+  /* ── 로그인한 회원에게 알림을 기본으로 켜기 ──
+     브라우저(크롬·사파리·엣지)는 사용자가 직접 한 번 '허용'을 눌러야만 알림을 켤 수 있어서,
+     · 이미 허용된 기기 → 아무것도 묻지 않고 바로 회원 계정과 연결
+     · 아직 묻지 않은 기기 → 화면 아래 '알림 켜기' 띠를 띄움 (한 번 누르면 허용 창)
+     · 아이폰 사파리 → 홈 화면에 추가해야 받을 수 있다는 안내
+     · 차단한 기기 → 묻지 않음 */
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  function snoozed(k) { var t = +ls(k) || 0; return Date.now() < t; }
+  function snooze(k, days) { ls(k, String(Date.now() + days * 864e5)); }
+  function autoPrompt() {
+    if (!cfg.onesignalAppId) return;
+    if (/\/(login|signup)\.html$/.test(location.pathname)) return;
+    var u = (typeof currentUser === "function") ? currentUser() : null;
+    if (!u || !u.id) return;
+    if (isIOSBrowser()) {
+      if (!("serviceWorker" in navigator) || snoozed("ji_push_ios")) return;
+      return banner("📱 아이폰은 <b>공유 버튼(□↑) → 홈 화면에 추가</b> 후, 그 아이콘으로 열면 쪽지·댓글 알림을 받을 수 있어요.", null, function () { snooze("ji_push_ios", 7); });
+    }
+    if (!pushSupported()) return;
+    var perm = window.Notification ? Notification.permission : "denied";
+    if (perm === "granted") { linkAccount(); return; }
+    if (perm !== "default" || snoozed("ji_push_ask")) return;
+    banner("🔔 쪽지·댓글·좋아요 알림을 이 기기로 받아 보세요. (무료)", "알림 켜기", function () { snooze("ji_push_ask", 3); }, function (bar) {
+      enableAccountPush().then(function (r) {
+        if (r.push) { bar.querySelector(".jpb-t").innerHTML = "✅ 이제 이 기기로 알림을 받아요."; bar.querySelector(".jpb-a").remove(); setTimeout(function () { bar.remove(); }, 1800); }
+        else { if (r.denied) snooze("ji_push_ask", 30); bar.remove(); }
+      });
+    });
+  }
+  function banner(html, btn, onLater, onOk) {
+    if (document.getElementById("ji-push-bar")) return;
+    if (!document.getElementById("ji-push-css")) {
+      var st = document.createElement("style"); st.id = "ji-push-css";
+      st.textContent = "#ji-push-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:9990;width:min(560px,calc(100% - 24px));display:flex;align-items:center;gap:10px;padding:12px 12px 12px 16px;background:#16233a;color:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(10,25,50,.28);font-size:14px;line-height:1.5;animation:jpbIn .25s ease}" +
+        "#ji-push-bar .jpb-t{flex:1;min-width:0}#ji-push-bar b{color:#ffd27a}" +
+        "#ji-push-bar button{flex:none;border:0;border-radius:999px;font:inherit;font-weight:800;cursor:pointer;padding:9px 14px}" +
+        "#ji-push-bar .jpb-a{background:#ff8a1f;color:#fff}#ji-push-bar .jpb-x{background:transparent;color:rgba(255,255,255,.65);padding:9px 8px;font-weight:600}" +
+        "@keyframes jpbIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}";
+      document.head.appendChild(st);
+    }
+    var bar = document.createElement("div"); bar.id = "ji-push-bar"; bar.setAttribute("role", "dialog"); bar.setAttribute("aria-label", "알림 받기");
+    bar.innerHTML = '<div class="jpb-t">' + html + '</div>' + (btn ? '<button type="button" class="jpb-a">' + btn + '</button>' : '') + '<button type="button" class="jpb-x">' + (btn ? "나중에" : "닫기") + '</button>';
+    document.body.appendChild(bar);
+    bar.querySelector(".jpb-x").onclick = function () { onLater && onLater(); bar.remove(); };
+    if (btn) bar.querySelector(".jpb-a").onclick = function () { onOk(bar); };
+  }
+  function startAuto() {
+    var go = function () { setTimeout(autoPrompt, 1200); };
+    if (typeof JIDB !== "undefined" && JIDB.ready && JIDB.ready.then) JIDB.ready.then(go, go); else go();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startAuto); else startAuto();
+
   return { linkAccount: linkAccount, enableAccountPush: enableAccountPush, accountPushOn: accountPushOn, isIOSBrowser: isIOSBrowser,
     subscribe: subscribe, unsubscribe: unsubscribe, isOn: isOn, changes: changes, acknowledge: acknowledge, openSheet: openSheet, pushSupported: pushSupported };
 })();
