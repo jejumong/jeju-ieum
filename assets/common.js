@@ -37,6 +37,77 @@ var SITE_CFG = {
 };
 
 /* ── 저장소 헬퍼 ── */
+/* ── 공유하기 (머리글 ↗ 공유 버튼) ──
+   카카오톡: SITE_CFG.kakaoJsKey 로 카카오 공유 SDK 사용 (카카오 디벨로퍼스 '제주이음' 앱에 jejuieum.com 도메인 등록 필요)
+   안 되면 휴대폰 기본 공유 창 → 그것도 안 되면 링크 복사로 대신합니다. */
+var SHARE_ICO = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+var JIShare = (function () {
+  var KAKAO_SDK = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js";
+  function info() {
+    var o = window.SHARE_INFO || {};
+    var md = document.querySelector('meta[name="description"]');
+    var url = (o.url || location.href).split("#")[0];
+    return {
+      title: o.title || document.title.replace(/\s*—\s*제주이음\s*$/, "") || "제주이음",
+      text: o.text || (md ? md.content : "제주에 사는 우리를 잇는 생활 정보"),
+      url: url,
+      image: o.image || "https://jejuieum.com/assets/og-image.png"
+    };
+  }
+  function e(t) { var d = document.createElement("div"); d.textContent = t == null ? "" : String(t); return d.innerHTML; }
+  function close() { var w = document.getElementById("ji-share"); if (w) { w.classList.remove("on"); setTimeout(function () { w.remove(); }, 200); } document.removeEventListener("keydown", esc); }
+  function esc(ev) { if (ev.key === "Escape") close(); }
+  function toast(t) { var s = document.querySelector("#ji-share .js-msg"); if (s) { s.textContent = t; s.hidden = false; } }
+  function copy(url) {
+    var done = function () { toast("✅ 링크를 복사했어요. 원하는 곳에 붙여 넣으세요."); };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(done, fallback); else fallback();
+    function fallback() { var ta = document.createElement("textarea"); ta.value = url; ta.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (x) { toast(url); } ta.remove(); }
+  }
+  function native(i) { if (navigator.share) return navigator.share({ title: i.title, text: i.title, url: i.url }).then(close, function () {}); copy(i.url); }
+  function loadKakao(cb) {
+    if (window.Kakao && window.Kakao.Share) return cb();
+    var s = document.createElement("script"); s.src = KAKAO_SDK; s.crossOrigin = "anonymous";
+    s.onload = cb; s.onerror = function () { cb(new Error("sdk")); }; document.head.appendChild(s);
+  }
+  function kakao(i) {
+    if (!SITE_CFG.kakaoJsKey) return native(i);
+    loadKakao(function (err) {
+      try {
+        if (err || !window.Kakao) throw err || new Error("no sdk");
+        if (!Kakao.isInitialized()) Kakao.init(SITE_CFG.kakaoJsKey);
+        var link = { mobileWebUrl: i.url, webUrl: i.url };
+        Kakao.Share.sendDefault({ objectType: "feed",
+          content: { title: i.title, description: (i.text || "").slice(0, 100), imageUrl: i.image, link: link },
+          buttons: [{ title: "제주이음에서 보기", link: link }] });
+        close();
+      } catch (x) { native(i); }
+    });
+  }
+  function open() {
+    if (document.getElementById("ji-share")) return;
+    var i = info();
+    var w = document.createElement("div"); w.id = "ji-share"; w.setAttribute("role", "dialog"); w.setAttribute("aria-label", "공유하기");
+    w.innerHTML = '<div class="js-dim"></div><div class="js-sheet"><div class="js-grab"></div>' +
+      '<div class="js-hd"><h3>공유하기</h3><button type="button" class="js-x" aria-label="닫기">✕</button></div>' +
+      '<div class="js-prev"><img src="' + e(i.image) + '" alt=""><div><b>' + e(i.title) + '</b><small>' + e(i.url.replace(/^https?:\/\//, "").slice(0, 60)) + '</small></div></div>' +
+      '<div class="js-btns">' +
+        '<button type="button" data-k="kakao"><span style="background:#fee500">' + '<svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 4C7 4 3 7.1 3 11c0 2.5 1.7 4.7 4.2 6l-1 3.6c-.1.3.3.6.6.4l4.2-2.8c.3 0 .7.1 1 .1 5 0 9-3.1 9-7s-4-7-9-7z" fill="#3a1d1d"/></svg>' + '</span>카카오톡</button>' +
+        '<a href="sms:?&body=' + encodeURIComponent(i.title + " " + i.url) + '"><span style="background:#e8f7ec">✉️</span>문자</a>' +
+        '<button type="button" data-k="copy"><span style="background:var(--sea-50)">🔗</span>링크 복사</button>' +
+        (navigator.share ? '<button type="button" data-k="more"><span style="background:#f1f3f6">⋯</span>다른 앱</button>' : '') +
+      '</div><p class="js-msg" hidden></p></div>';
+    document.body.appendChild(w);
+    requestAnimationFrame(function () { w.classList.add("on"); });
+    w.querySelector(".js-dim").onclick = close; w.querySelector(".js-x").onclick = close;
+    w.querySelector(".js-btns").addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      if (b.dataset.k === "kakao") kakao(i); else if (b.dataset.k === "copy") copy(i.url); else if (b.dataset.k === "more") native(i);
+    });
+    document.addEventListener("keydown", esc);
+  }
+  return { open: open, close: close };
+})();
+
 var JI = {
   get: function (k, d) {
     try { var v = localStorage.getItem("ji_" + k); return v ? JSON.parse(v) : d; }
@@ -363,7 +434,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
         '<a href="index.html" class="logo" aria-label="제주이음 홈">' + LOGOMARK + '<span class="mark">제주<em>이음</em></span></a>' +
         '<div class="search"><span class="s-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="17" height="17"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="m13 13 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>' +
           '<input type="text" id="gsearch" placeholder="태풍 대비, 신구간, 소아과… 제주 생활을 찾아보세요"><button type="button" onclick="goSearch()">검색</button></div>' +
-        '<div class="header-actions">' + util + '</div>' +
+        '<div class="header-actions"><button type="button" class="hd-share" onclick="JIShare.open()" aria-label="이 페이지 공유하기" title="공유하기">' + SHARE_ICO + '<span>공유</span></button>' + util + '</div>' +
       '</div>' +
       '<nav class="gnb"><div class="gnb-inner">' + gnbItems + '</div></nav>' +
       gnbMobile +

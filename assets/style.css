@@ -1929,3 +1929,33 @@ a.act-item:hover{border-color:var(--sea-200)}
   .hm-feed a small{color:var(--ink-4);font-size:12.5px;flex:none}
   .hm-empty{padding:14px 0;color:var(--ink-4);font-size:14px;margin:0}
 }
+
+/* ── 머리글 공유 버튼 + 공유 창 ── */
+.hd-share{display:inline-flex;align-items:center;gap:5px;height:38px;padding:0 13px;border:0;border-radius:999px;background:var(--sea-50);color:var(--sea-700);font:inherit;font-size:14px;font-weight:800;cursor:pointer;flex-shrink:0}
+.hd-share:hover{background:var(--sea-100)}
+@media (max-width:680px){ .hd-share{height:34px;width:34px;padding:0;justify-content:center} .hd-share span{display:none} }
+#ji-share{position:fixed;inset:0;z-index:9995}
+#ji-share .js-dim{position:absolute;inset:0;background:rgba(10,20,35,.45);opacity:0;transition:opacity .2s}
+#ji-share .js-sheet{position:absolute;left:50%;bottom:0;width:min(520px,100%);transform:translate(-50%,100%);background:#fff;border-radius:22px 22px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(0,0,0,.15);transition:transform .22s ease}
+#ji-share.on .js-dim{opacity:1}
+#ji-share.on .js-sheet{transform:translate(-50%,0)}
+@media (min-width:681px){ #ji-share .js-sheet{bottom:50%;border-radius:22px;transform:translate(-50%,60%);opacity:0;transition:transform .2s,opacity .2s} #ji-share.on .js-sheet{transform:translate(-50%,50%);opacity:1} #ji-share .js-grab{display:none} }
+#ji-share .js-grab{width:40px;height:4px;border-radius:9px;background:#d5dbe2;margin:0 auto 12px}
+#ji-share .js-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#ji-share h3{font-size:17px;font-weight:800;color:var(--ink);margin:0}
+#ji-share .js-x{border:0;background:none;font-size:18px;color:var(--ink-4);cursor:pointer;padding:4px 6px}
+#ji-share .js-prev{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:16px}
+#ji-share .js-prev img{width:96px;height:50px;object-fit:cover;border-radius:10px;background:var(--sea-50);flex:none}
+#ji-share .js-prev div{min-width:0}
+#ji-share .js-prev b{display:block;font-size:14.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ji-share .js-prev small{font-size:12.5px;color:var(--ink-3)}
+#ji-share .js-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+#ji-share .js-btns button,#ji-share .js-btns a{border:0;background:none;font:inherit;font-size:12.5px;font-weight:700;color:var(--ink-2);text-decoration:none;cursor:pointer;padding:0}
+#ji-share .js-btns span{display:grid;place-items:center;width:56px;height:56px;border-radius:18px;margin:0 auto 7px;font-size:24px}
+#ji-share .js-msg{margin:14px 0 0;font-size:13.5px;color:var(--sea-700);text-align:center;word-break:break-all}
+@media (max-width:380px){
+  .header-actions{gap:3px}
+  .header-actions .hd-share,.header-actions .hd-bell{width:31px;height:31px;font-size:14px}
+  .header-actions .hb-out{padding:6px 8px}
+}
+@media (max-width:350px){ .header-actions .hb-out{display:none} }
