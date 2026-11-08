@@ -216,26 +216,23 @@ var JIDB = (function () {
   /* 준비되면: 위쪽에 알림 종, 휴대폰 알림 계정 연결 */
   function afterReady() {
     var u = me(); if (!u) return;
-    var acts = document.querySelector(".header-actions");
-    if (acts && !document.getElementById("hd-bell")) {
-      var a = document.createElement("a");
-      a.id = "hd-bell"; a.href = "activity.html"; a.className = "hd-bell"; a.title = "알림"; a.setAttribute("aria-label", "알림");
-      a.innerHTML = '<span aria-hidden="true">🔔</span><b class="hd-bell-n" hidden></b>';
-      acts.insertBefore(a, acts.firstChild);
-      var m = document.createElement("a");
-      m.id = "hd-msg"; m.href = "messages.html"; m.className = "hd-bell"; m.title = "쪽지"; m.setAttribute("aria-label", "쪽지");
-      m.innerHTML = '<span aria-hidden="true">✉️</span><b class="hd-bell-n" hidden></b>';
-      acts.insertBefore(m, acts.firstChild);
-    }
-    unreadMessages().then(function (n) {
-      var b = document.querySelector("#hd-msg .hd-bell-n"); if (!b) return;
-      if (n > 0) { b.textContent = n > 99 ? "99+" : n; b.hidden = false; } else b.hidden = true;
-    });
-    unreadCount().then(function (n) {
-      var b = document.querySelector("#hd-bell .hd-bell-n"); if (!b) return;
-      if (n > 0) { b.textContent = n > 99 ? "99+" : n; b.hidden = false; } else b.hidden = true;
-    });
+    refreshUnread();
     linkPush();
+  }
+  // 쪽지·알림은 머리글 버튼 대신 프로필(내 정보) 안으로 — 안 읽은 수를 프로필 사진에 표시
+  function refreshUnread() {
+    if (!me()) return;
+    Promise.all([unreadMessages(), unreadCount()]).then(function (r) {
+      var nm = +r[0] || 0, nn = +r[1] || 0, t = nm + nn;
+      window.JI_UNREAD = { msg: nm, noti: nn };
+      document.querySelectorAll(".me-link").forEach(function (a) {
+        var b = a.querySelector(".me-n");
+        if (!b) { b = document.createElement("b"); b.className = "me-n"; a.appendChild(b); }
+        b.textContent = t > 99 ? "99+" : t; b.hidden = !t;
+        a.title = t ? "내 정보 · 안 읽은 쪽지 " + nm + " · 알림 " + nn : "내 정보";
+      });
+      document.dispatchEvent(new CustomEvent("ji-unread", { detail: window.JI_UNREAD }));
+    });
   }
 
   return {
@@ -248,6 +245,6 @@ var JIDB = (function () {
     sendSellerRequest: sendSellerRequest, syncFeed: syncFeed,
     toggleLike: toggleLike, uploadPhoto: uploadPhoto, shrinkImage: shrinkImage, sendMessage: sendMessage, messages: messages, readMessage: readMessage, deleteMessage: deleteMessage, unreadMessages: unreadMessages,
     comments: comments, addComment: addComment, myComments: myComments, changePassword: changePassword, deleteAccount: deleteAccount, updateComment: updateComment, deleteComment: deleteComment,
-    notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead
+    notifications: notifications, unreadCount: unreadCount, markAllRead: markAllRead, refreshUnread: refreshUnread
   };
 })();

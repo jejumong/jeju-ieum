@@ -11,12 +11,12 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107y">
+<link rel="stylesheet" href="assets/style.css?v=20261107z">
 </head>
 <body data-active="">
 
 <main class="wrap" style="max-width:860px;padding-top:28px">
-  <div class="crumb"><a href="index.html">홈</a> › 쪽지함</div>
+  <div class="crumb"><a href="index.html">홈</a> › <a href="profile.html">내 정보</a> › 쪽지함</div>
   <h1 class="hp-h1">✉️ 쪽지함</h1>
 
   <div class="sh-tabs act-tabs" role="tablist" id="m-tabs">
@@ -38,9 +38,9 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261107y"></script>
-<script src="assets/db.js?v=20261107y"></script>
-<script src="assets/notify.js?v=20261107y"></script>
+<script src="assets/common.js?v=20261107z"></script>
+<script src="assets/db.js?v=20261107z"></script>
+<script src="assets/notify.js?v=20261107z"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
@@ -92,7 +92,7 @@
     var id = el.dataset.id, box = el.dataset.box, m = BOX[box].filter(function(x){ return x.id === id; })[0];
     if (opening && box === "in" && m && !m.read) {
       JIDB.readMessage(id).then(function(){ m.read = true; el.classList.remove("unread"); var n = BOX["in"].filter(function(x){ return !x.read; }).length; $("n-in").textContent = n || "";
-        var b = document.querySelector("#hd-msg .hd-bell-n"); if (b) { if (n) b.textContent = n; else b.hidden = true; } });
+        JIDB.refreshUnread(); });
     }
   }
   document.querySelector("main").addEventListener("click", function(e){

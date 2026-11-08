@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107y">
+<link rel="stylesheet" href="assets/style.css?v=20261107z">
 <style>
 .me-card{max-width:640px;margin:0 auto}
 .me-top{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;flex-wrap:wrap;box-shadow:var(--sh-2)}
@@ -25,6 +25,12 @@
 .ava-del{font-size:12px;color:var(--muted);background:none;border:0;cursor:pointer;padding:2px 0;margin-top:4px}
 .ava-del:hover{color:#c0392b;text-decoration:underline}
 
+/* 쪽지·알림 */
+.me-inbox{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:4px}
+.me-inbox a{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 10px;border-radius:var(--r);border:1px solid var(--sea-100);background:var(--sea-50);font-size:15px;font-weight:800;color:var(--sea-700);text-decoration:none}
+.me-inbox a:hover{border-color:var(--sea);background:var(--sea-pale)}
+.me-inbox a span{font-size:18px}
+.me-inbox b{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#ef4444;color:#fff;font-size:12px;display:inline-grid;place-items:center}
 /* 활동 통계 버튼 */
 .me-stats{display:flex;gap:8px;width:100%;margin-top:4px}
 .stat-btn{flex:1;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 8px;text-align:center;cursor:pointer;transition:all .14s var(--ease)}
@@ -84,6 +90,10 @@
         <div class="who" id="who">-</div>
         <div class="sub" id="sub">-</div>
         <button class="ava-del" id="ava-del" onclick="removePhoto()" style="display:none">사진 삭제</button>
+      </div>
+      <div class="me-inbox">
+        <a href="messages.html"><span>✉️</span>쪽지함<b id="ib-msg" hidden></b></a>
+        <a href="activity.html"><span>🔔</span>알림<b id="ib-noti" hidden></b></a>
       </div>
       <div class="me-stats">
         <button class="stat-btn" id="tab-posts" onclick="showTab('posts')"><b id="st-posts">0</b><span>내가 쓴 글 <i>▾</i></span></button>
@@ -161,14 +171,14 @@
   <p style="text-align:center;margin:26px 0 6px"><a class="btn ghost" href="#" onclick="logout();return false">로그아웃</a></p>
 </main>
 
-<script src="assets/common.js?v=20261107y"></script>
-<script src="assets/db.js?v=20261107y"></script>
-<script src="assets/notify.js?v=20261107y"></script>
-<script src="assets/seed-trade.js?v=20261107y"></script>
-<script src="assets/seed-extra.js?v=20261107y"></script>
-<script src="assets/seed-new.js?v=20261107y"></script>
-<script src="assets/seed-comments.js?v=20261107y"></script>
-<script src="assets/admin-data.js?v=20261107y"></script>
+<script src="assets/common.js?v=20261107z"></script>
+<script src="assets/db.js?v=20261107z"></script>
+<script src="assets/notify.js?v=20261107z"></script>
+<script src="assets/seed-trade.js?v=20261107z"></script>
+<script src="assets/seed-extra.js?v=20261107z"></script>
+<script src="assets/seed-new.js?v=20261107z"></script>
+<script src="assets/seed-comments.js?v=20261107z"></script>
+<script src="assets/admin-data.js?v=20261107z"></script>
 <script>
 var user = currentUser();
 if (!user) {
@@ -499,6 +509,11 @@ function leave(){
   alert("탈퇴 처리되었습니다. 이용해주셔서 감사합니다.");
   location.href = "index.html";
 }
+
+/* 안 읽은 쪽지·알림 수 */
+function showUnread(u){ [["ib-msg", u.msg], ["ib-noti", u.noti]].forEach(function(x){ var b = document.getElementById(x[0]); if (!b) return; b.textContent = x[1] > 99 ? "99+" : x[1]; b.hidden = !x[1]; }); }
+if (window.JI_UNREAD) showUnread(window.JI_UNREAD);
+document.addEventListener("ji-unread", function(e){ showUnread(e.detail); });
 </script>
 </body>
 </html>

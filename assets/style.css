@@ -1959,3 +1959,8 @@ a.act-item:hover{border-color:var(--sea-200)}
   .header-actions .hb-out{padding:6px 8px}
 }
 @media (max-width:350px){ .header-actions .hb-out{display:none} }
+
+/* 프로필 사진의 안 읽은 쪽지·알림 수 */
+.me-link{position:relative}
+.me-link .me-n{position:absolute;top:-5px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;border:2px solid #fff;line-height:1}
+.me-link .me-n[hidden]{display:none}

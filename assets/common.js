@@ -43,12 +43,18 @@ var SITE_CFG = {
 var SHARE_ICO = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 var JIShare = (function () {
   var KAKAO_SDK = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js";
+  /* 내 정보·쪽지·글쓰기·로그인 같은 개인 화면에서는 그 화면 대신 '제주이음' 메인을 공유 */
+  var PRIVATE = /\/(profile|messages|activity|mypage|write|login|signup|forgot|reset)\.html$|\/admin\//;
+  function isMobile() { return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform)); }
   function info() {
     var o = window.SHARE_INFO || {};
     var md = document.querySelector('meta[name="description"]');
+    if (PRIVATE.test(location.pathname)) return { title: "제주이음", text: "제주에 사는 우리를 잇는 생활 정보", url: "https://jejuieum.com/", image: "https://jejuieum.com/assets/og-image.png" };
     var url = (o.url || location.href).split("#")[0];
+    var t = o.title || document.title.replace(/\s*—\s*제주이음\s*$/, "");
+    if (/^index\.html$|\/$/.test(location.pathname.split("/").pop() || "/") || !t || /^제주이음/.test(t)) t = "제주이음";
     return {
-      title: o.title || document.title.replace(/\s*—\s*제주이음\s*$/, "") || "제주이음",
+      title: t,
       text: o.text || (md ? md.content : "제주에 사는 우리를 잇는 생활 정보"),
       url: url,
       image: o.image || "https://jejuieum.com/assets/og-image.png"
@@ -77,7 +83,7 @@ var JIShare = (function () {
         if (!Kakao.isInitialized()) Kakao.init(SITE_CFG.kakaoJsKey);
         var link = { mobileWebUrl: i.url, webUrl: i.url };
         Kakao.Share.sendDefault({ objectType: "feed",
-          content: { title: i.title, description: (i.text || "").slice(0, 100), imageUrl: i.image, link: link },
+          content: { title: i.title === "제주이음" ? "제주이음 — 제주에 사는 우리를 잇는 생활 정보" : i.title, description: (i.text || "").slice(0, 100), imageUrl: i.image, link: link },
           buttons: [{ title: "제주이음에서 보기", link: link }] });
         close();
       } catch (x) { native(i); }
@@ -92,7 +98,7 @@ var JIShare = (function () {
       '<div class="js-prev"><img src="' + e(i.image) + '" alt=""><div><b>' + e(i.title) + '</b><small>' + e(i.url.replace(/^https?:\/\//, "").slice(0, 60)) + '</small></div></div>' +
       '<div class="js-btns">' +
         '<button type="button" data-k="kakao"><span style="background:#fee500">' + '<svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 4C7 4 3 7.1 3 11c0 2.5 1.7 4.7 4.2 6l-1 3.6c-.1.3.3.6.6.4l4.2-2.8c.3 0 .7.1 1 .1 5 0 9-3.1 9-7s-4-7-9-7z" fill="#3a1d1d"/></svg>' + '</span>카카오톡</button>' +
-        '<a href="sms:?&body=' + encodeURIComponent(i.title + " " + i.url) + '"><span style="background:#e8f7ec">✉️</span>문자</a>' +
+        (isMobile() ? '<a href="sms:?&body=' + encodeURIComponent((i.title === "제주이음" ? "제주이음" : "[제주이음] " + i.title) + " " + i.url) + '"><span style="background:#e8f7ec">✉️</span>문자</a>' : '') +
         '<button type="button" data-k="copy"><span style="background:var(--sea-50)">🔗</span>링크 복사</button>' +
         (navigator.share ? '<button type="button" data-k="more"><span style="background:#f1f3f6">⋯</span>다른 앱</button>' : '') +
       '</div><p class="js-msg" hidden></p></div>';
