@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107z">
+<link rel="stylesheet" href="assets/style.css?v=20261108a">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -77,15 +77,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261107z"></script>
-<script src="assets/common.js?v=20261107z"></script>
-<script src="assets/db.js?v=20261107z"></script>
-<script src="assets/notify.js?v=20261107z"></script>
-<script src="assets/seed-trade.js?v=20261107z"></script>
-<script src="assets/seed-extra.js?v=20261107z"></script>
-<script src="assets/seed-new.js?v=20261107z"></script>
-<script src="assets/seed-comments.js?v=20261107z"></script>
-<script src="assets/admin-data.js?v=20261107z"></script>
+<script src="assets/kmap.js?v=20261108a"></script>
+<script src="assets/common.js?v=20261108a"></script>
+<script src="assets/db.js?v=20261108a"></script>
+<script src="assets/notify.js?v=20261108a"></script>
+<script src="assets/seed-trade.js?v=20261108a"></script>
+<script src="assets/seed-extra.js?v=20261108a"></script>
+<script src="assets/seed-new.js?v=20261108a"></script>
+<script src="assets/seed-comments.js?v=20261108a"></script>
+<script src="assets/admin-data.js?v=20261108a"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -137,8 +137,6 @@ if (!post) {
 } else {
   addViews(id);
   document.title = post.title + " — 제주이음";
-  window.SHARE_INFO = { title: post.title, text: String(post.content || "").replace(/\s+/g, " ").slice(0, 90),
-    image: (typeof postPhotos === "function" && postPhotos(post)[0]) ? new URL(postPhotos(post)[0], location.href).href : "" };
 
   var extra = "";
   if (post.board === "구인구직" && (post.payType || post.addr)) {

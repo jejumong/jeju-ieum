@@ -43,22 +43,10 @@ var SITE_CFG = {
 var SHARE_ICO = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 var JIShare = (function () {
   var KAKAO_SDK = "https://t1.kakaocdn.net/kakao_js_sdk/2.8.4/kakao.min.js";
-  /* 내 정보·쪽지·글쓰기·로그인 같은 개인 화면에서는 그 화면 대신 '제주이음' 메인을 공유 */
-  var PRIVATE = /\/(profile|messages|activity|mypage|write|login|signup|forgot|reset)\.html$|\/admin\//;
   function isMobile() { return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform)); }
+  /* 어느 화면에서 누르든 항상 제주이음 메인 주소를 공유 */
   function info() {
-    var o = window.SHARE_INFO || {};
-    var md = document.querySelector('meta[name="description"]');
-    if (PRIVATE.test(location.pathname)) return { title: "제주이음", text: "제주에 사는 우리를 잇는 생활 정보", url: "https://jejuieum.com/", image: "https://jejuieum.com/assets/og-image.png" };
-    var url = (o.url || location.href).split("#")[0];
-    var t = o.title || document.title.replace(/\s*—\s*제주이음\s*$/, "");
-    if (/^index\.html$|\/$/.test(location.pathname.split("/").pop() || "/") || !t || /^제주이음/.test(t)) t = "제주이음";
-    return {
-      title: t,
-      text: o.text || (md ? md.content : "제주에 사는 우리를 잇는 생활 정보"),
-      url: url,
-      image: o.image || "https://jejuieum.com/assets/og-image.png"
-    };
+    return { title: "제주이음", text: "제주에 사는 우리를 잇는 생활 정보", url: "https://jejuieum.com/", image: "https://jejuieum.com/assets/og-image.png" };
   }
   function e(t) { var d = document.createElement("div"); d.textContent = t == null ? "" : String(t); return d.innerHTML; }
   function close() { var w = document.getElementById("ji-share"); if (w) { w.classList.remove("on"); setTimeout(function () { w.remove(); }, 200); } document.removeEventListener("keydown", esc); }
