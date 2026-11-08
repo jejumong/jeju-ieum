@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261108a">
+<link rel="stylesheet" href="assets/style.css?v=20261108b">
 </head>
 <body data-active="home">
 
@@ -61,6 +61,10 @@
   <section class="hm-news">
     <div class="hm-hd"><h2>동네 소식</h2><a href="community.html">더 보기 →</a></div>
     <div class="hm-feed" id="hm-feed"></div>
+  </section>
+  <section class="hm-news">
+    <div class="hm-hd"><h2>지원 프로그램 소식</h2><a href="stay.html#programs-top">더 보기 →</a></div>
+    <div class="hm-feed" id="hm-prog"></div>
   </section>
 
   <!-- 2. 처음이라면 이 순서로 -->
@@ -113,18 +117,18 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261108a"></script>
-<script src="assets/db.js?v=20261108a"></script>
-<script src="assets/notify.js?v=20261108a"></script>
-<script src="assets/seed-trade.js?v=20261108a"></script>
-<script src="assets/seed-extra.js?v=20261108a"></script>
-<script src="assets/seed-new.js?v=20261108a"></script>
-<script src="assets/seed-comments.js?v=20261108a"></script>
-<script src="assets/admin-data.js?v=20261108a"></script>
-<script src="assets/guide-data.js?v=20261108a"></script>
-<script src="assets/programs-data.js?v=20261108a"></script>
-<script src="assets/school-housing-data.js?v=20261108a"></script>
-<script src="assets/jangnal-data.js?v=20261108a"></script>
+<script src="assets/common.js?v=20261108b"></script>
+<script src="assets/db.js?v=20261108b"></script>
+<script src="assets/notify.js?v=20261108b"></script>
+<script src="assets/seed-trade.js?v=20261108b"></script>
+<script src="assets/seed-extra.js?v=20261108b"></script>
+<script src="assets/seed-new.js?v=20261108b"></script>
+<script src="assets/seed-comments.js?v=20261108b"></script>
+<script src="assets/admin-data.js?v=20261108b"></script>
+<script src="assets/guide-data.js?v=20261108b"></script>
+<script src="assets/programs-data.js?v=20261108b"></script>
+<script src="assets/school-housing-data.js?v=20261108b"></script>
+<script src="assets/jangnal-data.js?v=20261108b"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -215,6 +219,11 @@
     var n = cc(p.id), lb = i === 0 ? "인기" : (LABEL[p.board] || p.board);
     return '<a href="view.html?id=' + p.id + '"><em>' + esc(lb) + '</em><span>' + esc(p.title) + '</span><small>' + (n ? "💬" + n : fmtDate(p.date)) + '</small></a>';
   }).join("") || '<p class="hm-empty">아직 글이 없어요</p>';
+  // ── 모바일: 지원 프로그램 소식 3줄 (모집 중 → 상시 → 문의 → 대기 순) ──
+  $("hm-prog").innerHTML = progs.slice(0, 3).map(function(p){
+    var st = PROGRAM_STATUS[p.status] || ["", "", "#a3adb8"];
+    return '<a href="' + (p.id ? "program/" + p.id + ".html" : "stay.html#programs-top") + '"><em class="hm-st" style="color:' + st[2] + ';background:' + st[2] + '1a">' + esc(st[0].replace("다음 공고 ", "")) + '</em><span>' + esc(p.name) + '</span></a>';
+  }).join("") || '<p class="hm-empty">지원 프로그램 소식을 준비하고 있어요</p>';
 })();
 window.onJIData = function(){ location.reload(); };   // 새 글이 생기면 한 번 새로 그림
 </script>

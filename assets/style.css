@@ -1964,3 +1964,5 @@ a.act-item:hover{border-color:var(--sea-200)}
 .me-link{position:relative}
 .me-link .me-n{position:absolute;top:-5px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;border:2px solid #fff;line-height:1}
 .me-link .me-n[hidden]{display:none}
+@media (max-width:680px){ .hm-feed a em.hm-st{min-width:46px;text-align:center} }
+@media (max-width:680px){ .hm-news + .hm-news{margin-top:24px} }
