@@ -73,6 +73,7 @@ case 'signup': {
   $id = uuid();
   q("INSERT INTO ji_users (id, email, pass, nick, region, role, created_at, last_login) VALUES (?,?,?,?,?,?,?,?)",
     [$id, $email, password_hash($pw, PASSWORD_DEFAULT), $nick, $region, $role, now(), now()]);
+  alert_admins('signup', '👋 새 회원가입', $nick . '님이 가입했어요' . ($region ? ' (' . $region . ')' : ''), 'admin/index.html#members', $id);
   out(['token' => new_session($id), 'user' => ['id' => $id, 'email' => $email, 'nick' => $nick, 'region' => $region, 'role' => $role]]);
 }
 case 'login': {
@@ -120,6 +121,8 @@ case 'account_delete': {
   q("DELETE FROM ji_notifications WHERE user_id = ?", [$u['id']]);
   q("DELETE FROM ji_club_joins WHERE applicant = ?", [$u['id']]);
   q("DELETE FROM ji_users WHERE id = ?", [$u['id']]);
+  q("DELETE FROM ji_settings WHERE k = ?", ['al:' . $u['id']]);
+  alert_admins('leave', '🚪 회원 탈퇴', $u['nick'] . '님이 탈퇴했어요', 'admin/index.html#members', $u['id']);
   out(true);
 }
 /* 비밀번호 찾기: 이메일로 재설정 링크 보내기 (가입 여부는 알려 주지 않음) */
@@ -243,6 +246,8 @@ case 'post_create': {
     $x = $R['extra']; $x['photos'] = attach_photos($id, $u['id'], $x['photos']);
     q("UPDATE ji_posts SET extra = ? WHERE id = ?", [json_encode($x, JSON_UNESCAPED_UNICODE), $id]);
   }
+  $isTrade = in_array($b, ['구인구직', '중고사고팔기', '부동산', '제주상점', '특가공구'], true);
+  alert_admins($isTrade ? 'trade' : 'post', ($isTrade ? '🏷️ ' : '📝 ') . $b . ' 새 글', $u['nick'] . '님: ' . mb_substr($title, 0, 60), 'view.html?id=' . $id, $u['id']);
   out(post_out(one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
 }
 case 'post_update': {
@@ -308,6 +313,7 @@ case 'comment_add': {
   $p = is_uuid($pid) ? one("SELECT author, title FROM ji_posts WHERE id = ?", [$pid]) : null;
   if ($p && $p['author'] !== $u['id'])
     notify($p['author'], 'comment', '새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60), 'view.html?id=' . $pid . '#cmt-list', '제주이음 · 「' . mb_substr($p['title'], 0, 30) . '」 새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60));
+  alert_admins('comment', '💬 새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60), 'view.html?id=' . $pid . '#cmt-list', $u['id']);
   out(cmt_out(one("SELECT * FROM ji_comments WHERE id = ?", [$id])));
 }
 case 'comment_update': {
@@ -398,8 +404,7 @@ case 'seller_request': {
   if (!in_array($b, ['제주상점', '특가공구'], true)) fail('게시판 이름이 올바르지 않아요');
   q("INSERT INTO ji_seller_requests (id, board, applicant, applicant_nick, details, message, created_at) VALUES (?,?,?,?,?,?,?)",
     [uuid(), $b, $u['id'], $u['nick'], json_encode($R['details'] ?? new stdClass(), JSON_UNESCAPED_UNICODE), str($R['message'] ?? '', 1000), now()]);
-  foreach (all("SELECT id FROM ji_users WHERE role IN ('admin','staff')") as $ad)
-    notify($ad['id'], 'seller_request', '새 입점·공구 요청', $u['nick'] . '님이 ' . $b . ' 승인을 요청했어요.', 'admin/index.html');
+  alert_admins('seller', '🏪 새 입점·공구 요청', $u['nick'] . '님이 ' . $b . ' 승인을 요청했어요.', 'admin/index.html#sellers');
   out(true);
 }
 
@@ -436,10 +441,9 @@ case 'inquiry_add': {
   $js = json_encode($d, JSON_UNESCAPED_UNICODE); if (strlen($js) > 8000) fail('내용이 너무 길어요');
   $who = me($R, false);
   q("INSERT INTO ji_inquiries (id, data, ip, user_id, created_at) VALUES (?,?,?,?,?)", [uuid(), $js, ip(), $who ? $who['id'] : null, now()]);
-  foreach (all("SELECT id FROM ji_users WHERE role IN ('admin','staff')") as $ad)
-    notify($ad['id'], 'inquiry', '📮 새 문의 · ' . mb_substr((string)($d['type'] ?? $d['service'] ?? '문의'), 0, 30),
-      mb_substr((string)($d['name'] ?? ''), 0, 20) . ($who ? ' (회원 ' . $who['nick'] . ')' : ' (비회원)') . ': ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 70),
-      'admin/index.html#inquiries', '제주이음 · 새 문의가 왔어요', mb_substr((string)($d['type'] ?? '문의'), 0, 30) . ' · ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 60));
+  alert_admins('inquiry', '📮 새 문의 · ' . mb_substr((string)($d['type'] ?? $d['service'] ?? '문의'), 0, 30),
+    mb_substr((string)($d['name'] ?? ''), 0, 20) . ($who ? ' (회원 ' . $who['nick'] . ')' : ' (비회원)') . ': ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 70),
+    'admin/index.html#inquiries', null, '제주이음 · 새 문의가 왔어요', mb_substr((string)($d['type'] ?? '문의'), 0, 30) . ' · ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 60));
   out(true);
 }
 
@@ -477,6 +481,18 @@ case 'admin_set_role': {
   $t = one("SELECT role FROM ji_users WHERE id = ?", [$R['id'] ?? '']); if (!$t) fail('회원을 찾을 수 없어요', 404);
   if ($t['role'] === 'admin') fail('관리자 역할은 GitHub Secrets 의 ADMIN_EMAILS 로만 바꿀 수 있어요');
   q("UPDATE ji_users SET role = ? WHERE id = ?", [$role, $R['id'] ?? '']); out(true);
+}
+case 'admin_alerts': {
+  $u = me($R); if (!is_mod($u)) fail('권한이 없어요', 403);
+  $list = []; foreach (ADMIN_ALERTS as $k => $v) $list[] = ['key' => $k, 'label' => $v[0], 'default' => $v[1]];
+  out(['items' => $list, 'prefs' => admin_alert_prefs($u['id'])]);
+}
+case 'admin_alerts_set': {
+  $u = me($R); if (!is_mod($u)) fail('권한이 없어요', 403);
+  $in = is_array($R['prefs'] ?? null) ? $R['prefs'] : []; $save = [];
+  foreach (ADMIN_ALERTS as $k => $v) $save[$k] = !empty($in[$k]);
+  q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", ['al:' . $u['id'], json_encode($save), now()]);
+  out(['prefs' => $save]);
 }
 case 'admin_set': {
   admin($R); $k = $R['k'] ?? '';

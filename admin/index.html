@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>제주이음 관리자 콘솔</title>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261108d">
+<link rel="stylesheet" href="../assets/style.css?v=20261108e">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -123,6 +123,19 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 /* 긴 글·띄어쓰기 없는 글도 칸 안에서 줄바꿈 */
 .iq-msg,.iq-dl td,.iq-clamp,.adm-t td,.modal .box{overflow-wrap:anywhere;word-break:break-word}
 .iq-msg{white-space:pre-wrap!important;max-width:100%}
+
+.al-list{display:flex;flex-direction:column}
+.al-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 4px;border-top:1px solid var(--line);cursor:pointer}
+.al-row:first-child{border-top:0}
+.al-row b{display:block;font-size:15px;color:var(--ink)}
+.al-row small{display:block;font-size:13px;color:var(--ink-3);margin-top:2px}
+.al-row input{position:absolute;opacity:0;pointer-events:none}
+.al-row i{flex:none;width:46px;height:26px;border-radius:999px;background:#cfd6de;position:relative;transition:background .15s}
+.al-row i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .15s}
+.al-row input:checked + i{background:var(--sea-600)}
+.al-row input:checked + i::after{left:23px}
+.al-row input:focus-visible + i{outline:2px solid var(--sea-600);outline-offset:2px}
+.al-note{font-size:13px;color:var(--ink-3);margin:14px 4px 0;line-height:1.6}
 </style>
 </head>
 <body data-admin>
@@ -131,14 +144,14 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261108d"></script>
-<script src="../assets/db.js?v=20261108d"></script>
-<script src="../assets/seed-trade.js?v=20261108d"></script>
-<script src="../assets/seed-extra.js?v=20261108d"></script>
-<script src="../assets/seed-new.js?v=20261108d"></script>
-<script src="../assets/seed-comments.js?v=20261108d"></script>
-<script src="../assets/photos.js?v=20261108d"></script>
-<script src="../assets/admin-data.js?v=20261108d"></script>
+<script src="../assets/common.js?v=20261108e"></script>
+<script src="../assets/db.js?v=20261108e"></script>
+<script src="../assets/seed-trade.js?v=20261108e"></script>
+<script src="../assets/seed-extra.js?v=20261108e"></script>
+<script src="../assets/seed-new.js?v=20261108e"></script>
+<script src="../assets/seed-comments.js?v=20261108e"></script>
+<script src="../assets/photos.js?v=20261108e"></script>
+<script src="../assets/admin-data.js?v=20261108e"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -222,7 +235,7 @@ function restorePost(p){
 function cmtCount(p){ return typeof commentCountOf === "function" ? commentCountOf(p.id) : 0; }
 
 /* ── 화면 틀 ── */
-var view = ["dash","posts","notices","premium","inquiries","sellers","trash","members"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
+var view = ["dash","posts","notices","premium","inquiries","sellers","trash","members","alerts"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
 var MENU = [
   ["dash","대시보드"],["posts","게시글 관리"],["notices","공지 관리"],["premium","프리미엄 관리"],
   ["inquiries","문의·제보"],["sellers","판매자 승인"],["trash","삭제된 글"],["settings","설정"]
@@ -243,6 +256,9 @@ function boot(){
 function go(v){ view = v; try { history.replaceState(null, "", "#" + v); } catch (e) {} boot(); window.scrollTo(0,0); }
 function draw(){ ({inquiries:drawInquiries,dash:drawDash,posts:drawPosts,notices:drawNotices,premium:drawPremium,sellers:drawSellers,trash:drawTrash,settings:drawSettings})[view](); }
 function M(){ return document.getElementById("main"); }
+var AL_HELP = { signup: "누군가 회원가입하면", leave: "회원이 탈퇴하면", post: "자유게시판·질문하기 등 커뮤니티와 동호회·축제 게시판에 새 글이 올라오면",
+  trade: "부동산·중고·구인구직·제주상점·특가공구에 새 글이 올라오면", comment: "어느 글에든 새 댓글이 달리면 (많을 수 있어요)",
+  inquiry: "문의·제보·정보 정정 요청이 들어오면", seller: "제주상점·특가공구 판매 승인 요청이 오면" };
 
 /* ── 문의·제보 (contact.html 신청서) ──
    ※ SITE_CFG.inquiryEndpoint 를 설정하지 않으면, 방문자가 남긴 신청서는 그 방문자 브라우저에만 저장됩니다.
@@ -679,9 +695,28 @@ if (SRV) {
   };
 
   /* 회원 관리 (서버 모드에서만) */
-  MENU.splice(MENU.length - 1, 1, ["members", "회원 관리"]);
+  MENU.splice(MENU.length - 1, 1, ["members", "회원 관리"], ["alerts", "알림 설정"]);
   var _draw = draw;
-  draw = function(){ if (view === "members") return drawMembers(); if (view === "settings") view = "members"; return _draw(); };
+  draw = function(){ if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "settings") view = "members"; return _draw(); };
+
+  /* 알림 설정: 관리자·스텝이 각자 받을 알림 종류를 켜고 끔 */
+  window.drawAlerts = function(){
+    M().innerHTML = '<h1>알림 설정</h1><p class="sub">내가 받을 관리자 알림을 고르세요. 켜 둔 알림은 사이트 알림함과 휴대폰 알림으로 와요. 설정은 관리자·스텝이 각자 따로 정해요.</p><div class="panel" id="al-box">불러오는 중…</div>';
+    JIDB.call("admin_alerts").then(function(r){
+      var box = document.getElementById("al-box");
+      box.innerHTML = '<div class="al-list">' + r.items.map(function(it){
+        return '<label class="al-row"><span><b>' + esc(it.label) + '</b><small>' + esc(AL_HELP[it.key] || "") + '</small></span>' +
+          '<input type="checkbox" class="al-sw" data-k="' + it.key + '"' + (r.prefs[it.key] ? " checked" : "") + '><i></i></label>';
+      }).join("") + '</div><p class="al-note">휴대폰으로도 받으려면 사이트에서 <b>알림 켜기</b>를 허용해 두세요. 내가 직접 한 일(내 글·내 댓글)은 알림이 오지 않아요.</p>';
+      box.querySelectorAll(".al-sw").forEach(function(sw){
+        sw.onchange = function(){
+          var prefs = {}; box.querySelectorAll(".al-sw").forEach(function(x){ prefs[x.dataset.k] = x.checked; });
+          JIDB.call("admin_alerts_set", { prefs: prefs }).then(function(){ toast((sw.checked ? "켰어요 · " : "껐어요 · ") + sw.closest(".al-row").querySelector("b").textContent); },
+            function(e){ sw.checked = !sw.checked; alert(e.message); });
+        };
+      });
+    }, function(e){ document.getElementById("al-box").textContent = e.message; });
+  };
   window.drawMembers = function(){
     var R = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝" };
     var me = JIDB.me(), boss = me && me.role === "admin";

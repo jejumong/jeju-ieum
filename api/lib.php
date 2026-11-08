@@ -177,6 +177,28 @@ function can_write_board($u, $b) {
   if ($b === '특가공구') return ($u['role'] ?? '') === 'dealer';
   return true;
 }
+/* 관리자·스텝이 받을 알림 종류 — 각자 켜고 끔 (ji_settings 'al:<회원id>') */
+const ADMIN_ALERTS = [
+  'signup'  => ['👋 새 회원가입', false],
+  'leave'   => ['🚪 회원 탈퇴', false],
+  'post'    => ['📝 커뮤니티 새 글', false],
+  'trade'   => ['🏷️ 거래·부동산 새 글', false],
+  'comment' => ['💬 새 댓글', false],
+  'inquiry' => ['📮 새 문의·제보', true],
+  'seller'  => ['🏪 입점·공구 승인 요청', true],
+];
+function admin_alert_prefs($uid) {
+  $saved = setting('al:' . $uid, []); $out = [];
+  foreach (ADMIN_ALERTS as $k => $v) $out[$k] = array_key_exists($k, $saved) ? (bool)$saved[$k] : $v[1];
+  return $out;
+}
+function alert_admins($ev, $title, $body, $link, $except = null, $pushTitle = null, $pushBody = null) {
+  foreach (all("SELECT id FROM ji_users WHERE role IN ('admin','staff')") as $ad) {
+    if ($ad['id'] === $except) continue;
+    if (!(admin_alert_prefs($ad['id'])[$ev] ?? false)) continue;
+    notify($ad['id'], 'admin_' . $ev, $title, $body, $link, $pushTitle ?? ('제주이음 · ' . $title), $pushBody ?? $body);
+  }
+}
 function setting($k, $def) { $r = one("SELECT v FROM ji_settings WHERE k = ?", [$k]); return $r ? json_decode($r['v'], true) : $def; }
 /* ── 사진 ── */
 function upload_dir() { return dirname(__DIR__) . '/uploads'; }   // www/jeju/uploads
