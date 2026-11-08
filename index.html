@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261107v">
+<link rel="stylesheet" href="assets/style.css?v=20261107w">
 </head>
 <body data-active="home">
 
@@ -112,18 +112,18 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261107v"></script>
-<script src="assets/db.js?v=20261107v"></script>
-<script src="assets/notify.js?v=20261107v"></script>
-<script src="assets/seed-trade.js?v=20261107v"></script>
-<script src="assets/seed-extra.js?v=20261107v"></script>
-<script src="assets/seed-new.js?v=20261107v"></script>
-<script src="assets/seed-comments.js?v=20261107v"></script>
-<script src="assets/admin-data.js?v=20261107v"></script>
-<script src="assets/guide-data.js?v=20261107v"></script>
-<script src="assets/programs-data.js?v=20261107v"></script>
-<script src="assets/school-housing-data.js?v=20261107v"></script>
-<script src="assets/jangnal-data.js?v=20261107v"></script>
+<script src="assets/common.js?v=20261107w"></script>
+<script src="assets/db.js?v=20261107w"></script>
+<script src="assets/notify.js?v=20261107w"></script>
+<script src="assets/seed-trade.js?v=20261107w"></script>
+<script src="assets/seed-extra.js?v=20261107w"></script>
+<script src="assets/seed-new.js?v=20261107w"></script>
+<script src="assets/seed-comments.js?v=20261107w"></script>
+<script src="assets/admin-data.js?v=20261107w"></script>
+<script src="assets/guide-data.js?v=20261107w"></script>
+<script src="assets/programs-data.js?v=20261107w"></script>
+<script src="assets/school-housing-data.js?v=20261107w"></script>
+<script src="assets/jangnal-data.js?v=20261107w"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -203,7 +203,7 @@
   $("hm-rows").innerHTML =
     (nt ? row("view.html?id=" + encodeURIComponent(nt.id), "📌", "공지", nt.title || "") : "") +
     row("jangnal.html", "🧺", "오늘 열리는 오일장", openM.length ? openM.map(function(x){ return x.n.replace(/ (민속|향토)?오일장/, "").replace(" (성산)", ""); }).join(" · ") + " (" + openM[0].d.join("·") + "일장)" : "오늘은 열리는 장이 없어요") +
-    row("tool.html?t=tide", "🌊", "오늘 물때", "만조·간조 시각 보기") +
+    row("tool.html?t=cal", "🗓️", "열두 달 달력", "이번 달 축제·행사·제철 먹거리") +
     row("guide/seasons.html", "🍊", m + "월의 제주", note.t) +
     row("stay.html#programs-top", "📢", "지원 프로그램 " + (openProgs.length ? "모집 중 " + openProgs.length + "곳" : "소식"), (openProgs[0] || progs[0] || {}).name ? ((openProgs[0] || progs[0]).name + (openProgs.length > 1 ? " 외" : "")) : "");
   // ── 모바일: 동네 소식 3줄 (인기글 1 + 최근 글 2) ──
