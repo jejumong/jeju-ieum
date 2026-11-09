@@ -243,9 +243,12 @@ function notify($uid, $kind, $title, $body, $link, $pushTitle = null, $pushBody 
     [uuid(), $uid, $kind, mb_substr($title, 0, 200), mb_substr($body, 0, 500), $link, now()]);
   if (empty($CFG['onesignal_key']) || !function_exists('curl_init')) return;
   $h = $pushTitle ?? ('제주이음 · ' . $title); $m = $pushBody ?? $body;
+  // 같은 기기에 사이트 앱·관리자 앱·브라우저가 따로 구독돼 있어도 기기마다 한 번만 오게: 기기별 최근 구독 하나로만 보냄
+  $subs = array_values(array_unique(array_filter(array_map(function ($d) { return $d['sid'] ?? ''; }, (array)setting('ps:' . $uid, [])))));
   $payload = json_encode([
     'app_id' => $CFG['onesignal_app'], 'target_channel' => 'push',
-    'include_aliases' => ['external_id' => [$uid]],
+  ] + ($subs ? ['include_subscription_ids' => $subs] : ['include_aliases' => ['external_id' => [$uid]]]) + [
+    'web_push_topic' => substr(md5($uid . $title . $body), 0, 16),
     'headings' => ['en' => $h, 'ko' => $h], 'contents' => ['en' => $m, 'ko' => $m],
     'url' => rtrim($CFG['site_url'], '/') . '/' . ltrim($link, '/'),
   ], JSON_UNESCAPED_UNICODE);

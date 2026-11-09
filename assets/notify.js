@@ -67,6 +67,12 @@ var JINotify = (function () {
     }).catch(function () { return { push: false, saved: true }; });
   }
 
+  /* 같은 기기면 같은 값 (사이트 앱·관리자 앱·브라우저가 함께 씀) */
+  function devKey() {
+    var s = navigator.userAgent.replace(/\b(Version|Safari|Mobile)\/[\w.]+/g, "") + "|" + screen.width + "x" + screen.height + "|" + (navigator.platform || "");
+    var h = 0; for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; }
+    return "d" + (h >>> 0).toString(36);
+  }
   /* 로그인한 회원이면 이 기기의 푸시를 회원 계정(external_id)과 연결 → 가입 신청 알림 등을 이 기기로 받음 */
   function linkAccount() {
     var u = (typeof currentUser === "function") ? currentUser() : null;
@@ -74,6 +80,13 @@ var JINotify = (function () {
     return loadPush().then(function (OneSignal) {
       if (!OneSignal) return false;
       try { OneSignal.login(u.id); } catch (e) {}
+      // 이 기기의 구독 id 를 서버에 알려 둠 (같은 기기의 여러 앱·브라우저 중 마지막으로 쓴 곳 하나로만 알림)
+      setTimeout(function () {
+        try {
+          var ps = OneSignal.User && OneSignal.User.PushSubscription, sid = ps && ps.id;
+          if (sid && ps.optedIn !== false && window.JIDB && JIDB.enabled) JIDB.call("push_reg", { sid: sid, dev: devKey() }).catch(function () {});
+        } catch (e) {}
+      }, 2500);
       return true;
     }).catch(function () { return false; });
   }

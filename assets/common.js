@@ -370,6 +370,19 @@ function writeHref(board) {
   if (board && typeof isRestrictedBoard === "function" && isRestrictedBoard(board) && !isApprovedSeller(board)) return "seller-request.html?board=" + encodeURIComponent(board);
   return "write.html" + (board ? "?board=" + encodeURIComponent(board) : "");
 }
+/* 작은 창 (쪽지·알림 내용 보기 등) — 바깥을 눌렀다 뗄 때·Esc 로 닫힘 */
+function jiModal(html) {
+  jiModalClose();
+  var o = document.createElement("div"); o.className = "jm-ov"; o.id = "jm-ov";
+  o.innerHTML = '<div class="jm-box" role="dialog" aria-modal="true"><button type="button" class="jm-x" aria-label="닫기" onclick="jiModalClose()">✕</button>' + html + '</div>';
+  var down = false;
+  o.addEventListener("mousedown", function (e) { down = e.target === o; });
+  o.addEventListener("click", function (e) { if (e.target === o && down) jiModalClose(); });
+  document.body.appendChild(o); document.body.style.overflow = "hidden";
+  return o.querySelector(".jm-box");
+}
+function jiModalClose() { var o = document.getElementById("jm-ov"); if (o) { o.remove(); document.body.style.overflow = ""; } }
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") jiModalClose(); });
 function emptyInvite(board, noun) {
   noun = noun || "글";
   var has = board && allPosts().some(function (p) { return p.board === board; });

@@ -733,6 +733,16 @@ case 'msg_read_many': {   // 고른 쪽지만 읽음으로
   foreach (array_slice((array)($R['ids'] ?? []), 0, 200) as $id) if (is_uuid($id)) { q("UPDATE ji_messages SET read_at = ? WHERE id = ? AND receiver = ? AND read_at IS NULL", [now(), $id, $u['id']]); $n++; }
   out($n);
 }
+case 'push_reg': {   // 이 기기(dev)의 최근 푸시 구독 id 를 기억 — 기기마다 하나만 남김
+  $u = me($R); $sid = (string)($R['sid'] ?? ''); $dev = substr(preg_replace('/[^a-z0-9]/', '', (string)($R['dev'] ?? '')), 0, 16);
+  if (!preg_match('/^[0-9a-f-]{36}$/i', $sid) || $dev === '') fail('구독 정보가 올바르지 않아요');
+  $m = (array)setting('ps:' . $u['id'], []);
+  foreach ($m as $k => $d) if (($d['sid'] ?? '') === $sid && $k !== $dev) unset($m[$k]);
+  $m[$dev] = ['sid' => $sid, 'at' => date('Y-m-d H:i')];
+  if (count($m) > 6) { uasort($m, function ($a, $b) { return strcmp($b['at'], $a['at']); }); $m = array_slice($m, 0, 6, true); }
+  q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", ['ps:' . $u['id'], json_encode($m), now()]);
+  out(count($m));
+}
 case 'noti_read_all': { $u = me($R); q("UPDATE ji_notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0", [$u['id']]); out(true); }
 
 default: fail('알 수 없는 요청이에요', 404);

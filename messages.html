@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110f">
+<link rel="stylesheet" href="assets/style.css?v=20261110g">
 </head>
 <body data-active="">
 
@@ -38,9 +38,9 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261110f"></script>
-<script src="assets/db.js?v=20261110f"></script>
-<script src="assets/notify.js?v=20261110f"></script>
+<script src="assets/common.js?v=20261110g"></script>
+<script src="assets/db.js?v=20261110g"></script>
+<script src="assets/notify.js?v=20261110g"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
@@ -98,15 +98,24 @@
   function load(box){ return JIDB.messages(box).then(function(l){ BOX[box] = l; draw(box); }); }
 
   function open(el){
-    var full = el.querySelector(".msg-full"), opening = full.hidden;
-    document.querySelectorAll(".msg-full").forEach(function(f){ f.hidden = true; });
-    full.hidden = !opening;
-    var id = el.dataset.id, box = el.dataset.box, m = BOX[box].filter(function(x){ return x.id === id; })[0];
+    var id = el.dataset.id, box = el.dataset.box, m = BOX[box].filter(function(x){ return x.id === id; })[0]; if (!m) return;
+    var who = box === "in" ? m.from_nick : m.to_nick;
+    jiModal('<div class="jm-h">' + (box === "in" ? "✉️ " + esc(who) + "님이 보낸 쪽지" : "📤 " + esc(who) + "님에게 보낸 쪽지") + '</div>' +
+      '<div class="jm-meta">' + when(m.created_at) + (box === "sent" ? (m.read ? " · 읽음" : " · 안 읽음") : "") + '</div>' +
+      '<div class="jm-body">' + esc(m.body) + '</div><div class="jm-btns">' +
+      (box === "in" ? '<button type="button" class="btn primary" data-reply="' + m.id + '">답장</button>' : '') +
+      '<button type="button" class="btn ghost" data-del="' + m.id + '">삭제</button><button type="button" class="btn ghost" onclick="jiModalClose()">닫기</button></div>');
+    var opening = true;
     if (opening && box === "in" && m && !m.read) {
       JIDB.readMessage(id).then(function(){ m.read = true; el.classList.remove("unread"); var n = BOX["in"].filter(function(x){ return !x.read; }).length; $("n-in").textContent = n || "";
         JIDB.refreshUnread(); });
     }
   }
+  document.addEventListener("click", function(e){ if (!e.target.closest("#jm-ov")) return;   // 창 안의 답장·삭제 버튼
+    var r = e.target.closest("[data-reply]"), d = e.target.closest("[data-del]");
+    if (r) { jiModalClose(); var m = BOX["in"].filter(function(x){ return x.id === r.dataset.reply; })[0]; if (m) compose(m.from_nick, m.from, m.body); }
+    if (d) { if (!confirm("이 쪽지를 삭제할까요?")) return; jiModalClose(); JIDB.deleteMessage(d.dataset.del).then(function(){ load("in"); load("sent"); }); }
+  });
   document.querySelector("main").addEventListener("click", function(e){
     var r = e.target.closest("[data-reply]"), d = e.target.closest("[data-del]");
     if (r) { var m = BOX["in"].filter(function(x){ return x.id === r.dataset.reply; })[0]; if (m) compose(m.from_nick, m.from, m.body); return; }

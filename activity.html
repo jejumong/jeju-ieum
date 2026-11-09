@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110f">
+<link rel="stylesheet" href="assets/style.css?v=20261110g">
 </head>
 <body data-active="">
 
@@ -32,9 +32,9 @@
   <section class="act-panel" id="p-sent"><div class="act-list" id="l-sent"></div></section>
 </main>
 
-<script src="assets/common.js?v=20261110f"></script>
-<script src="assets/db.js?v=20261110f"></script>
-<script src="assets/notify.js?v=20261110f"></script>
+<script src="assets/common.js?v=20261110g"></script>
+<script src="assets/db.js?v=20261110g"></script>
+<script src="assets/notify.js?v=20261110g"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
@@ -104,9 +104,13 @@
       if (e.target.id === "nk-read") return readNoti(Object.keys(NSEL));
       if (e.target.id === "nk-allread") return JIDB.markAllRead().then(function(){ NOTI.forEach(function(n){ n.read = true; }); NSEL = {}; drawNoti(); JIDB.refreshUnread(); });
       var a = e.target.closest("a[data-nid]"); if (!a) return;
-      var n = NOTI.filter(function(x){ return x.id === a.dataset.nid; })[0]; if (!n || n.read) return;   // 누른 알림은 읽음으로 바꾸고 이동
-      e.preventDefault(); var href = a.getAttribute("href");
-      JIDB.call("noti_read", { ids: [n.id] }).catch(function(){}).then(function(){ JIDB.refreshUnread(); if (href && href !== "#") location.href = href; else { n.read = true; drawNoti(); } });
+      e.preventDefault();
+      var n = NOTI.filter(function(x){ return x.id === a.dataset.nid; })[0]; if (!n) return;   // 누르면 창으로 내용 보기 + 읽음
+      var href = n.link && n.link !== "#" ? n.link : "";
+      jiModal('<div class="jm-h">' + esc(n.title) + '</div><div class="jm-meta">' + when(n.created_at) + '</div>' +
+        (n.body ? '<div class="jm-body">' + esc(n.body) + '</div>' : '') +
+        '<div class="jm-btns">' + (href ? '<a class="btn primary" href="' + esc(href) + '">바로 가기 →</a>' : '') + '<button type="button" class="btn ghost" onclick="jiModalClose()">닫기</button></div>');
+      if (!n.read) JIDB.call("noti_read", { ids: [n.id] }).then(function(){ n.read = true; drawNoti(); JIDB.refreshUnread(); }).catch(function(){});
     });
     JIDB.notifications().then(function(list){ NOTI = list; drawNoti(); });
 
