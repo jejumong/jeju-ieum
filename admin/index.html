@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261110q">
+<link rel="stylesheet" href="../assets/style.css?v=20261110r">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -209,17 +209,17 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261110q"></script>
-<script src="../assets/db.js?v=20261110q"></script>
-<script src="../assets/notify.js?v=20261110q"></script>
-<script src="../assets/seed-trade.js?v=20261110q"></script>
-<script src="../assets/seed-extra.js?v=20261110q"></script>
-<script src="../assets/seed-new.js?v=20261110q"></script>
-<script src="../assets/seed-comments.js?v=20261110q"></script>
-<script src="../assets/photos.js?v=20261110q"></script>
-<script src="../assets/admin-data.js?v=20261110q"></script>
-<script src="../assets/kmap.js?v=20261110q"></script>
-<script src="../assets/op-posts.js?v=20261110q"></script>
+<script src="../assets/common.js?v=20261110r"></script>
+<script src="../assets/db.js?v=20261110r"></script>
+<script src="../assets/notify.js?v=20261110r"></script>
+<script src="../assets/seed-trade.js?v=20261110r"></script>
+<script src="../assets/seed-extra.js?v=20261110r"></script>
+<script src="../assets/seed-new.js?v=20261110r"></script>
+<script src="../assets/seed-comments.js?v=20261110r"></script>
+<script src="../assets/photos.js?v=20261110r"></script>
+<script src="../assets/admin-data.js?v=20261110r"></script>
+<script src="../assets/kmap.js?v=20261110r"></script>
+<script src="../assets/op-posts.js?v=20261110r"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -516,7 +516,7 @@ function bindRowControls(root){
 /* 수정 창 */
 var MOVE_BOARDS = [["커뮤니티", ["자유게시판", "질문하기", "최신뉴스", "생활정보", "취미·여행", "교육", "건강웰빙"]],
   ["지역", ["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"]],
-  ["생활·거래", ["중고사고팔기", "구인구직", "부동산", "제주상점", "특가공구", "동호회", "축제정보"]]];
+  ["생활·장터", ["중고사고팔기", "구인구직", "부동산", "제주상점", "특가공구", "동호회", "축제정보"]]];
 function openEdit(id){
   var p = findAny(id); if (!p) return;
   var trade = TRADE_BOARDS.indexOf(p.board) > -1;

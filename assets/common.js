@@ -432,7 +432,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
     { id: "school", label: "학교 연계 집", href: "school.html" },
     { id: "realestate", label: "부동산", href: "realestate.html",
       dd: ddGroup("부동산", [["매물 보기", "realestate.html"], ["매물 등록", "write.html?board=부동산"]], "auto") },
-    { id: "trade", label: "생활·거래", href: "trade.html", match: ["jobs", "market", "shops", "clubs", "deals", "festivals"],
+    { id: "trade", label: "생활·장터", href: "trade.html", match: ["jobs", "market", "shops", "clubs", "deals", "festivals"],
       dd: ddGroup("이웃과 나누기", [["전체 한눈에", "trade.html"], ["구인구직", "jobs.html"], ["중고사고팔기", "market.html"],
             ["제주상점", "shops.html"], ["동호회", "clubs.html"], ["특가공구", "deals.html"], ["축제정보", "festivals.html"]]) },
     { id: "community", label: "동네 커뮤니티", href: "community.html",
@@ -442,12 +442,12 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
     { id: "contact", label: "문의·제보", href: "contact.html" }
   ];
 
-  /* 휴대폰 전용 메뉴 5개: 부동산은 생활·거래로, 생활도구·문의제보는 커뮤니티로 묶음 */
+  /* 휴대폰 전용 메뉴 5개: 부동산은 생활·장터로, 생활도구·문의제보는 커뮤니티로 묶음 */
   var M_MENU = [
     ["가이드", "guide.html", ["guide", "article"]],
     ["한달살기", "stay.html", ["stay"]],
     ["학교 연계", "school.html", ["school"]],
-    ["생활·거래", "trade.html", ["trade", "realestate", "jobs", "market", "shops", "clubs", "deals", "festivals"]],
+    ["생활·장터", "trade.html", ["trade", "realestate", "jobs", "market", "shops", "clubs", "deals", "festivals"]],
     ["커뮤니티", "community.html", ["community", "tools", "contact"]]
   ];
   var gnbMobile = '<nav class="gnb-m" aria-label="메뉴">' + M_MENU.map(function (m) {
@@ -524,13 +524,13 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
   document.body.insertAdjacentHTML("afterbegin", top);
   document.body.insertAdjacentHTML("beforeend", foot);
 
-  /* 생활·거래 묶음 페이지: 헤더 아래 탭으로 서로 이동 */
+  /* 생활·장터 묶음 페이지: 헤더 아래 탭으로 서로 이동 */
   var TRADE_TABS = [["trade", "전체", "trade.html", "🧺"], ["realestate", "부동산", "realestate.html", "🏡", "m-only"], ["jobs", "구인구직", "jobs.html", "💼"],
     ["market", "중고사고팔기", "market.html", "📦"], ["shops", "제주상점", "shops.html", "🏪"], ["clubs", "동호회", "clubs.html", "🏄"],
     ["deals", "특가공구", "deals.html", "🍊"], ["festivals", "축제정보", "festivals.html", "🎉"]];
   var isTrade = TRADE_TABS.some(function (t) { return t[0] === active; });
   if (isTrade) {
-    var sub = '<nav class="subnav' + (active === "realestate" ? " m-only-nav" : "") + '" aria-label="생활·거래 게시판"><div class="subnav-inner"><span class="subnav-l">생활·거래</span>' +
+    var sub = '<nav class="subnav' + (active === "realestate" ? " m-only-nav" : "") + '" aria-label="생활·장터 게시판"><div class="subnav-inner"><span class="subnav-l">생활·장터</span>' +
       TRADE_TABS.map(function (t) {
         var cls = [t[0] === active ? "on" : "", t[4] || ""].join(" ").trim();
         return '<a href="' + t[2] + '"' + (cls ? ' class="' + cls + '"' : "") + (t[0] === active ? ' aria-current="page"' : "") + '><span class="sn-i">' + t[3] + "</span>" + t[1] + "</a>";
@@ -539,7 +539,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
     var on = document.querySelector(".subnav a.on");
     if (on && on.scrollIntoView && window.innerWidth < 700) on.parentNode.scrollLeft = on.offsetLeft - 60;
     var cr = document.querySelector(".page-head .crumb");
-    if (cr && active !== "trade" && active !== "realestate") cr.innerHTML = cr.innerHTML.replace('</a> ›', '</a> › <a href="trade.html">생활·거래</a> ›');
+    if (cr && active !== "trade" && active !== "realestate") cr.innerHTML = cr.innerHTML.replace('</a> ›', '</a> › <a href="trade.html">생활·장터</a> ›');
   }
 
   /* 휴대폰: 커뮤니티 묶음(게시판·생활도구·문의제보) 탭 */

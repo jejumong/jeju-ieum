@@ -919,7 +919,7 @@ table.post td.title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hero-copy h1 em{white-space:nowrap}
 body{word-break:keep-all}
 
-/* 생활·거래 탭 */
+/* 생활·장터 탭 */
 .subnav{background:var(--surface);border-bottom:1px solid var(--line)}
 .subnav-inner{max-width:var(--shell);margin:0 auto;padding:10px var(--gutter);display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .subnav-inner::-webkit-scrollbar{display:none}
@@ -1319,7 +1319,7 @@ a.ap-next:hover{background:var(--sea-600)}
 .dd-grid.auto{grid-template-columns:repeat(3,auto);justify-content:start}
 .dd-grid.auto a{white-space:nowrap;padding-left:18px;padding-right:18px}
 
-/* 생활·거래 위쪽 게시판 탭: 더 크고 또렷하게 */
+/* 생활·장터 위쪽 게시판 탭: 더 크고 또렷하게 */
 .subnav{background:linear-gradient(180deg,#fff,var(--bg-2));border-bottom:1px solid var(--line);box-shadow:0 4px 14px rgba(16,40,70,.04)}
 .subnav-inner{padding:14px var(--gutter);gap:8px}
 .subnav-l{font-size:13px;color:var(--ink-2);letter-spacing:0;margin-right:10px;padding-right:14px;border-right:1px solid var(--line)}
