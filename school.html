@@ -11,19 +11,19 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110s">
+<link rel="stylesheet" href="assets/style.css?v=20261110t">
 <meta name="description" content="제주 작은학교 살리기 마을 공동주택, 학교 연계 주택, 농어촌유학 학교, 체류형 지원을 한곳에 정리했습니다. 주소·입주 조건·비용·문의처와 빈자리 무료 알림.">
 <link rel="canonical" href="https://jejuieum.com/school.html">
 </head>
 <body data-active="school">
 
-<div class="page-head"><div class="inner">
+<div class="page-head sch-head"><div class="inner">
   <div>
     <div class="crumb"><a href="index.html">홈</a> › 학교 연계 집</div>
     <h1>학교 연계·체류형 집</h1>
     <p>일반 부동산엔 잘 안 나오는 집 — 작은학교를 살리려고 마을이 지은 주택, 농어촌유학 학교 주변 집, 체류형 지원을 모았어요.</p>
   </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <div class="sch-head-btns" style="display:flex;gap:8px;flex-wrap:wrap">
     <a class="btn ghost" href="house/index.html">전체 목록 한눈에</a>
     <a class="btn accent" href="contact.html?type=%ED%95%99%EA%B5%90%20%EC%97%B0%EA%B3%84%20%EC%A3%BC%ED%83%9D%20%EC%A0%9C%EB%B3%B4">우리 학교 주택 제보</a>
   </div>
@@ -33,9 +33,9 @@
   <!-- 학교 연계·체류형 집 (데이터: assets/school-housing-data.js, programs-data.js) -->
   <section class="sh" id="school-stay">
     <div class="sh-tabs" role="tablist" id="sh-tabs">
-      <button type="button" class="on" data-t="houses"><span class="st-i">🏫</span><span class="st-t"><b>학교 연계 주택 <small id="sh-n1"></small></b></span></button>
-      <button type="button" data-t="yuhak"><span class="st-i">🔎</span><span class="st-t"><b>농어촌유학 학교 주변 찾기 <small id="sh-n2"></small></b></span></button>
-      <button type="button" data-t="support"><span class="st-i">🧳</span><span class="st-t"><b>체류형 지원</b></span></button>
+      <button type="button" class="on" data-t="houses"><span class="st-i">🏫</span><span class="st-t"><b><span class="st-l">학교 연계 주택</span><span class="st-s">연계 주택</span> <small id="sh-n1"></small></b></span></button>
+      <button type="button" data-t="yuhak"><span class="st-i">🔎</span><span class="st-t"><b><span class="st-l">농어촌유학 학교 주변 찾기</span><span class="st-s">유학 학교 찾기</span> <small id="sh-n2"></small></b></span></button>
+      <button type="button" data-t="support"><span class="st-i">🧳</span><span class="st-t"><b><span class="st-l">체류형 지원</span><span class="st-s">체류 지원</span></b></span></button>
     </div>
 
     <div class="sh-panel on" id="sh-houses">
@@ -49,6 +49,7 @@
       </ol></details>
       <div class="hr-list" id="sh-list"></div>
       <div class="pg-pager" id="sh-pager"></div>
+      <a class="sch-tip m-only" href="contact.html?type=%ED%95%99%EA%B5%90%20%EC%97%B0%EA%B3%84%20%EC%A3%BC%ED%83%9D%20%EC%A0%9C%EB%B3%B4">🏫 목록에 없는 우리 학교 주택 제보하기 →</a>
       <p class="sh-note">공식 목록·보도 기준 <b id="sh-total"></b>. 출처: <a id="src-jj" target="_blank" rel="noopener"></a> · <a id="src-sg" target="_blank" rel="noopener"></a>. 입주 조건·임대료는 마을마다 다르고 바뀔 수 있어요 · 마지막 정리 <b id="sh-checked"></b></p>
     </div>
 
@@ -64,14 +65,14 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261110s"></script>
-<script src="assets/db.js?v=20261110s"></script>
-<script src="assets/seed-trade.js?v=20261110s"></script>
-<script src="assets/admin-data.js?v=20261110s"></script>
-<script src="assets/school-housing-data.js?v=20261110s"></script>
-<script src="assets/programs-data.js?v=20261110s"></script>
-<script src="assets/notify.js?v=20261110s"></script>
-<script src="assets/kmap.js?v=20261110s"></script>
+<script src="assets/common.js?v=20261110t"></script>
+<script src="assets/db.js?v=20261110t"></script>
+<script src="assets/seed-trade.js?v=20261110t"></script>
+<script src="assets/admin-data.js?v=20261110t"></script>
+<script src="assets/school-housing-data.js?v=20261110t"></script>
+<script src="assets/programs-data.js?v=20261110t"></script>
+<script src="assets/notify.js?v=20261110t"></script>
+<script src="assets/kmap.js?v=20261110t"></script>
 <script>
 /* ── 학교 연계·체류형 집 ── */
 (function(){
@@ -124,12 +125,14 @@
   }
 
   // 필터
-  var fCity = "", fYuhak = false, fWatch = false, shPage = 1, SH_PER = 10;
+  var fCity = "", fYuhak = false, fWatch = false, shPage = 1, SH_PER = 10, fOpen = false;
   function drawFilter(){
     var n = function(fn){ return SCHOOL_HOUSES.filter(fn).length; };
     document.getElementById("sh-filter").innerHTML =
-      '<span class="shf-n" id="sh-count"></span>' +
-      '<div class="shf-r"><div class="seg" role="group" aria-label="지역">' +
+      '<div class="shf-top"><span class="shf-n" id="sh-count"></span>' +
+      (function(){ var k = (fCity ? 1 : 0) + (fYuhak ? 1 : 0) + (fWatch ? 1 : 0);
+        return '<button type="button" class="shf-tog' + (k ? " has" : "") + '" data-tog="1" aria-expanded="' + fOpen + '">⚙️ 조건' + (k ? " " + k : "") + ' <span>' + (fOpen ? "▴" : "▾") + '</span></button>'; })() + '</div>' +
+      '<div class="shf-r' + (fOpen ? " open" : "") + '"><div class="seg" role="group" aria-label="지역">' +
       [["", "전체", n(function(){return true;})], ["제주시", "제주시", n(function(h){return h.city==="제주시";})], ["서귀포시", "서귀포시", n(function(h){return h.city==="서귀포시";})]]
         .map(function(c){ return '<button type="button" class="' + (fCity === c[0] ? "on" : "") + '" data-city="' + c[0] + '">' + c[1] + ' <small>' + c[2] + '</small></button>'; }).join("") + '</div>' +
       '<button type="button" class="tg' + (fYuhak ? " on" : "") + '" data-yuhak="1" aria-pressed="' + fYuhak + '"><i></i>농어촌유학 학교만</button>' +
@@ -137,6 +140,7 @@
   }
   document.getElementById("sh-filter").addEventListener("click", function(e){
     var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.tog) { fOpen = !fOpen; drawFilter(); drawList(); return; }
     if (b.dataset.city !== undefined) fCity = b.dataset.city;
     if (b.dataset.yuhak) fYuhak = !fYuhak;
     if (b.dataset.watch) fWatch = !fWatch;
@@ -152,7 +156,7 @@
     var cEl = document.getElementById("sh-count"); if (cEl) cEl.innerHTML = "<b>" + list.length + "곳</b>" + (fCity || fYuhak || fWatch ? " 찾았어요" : "의 학교 연계 주택");
     var pages = Math.max(1, Math.ceil(list.length / SH_PER)); if (shPage > pages) shPage = pages;
     var shown = list.slice((shPage - 1) * SH_PER, shPage * SH_PER);
-    function row(k, v){ return v ? '<div><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>' : ''; }
+    function row(k, v, x){ return v ? '<div' + (x ? ' class="hr-x"' : '') + '><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>' : ''; }
     document.getElementById("sh-list").innerHTML = shown.map(function(h){
       var st = SCHOOL_HOUSE_STATUS[h.status], on = JINotify.isOn(topic(h));
       var size = [h.units, areaText(h), h.built ? h.built + "년 준공" : ""].filter(Boolean).join(" · ");
@@ -163,13 +167,13 @@
         '<h3>' + esc(h.name) + '</h3>' +
         '<dl class="hr-dl">' +
           row("주소", h.address || (h.city + " " + h.village)) +
-          row("규모", size) +
-          row("입주 조건", h.rule) +
-          row("거주 기간", h.stay) +
+          row("규모", size, 1) +
+          row("입주 조건", h.rule, 1) +
+          row("거주 기간", h.stay, 1) +
           row("비용", h.cost) +
-          row("문의", h.tel ? h.tel + (h.telLabel ? " (" + h.telLabel + ")" : "") : "") +
+          row("문의", h.tel ? h.tel + (h.telLabel ? " (" + h.telLabel + ")" : "") : "", 1) +
         '</dl>' +
-        '<div class="hr-f"><span class="hc-more">지도·출처 자세히 보기 →</span><button type="button" class="bell' + (on ? " on" : "") + '" data-bell="' + h.id + '" aria-label="빈자리 알림">' + (on ? "🔔 알림 켜짐" : "🔕 빈자리 알림") + '</button></div></article>';
+        '<div class="hr-f"><span class="hc-more"><span class="st-l">지도·출처 </span>자세히 보기 →</span><button type="button" class="bell' + (on ? " on" : "") + '" data-bell="' + h.id + '" aria-label="빈자리 알림">' + (on ? "🔔 알림 켜짐" : "🔕 빈자리 알림") + '</button></div></article>';
     }).join("") || '<div class="card" style="text-align:center;color:var(--ink-3);padding:30px">조건에 맞는 주택이 없어요.</div>';
     var pg = document.getElementById("sh-pager");
     if (pages < 2) { pg.innerHTML = ""; return; }
