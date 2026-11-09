@@ -6,14 +6,15 @@
    - cat: 체류 체험 / 워케이션 / 귀농·귀촌 / 정착 지원 / 청년
    ============================================================ */
 
-var PROGRAMS_CHECKED = "2026-11-04";
+var PROGRAMS_CHECKED = "2026-11-09";
 
 var PROGRAM_CATS = [
   { id: "체류 체험", ico: "🧳", desc: "먼저 살아보기 — 숙박비·체험비 지원" },
   { id: "워케이션", ico: "💻", desc: "일하면서 머물기 — 숙박·오피스 지원" },
   { id: "귀농·귀촌", ico: "🌱", desc: "농촌에 정착하기 — 융자·실습·임시 거처" },
   { id: "정착 지원", ico: "🏡", desc: "이사 온 뒤 — 상담 창구·공동체" },
-  { id: "청년", ico: "🎒", desc: "만 19~39세 대상 지원" }
+  { id: "청년", ico: "🎒", desc: "만 19~39세 대상 지원" },
+  { id: "주거비 지원", ico: "🏠", desc: "월세·전세 대출이자·주거비 지원만 모아 보기" }
 ];
 
 var PROGRAMS = [
@@ -58,7 +59,7 @@ var PROGRAMS = [
     url: "https://jejuzine.com/5894",
     src: [["제주진 기사", "https://jejuzine.com/5894"]] },
 
-  { id: "p05", cat: "체류 체험", tags: [], status: "wait", top: true,
+  { id: "p05", cat: "체류 체험", tags: ["주거비 지원"], status: "wait", top: true,
     name: "함께온제주 농어촌유학 (가족체류형)", org: "제주도교육청 · 제주도 · 서울시교육청",
     who: "제주 외 지역 초등학생과 함께 이주하는 부모 1명 이상 (농어촌 읍면 거주 학생 제외)",
     what: "자녀 수에 따라 가구당 월 60만~120만 원 주거·생활비 지원, 6개월 단위로 읍면 작은 학교에 다님",
@@ -115,7 +116,7 @@ var PROGRAMS = [
     src: [["제주愛in 체류 프로그램 목록", "https://www.jeju.go.kr/move/intro/list.htm"], ["파이낸셜뉴스 2026.9", "https://www.fnnews.com/news/202609050200011619"]] },
 
   /* ── 귀농·귀촌 ── */
-  { id: "p11", cat: "귀농·귀촌", tags: [], status: "always", top: true,
+  { id: "p11", cat: "귀농·귀촌", tags: ["주거비 지원"], status: "always", top: true,
     name: "귀농 농업창업·주택구입 융자", org: "제주시·서귀포시 마을활력과",
     who: "도시 1년 이상 거주 후 농어촌 전입 5년 이내, 귀농교육 100시간 이수자 등",
     what: "농업 창업자금 최대 3억 원, 주택자금 최대 7,500만 원 — 연 2%(변동), 5년 거치 10년 분할상환",
@@ -125,7 +126,7 @@ var PROGRAMS = [
     url: "https://www.jeju.go.kr/move/guide/farm.htm",
     src: [["제주愛in 귀농귀촌 지원사업", "https://www.jeju.go.kr/move/guide/farm.htm"]] },
 
-  { id: "p12", cat: "귀농·귀촌", tags: [], status: "always", top: true,
+  { id: "p12", cat: "귀농·귀촌", tags: ["주거비 지원"], status: "always", top: true,
     name: "귀농인의 집 (임시 거처)", org: "제주시·서귀포시 마을활력과 (운영: 마을회)",
     who: "영농기술을 배우고 농촌을 체험하며 귀농을 준비하는 예비 귀농·귀촌인",
     what: "마을회가 운영하는 임시 거처 제공 — 임대료·공공요금은 관리자와 협의",
@@ -186,7 +187,7 @@ var PROGRAMS = [
     url: "https://www.jeju.go.kr/move/guide/settle.htm",
     src: [["제주愛in 정착지원사업", "https://www.jeju.go.kr/move/guide/settle.htm"]] },
 
-  { id: "p18", cat: "정착 지원", tags: [], status: "ask",
+  { id: "p18", cat: "정착 지원", tags: ["주거비 지원"], status: "ask",
     name: "작은학교 마을 학부모 주택 (빈집 리모델링)", org: "제주도 문화체육교육국 · 행정시",
     who: "학생 100명 이하 또는 6학급 이하 작은 학교 통학구역 마을로 이사 오는 학부모 (도내 61개교)",
     what: "마을이 빈집·노후주택을 고쳐 학부모용 임대주택으로 공급 — 도가 리모델링비 90%, 신축비 60% 지원",
@@ -197,7 +198,7 @@ var PROGRAMS = [
     src: [["서울신문 2026.7", "https://www.seoul.co.kr/news/society/2026/07/01/20260701500137"], ["파이낸셜뉴스 2026.7", "https://www.fnnews.com/news/202607011451171546"]] },
 
   /* ── 청년 ── */
-  { id: "p19", cat: "청년", tags: [], status: "wait",
+  { id: "p19", cat: "청년", tags: ["주거비 지원"], status: "wait",
     name: "청년월세 지원 (국토교통부)", org: "국토교통부 · 복지로",
     who: "만 19~34세 부모와 따로 사는 무주택 청년 (소득 기준 있음) — 제주로 이사 온 청년도 해당",
     what: "월 최대 20만 원, 최대 24개월 (생애 1회)",
@@ -205,7 +206,44 @@ var PROGRAMS = [
     when: "2026년 3.30~5.29 접수 (마감) — 2026년 신규 6만 명",
     contact: "콜센터 1599-0001",
     url: "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/customer/notice/1309500_1141.html",
-    src: [["복지로 공지", "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/customer/notice/1309500_1141.html"]] }
+    src: [["복지로 공지", "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/customer/notice/1309500_1141.html"]] },
+  /* ── 주거비 (제주도 자체·복권기금) ── */
+  { id: "p20", cat: "청년", tags: ["주거비 지원"], status: "ask",
+    name: "제주청년 희망충전 월세 지원 (35~39세)", org: "제주특별자치도",
+    who: "국토교통부 청년월세 지원 대상에서 빠지는 만 35~39세 청년 (부모와 따로 사는 무주택자)",
+    what: "월세 일부 지원 — 지원 금액·기간은 해당 연도 공고 확인",
+    cond: "청년 가구 기준 중위소득 60% 이하, 자산 1억 2,200만 원 이하 (원가구 소득은 보지 않음)",
+    when: "2025년부터 시행 — 2026년 신청 일정은 정부24·주민센터 확인",
+    contact: "거주지 읍면동 주민센터, 도 주택토지과 주거복지팀 064-710-4251~4252",
+    url: "https://www.gov.kr",
+    src: [["제주도민일보 2026.3", "https://www.jejudomin.co.kr/news/articleView.html?idxno=317932"]] },
+  { id: "p21", cat: "정착 지원", tags: ["주거비 지원"], status: "wait",
+    name: "신혼부부·자녀출산 가구 전세자금 대출이자 지원", org: "제주특별자치도 (복권기금)",
+    who: "혼인신고 또는 자녀 출생 7년 이내 무주택 가구 중 금융기관 전세자금 대출을 받은 가구",
+    what: "대출잔액의 1.5%, 최대 150만 원 / 다자녀·장애인·다문화 가구는 2%, 최대 190만 원",
+    cond: "공고일 기준 주택 전세자금 대출 이용 중",
+    when: "2026년 2차 5.4~6.5 접수 (마감) — 다음 공고는 도청 고시·공고 확인",
+    contact: "도 주택토지과 064-710-4254, 제주시 주택과 064-728-3072, 서귀포시 건축과 064-760-3013",
+    url: "https://www.jeju.go.kr/news/news/law/jeju2.htm",
+    src: [["제주진 2026.4", "https://jejuzine.com/5491"], ["헤드라인제주 2026.4", "https://www.headlinejeju.co.kr/news/articleView.html?idxno=591558"]] },
+  { id: "p22", cat: "정착 지원", tags: ["주거비 지원"], status: "wait",
+    name: "하영드림 주택마련 지원 (주택구입 대출이자)", org: "제주특별자치도",
+    who: "제주에서 집을 산 신혼부부 또는 7년 이내 자녀 출산 가구 (전용 85㎡ 이하, 6억 원 이하 주택)",
+    what: "주택구입 대출 3억 원 한도 이자 지원 — 신혼 0.2%, 1자녀 0.8%, 2자녀 이상 0.5% (기사 기준)",
+    cond: "부부 합산 연소득 1억 원 이하(정책대출) 또는 1억 3천만 원 이하(일반 대출)",
+    when: "2026년 5.4~6.22 접수 (마감) — 다음 공고 확인",
+    contact: "도 주택토지과 주거복지팀 064-710-4251~4252",
+    url: "https://plus.gov.kr",
+    src: [["헤드라인제주 2026.4", "https://www.headlinejeju.co.kr/news/articleView.html?idxno=591558"]] },
+  { id: "p23", cat: "정착 지원", tags: ["주거비 지원", "청년"], status: "ask",
+    name: "주택 연세·월세 대출이자 지원", org: "제주특별자치도 (복권기금)",
+    who: "7년 이내 무주택 신혼부부·자녀출산 가정, 만 19~39세 사회초년생(재직 5년 이내)",
+    what: "제주은행·NH농협에서 연 최대 600만 원 대출, 도가 이자 3.5%(연 최대 21만 원) 지원",
+    cond: "보증금 3,000만 원 이하, 연세 720만 원 또는 월세 60만 원 이하 계약",
+    when: "2024년 발표 기준 연중 접수 — 올해 운영 여부는 도청 문의",
+    contact: "도 주택토지과 주거복지팀 064-710-4251~4252",
+    url: "https://www.jeju.go.kr/news/news/law/jeju2.htm",
+    src: [["헤드라인제주 2024.2", "https://www.headlinejeju.co.kr/news/articleView.html?idxno=535515"]] }
 ];
 
 /* [표시 이름, 색 클래스, 점 색] — 색은 style.css 의 .pst.* 에서 바꿀 수 있어요 */
