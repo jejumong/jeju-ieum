@@ -232,7 +232,17 @@ var JIDB = (function () {
         a.title = t ? "내 정보 · 안 읽은 쪽지 " + nm + " · 알림 " + nn : "내 정보";
       });
       document.dispatchEvent(new CustomEvent("ji-unread", { detail: window.JI_UNREAD }));
+      setAppBadge(t);
     });
+  }
+  /* 홈 화면 앱 아이콘 숫자 — 안 읽은 쪽지+알림 수 (서비스 워커와 같은 저장소에 기록) */
+  function setAppBadge(n) {
+    try {
+      if (navigator.setAppBadge) { if (n) navigator.setAppBadge(n).catch(function () {}); else navigator.clearAppBadge().catch(function () {}); }
+      var r = indexedDB.open("ji-badge", 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore("kv"); };
+      r.onsuccess = function () { try { r.result.transaction("kv", "readwrite").objectStore("kv").put(n, "n"); } catch (e) {} };
+    } catch (e) {}
   }
 
   return {
