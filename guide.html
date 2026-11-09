@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110u">
+<link rel="stylesheet" href="assets/style.css?v=20261110v">
 </head>
 <body data-active="guide">
 
@@ -20,7 +20,7 @@
   <div class="gd-top">
     <div class="crumb"><a href="index.html">홈</a> › 제주살이 가이드</div>
     <h1 id="g-title">제주살이 가이드</h1>
-    <p>지금 상황을 고르면 꼭 필요한 글만 보여 드려요. 글마다 어떤 내용이 들어 있는지 미리 볼 수 있어요.</p>
+    <p>지금 상황을 고르면 꼭 필요한 글만 보여 드려요.</p>
     <form class="gd-search" onsubmit="return false">
       <input id="gq" type="search" placeholder="궁금한 걸 검색해 보세요 (예: 습기, 학교, 생활비)" autocomplete="off">
     </form>
@@ -30,13 +30,8 @@
 
   <div id="search-note"></div>
 
-  <section id="gd-path-wrap">
-    <h2 class="gd-h">처음이라면 이 순서로</h2>
-    <ol class="hx-path" id="gd-path"></ol>
-  </section>
-
   <h2 class="gd-h" id="list-h">모든 가이드</h2>
-  <div class="gd-list" id="gd-list"></div>
+  <div class="gd-list gd-grid" id="gd-list"></div>
 
   <div class="gd-ask">
     <div><b>찾는 내용이 없나요?</b><span>궁금한 주제를 알려 주시면 다음 가이드로 정리해요. 이웃에게 바로 물어봐도 좋아요.</span></div>
@@ -47,14 +42,14 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261110u"></script>
-<script src="assets/db.js?v=20261110u"></script>
-<script src="assets/notify.js?v=20261110u"></script>
-<script src="assets/seed-trade.js?v=20261110u"></script>
-<script src="assets/seed-extra.js?v=20261110u"></script>
-<script src="assets/seed-new.js?v=20261110u"></script>
-<script src="assets/admin-data.js?v=20261110u"></script>
-<script src="assets/guide-data.js?v=20261110u"></script>
+<script src="assets/common.js?v=20261110v"></script>
+<script src="assets/db.js?v=20261110v"></script>
+<script src="assets/notify.js?v=20261110v"></script>
+<script src="assets/seed-trade.js?v=20261110v"></script>
+<script src="assets/seed-extra.js?v=20261110v"></script>
+<script src="assets/seed-new.js?v=20261110v"></script>
+<script src="assets/admin-data.js?v=20261110v"></script>
+<script src="assets/guide-data.js?v=20261110v"></script>
 <script>
 (function(){
   var P = new URLSearchParams(location.search);
@@ -69,17 +64,9 @@
   $("gd-stages").innerHTML = stages.map(function(s){
     var n = s.id ? GUIDES.filter(function(g){ return (g.stage||[]).indexOf(s.id) > -1; }).length : GUIDES.length;
     return '<a href="' + stageUrl(s.id) + '" class="' + (stage === s.id && !cat && !q ? "on" : "") + '">' +
-      '<span class="s-ico">' + STAGE_ICO[s.id] + '</span><b>' + s.label + '</b><small>' + s.sub + ' · ' + n + '편</small></a>';
+      '<span class="s-ico">' + STAGE_ICO[s.id] + '</span>' + s.label + ' <small>' + n + '</small></a>';
   }).join("");
 
-  // 처음 읽는 순서 (전체 보기일 때만)
-  if (!stage && !cat && !q) {
-    $("gd-path").innerHTML = GUIDE_PATH.map(function(x, i){
-      var g = guideById(x.id); if (!g) return "";
-      return '<li><a href="guide/' + g.id + '.html"><span class="p-n">' + (i+1) + '</span><span class="p-q">' + esc(x.q) + '</span>' +
-        '<b>' + esc(g.title.split(" — ")[0]) + '</b><span class="p-m">' + g.min + '분 읽기</span></a></li>';
-    }).join("");
-  } else { $("gd-path-wrap").style.display = "none"; }
 
   // 목록
   var list = GUIDES.filter(function(g){
@@ -88,6 +75,12 @@
     if (q && guideText(g).toLowerCase().indexOf(q.toLowerCase()) < 0) return false;
     return true;
   });
+  // 전체 보기에서는 '처음이라면 이 순서로' 4편을 맨 앞에 번호와 함께
+  var first = {};
+  if (!stage && !cat && !q) {
+    GUIDE_PATH.forEach(function(x, i){ first[x.id] = i + 1; });
+    list.sort(function(a, b){ return (first[a.id] || 99) - (first[b.id] || 99); });
+  }
 
   var st = GUIDE_STAGES.filter(function(s){ return s.id === stage; })[0];
   if (st) { $("g-title").textContent = st.label + "이라면"; $("list-h").textContent = st.label + " — 가이드 " + list.length + "편"; }
@@ -104,16 +97,15 @@
 
   $("gd-list").innerHTML = list.length ? list.map(function(g){
     var parts = g.title.split(" — ");
-    var inside = (g.sections || []).map(function(s){ return s.h; }).slice(0, 3);
-    return '<a class="gd-row" href="guide/' + g.id + '.html">' +
-      '<span class="r-ico">' + g.ico + '</span>' +
-      '<span class="r-body">' +
-        '<span class="r-cat">' + esc(g.cat) + '</span>' +
+    var n = first[g.id];
+    return '<a class="gd-card" href="guide/' + g.id + '.html">' +
+      '<span class="c-ico">' + g.ico + '</span>' +
+      '<span class="c-body">' +
+        '<span class="c-cat">' + (n ? '<em class="c-first">처음이라면 ' + n + '번째</em>' : esc(g.cat)) + '</span>' +
         '<b>' + esc(parts[0]) + '</b>' +
-        (parts[1] ? '<span class="r-sub">' + esc(parts[1]) + '</span>' : '') +
-        (inside.length ? '<span class="r-in"><em>이런 내용을 담았어요</em>' + inside.map(function(h){ return '<i>' + esc(h) + '</i>'; }).join("") + '</span>' : '') +
+        (parts[1] ? '<span class="c-sub">' + esc(parts[1]) + '</span>' : '') +
       '</span>' +
-      '<span class="r-side"><span>' + g.min + '분</span><small>' + g.updated.slice(5).replace("-", ".") + ' 확인</small><span class="r-arr">›</span></span>' +
+      '<span class="c-min">' + g.min + '분</span>' +
     '</a>';
   }).join("") : '<div class="gd-empty">이 조건의 가이드가 아직 없어요. 아래에서 주제를 제안해 주세요.</div>';
 
