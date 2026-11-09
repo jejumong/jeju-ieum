@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110c">
+<link rel="stylesheet" href="assets/style.css?v=20261110d">
 <style>
 .req-status{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r);margin-bottom:20px;font-size:14px}
 .req-status.pending{background:var(--sea-50);border:1px solid var(--sea-100);color:var(--sea-700)}
@@ -59,8 +59,17 @@
         </div>
         <div class="field-row">
           <div class="field"><label for="f-tel">연락처 <span class="req">*</span></label><input id="f-tel" maxlength="20" inputmode="tel" placeholder="010-0000-0000 (관리자만 봐요)"></div>
-          <div class="field"><label for="f-addr">가게·농장 위치 <span class="req">*</span></label><input id="f-addr" maxlength="80" placeholder="예: 제주시 구좌읍 세화리"></div>
+          <div class="field"><label for="f-addr">가게·농장 위치 <span class="req">*</span></label>
+            <div style="display:flex;gap:8px"><input id="f-addr" maxlength="100" placeholder="주소 찾기를 눌러 주세요" style="flex:1;min-width:0">
+              <button type="button" class="btn ghost" id="addr-find" style="flex:none">주소 찾기</button></div></div>
         </div>
+        <div class="field" style="margin-top:-4px"><input id="f-addr2" maxlength="60" placeholder="상세 주소 (선택) — 예: 2층, ○○농장 입구"></div>
+        <div id="addr-map" style="margin:4px 0 8px"></div>
+        <div class="field"><label>가게·농장 사진 <small>(선택 · 최대 6장 — 가게 전경, 대표 상품 등)</small></label>
+          <input type="file" id="ph-input" accept="image/jpeg,image/png,image/webp,image/heic,image/*" multiple hidden>
+          <div class="ph-grid" id="ph-grid"></div>
+          <div class="file-drop" id="ph-drop" role="button" tabindex="0">📷 눌러서 사진 올리기</div>
+          <div class="hint" id="ph-note"></div></div>
       </div>
 
       <div class="sr-sec" id="sec-deal">
@@ -101,10 +110,11 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261110c"></script>
-<script src="assets/db.js?v=20261110c"></script>
-<script src="assets/notify.js?v=20261110c"></script>
-<script src="assets/admin-data.js?v=20261110c"></script>
+<script src="assets/common.js?v=20261110d"></script>
+<script src="assets/db.js?v=20261110d"></script>
+<script src="assets/notify.js?v=20261110d"></script>
+<script src="assets/admin-data.js?v=20261110d"></script>
+<script src="assets/kmap.js?v=20261110d"></script>
 <script>
 var user = currentUser();
 var board = new URLSearchParams(location.search).get("board") || "특가공구";
@@ -171,15 +181,61 @@ document.getElementById("sec-deal").style.display = board === "특가공구" ? "
 document.getElementById("sec-shop").style.display = board === "특가공구" ? "none" : "block";
 
 function v(id){ var e = document.getElementById(id); return e ? e.value.trim() : ""; }
+
+/* 위치: 주소 찾기(다음 우편번호) → 카카오맵 좌표 → 지도 미리보기 */
+var POS = null;
+function setAddr(addr){
+  document.getElementById("f-addr").value = addr; POS = null;
+  JIMap.load().then(function(ok){ return ok ? JIMap.find(addr) : null; }).then(function(p){ if (p) POS = { lat: p.lat, lng: p.lng }; });
+  JIMap.show(document.getElementById("addr-map"), addr);
+}
+document.getElementById("addr-find").onclick = function(){
+  function open(){ new daum.Postcode({ oncomplete: function(d){ setAddr(d.roadAddress || d.jibunAddress || d.address); if (!v("f-name") && d.buildingName) document.getElementById("f-name").value = d.buildingName; document.getElementById("f-addr2").focus(); } }).open(); }
+  if (window.daum && daum.Postcode) return open();
+  var sc = document.createElement("script"); sc.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+  sc.onload = open; sc.onerror = function(){ alert("주소 찾기를 불러오지 못했어요. 주소를 직접 적어 주세요."); }; document.head.appendChild(sc);
+};
+document.getElementById("f-addr").addEventListener("change", function(){ if (this.value.trim()) setAddr(this.value.trim()); });
+
+/* 사진 (최대 6장) */
+var PHOTOS = [], PH_BUSY = 0, PH_MAX = 6;
+function drawPhotos(){
+  document.getElementById("ph-grid").innerHTML = PHOTOS.map(function(p, i){
+    return '<div class="ph-item' + (p.url ? '' : ' up') + '"><img src="' + (p.url || p.preview) + '" alt="">' + (p.url ? '' : '<span class="ph-load">올리는 중…</span>') +
+      '<div class="ph-acts"><button type="button" class="ph-del" onclick="PHOTOS.splice(' + i + ',1);drawPhotos()" title="빼기">✕</button></div></div>';
+  }).join("");
+  document.getElementById("ph-drop").style.display = PHOTOS.length >= PH_MAX ? "none" : "";
+  document.getElementById("ph-note").textContent = PHOTOS.length ? PHOTOS.length + " / " + PH_MAX + "장" + (PH_BUSY ? " · 올리는 중이에요" : "") : "";
+}
+function addPhotos(files){
+  if (!(window.JIDB && JIDB.enabled) || !(user && user.id)) { alert("로그인 후 사진을 올릴 수 있어요."); return; }
+  [].slice.call(files, 0, PH_MAX - PHOTOS.length).forEach(function(f){
+    if (!/^image\//.test(f.type) && !/\.(jpe?g|png|webp|heic)$/i.test(f.name)) { alert(f.name + " 은(는) 사진 파일이 아니에요."); return; }
+    var it = { preview: URL.createObjectURL(f), url: "" }; PHOTOS.push(it); PH_BUSY++;
+    JIDB.shrinkImage(f, 1600, 0.82).then(function(b){ return JIDB.uploadPhoto(b, "photo.jpg"); }).then(function(r){ it.url = r.url; PH_BUSY--; drawPhotos(); },
+      function(e){ PH_BUSY--; var k = PHOTOS.indexOf(it); if (k > -1) PHOTOS.splice(k, 1); drawPhotos(); alert("사진을 올리지 못했어요: " + (e.message || e)); });
+  });
+  drawPhotos();
+}
+(function(){
+  var inp = document.getElementById("ph-input"), drop = document.getElementById("ph-drop");
+  drop.onclick = function(){ inp.click(); };
+  inp.onchange = function(){ if (this.files.length) addPhotos(this.files); this.value = ""; };
+  ["dragover", "dragenter"].forEach(function(t){ drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.add("on"); }); });
+  ["dragleave", "drop"].forEach(function(t){ drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.remove("on"); }); });
+  drop.addEventListener("drop", function(e){ if (e.dataTransfer.files.length) addPhotos(e.dataTransfer.files); });
+})();
 function submitRequest(){
   var need = [["f-name","상호명"],["f-owner","대표자 이름"],["f-cat","업종"],["f-tel","연락처"],["f-addr","가게·농장 위치"]]
     .concat(board === "특가공구" ? [["d-item","공구할 상품"]] : [["s-menu","대표 메뉴·서비스"]]);
   for (var i = 0; i < need.length; i++) if (!v(need[i][0])) { alert(need[i][1] + "을(를) 입력해 주세요."); document.getElementById(need[i][0]).focus(); return; }
   if (!/^[0-9\-\s]{9,}$/.test(v("f-tel"))) { alert("연락처를 숫자로 정확히 적어 주세요."); document.getElementById("f-tel").focus(); return; }
   if (!document.getElementById("agree").checked) { alert("정보 이용에 동의해 주세요."); return; }
-  var d = { 상호명: v("f-name"), 대표자: v("f-owner"), 업종: v("f-cat"), 사업자등록번호: v("f-biz"), 연락처: v("f-tel"), 위치: v("f-addr") };
+  if (PH_BUSY) { alert("사진을 올리는 중이에요. 다 올라간 뒤 보내 주세요."); return; }
+  var d = { 상호명: v("f-name"), 대표자: v("f-owner"), 업종: v("f-cat"), 사업자등록번호: v("f-biz"), 연락처: v("f-tel"), 위치: v("f-addr") + (v("f-addr2") ? " " + v("f-addr2") : "") };
   if (board === "특가공구") { d.공구상품 = v("d-item"); d.가격 = v("d-price"); d.인원 = v("d-goal"); d.시기 = v("d-when"); d.받는방법 = v("d-ship"); }
   else { d.영업시간 = v("s-hours"); d.주차 = v("s-park"); d.대표메뉴 = v("s-menu"); d.이웃혜택 = v("s-benefit"); }
+  var extra = { photos: PHOTOS.filter(function(p){ return p.url; }).map(function(p){ return p.url; }), lat: POS ? POS.lat : "", lng: POS ? POS.lng : "", addr: v("f-addr") };
   var text = Object.keys(d).filter(function(k){ return d[k]; }).map(function(k){ return k + ": " + d[k]; }).join("\n") + (v("msg") ? "\n\n" + v("msg") : "");
   var btn = document.getElementById("sr-send"); btn.disabled = true; btn.textContent = "보내는 중…";
   var done = function(){
@@ -188,7 +244,7 @@ function submitRequest(){
     location.reload();
   };
   if (window.JIDB && JIDB.enabled && user && user.id) {
-    JIDB.sendSellerRequest(board, d, v("msg")).then(done, function(e){
+    JIDB.sendSellerRequest(board, Object.assign({}, d, { _photos: extra.photos, _lat: extra.lat, _lng: extra.lng, _addr: extra.addr }), v("msg")).then(done, function(e){
       btn.disabled = false; btn.textContent = "승인 요청 보내기";
       alert("요청을 보내지 못했어요: " + (e.message || e) + "\n잠시 후 다시 시도해 주세요.");
     });

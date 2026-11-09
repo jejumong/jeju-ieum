@@ -511,8 +511,14 @@ case 'seller_my': {   // 내가 이 게시판에 보낸 가장 최근 승인 요
 case 'seller_request': {
   $u = me($R); $b = $R['board'] ?? '';
   if (!in_array($b, ['제주상점', '특가공구'], true)) fail('게시판 이름이 올바르지 않아요');
+  $rid = uuid(); $det = is_array($R['details'] ?? null) ? $R['details'] : [];
   q("INSERT INTO ji_seller_requests (id, board, applicant, applicant_nick, details, message, created_at) VALUES (?,?,?,?,?,?,?)",
-    [uuid(), $b, $u['id'], $u['nick'], json_encode($R['details'] ?? new stdClass(), JSON_UNESCAPED_UNICODE), str($R['message'] ?? '', 1000), now()]);
+    [$rid, $b, $u['id'], $u['nick'], json_encode($det ?: new stdClass(), JSON_UNESCAPED_UNICODE), str($R['message'] ?? '', 1000), now()]);
+  if (!empty($det['_photos']) && is_array($det['_photos'])) {   // 신청 사진은 자동 정리되지 않게 이 신청에 묶어 둠
+    $base = upload_base();
+    foreach (array_slice($det['_photos'], 0, 6) as $url) if (is_string($url) && strpos($url, $base) === 0)
+      q("UPDATE ji_uploads SET post_id = ? WHERE path = ? AND user_id = ? AND post_id IS NULL", [$rid, substr($url, strlen($base)), $u['id']]);
+  }
   alert_admins('seller', '🏪 새 입점·공구 요청', $u['nick'] . '님이 ' . $b . ' 승인을 요청했어요.', 'admin/index.html#sellers');
   out(true);
 }
