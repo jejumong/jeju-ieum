@@ -1,12 +1,13 @@
 # 서버 글 정리 — Actions 탭에서 직접 실행할 때만 돌아갑니다.
 #  op=list   : 서버에 있는 글·댓글 목록(제목·닉네임)을 기록에 보여 줌
+#  op=op_upload : assets/op-posts.js 의 운영자 정보 글을 관리자 계정 이름으로 올림 (이미 올린 글은 건너뜀)
 #  op=delete : ids(글 id, 쉼표로 구분)와 cids(댓글 id) 를 지움 — 글을 지우면 그 글의 댓글·사진도 함께 지워져요
 name: 서버 글 정리
 on:
   workflow_dispatch:
     inputs:
       op:
-        description: "list 또는 delete"
+        description: "list / delete / op_upload"
         required: true
         default: list
       ids:
@@ -21,6 +22,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: 서버에 요청
         env:
           DB_PASS: ${{ secrets.CAFE24_DB_PASSWORD }}
@@ -28,11 +30,14 @@ jobs:
           IDS: ${{ inputs.ids }}
           CIDS: ${{ inputs.cids }}
         run: |
+          node -e 'global.window={};eval(require("fs").readFileSync("assets/op-posts.js","utf8"));require("fs").writeFileSync("op.json",JSON.stringify(window.OP_POSTS))'
           export KEY=$(printf 'jeju-cron|%s' "$DB_PASS" | sha256sum | cut -d' ' -f1)
-          BODY=$(python3 -c 'import json,os
+          python3 -c 'import json,os
           s=lambda v:[x.strip() for x in v.split(",") if x.strip()]
-          print(json.dumps({"key":os.environ["KEY"],"op":os.environ["OP"],"ids":s(os.environ["IDS"]),"cids":s(os.environ["CIDS"])}))')
-          curl -sS --max-time 40 -H "Content-Type: text/plain" --data "$BODY" "https://andend07.mycafe24.com/jeju/api/?a=maint" > r.json
+          d={"key":os.environ["KEY"],"op":os.environ["OP"],"ids":s(os.environ["IDS"]),"cids":s(os.environ["CIDS"])}
+          if d["op"]=="op_upload": d["posts"]=json.load(open("op.json"))
+          json.dump(d,open("body.json","w"))'
+          curl -sS --max-time 40 -H "Content-Type: text/plain" --data-binary @body.json "https://andend07.mycafe24.com/jeju/api/?a=maint" > r.json
           python3 -c 'import json
           d=json.load(open("r.json"))
           if not d.get("ok"): print("오류:", d); raise SystemExit(1)

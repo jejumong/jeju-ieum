@@ -189,6 +189,22 @@ case 'maint': {
     foreach ((array)($R['cids'] ?? []) as $cid) { if (is_string($cid) && $cid !== '') { q("DELETE FROM ji_comments WHERE id = ?", [$cid]); $m++; } }
     out(['deleted_posts' => $n, 'deleted_comments' => $m]);
   }
+  if ($op === 'op_upload') {   // 운영자 정보 글 올리기 — 관리자 계정(ADMIN_EMAILS 첫 번째) 이름으로, 이미 올린 글(extra.op 같음)은 건너뜀
+    $a = null; foreach ($CFG['admins'] as $em) { $a = one("SELECT * FROM ji_users WHERE email = ?", [$em]); if ($a) break; }
+    if (!$a) fail('관리자 계정을 찾지 못했어요');
+    $done = []; foreach (all("SELECT extra FROM ji_posts WHERE author = ?", [$a['id']]) as $r) { $x = json_decode($r['extra'] ?: '{}', true); if (!empty($x['op'])) $done[$x['op']] = 1; }
+    $list = array_reverse((array)($R['posts'] ?? [])); $base = time() - count($list); $n = 0; $skip = 0;
+    foreach ($list as $i => $p) {
+      $k = str($p['k'] ?? '', 40); $b = str($p['board'] ?? '', 30);
+      if ($k === '' || !in_array($b, $BOARDS, true)) continue;
+      if (isset($done[$k])) { $skip++; continue; }
+      $t = date('Y-m-d H:i:s', $base + $i);
+      q("INSERT INTO ji_posts (id, board, head, title, content, loc, meta, price, extra, author, author_nick, created_at, updated_at) VALUES (?,?,?,?,?,'','','',?,?,?,?,?)",
+        [uuid(), $b, str($p['head'] ?? '', 30), str($p['title'] ?? '', 120), str($p['content'] ?? '', 20000), json_encode(['op' => $k], JSON_UNESCAPED_UNICODE), $a['id'], $a['nick'], $t, $t]);
+      $n++;
+    }
+    out(['as' => $a['nick'], 'uploaded' => $n, 'skipped' => $skip]);
+  }
   fail('op 가 올바르지 않아요');
 }
 case 'mail_check': {
