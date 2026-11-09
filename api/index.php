@@ -164,6 +164,33 @@ case 'pw_reset': {
   out(true);
 }
 /* 메일 발송 점검: GitHub 매달 자동 실행 → help@ 로 점검 메일 (Brevo 키가 90일 안 쓰면 만료되는 것 방지) */
+/* 운영 정리용 (GitHub Actions '서버 글 정리' 에서만 호출 — cron_key 필요)
+   op=list : 모든 글·댓글 목록 (제목·작성자만) / op=delete : ids 의 글(댓글·사진 포함)과 cids 의 댓글 삭제 */
+case 'maint': {
+  $k = (string)($R['key'] ?? ''); $want = (string)($CFG['cron_key'] ?? '');
+  if ($want === '' || !hash_equals($want, $k)) fail('권한이 없어요', 403);
+  $op = $R['op'] ?? 'list';
+  if ($op === 'list') {
+    out(['posts' => all("SELECT id, board, title, author_nick, created_at FROM ji_posts ORDER BY created_at"),
+         'comments' => all("SELECT id, post_id, LEFT(text, 30) text, author_nick, created_at FROM ji_comments ORDER BY created_at")]);
+  }
+  if ($op === 'delete') {
+    $n = 0; $m = 0;
+    foreach ((array)($R['ids'] ?? []) as $id) {
+      if (!is_uuid($id) || !one("SELECT id FROM ji_posts WHERE id = ?", [$id])) continue;
+      q("DELETE FROM ji_posts WHERE id = ?", [$id]);
+      q("DELETE FROM ji_club_joins WHERE club_id = ?", [$id]);
+      q("DELETE FROM ji_club_notices WHERE club_id = ?", [$id]);
+      q("DELETE FROM ji_comments WHERE post_id = ?", [$id]);
+      foreach (all("SELECT path FROM ji_uploads WHERE post_id = ?", [$id]) as $o) remove_upload($o['path']);
+      q("DELETE FROM ji_likes WHERE post_id = ?", [$id]);
+      $n++;
+    }
+    foreach ((array)($R['cids'] ?? []) as $cid) { if (is_string($cid) && $cid !== '') { q("DELETE FROM ji_comments WHERE id = ?", [$cid]); $m++; } }
+    out(['deleted_posts' => $n, 'deleted_comments' => $m]);
+  }
+  fail('op 가 올바르지 않아요');
+}
 case 'mail_check': {
   $k = (string)($R['key'] ?? ''); $want = (string)($CFG['cron_key'] ?? '');
   if ($want === '' || !hash_equals($want, $k)) fail('권한이 없어요', 403);

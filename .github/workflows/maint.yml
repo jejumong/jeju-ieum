@@ -1,0 +1,45 @@
+# 서버 글 정리 — Actions 탭에서 직접 실행할 때만 돌아갑니다.
+#  op=list   : 서버에 있는 글·댓글 목록(제목·닉네임)을 기록에 보여 줌
+#  op=delete : ids(글 id, 쉼표로 구분)와 cids(댓글 id) 를 지움 — 글을 지우면 그 글의 댓글·사진도 함께 지워져요
+name: 서버 글 정리
+on:
+  workflow_dispatch:
+    inputs:
+      op:
+        description: "list 또는 delete"
+        required: true
+        default: list
+      ids:
+        description: "지울 글 id (쉼표로 구분)"
+        required: false
+        default: ""
+      cids:
+        description: "지울 댓글 id (쉼표로 구분)"
+        required: false
+        default: ""
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 서버에 요청
+        env:
+          DB_PASS: ${{ secrets.CAFE24_DB_PASSWORD }}
+          OP: ${{ inputs.op }}
+          IDS: ${{ inputs.ids }}
+          CIDS: ${{ inputs.cids }}
+        run: |
+          export KEY=$(printf 'jeju-cron|%s' "$DB_PASS" | sha256sum | cut -d' ' -f1)
+          BODY=$(python3 -c 'import json,os
+          s=lambda v:[x.strip() for x in v.split(",") if x.strip()]
+          print(json.dumps({"key":os.environ["KEY"],"op":os.environ["OP"],"ids":s(os.environ["IDS"]),"cids":s(os.environ["CIDS"])}))')
+          curl -sS --max-time 40 -H "Content-Type: text/plain" --data "$BODY" "https://andend07.mycafe24.com/jeju/api/?a=maint" > r.json
+          python3 -c 'import json
+          d=json.load(open("r.json"))
+          if not d.get("ok"): print("오류:", d); raise SystemExit(1)
+          d=d["data"]
+          if "posts" in d:
+              print("== 글", len(d["posts"]), "개")
+              for p in d["posts"]: print(p["id"], "|", p["board"], "|", p["author_nick"], "|", p["created_at"], "|", p["title"])
+              print("== 댓글", len(d["comments"]), "개")
+              for c in d["comments"]: print(c["id"], "|", c["post_id"], "|", c["author_nick"], "|", c["created_at"], "|", c["text"])
+          else: print(d)'
