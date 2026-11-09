@@ -2110,3 +2110,10 @@ a.act-item:hover{border-color:var(--sea-200)}
   .gd-top .crumb,.gd-top>p{display:none!important}
   .gd-top h1{font-size:24px}
 }
+/* 가이드: 검색창·상황 버튼을 카드 목록과 같은 폭으로 */
+.gd .gd-top{max-width:none}
+.gd .gd-search{max-width:none;width:100%}
+@media (min-width:761px){
+  .gd .gd-stages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+  .gd .gd-stages a{justify-content:center;padding:12px 10px}
+}
