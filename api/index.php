@@ -603,6 +603,12 @@ case 'admin_inquiries': {
     $d['replied_at'] = $r['replied_at'] ? date('Y-m-d H:i', strtotime($r['replied_at'])) : null; return $d; },
     all("SELECT i.*, u.nick FROM ji_inquiries i LEFT JOIN ji_users u ON u.id = i.user_id ORDER BY i.created_at DESC LIMIT 500")));
 }
+case 'admin_inquiry_pub': {   // 축제 제보를 게시한 뒤: 게시한 제목·글 id 를 제보에 적어 둠 (목록에 고친 제목으로 보이게)
+  admin($R); $r = one("SELECT data FROM ji_inquiries WHERE id = ?", [$R['id'] ?? '']); if (!$r) fail('제보를 찾을 수 없어요', 404);
+  $d = json_decode($r['data'], true) ?: [];
+  $d['pub_title'] = str($R['title'] ?? '', 120); $d['pub_id'] = is_uuid($R['post_id'] ?? '') ? $R['post_id'] : ''; $d['pub_at'] = date('Y-m-d H:i');
+  q("UPDATE ji_inquiries SET data = ?, status = 'done' WHERE id = ?", [json_encode($d, JSON_UNESCAPED_UNICODE), $R['id']]); out(true);
+}
 case 'admin_inquiry_set': {
   admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'seen', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
   q("UPDATE ji_inquiries SET status = ? WHERE id = ?", [$st, $R['id'] ?? '']); out(true);
