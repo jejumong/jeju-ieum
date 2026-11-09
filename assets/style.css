@@ -2079,5 +2079,4 @@ a.act-item:hover{border-color:var(--sea-200)}
   .hr-x{display:none!important}
   .hr .st-l{display:none}
   .hr-dl>div{grid-template-columns:44px 1fr;font-size:13.5px}
-  .sch-tip{display:block!important;order:4;margin-top:12px;text-align:center;font-size:13.5px;font-weight:700;color:var(--sea-700);padding:10px;border:1px dashed var(--line);border-radius:12px;text-decoration:none}
 }
