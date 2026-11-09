@@ -143,7 +143,19 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 .al-row input:focus-visible + i{outline:2px solid var(--sea-600);outline-offset:2px}
 .al-note{font-size:13px;color:var(--ink-3);margin:14px 4px 0;line-height:1.6}
 
-a.brand{text-decoration:none;color:inherit;cursor:pointer}
+/* 로고: 사이트 공용 .brand 모양(흰 알약)을 쓰지 않음 */
+.side a.brand{text-decoration:none;cursor:pointer;background:none;border:0;box-shadow:none;border-radius:0;justify-content:flex-start;text-align:left;min-height:0}
+.side a.brand div{text-align:left;color:#fff}
+@media (max-width:900px){
+  .side{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px 6px;padding:10px 12px}
+  .side a.brand{width:auto;padding:2px 4px;font-size:15px}
+  .side a.brand small{font-size:10px}
+  .side .foot{grid-column:2;grid-row:1;gap:2px}
+  .side .foot a,.side .foot button{font-size:12.5px;padding:6px 8px;white-space:nowrap}
+  .side nav{grid-column:1 / -1;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -12px;padding:0 12px 2px}
+  .side nav::-webkit-scrollbar{display:none}
+  .side nav button{flex:none;white-space:nowrap}
+}
 /* 회원 관리: PC 는 한 줄로 */
 table.mem-t td,table.mem-t th{white-space:nowrap;overflow-wrap:normal;word-break:keep-all}
 table.mem-t td small{font-size:13px}
@@ -462,13 +474,13 @@ function drawNotices(){
   M().innerHTML = '<h1>공지 관리</h1><p class="sub">공지는 선택한 게시판 맨 위에 표시됩니다. ‘전체’로 올리면 홈 화면과 모든 게시판에 나옵니다.</p>' +
     '<div class="panel"><h2>새 공지 작성</h2>' + noticeForm(null) +
     '<div class="bt" style="display:flex;justify-content:flex-end"><button class="btn primary" onclick="saveNotice(null)">공지 올리기</button></div></div>' +
-    '<div class="panel"><h2>등록된 공지 (' + list.length + ')</h2>' + (list.length ? '<table class="adm-t"><thead><tr><th>대상</th><th>제목</th><th>조회수</th><th>관리</th></tr></thead><tbody>' +
+    '<div class="panel"><h2>등록된 공지 (' + list.length + ')</h2>' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>대상</th><th>제목</th><th>조회수</th><th>관리</th></tr></thead><tbody>' +
       list.map(function(n){
         return '<tr><td><span class="bd">' + esc(n.target) + '</span>' + (n.pinned ? ' 📌' : '') + '</td>' +
           '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(n.id) + '" target="_blank">' + esc(n.title) + '</a><small>' + esc(n.date) + '</small></td>' +
           '<td><input class="num" type="number" min="0" value="' + viewsOf(n) + '" data-nid="' + n.id + '"></td>' +
           '<td><div class="acts"><button class="mb" onclick="editNotice(\'' + n.id + '\')">수정</button><button class="mb del" onclick="delNotice(\'' + n.id + '\')">삭제</button></div></td></tr>';
-      }).join("") + '</tbody></table>' : '<div class="empty">등록된 공지가 없습니다.</div>') + '</div>';
+      }).join("") + '</tbody></table></div>' : '<div class="empty">등록된 공지가 없습니다.</div>') + '</div>';
   M().querySelectorAll("input[data-nid]").forEach(function(inp){
     function save(){ setNotice(inp.dataset.nid, { views: Math.max(0, parseInt(inp.value,10)||0) }, true); toast("조회수를 바꿨습니다"); }
     inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { save(); inp.blur(); } });
