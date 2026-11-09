@@ -543,5 +543,5 @@ for (var _f2 = 0; _f2 < EXTRA2_TRADE.length; _f2++) { TRADE_SEEDS.push(EXTRA2_TR
 }
 ];
   // 실제 축제 일정은 운영자가 확인해 올린 정보로 남김 (예시 글 숨김에서 제외, 조회수 숫자 없음)
-  REAL.forEach(function(p){ p.keep = true; p.author = "제주이음 운영자"; delete p.views; TRADE_SEEDS.push(p); SEED_POSTS.push(p); });
+  REAL.forEach(function(p){ p.keep = true; p.author = "제주이음"; delete p.views; TRADE_SEEDS.push(p); SEED_POSTS.push(p); });
 })();

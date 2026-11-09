@@ -85,7 +85,7 @@ function guideStatic(g) {
   }).join("");
   return `<header class="art-head"><div class="chips"><span class="chip region">${esc(g.cat)}</span>${(g.stage || []).map((s) => `<span class="chip stage">${esc(stageLabel(s))}</span>`).join("")}</div>
 <h1>${esc(g.title)}</h1><p class="lead">${esc(g.lead)}</p>
-<div class="art-meta"><span class="by">제주이음 운영자</span><span class="upd">✓ ${g.updated.replace(/-/g, ".")} 내용 확인</span><span>${g.min}분 읽기</span></div></header>
+<div class="art-meta"><span class="by">제주이음</span><span class="upd">✓ ${g.updated.replace(/-/g, ".")} 내용 확인</span><span>${g.min}분 읽기</span></div></header>
 <div class="art-sum"><h4>3줄 요약</h4><ul>${(g.summary || []).map((t) => `<li>${esc(t)}</li>`).join("")}</ul></div>
 <div class="art-body">${body}${g.tip ? `<div class="callout"><span class="ci">💡</span><div><b>운영자 메모</b><p>${esc(g.tip)}</p></div></div>` : ""}</div>
 <div class="src-box"><h4>출처 · 참고</h4><ul>${(g.sources || []).map((s) => `<li><a href="${esc(s[1])}">${esc(s[0])}</a></li>`).join("")}</ul></div>`;

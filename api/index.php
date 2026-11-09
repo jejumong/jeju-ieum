@@ -52,7 +52,7 @@ function send_msg($from, $fromNick, $to, $body, $kind = 'dm', $ref = '') {
   q("INSERT INTO ji_messages (id, sender, sender_nick, receiver, receiver_nick, body, kind, ref, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
     [$id, $from, $fromNick, $to['id'], $to['nick'], $body, $kind, $ref, now()]);
   notify($to['id'], 'message', '✉️ ' . $fromNick . '님의 쪽지', mb_substr($body, 0, 80), 'messages.html?open=' . $id,
-    '제주이음 · ' . $fromNick . '님의 쪽지', mb_substr($body, 0, 80));
+    '제주이음 · ' . $fromNick . '님의 쪽지', mb_substr($body, 0, 80), false);   // 쪽지는 쪽지함 숫자로만 — 알림함에는 안 남기고 휴대폰 푸시만
   return $id;
 }
 $BOARDS = ['동호회', '구인구직', '중고사고팔기', '부동산', '제주상점', '특가공구', '축제정보', '자유게시판', '질문하기', '최신뉴스', '생활정보', '취미·여행', '교육', '건강웰빙', '제주북쪽', '제주동쪽', '제주서쪽', '제주남쪽'];
@@ -69,6 +69,7 @@ case 'signup': {
   if (mb_strlen($nick) < 2) fail('닉네임은 2~10자로 입력해 주세요.');
   if (one("SELECT id FROM ji_users WHERE email = ?", [$email])) fail('이미 가입된 이메일입니다.');
   if (one("SELECT id FROM ji_users WHERE nick = ?", [$nick])) fail('이미 사용 중인 닉네임입니다.');
+  if (reserved_nick($nick)) fail('운영자용 이름이라 쓸 수 없어요. 다른 닉네임을 골라 주세요.');
   // 관리자 계정이 이미 있으면 ADMIN_EMAILS 의 다른 주소로 새로 가입해 관리자가 되는 것을 막음 (이메일 인증이 없어서)
   if (in_array($email, $CFG['admins'], true) && one("SELECT id FROM ji_users WHERE role = 'admin'")) fail('이 이메일로는 가입할 수 없어요.');
   $role = in_array($email, $CFG['admins'], true) ? 'admin' : 'user';
@@ -103,6 +104,7 @@ case 'profile_update': {
   $u = me($R); $nick = str($R['nick'] ?? $u['nick'], 10); $region = str($R['region'] ?? $u['region'], 40);
   if (mb_strlen($nick) < 2) fail('닉네임은 2~10자로 입력해 주세요.');
   if ($nick !== $u['nick'] && one("SELECT id FROM ji_users WHERE nick = ?", [$nick])) fail('이미 사용 중인 닉네임입니다.');
+  if ($nick !== $u['nick'] && !is_mod($u) && reserved_nick($nick)) fail('운영자용 이름이라 쓸 수 없어요. 다른 닉네임을 골라 주세요.');
   q("UPDATE ji_users SET nick = ?, region = ? WHERE id = ?", [$nick, $region, $u['id']]);
   if ($nick !== $u['nick']) q("UPDATE ji_posts SET author_nick = ? WHERE author = ?", [$nick, $u['id']]);
   out(['nick' => $nick, 'region' => $region]);
@@ -206,6 +208,16 @@ case 'maint': {
       $n++;
     }
     out(['as' => $a['nick'], 'uploaded' => $n, 'skipped' => $skip]);
+  }
+  if ($op === 'admin_nick') {   // 관리자 계정 닉네임을 바꾸고, 이미 쓴 글·댓글·쪽지의 작성자 이름도 함께 바꿈
+    $nick = str(((array)($R['ids'] ?? []))[0] ?? '', 20); if ($nick === '') fail('닉네임이 비었어요');
+    $ad = all("SELECT id FROM ji_users WHERE role = 'admin'"); if (count($ad) !== 1) fail('관리자 계정이 ' . count($ad) . '개예요');
+    $aid = $ad[0]['id'];
+    if (one("SELECT id FROM ji_users WHERE nick = ? AND id <> ?", [$nick, $aid])) fail('다른 회원이 쓰는 닉네임이에요');
+    q("UPDATE ji_users SET nick = ? WHERE id = ?", [$nick, $aid]);
+    $c = [q("UPDATE ji_posts SET author_nick = ? WHERE author = ?", [$nick, $aid])->rowCount(), q("UPDATE ji_comments SET author_nick = ? WHERE author = ?", [$nick, $aid])->rowCount(),
+          q("UPDATE ji_messages SET sender_nick = ? WHERE sender = ?", [$nick, $aid])->rowCount(), q("UPDATE ji_messages SET receiver_nick = ? WHERE receiver = ?", [$nick, $aid])->rowCount()];
+    out(['nick' => $nick, 'posts' => $c[0], 'comments' => $c[1], 'msgs' => $c[2] + $c[3]]);
   }
   if ($op === 'admins') {   // 관리자 계정 확인 (기록이 공개될 수 있어 이메일은 가림)
     $mask = function($e){ $p = explode('@', $e); return mb_substr($p[0], 0, 2) . '***@' . ($p[1] ?? ''); };
@@ -682,7 +694,7 @@ case 'admin_inquiry_reply': {
   $i = one("SELECT * FROM ji_inquiries WHERE id = ?", [$R['id'] ?? '']); if (!$i) fail('문의를 찾을 수 없어요', 404);
   if (!$i['user_id']) fail('로그인하지 않고 보낸 문의라 쪽지로 답할 수 없어요. 남긴 연락처로 연락해 주세요.');
   $to = one("SELECT id, nick FROM ji_users WHERE id = ?", [$i['user_id']]); if (!$to) fail('탈퇴한 회원이에요');
-  send_msg($a['id'], '제주이음 운영자', $to, $body, 'reply', $i['id']);
+  send_msg($a['id'], '제주이음', $to, $body, 'reply', $i['id']);
   q("UPDATE ji_inquiries SET status = 'done', replied_at = ? WHERE id = ?", [now(), $i['id']]);
   out(true);
 }
@@ -691,9 +703,9 @@ case 'admin_inquiry_reply': {
 case 'notis': {
   $u = me($R);
   out(array_map(function ($n) { $n['read'] = (bool)$n['is_read']; unset($n['is_read']); $n['created_at'] = iso($n['created_at']); return $n; },
-    all("SELECT * FROM ji_notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50", [$u['id']])));
+    all("SELECT * FROM ji_notifications WHERE user_id = ? AND kind <> 'message' ORDER BY created_at DESC LIMIT 50", [$u['id']])));
 }
-case 'noti_unread': { $u = me($R, false); out($u ? (int)one("SELECT COUNT(*) n FROM ji_notifications WHERE user_id = ? AND is_read = 0", [$u['id']])['n'] : 0); }
+case 'noti_unread': { $u = me($R, false); out($u ? (int)one("SELECT COUNT(*) n FROM ji_notifications WHERE user_id = ? AND is_read = 0 AND kind <> 'message'", [$u['id']])['n'] : 0); }
 case 'noti_read': {   // 고른 알림만 읽음으로
   $u = me($R); $n = 0;
   foreach (array_slice((array)($R['ids'] ?? []), 0, 200) as $id) if (is_uuid($id)) { q("UPDATE ji_notifications SET is_read = 1 WHERE id = ? AND user_id = ?", [$id, $u['id']]); $n++; }

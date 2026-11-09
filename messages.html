@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109y">
+<link rel="stylesheet" href="assets/style.css?v=20261109z">
 </head>
 <body data-active="">
 
@@ -38,9 +38,9 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261109y"></script>
-<script src="assets/db.js?v=20261109y"></script>
-<script src="assets/notify.js?v=20261109y"></script>
+<script src="assets/common.js?v=20261109z"></script>
+<script src="assets/db.js?v=20261109z"></script>
+<script src="assets/notify.js?v=20261109z"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
@@ -77,7 +77,7 @@
   $("m-body").addEventListener("input", function(){ $("m-len").textContent = this.value.length + " / 2000"; });
 
   function item(m, box){
-    var who = box === "in" ? m.from_nick : m.to_nick, op = m.from_nick === "제주이음 운영자";
+    var who = box === "in" ? m.from_nick : m.to_nick, op = m.from_nick === "제주이음" || m.from_nick === "제주이음 운영자";
     return '<div class="act-item msg-item' + (box === "in" ? " sel-item" : "") + (box === "in" && !m.read ? " unread" : "") + (op ? " msg-op" : "") + '" data-id="' + m.id + '" data-box="' + box + '">' +
       (box === "in" ? '<input type="checkbox" class="mk" data-id="' + m.id + '"' + (MSEL[m.id] ? ' checked' : '') + ' aria-label="선택">' : '') + '<div class="sel-main"><div class="ai-t"><b>' + (box === "in" ? "" : "→ ") + esc(who) + (op ? ' <span class="msg-badge">운영자</span>' : '') + '</b><span>' + when(m.created_at) + (box === "sent" ? (m.read ? " · 읽음" : " · 안 읽음") : "") + '</span></div>' +
       '<p class="msg-prev">' + esc(m.body.split("\n")[0].slice(0, 80)) + '</p>' +

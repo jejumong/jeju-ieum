@@ -164,6 +164,8 @@ function me($req, $need = true) {
 }
 /* 역할: user 일반 · realtor 부동산 중개인 · shop 상점판매자 · dealer 공구판매자 · staff 스텝 · admin 관리자 */
 const JI_ROLES = ['user', 'realtor', 'shop', 'dealer', 'staff', 'admin'];
+/* 운영자처럼 보이는 닉네임은 일반 회원이 못 씀 */
+function reserved_nick($n) { $k = preg_replace('/\s+/u', '', mb_strtolower($n)); return (bool)preg_match('/제주이음|운영자|관리자|운영진|admin/u', $k); }
 function is_mod($u) { return in_array($u['role'] ?? '', ['admin', 'staff'], true); }   // 글·댓글 관리 가능
 /* 관리자 페이지: 스텝도 들어올 수 있음. $strict 이면 관리자만 (역할 바꾸기 등) */
 function admin($req, $strict = false) {
@@ -235,9 +237,9 @@ function remove_upload($path) {
 function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user']; }
 
 /* ── 알림 + 휴대폰 푸시 (OneSignal) ── */
-function notify($uid, $kind, $title, $body, $link, $pushTitle = null, $pushBody = null) {
+function notify($uid, $kind, $title, $body, $link, $pushTitle = null, $pushBody = null, $save = true) {
   global $CFG;
-  q("INSERT INTO ji_notifications (id, user_id, kind, title, body, link, created_at) VALUES (?,?,?,?,?,?,?)",
+  if ($save) q("INSERT INTO ji_notifications (id, user_id, kind, title, body, link, created_at) VALUES (?,?,?,?,?,?,?)",
     [uuid(), $uid, $kind, mb_substr($title, 0, 200), mb_substr($body, 0, 500), $link, now()]);
   if (empty($CFG['onesignal_key']) || !function_exists('curl_init')) return;
   $h = $pushTitle ?? ('제주이음 · ' . $title); $m = $pushBody ?? $body;
