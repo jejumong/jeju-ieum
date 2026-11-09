@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110b">
+<link rel="stylesheet" href="assets/style.css?v=20261110c">
 <style>
 .req-status{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r);margin-bottom:20px;font-size:14px}
 .req-status.pending{background:var(--sea-50);border:1px solid var(--sea-100);color:var(--sea-700)}
@@ -101,10 +101,10 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261110b"></script>
-<script src="assets/db.js?v=20261110b"></script>
-<script src="assets/notify.js?v=20261110b"></script>
-<script src="assets/admin-data.js?v=20261110b"></script>
+<script src="assets/common.js?v=20261110c"></script>
+<script src="assets/db.js?v=20261110c"></script>
+<script src="assets/notify.js?v=20261110c"></script>
+<script src="assets/admin-data.js?v=20261110c"></script>
 <script>
 var user = currentUser();
 var board = new URLSearchParams(location.search).get("board") || "특가공구";
@@ -143,7 +143,18 @@ if (!user) {
     document.querySelector(".form-card").appendChild(go);
     return;
   }
-  var req = mySellerRequest(board);
+  // 서버가 있으면 서버의 최신 상태로 (반려·승인이 바로 반영되게), 없으면 이 브라우저 기록
+  if (window.JIDB && JIDB.enabled && user.id) {
+    JIDB.ready.then(function () { return JIDB.call("seller_my", { board: board }); }).then(showReq, function () { showReq(mySellerRequest(board)); });
+  } else showReq(mySellerRequest(board));
+})();
+function showReq(req){
+  document.getElementById("status-box").innerHTML = ""; document.getElementById("form-box").style.display = "";
+  if (req && req.status === "approved") {   // 승인됐는데 이 화면의 회원 정보가 옛것인 경우
+    if (!sessionStorage.getItem("sr_reload")) { sessionStorage.setItem("sr_reload", "1"); location.reload(); return; }
+    document.getElementById("status-box").innerHTML = '<div class="req-status approved"><span class="ico">✅</span><div><div class="rt">승인되었어요</div><div class="rs">로그아웃 후 다시 로그인하면 ' + board + ' 글쓰기가 열려요.</div></div></div>';
+    document.getElementById("form-box").style.display = "none"; return;
+  }
   if (req && req.status === "pending") {
     document.getElementById("status-box").innerHTML =
       '<div class="req-status pending"><span class="ico">⏳</span><div><div class="rt">승인 대기중</div>' +
@@ -152,9 +163,9 @@ if (!user) {
   } else if (req && req.status === "rejected") {
     document.getElementById("status-box").innerHTML =
       '<div class="req-status rejected"><span class="ico">✕</span><div><div class="rt">이전 요청이 반려되었습니다</div>' +
-      '<div class="rs">내용을 보완해서 다시 요청해보세요.</div></div></div>';
+      '<div class="rs">내용을 보완해서 아래 양식으로 다시 요청할 수 있어요.</div></div></div>';
   }
-})();
+}
 
 document.getElementById("sec-deal").style.display = board === "특가공구" ? "block" : "none";
 document.getElementById("sec-shop").style.display = board === "특가공구" ? "none" : "block";

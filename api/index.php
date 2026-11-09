@@ -504,6 +504,10 @@ case 'club_members': {
 }
 
 /* ───────── 상점·공구 승인 요청 ───────── */
+case 'seller_my': {   // 내가 이 게시판에 보낸 가장 최근 승인 요청 (상태는 서버 기준)
+  $u = me($R); $r = one("SELECT status, created_at FROM ji_seller_requests WHERE applicant = ? AND board = ? ORDER BY created_at DESC LIMIT 1", [$u['id'], $R['board'] ?? '']);
+  out($r ? ['status' => $r['status'], 'date' => substr($r['created_at'], 0, 10)] : null);
+}
 case 'seller_request': {
   $u = me($R); $b = $R['board'] ?? '';
   if (!in_array($b, ['제주상점', '특가공구'], true)) fail('게시판 이름이 올바르지 않아요');
