@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109s">
+<link rel="stylesheet" href="assets/style.css?v=20261109t">
 </head>
 <body data-active="">
 
@@ -115,6 +115,24 @@
       </div>
     </div>
 
+    <div id="fest-row" style="display:none">
+      <div class="field-row">
+        <div class="field">
+          <label for="fest-start">시작일 <span class="req">*</span></label>
+          <input type="date" id="fest-start">
+        </div>
+        <div class="field">
+          <label for="fest-end">종료일 <span class="req">*</span></label>
+          <input type="date" id="fest-end">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fest-loc">장소</label>
+        <input type="text" id="fest-loc" placeholder="예: 제주도립미술관 일원">
+        <div class="hint">기간을 적으면 축제 목록에 진행중·예정·종료가 자동으로 표시돼요.</div>
+      </div>
+    </div>
+
     <div class="field">
       <label for="title">제목 <span class="req">*</span></label>
       <input type="text" id="title" placeholder="핵심이 드러나는 제목을 적어주세요" maxlength="80">
@@ -140,15 +158,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261109s"></script>
-<script src="assets/common.js?v=20261109s"></script>
-<script src="assets/db.js?v=20261109s"></script>
-<script src="assets/notify.js?v=20261109s"></script>
-<script src="assets/seed-trade.js?v=20261109s"></script>
-<script src="assets/seed-extra.js?v=20261109s"></script>
-<script src="assets/seed-new.js?v=20261109s"></script>
-<script src="assets/seed-comments.js?v=20261109s"></script>
-<script src="assets/admin-data.js?v=20261109s"></script>
+<script src="assets/kmap.js?v=20261109t"></script>
+<script src="assets/common.js?v=20261109t"></script>
+<script src="assets/db.js?v=20261109t"></script>
+<script src="assets/notify.js?v=20261109t"></script>
+<script src="assets/seed-trade.js?v=20261109t"></script>
+<script src="assets/seed-extra.js?v=20261109t"></script>
+<script src="assets/seed-new.js?v=20261109t"></script>
+<script src="assets/seed-comments.js?v=20261109t"></script>
+<script src="assets/admin-data.js?v=20261109t"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -216,6 +234,9 @@ function fillEdit(editing) {
     document.getElementById("addr").value = editing.addr || "";
     if (editing.payType) document.getElementById("paytype").value = editing.payType;
     document.getElementById("pay").value = editing.pay || "";
+    document.getElementById("fest-start").value = editing.start || (editing.extra && editing.extra.start) || "";
+    document.getElementById("fest-end").value = editing.end || (editing.extra && editing.extra.end) || "";
+    document.getElementById("fest-loc").value = editing.loc || "";
   if (typeof toggleExtra === "function") toggleExtra();
   // 이미 올린 사진 불러오기
   if (editing.extra && editing.extra.photos && editing.extra.photos.length) {
@@ -310,6 +331,12 @@ function toggleExtra() {
   var v = document.getElementById("board").value;
   var trade = ["구인구직", "부동산", "중고사고팔기", "특가공구"].indexOf(v) > -1;
   document.getElementById("extra-trade").style.display = trade ? "block" : "none";
+  document.getElementById("fest-row").style.display = v === "축제정보" ? "block" : "none";
+  if (v === "축제정보" && !editing) {   // 운영진은 '축제 등록', 회원은 '축제 제보'
+    var mod = ["admin", "staff"].indexOf((currentUser() || {}).role) > -1;
+    document.getElementById("page-title").textContent = mod ? "축제 등록" : "축제 제보";
+    document.title = (mod ? "축제 등록" : "축제 제보") + " — 제주이음";
+  }
   document.getElementById("htype-field").style.display = v === "부동산" ? "block" : "none";
   var job = v === "구인구직";
   document.getElementById("addr-field").style.display = (v === "부동산" || job) ? "block" : "none";
@@ -400,6 +427,13 @@ function submitPost() {
   var loc = (document.getElementById("loc").value || "").trim();
   var htype = board === "부동산" ? document.getElementById("htype").value : "";
   var addr = (board === "부동산" || board === "구인구직") ? (document.getElementById("addr").value || "").trim() : "";
+  var fs = "", fe = "";
+  if (board === "축제정보") {
+    fs = document.getElementById("fest-start").value; fe = document.getElementById("fest-end").value;
+    if (!fs || !fe) { alert("축제 시작일과 종료일을 골라 주세요."); document.getElementById(fs ? "fest-end" : "fest-start").focus(); return; }
+    if (fe < fs) { alert("종료일이 시작일보다 빨라요."); document.getElementById("fest-end").focus(); return; }
+    loc = (document.getElementById("fest-loc").value || "").trim(); price = "";
+  }
   var payType = "", pay = "";
   if (board === "구인구직") {
     payType = document.getElementById("paytype").value;
@@ -429,6 +463,7 @@ function submitPost() {
     }
     var btn = document.getElementById("submit-btn"); btn.disabled = true;
     extra.htype = htype; extra.addr = addr; extra.payType = payType; extra.pay = pay;
+    if (board === "축제정보") { extra.start = fs; extra.end = fe; } else { delete extra.start; delete extra.end; }
     extra.photos = PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; });
     var data = { board: board, head: head === "선택 안 함" ? "" : head, title: title, content: content, price: price, loc: loc, meta: (editing && editing.meta) || "", extra: extra };
     (editing && editing.db ? JIDB.updatePost(editing.id, data) : JIDB.createPost(data)).then(function (p) {
