@@ -147,7 +147,8 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 .side a.brand{text-decoration:none;cursor:pointer;background:none;border:0;box-shadow:none;border-radius:0;justify-content:flex-start;text-align:left;min-height:0}
 .side a.brand div{text-align:left;color:#fff}
 @media (max-width:900px){
-  .side{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px 6px;padding:10px 12px}
+  .adm{grid-template-rows:auto 1fr}
+  .side{display:grid;grid-template-columns:1fr auto;align-items:center;align-content:start;gap:8px 6px;padding:10px 12px}
   .side a.brand{width:auto;padding:2px 4px;font-size:15px}
   .side a.brand small{font-size:10px}
   .side .foot{grid-column:2;grid-row:1;gap:2px}
@@ -281,6 +282,7 @@ var MENU = [
 ];
 function boot(){
   var pending = JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length;
+  var oldNav = document.querySelector(".side nav"), navX = oldNav ? oldNav.scrollLeft : 0;   // 휴대폰: 메뉴 가로 위치 기억
   document.getElementById("root").innerHTML =
     '<div class="adm"><aside class="side">' +
       '<a class="brand" href="index.html#dash" onclick="return goHome()" title="대시보드로 (새로고침)">' + LOGOMARK + '<div>제주이음<small>ADMIN CONSOLE</small></div></a>' +
@@ -290,6 +292,12 @@ function boot(){
       }).join("") + '</nav>' +
       '<div class="foot"><a href="' + SITE + 'index.html" target="_blank">사이트 열기 ↗</a><button onclick="logoutAdmin()">로그아웃</button></div>' +
     '</aside><main class="main" id="main"></main></div>';
+  var nv = document.querySelector(".side nav");
+  if (nv && nv.scrollWidth > nv.clientWidth) {
+    nv.scrollLeft = navX;
+    var on = nv.querySelector("button.on");   // 고른 메뉴가 화면 밖이면 보이는 곳으로
+    if (on && (on.offsetLeft < nv.scrollLeft || on.offsetLeft + on.offsetWidth > nv.scrollLeft + nv.clientWidth)) nv.scrollLeft = on.offsetLeft - 12;
+  }
   draw();
 }
 function goHome(){ try { history.replaceState(null, "", "#dash"); } catch (e) { location.hash = "dash"; } location.reload(); return false; }
