@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109t">
+<link rel="stylesheet" href="../assets/style.css?v=20261109u">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -189,6 +189,10 @@ table.mem-t td small{font-size:13px}
 .adm-t td.dt{white-space:nowrap;font-size:13px;color:var(--ink-2,#3a4652)}.adm-t td.dt small{display:block;font-size:11.5px;color:var(--ink-4,#8a96a3)}
 .mem-sort-m{display:none;gap:14px;align-items:center;font-size:13px;color:var(--ink-3);margin:0 0 10px;flex-wrap:wrap}
 @media(max-width:760px){.mem-sort-m{display:flex}}
+.iq-type{display:inline-block;font-size:14px;font-weight:800;padding:5px 11px;border-radius:999px;border:1px solid;white-space:nowrap;letter-spacing:-.01em}
+.iq-photos{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.iq-photos img{width:92px;height:92px;object-fit:cover;border-radius:10px;display:block}
+.pf-ph{position:relative;cursor:pointer}.pf-ph input{position:absolute;top:6px;left:6px;width:18px;height:18px}
+.iq-pub{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin:0 0 12px;font-size:13.5px;color:var(--ink-3)}
 </style>
 </head>
 <body data-admin>
@@ -197,16 +201,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109t"></script>
-<script src="../assets/db.js?v=20261109t"></script>
-<script src="../assets/notify.js?v=20261109t"></script>
-<script src="../assets/seed-trade.js?v=20261109t"></script>
-<script src="../assets/seed-extra.js?v=20261109t"></script>
-<script src="../assets/seed-new.js?v=20261109t"></script>
-<script src="../assets/seed-comments.js?v=20261109t"></script>
-<script src="../assets/photos.js?v=20261109t"></script>
-<script src="../assets/admin-data.js?v=20261109t"></script>
-<script src="../assets/op-posts.js?v=20261109t"></script>
+<script src="../assets/common.js?v=20261109u"></script>
+<script src="../assets/db.js?v=20261109u"></script>
+<script src="../assets/notify.js?v=20261109u"></script>
+<script src="../assets/seed-trade.js?v=20261109u"></script>
+<script src="../assets/seed-extra.js?v=20261109u"></script>
+<script src="../assets/seed-new.js?v=20261109u"></script>
+<script src="../assets/seed-comments.js?v=20261109u"></script>
+<script src="../assets/photos.js?v=20261109u"></script>
+<script src="../assets/admin-data.js?v=20261109u"></script>
+<script src="../assets/op-posts.js?v=20261109u"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -710,6 +714,8 @@ if (SRV) {
       }, function(e){ alert(e.message || e); document.getElementById("r-send").disabled = false; });
     };
   };
+  var IQ_TONE = { "축제 제보": "#e8730c", "정보 정정 요청": "#d6453a", "가이드 주제 제안": "#13865a", "가이드 내용 제보": "#13865a", "동네 소식 제보": "#0d7f86", "입점·제휴 문의": "#3b55c6", "도구 제안": "#6a44c9" };
+  window.iqType = function(q){ var t = q.type || q.service || "문의", c = IQ_TONE[t] || "#4d5967"; return '<span class="iq-type" style="color:' + c + ';background:' + c + '14;border-color:' + c + '33">' + esc(t) + '</span>'; };
   var IQ_HELP = '<div class="panel role-help"><b>상태는 운영자끼리 처리 상황을 표시하는 용도예요.</b> 회원에게는 보이지 않아요.<ul>' +
     '<li><b>새 신청</b> — 아직 아무도 안 읽음 (주황 바탕 + 메뉴에 숫자로 표시). <b>자세히 보기</b>를 열면 <b>확인함</b>으로 바뀌어요</li>' +
     '<li><b>확인함</b> — 읽었지만 아직 처리 전</li><li><b>연락함</b> — 전화·쪽지 등으로 연락했지만 처리 중</li>' +
@@ -720,18 +726,18 @@ if (SRV) {
     M().innerHTML = '<h1>문의·제보</h1><p class="sub">정보 정정 요청, 가이드 제보, 입점·제휴 문의가 모입니다.</p>' + IQ_HELP +
       '<div class="panel">' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>날짜</th><th>종류</th><th>보낸 사람</th><th>내용</th><th>상태</th><th></th></tr></thead><tbody>' +
         list.map(function(q){
-          return '<tr class="iq-row' + (q.status === "new" ? ' iq-new' : '') + '" data-iq="' + q.id + '"><td style="white-space:nowrap">' + (q.status === "new" ? '<span class="iq-dot" title="안 읽음"></span>' : '') + esc(q.date) + '</td><td><span class="bd">' + esc(q.type || q.service || "문의") + '</span></td>' +
+          return '<tr class="iq-row' + (q.status === "new" ? ' iq-new' : '') + '" data-iq="' + q.id + '"><td style="white-space:nowrap">' + (q.status === "new" ? '<span class="iq-dot" title="안 읽음"></span>' : '') + esc(q.date) + '</td><td>' + iqType(q) + '</td>' +
             '<td><b>' + esc(q.name) + '</b>' + (q.user_nick ? ' <span class="bd user">회원 ' + esc(q.user_nick) + '</span>' : ' <small>(비회원)</small>') + '<br><small>' + esc(q.contact) + '</small></td>' +
             '<td class="ttl iq-cell" onclick="showIq(\'' + q.id + '\')" title="눌러서 자세히 보기"><small>' + esc([q.stage, q.when].filter(Boolean).join(" · ")) + '</small><div class="iq-clamp">' + esc(q.msg) + '</div>' +
               '<span class="iq-more">자세히 보기 ›</span>' + (q.replied_at ? ' <small style="color:var(--sea-700)">✉️ ' + esc(q.replied_at) + ' 답장함</small>' : '') + '</td>' +
             '<td><select onchange="setIq(\'' + q.id + '\',this.value)">' + Object.keys(IQ_ST).map(function(k){ return '<option value="' + k + '"' + (q.status===k?" selected":"") + '>' + IQ_ST[k] + '</option>'; }).join("") + '</select></td>' +
-            '<td><div class="acts">' + (q.user_id ? '<button class="mb pri" onclick="msgTo(\'' + q.user_id + '\',\'' + esc(q.user_nick || q.name).replace(/'/g, "") + '\',\'' + q.id + '\')">답장하기</button>' : '') +
+            '<td><div class="acts">' + (q.type === "축제 제보" && q.status !== "done" ? '<button class="mb pri" onclick="pubFest(\'' + q.id + '\')">게시하기</button>' : '') + (q.user_id ? '<button class="mb" onclick="msgTo(\'' + q.user_id + '\',\'' + esc(q.user_nick || q.name).replace(/'/g, "") + '\',\'' + q.id + '\')">답장하기</button>' : '') +
             '<button class="mb" onclick="delIq(\'' + q.id + '\')">삭제</button></div></td></tr>';
         }).join("") + '</tbody></table></div>' : '<div class="empty">아직 들어온 신청이 없습니다.</div>') + '</div>';
   };
 
   /* 문의 상세 보기 */
-  var IQ_FIELDS = [["type","종류"],["service","신청 서비스"],["name","이름"],["contact","연락처"],["stage","상황"],["when","시기"],["email","이메일"],["region","지역"],["people","인원"],["budget","예산"]];
+  var IQ_FIELDS = [["type","종류"],["title","축제 이름"],["kind","분류"],["start","시작일"],["end","종료일"],["loc","장소"],["service","신청 서비스"],["name","이름"],["contact","연락처"],["stage","상황"],["when","시기"],["email","이메일"],["region","지역"],["people","인원"],["budget","예산"]];
   /* 자세히 보기를 열면 '확인함' 으로 — 메뉴 숫자와 주황 표시가 사라짐 */
   function markSeen(q){
     if (q.status !== "new") return;
@@ -747,18 +753,54 @@ if (SRV) {
   window.showIq = function(id){
     var q = JI.get("inquiries", []).filter(function(x){ return x.id === id; })[0]; if (!q) return;
     markSeen(q);
-    var known = { id:1, status:1, date:1, user_id:1, user_nick:1, replied_at:1, msg:1, agree:1 };
+    var known = { id:1, status:1, date:1, user_id:1, user_nick:1, replied_at:1, msg:1, agree:1, photos:1 };
     IQ_FIELDS.forEach(function(f){ known[f[0]] = 1; });
     var rows = IQ_FIELDS.filter(function(f){ return q[f[0]]; }).map(function(f){ return [f[1], q[f[0]]]; })
       .concat(Object.keys(q).filter(function(k){ return !known[k] && q[k] !== "" && q[k] != null && typeof q[k] !== "object"; }).map(function(k){ return [k, q[k]]; }));
     var nick = esc(q.user_nick || q.name).replace(/'/g, "");
-    showModal('<h3>문의 상세 <span class="bd">' + esc(q.type || q.service || "문의") + '</span></h3>' +
+    showModal('<h3>문의 상세 ' + iqType(q) + '</h3>' +
       '<div class="iq-meta">' + esc(q.date) + ' · ' + (q.user_nick ? '회원 <b>' + esc(q.user_nick) + '</b>' : '비회원') + ' · 상태 <b>' + esc(IQ_ST[q.status] || q.status) + '</b>' +
         (q.replied_at ? ' · ✉️ ' + esc(q.replied_at) + ' 답장함' : '') + '</div>' +
       '<table class="iq-dl">' + rows.map(function(r){ return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join("") + '</table>' +
       '<div class="iq-msg">' + (esc(q.msg) || '<span style="color:var(--ink-4)">내용 없음</span>') + '</div>' +
+      (q.photos && q.photos.length ? '<div class="iq-photos">' + q.photos.map(function(u){ return '<a href="' + esc(u) + '" target="_blank"><img src="' + esc(u) + '" alt=""></a>'; }).join("") + '</div>' : '') +
+      (q.type === "축제 제보" ? '<div class="iq-pub">' + (q.status === "done" ? '✅ 처리 완료된 제보예요. ' : '') + '<button class="mb pri" onclick="pubFest(\'' + q.id + '\')">✏️ 다듬어서 축제 목록에 게시</button></div>' : '') +
       '<div class="bt">' + (q.user_id ? '<button class="mb pri" onclick="msgTo(\'' + q.user_id + '\',\'' + nick + '\',\'' + q.id + '\')">답장하기</button>' : '<span style="margin-right:auto;color:var(--ink-4);font-size:13px">비회원 문의 — 연락처로 연락해 주세요</span>') +
         '<button class="mb" onclick="closeModal()">닫기</button></div>');
+  };
+
+  /* 축제 제보 → 운영자가 다듬어서 축제정보 게시판에 게시 */
+  var FEST_KINDS = ["축제", "공연·음악", "전시·문화", "체험·행사", "마켓·장터", "먹거리", "자연·계절"];
+  window.pubFest = function(id){
+    var q = JI.get("inquiries", []).filter(function(x){ return x.id === id; })[0]; if (!q) return;
+    var ph = q.photos || [];
+    showModal('<h3>축제 게시 <span class="bd">제보: ' + esc(q.user_nick || q.name || "") + '</span></h3>' +
+      '<p style="margin:-4px 0 12px;color:var(--ink-3);font-size:13.5px">내용을 확인하고 고친 뒤 게시하면 운영자 이름으로 축제 목록에 올라가요.</p>' +
+      '<div class="fld"><label>축제 이름</label><input id="pf-title" value="' + esc(q.title || "") + '"></div>' +
+      '<div class="row2"><div class="fld"><label>분류</label><select id="pf-kind"><option value="">선택 안 함</option>' + FEST_KINDS.map(function(k){ return '<option' + (k === q.kind ? ' selected' : '') + '>' + k + '</option>'; }).join("") + '</select></div>' +
+        '<div class="fld"><label>장소</label><input id="pf-loc" value="' + esc(q.loc || "") + '"></div></div>' +
+      '<div class="row2"><div class="fld"><label>시작일</label><input type="date" id="pf-start" value="' + esc(q.start || "") + '"></div>' +
+        '<div class="fld"><label>종료일</label><input type="date" id="pf-end" value="' + esc(q.end || "") + '"></div></div>' +
+      '<div class="fld"><label>내용</label><textarea id="pf-content">' + esc(q.msg || "") + '</textarea></div>' +
+      (ph.length ? '<div class="fld"><label>사진 (뺄 사진은 체크 해제)</label><div class="iq-photos">' + ph.map(function(u, i){ return '<label class="pf-ph"><img src="' + esc(u) + '" alt=""><input type="checkbox" class="pf-p" data-i="' + i + '" checked></label>'; }).join("") + '</div></div>' : '') +
+      (q.user_id ? '<label style="display:flex;gap:6px;align-items:center;font-size:13.5px;margin:4px 0 12px"><input type="checkbox" id="pf-notify" checked> 제보한 회원에게 게시했다고 쪽지 보내기</label>' : '') +
+      '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" id="pf-go">게시하기</button></div>');
+    document.getElementById("pf-go").onclick = function(){
+      var v = function(k){ return (document.getElementById("pf-" + k).value || "").trim(); };
+      var title = v("title"), st = v("start"), en = v("end");
+      if (!title) return alert("축제 이름을 적어 주세요.");
+      if (!st || !en) return alert("시작일과 종료일을 골라 주세요.");
+      if (en < st) return alert("종료일이 시작일보다 빨라요.");
+      var photos = [].filter.call(document.querySelectorAll(".pf-p"), function(c){ return c.checked; }).map(function(c){ return ph[+c.dataset.i]; });
+      var btn = this; btn.disabled = true; btn.textContent = "게시하는 중…";
+      var notify = document.getElementById("pf-notify"), wantMsg = notify && notify.checked;
+      JIDB.call("post_create", { board: "축제정보", head: v("kind"), title: title, content: v("content") || title, loc: v("loc"), extra: { start: st, end: en, photos: photos }, from_iq: q.id })
+        .then(function(post){
+          var jobs = [JIDB.call("admin_inquiry_set", { id: q.id, status: "done" })];
+          if (wantMsg) jobs.push(JIDB.sendMessage(q.user_id, "보내 주신 축제 제보 '" + title + "'를 축제 목록에 올렸어요. 고맙습니다!\n" + SITE + "view.html?id=" + post.id).catch(function(){}));
+          return Promise.all(jobs).then(function(){ closeModal(); toast("축제 목록에 게시했어요"); reloadAll(); });
+        }, function(e){ btn.disabled = false; btn.textContent = "게시하기"; alert("게시하지 못했어요: " + e.message); });
+    };
   };
 
   /* 판매자 승인 */

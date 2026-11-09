@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109t">
+<link rel="stylesheet" href="assets/style.css?v=20261109u">
 </head>
 <body data-active="">
 
@@ -158,15 +158,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261109t"></script>
-<script src="assets/common.js?v=20261109t"></script>
-<script src="assets/db.js?v=20261109t"></script>
-<script src="assets/notify.js?v=20261109t"></script>
-<script src="assets/seed-trade.js?v=20261109t"></script>
-<script src="assets/seed-extra.js?v=20261109t"></script>
-<script src="assets/seed-new.js?v=20261109t"></script>
-<script src="assets/seed-comments.js?v=20261109t"></script>
-<script src="assets/admin-data.js?v=20261109t"></script>
+<script src="assets/kmap.js?v=20261109u"></script>
+<script src="assets/common.js?v=20261109u"></script>
+<script src="assets/db.js?v=20261109u"></script>
+<script src="assets/notify.js?v=20261109u"></script>
+<script src="assets/seed-trade.js?v=20261109u"></script>
+<script src="assets/seed-extra.js?v=20261109u"></script>
+<script src="assets/seed-new.js?v=20261109u"></script>
+<script src="assets/seed-comments.js?v=20261109u"></script>
+<script src="assets/admin-data.js?v=20261109u"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -336,6 +336,10 @@ function toggleExtra() {
     var mod = ["admin", "staff"].indexOf((currentUser() || {}).role) > -1;
     document.getElementById("page-title").textContent = mod ? "축제 등록" : "축제 제보";
     document.title = (mod ? "축제 등록" : "축제 제보") + " — 제주이음";
+    if (!mod) {
+      document.getElementById("page-desc").textContent = "보내 주신 제보는 운영자가 확인하고 다듬어서 축제 목록에 올려요";
+      document.getElementById("submit-btn").textContent = "운영자에게 제보 보내기";
+    }
   }
   document.getElementById("htype-field").style.display = v === "부동산" ? "block" : "none";
   var job = v === "구인구직";
@@ -442,6 +446,17 @@ function submitPost() {
     // 지역 필터용: 주소에서 읍·면·동 이름을 뽑아 둠
     var m = addr.match(/([가-힣]+(?:읍|면|동))(?:\s|$)/); loc = m ? m[1] : addr.split(/\s+/).slice(0, 2).join(" ");
     price = "";
+  }
+  // 회원 축제 제보 → 바로 게시하지 않고 관리자 콘솔 '문의·제보'로 보냄 (운영자가 확인·수정 후 게시)
+  if (board === "축제정보" && !editing && ["admin", "staff"].indexOf(user.role) < 0 && window.JIDB && JIDB.enabled) {
+    if (PH_BUSY) { alert("사진을 올리는 중이에요. 다 올라간 뒤 보내 주세요."); return; }
+    var fb = document.getElementById("submit-btn"); fb.disabled = true;
+    JIDB.call("inquiry_add", { data: { type: "축제 제보", name: user.nick || "", contact: user.email || "", title: title, kind: head === "선택 안 함" ? "" : head,
+      start: fs, end: fe, loc: loc, msg: content, photos: PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; }) } }).then(function () {
+      alert("제보를 보냈어요. 운영자가 확인한 뒤 축제 목록에 올릴게요. 고마워요!");
+      location.href = "festivals.html";
+    }).catch(function (e) { fb.disabled = false; alert("보내지 못했어요: " + (e.message || e)); });
+    return;
   }
   // 서버가 연결되어 있으면 모든 게시판 글을 서버에 저장 (예전에 이 브라우저에만 저장된 글을 고칠 때만 예외)
   if (window.JIDB && JIDB.enabled && !(editing && !editing.db)) {

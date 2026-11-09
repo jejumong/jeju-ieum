@@ -504,10 +504,12 @@ for (var _f2 = 0; _f2 < EXTRA2_TRADE.length; _f2++) { TRADE_SEEDS.push(EXTRA2_TR
 "author": "축제알리미",
 "date": "2026-10-07",
 "views": 479,
-"loc": "제주올레 코스 일원",
+"loc": "제주올레 19·20코스 (조천~김녕~하도)",
 "start": "2026-11-05",
 "end": "2026-11-07",
-"emoji": "🥾"
+"emoji": "🥾",
+"px": 71.0,
+"py": 25.5
 },
 {
 "id": "rf15",

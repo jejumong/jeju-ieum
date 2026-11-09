@@ -290,7 +290,7 @@ case 'post_get': {
 case 'post_create': {
   $u = me($R); $b = str($R['board'] ?? '', 30);
   if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
-  if (!can_write_board($u, $b)) fail('승인된 ' . ($b === '제주상점' ? '상점판매자' : '공구판매자') . '만 올릴 수 있어요', 403);
+  if (!can_write_board($u, $b)) fail($b === '축제정보' ? '축제 정보는 운영자가 확인한 뒤 올려요. 축제 제보로 보내 주세요.' : '승인된 ' . ($b === '제주상점' ? '상점판매자' : '공구판매자') . '만 올릴 수 있어요', 403);
   $title = str($R['title'] ?? '', 120); if ($title === '') fail('제목을 입력해 주세요.');
   if ($b === '부동산') {
     if ($u['role'] === 'realtor') {
@@ -307,8 +307,9 @@ case 'post_create': {
   q("INSERT INTO ji_posts (id, board, head, title, content, loc, meta, price, extra, author, author_nick, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
     [$id, $b, str($R['head'] ?? '', 30), $title, str($R['content'] ?? '', 20000), str($R['loc'] ?? '', 100), str($R['meta'] ?? '', 255),
      str($R['price'] ?? '', 60), json_encode(array_diff_key(is_array($R['extra'] ?? null) ? $R['extra'] : [], ['photos' => 1]) ?: new stdClass(), JSON_UNESCAPED_UNICODE), $u['id'], $u['nick'], $t, $t]);
+  if (is_mod($u) && is_uuid($R['from_iq'] ?? '')) q("UPDATE ji_uploads SET post_id = NULL WHERE post_id = ?", [$R['from_iq']]);   // 제보 사진을 게시 글로 옮김
   if (!empty($R['extra']['photos'])) {
-    $x = $R['extra']; $x['photos'] = attach_photos($id, $u['id'], $x['photos']);
+    $x = $R['extra']; $x['photos'] = attach_photos($id, $u['id'], $x['photos'], is_mod($u));
     q("UPDATE ji_posts SET extra = ? WHERE id = ?", [json_encode($x, JSON_UNESCAPED_UNICODE), $id]);
   }
   $isTrade = in_array($b, ['구인구직', '중고사고팔기', '부동산', '제주상점', '특가공구'], true);
@@ -512,7 +513,13 @@ case 'inquiry_add': {
   if ($n >= 5) fail('잠시 후 다시 보내 주세요.', 429);
   $js = json_encode($d, JSON_UNESCAPED_UNICODE); if (strlen($js) > 8000) fail('내용이 너무 길어요');
   $who = me($R, false);
-  q("INSERT INTO ji_inquiries (id, data, ip, user_id, created_at) VALUES (?,?,?,?,?)", [uuid(), $js, ip(), $who ? $who['id'] : null, now()]);
+  $iqid = uuid();
+  q("INSERT INTO ji_inquiries (id, data, ip, user_id, created_at) VALUES (?,?,?,?,?)", [$iqid, $js, ip(), $who ? $who['id'] : null, now()]);
+  if ($who && !empty($d['photos']) && is_array($d['photos'])) {   // 제보 사진은 1일 뒤 자동 정리되지 않게 이 제보에 묶어 둠
+    $base = upload_base();
+    foreach (array_slice($d['photos'], 0, 10) as $url) if (is_string($url) && strpos($url, $base) === 0)
+      q("UPDATE ji_uploads SET post_id = ? WHERE path = ? AND user_id = ? AND post_id IS NULL", [$iqid, substr($url, strlen($base)), $who['id']]);
+  }
   alert_admins('inquiry', '📮 새 문의 · ' . mb_substr((string)($d['type'] ?? $d['service'] ?? '문의'), 0, 30),
     mb_substr((string)($d['name'] ?? ''), 0, 20) . ($who ? ' (회원 ' . $who['nick'] . ')' : ' (비회원)') . ': ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 70),
     'admin/index.html#inquiries', null, '제주이음 · 새 문의가 왔어요', mb_substr((string)($d['type'] ?? '문의'), 0, 30) . ' · ' . mb_substr(preg_replace('/\s+/u', ' ', (string)($d['msg'] ?? '')), 0, 60));
@@ -584,7 +591,7 @@ case 'admin_inquiry_set': {
   admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'seen', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
   q("UPDATE ji_inquiries SET status = ? WHERE id = ?", [$st, $R['id'] ?? '']); out(true);
 }
-case 'admin_inquiry_delete': { admin($R); q("DELETE FROM ji_inquiries WHERE id = ?", [$R['id'] ?? '']); out(true); }
+case 'admin_inquiry_delete': { admin($R); $iq = $R['id'] ?? ''; if (is_uuid($iq)) foreach (all("SELECT path FROM ji_uploads WHERE post_id = ?", [$iq]) as $o) remove_upload($o['path']); q("DELETE FROM ji_inquiries WHERE id = ?", [$iq]); out(true); }
 case 'admin_sellers': {
   admin($R);
   out(array_map(function ($r) { $r['details'] = json_decode($r['details'], true); $r['created_at'] = iso($r['created_at']);

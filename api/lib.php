@@ -175,6 +175,7 @@ function can_write_board($u, $b) {
   if (is_mod($u)) return true;
   if ($b === '제주상점') return ($u['role'] ?? '') === 'shop';
   if ($b === '특가공구') return ($u['role'] ?? '') === 'dealer';
+  if ($b === '축제정보') return false;   // 회원 축제 제보는 문의·제보로 받고 운영진이 검토해 게시
   return true;
 }
 /* 관리자·스텝이 받을 알림 종류 — 각자 켜고 끔 (ji_settings 'al:<회원id>') */
