@@ -585,7 +585,9 @@ case 'admin_overview': {
 }
 case 'admin_users': {
   admin($R);
-  out(array_map(function ($u) { $u['created_at'] = iso($u['created_at']); $u['last_login'] = iso($u['last_login']); return $u; },
+  out(array_map(function ($u) { $u['created_at'] = iso($u['created_at']); $u['last_login'] = iso($u['last_login']);
+    if (in_array($u['role'], ['shop', 'dealer'], true)) $u['periods'] = (array)setting('sp:' . $u['id'], []);
+    return $u; },
     all("SELECT u.id, u.email, u.nick, u.region, u.role, u.seller_until, u.created_at, u.last_login,
          (SELECT COUNT(*) FROM ji_posts p WHERE p.author = u.id) posts,
          (SELECT COUNT(*) FROM ji_comments c WHERE c.author = u.id) comments FROM ji_users u ORDER BY u.created_at DESC LIMIT 1000")));
@@ -660,7 +662,14 @@ case 'admin_user_delete': {   // 관리자만: 회원 탈퇴 처리 (관리자 �
 case 'admin_seller_until': {   // 판매자 입점 기간 정하기 (null = 기한 없음)
   admin($R, true); $u = one("SELECT id FROM ji_users WHERE id = ?", [$R['id'] ?? '']); if (!$u) fail('회원을 찾을 수 없어요', 404);
   $d = $R['until'] ?? null; if ($d !== null && $d !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) fail('날짜 형식이 올바르지 않아요');
-  q("UPDATE ji_users SET seller_until = ? WHERE id = ?", [$d ?: null, $u['id']]); out(true);
+  q("UPDATE ji_users SET seller_until = ? WHERE id = ?", [$d ?: null, $u['id']]);
+  // 입점 기간 기록 (언제부터 언제까지, 얼마나) — 'sp:<회원id>'
+  $log = (array)setting('sp:' . $u['id'], []);
+  $st = (string)($R['start'] ?? ''); if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $st)) $st = '';
+  $log[] = ['start' => $st, 'end' => $d ?: '', 'kind' => str($R['kind'] ?? '', 20), 'at' => date('Y-m-d H:i'), 'memo' => str($R['memo'] ?? '', 60)];
+  $log = array_slice($log, -50);
+  q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", ['sp:' . $u['id'], json_encode($log, JSON_UNESCAPED_UNICODE), now()]);
+  out($log);
 }
 case 'admin_inquiry_set': {
   admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'seen', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
