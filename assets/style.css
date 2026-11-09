@@ -1974,3 +1974,10 @@ a.act-item:hover{border-color:var(--sea-200)}
 .ji-empty p{max-width:420px;margin:8px auto 16px;font-size:14px;color:var(--ink-3);line-height:1.65}
 .ji-empty.f{background:none;border:0;padding:24px;color:var(--ink-3);font-size:14.5px}
 .empty-row:hover td{background:none!important}
+
+/* 말머리 색 */
+.chip.h-info{background:#e6f6ef;color:#0f7a50}
+.chip.h-ask{background:var(--sea-50);color:var(--sea-700)}
+.chip.h-review{background:#f1ecfd;color:#6a44c9}
+.chip.h-share{background:#e5f6f7;color:#0d7f86}
+.chip.h-free{background:#f0f2f5;color:#4d5967}

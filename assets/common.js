@@ -355,6 +355,8 @@ function addViews(id) {
 /* ── 빈 게시판 안내 (첫 글 유도) ──
    그 게시판에 글이 하나도 없으면 '첫 글 올리기' 안내, 글은 있는데 필터에 안 맞으면 짧은 안내 */
 function _josa(w, a, b) { var c = (w || "").charCodeAt((w || "").length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? a : b; }
+// 말머리별 색 (공지는 빨강 계열이라 겹치지 않게)
+function headCls(h) { return ({ "정보":"h-info", "질문":"h-ask", "후기":"h-review", "나눔":"h-share", "자유":"h-free" })[h] || "region"; }
 function emptyInvite(board, noun) {
   noun = noun || "글";
   var has = board && allPosts().some(function (p) { return p.board === board; });

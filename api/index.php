@@ -315,7 +315,8 @@ case 'post_update': {
   } else $extra = $r['extra'];
   $board = $r['board'];   // 게시판 이동은 운영진만
   if (isset($R['board']) && $R['board'] !== $r['board']) {
-    if (!is_mod($u)) fail('게시판은 운영진만 옮길 수 있어요', 403);
+    $COMM = ['자유게시판', '질문하기', '최신뉴스', '생활정보', '취미·여행', '교육', '건강웰빙', '제주북쪽', '제주동쪽', '제주서쪽', '제주남쪽'];
+    if (!is_mod($u) && !(in_array($r['board'], $COMM, true) && in_array($R['board'], $COMM, true))) fail('커뮤니티 글은 커뮤니티 게시판 안에서만 옮길 수 있어요', 403);
     if (!in_array($R['board'], $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
     $board = $R['board'];
   }
