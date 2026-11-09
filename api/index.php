@@ -313,8 +313,14 @@ case 'post_update': {
     if (!$x['photos']) unset($x['photos']);
     $extra = json_encode($x ?: new stdClass(), JSON_UNESCAPED_UNICODE);
   } else $extra = $r['extra'];
-  q("UPDATE ji_posts SET head = ?, title = ?, content = ?, loc = ?, meta = ?, price = ?, extra = ?, updated_at = ? WHERE id = ?",
-    [str($R['head'] ?? $r['head'], 30), $title, str($R['content'] ?? $r['content'], 20000), str($R['loc'] ?? $r['loc'], 100),
+  $board = $r['board'];   // 게시판 이동은 운영진만
+  if (isset($R['board']) && $R['board'] !== $r['board']) {
+    if (!is_mod($u)) fail('게시판은 운영진만 옮길 수 있어요', 403);
+    if (!in_array($R['board'], $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
+    $board = $R['board'];
+  }
+  q("UPDATE ji_posts SET board = ?, head = ?, title = ?, content = ?, loc = ?, meta = ?, price = ?, extra = ?, updated_at = ? WHERE id = ?",
+    [$board, str($R['head'] ?? $r['head'], 30), $title, str($R['content'] ?? $r['content'], 20000), str($R['loc'] ?? $r['loc'], 100),
      str($R['meta'] ?? $r['meta'], 255), str($R['price'] ?? $r['price'], 60), $extra, now(), $id]);
   out(post_out(one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
 }

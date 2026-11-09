@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109h">
+<link rel="stylesheet" href="../assets/style.css?v=20261109i">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -192,16 +192,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109h"></script>
-<script src="../assets/db.js?v=20261109h"></script>
-<script src="../assets/notify.js?v=20261109h"></script>
-<script src="../assets/seed-trade.js?v=20261109h"></script>
-<script src="../assets/seed-extra.js?v=20261109h"></script>
-<script src="../assets/seed-new.js?v=20261109h"></script>
-<script src="../assets/seed-comments.js?v=20261109h"></script>
-<script src="../assets/photos.js?v=20261109h"></script>
-<script src="../assets/admin-data.js?v=20261109h"></script>
-<script src="../assets/op-posts.js?v=20261109h"></script>
+<script src="../assets/common.js?v=20261109i"></script>
+<script src="../assets/db.js?v=20261109i"></script>
+<script src="../assets/notify.js?v=20261109i"></script>
+<script src="../assets/seed-trade.js?v=20261109i"></script>
+<script src="../assets/seed-extra.js?v=20261109i"></script>
+<script src="../assets/seed-new.js?v=20261109i"></script>
+<script src="../assets/seed-comments.js?v=20261109i"></script>
+<script src="../assets/photos.js?v=20261109i"></script>
+<script src="../assets/admin-data.js?v=20261109i"></script>
+<script src="../assets/op-posts.js?v=20261109i"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -449,10 +449,14 @@ function bindRowControls(root){
 }
 
 /* 수정 창 */
+var MOVE_BOARDS = [["커뮤니티", ["자유게시판", "질문하기", "최신뉴스", "생활정보", "취미·여행", "교육", "건강웰빙"]],
+  ["지역", ["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"]],
+  ["생활·거래", ["중고사고팔기", "구인구직", "부동산", "제주상점", "특가공구", "동호회", "축제정보"]]];
 function openEdit(id){
   var p = findAny(id); if (!p) return;
   var trade = TRADE_BOARDS.indexOf(p.board) > -1;
   showModal('<h3>글 수정 <span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></h3>' +
+    (p.db ? '<div class="fld"><label>게시판 (바꾸면 그 게시판으로 옮겨져요)</label><select id="e-board">' + MOVE_BOARDS.map(function(g){ return '<optgroup label="' + g[0] + '">' + g[1].map(function(x){ return '<option' + (x === p.board ? ' selected' : '') + '>' + x + '</option>'; }).join("") + '</optgroup>'; }).join("") + '</select></div>' : '') +
     '<div class="row2"><div class="fld"><label>말머리</label><input id="e-head" value="' + esc(p.head||"") + '"></div>' +
     '<div class="fld"><label>작성자 표시</label><input id="e-author" value="' + esc(p.author||"") + '"></div></div>' +
     '<div class="fld"><label>제목</label><input id="e-title" value="' + esc(p.title) + '"></div>' +
@@ -464,11 +468,12 @@ function openEdit(id){
 function saveEdit(id){
   var p = findAny(id); if (!p) return;
   var obj = {};
-  ["head","author","title","price","period","loc","content"].forEach(function(k){
+  ["board","head","author","title","price","period","loc","content"].forEach(function(k){
     var el = document.getElementById("e-" + k); if (el) obj[k] = el.value;
   });
   if (!obj.title.trim()) { alert("제목을 입력하세요."); return; }
-  setFields(p, obj); closeModal(); toast("수정했습니다"); draw();
+  var moved = obj.board && obj.board !== p.board ? obj.board : "";
+  setFields(p, obj); closeModal(); toast(moved ? "수정했고 '" + moved + "' 게시판으로 옮겼습니다" : "수정했습니다"); draw();
 }
 function askDelete(id){
   var p = findAny(id); if (!p) return;
@@ -649,7 +654,8 @@ if (SRV) {
   setFields = function(p, obj){
     if (p.db) {
       var post = {}, ov = {};
-      Object.keys(obj).forEach(function(k){ (["title","content","head","price","loc"].indexOf(k) > -1 ? post : ov)[k] = obj[k]; });
+      Object.keys(obj).forEach(function(k){ if (k === "board" && obj[k] === p.board) return;   // 그대로면 보내지 않음
+        (["board","title","content","head","price","loc"].indexOf(k) > -1 ? post : ov)[k] = obj[k]; });
       if (Object.keys(post).length) JIDB.updatePost(p.id, post).then(function(){ draw(); }, function(e){ alert("수정하지 못했어요: " + e.message); });
       if (Object.keys(ov).length) { var all = adminOv(); all[p.id] = Object.assign(all[p.id] || {}, ov); JI.set("admin_ov", all); }
       for (var k in obj) p[k] = obj[k]; _defaultPm = null; return;
@@ -762,7 +768,7 @@ if (SRV) {
     var L = window.OP_POSTS || [];
     M().innerHTML = '<h1>운영자 글</h1><p class="sub">미리 준비한 정보 글 ' + L.length + '개예요. 올릴 글을 고르면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 게시판에 올라가요. 올린 뒤에도 글 화면에서 고치거나 지울 수 있어요.</p>' +
       '<div class="panel"><div class="op-bar"><label><input type="checkbox" id="op-all"> 안 올린 글 모두 고르기</label><button class="btn accent" id="op-go" disabled>고른 글 올리기</button></div><div id="op-list">확인하는 중…</div></div>';
-    var boards = L.map(function(p){ return p.board; }).filter(function(b, i, a){ return a.indexOf(b) === i; });
+    var boards = [].concat.apply([], MOVE_BOARDS.map(function(g){ return g[1]; }));   // 게시판을 옮긴 글도 '올림'으로 잡히게 전체 게시판 확인
     Promise.all(boards.map(function(b){ return JIDB.call("post_list", { board: b }).catch(function(){ return []; }); })).then(function(rs){
       var done = {};
       rs.forEach(function(arr){ (arr || []).forEach(function(p){ if (p.extra && p.extra.op) done[p.extra.op] = p.id; }); });

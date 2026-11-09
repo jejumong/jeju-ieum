@@ -120,7 +120,7 @@ var JIDB = (function () {
       meta: p.meta || "", price: p.price || "", extra: p.extra || {} }).then(function (r) { var q = toPost(r); cachePut(q); return q; });
   }
   function updatePost(id, p) {
-    var b = { id: id }; ["head", "title", "content", "loc", "meta", "price", "extra"].forEach(function (k) { if (p[k] !== undefined) b[k] = p[k]; });
+    var b = { id: id }; ["board", "head", "title", "content", "loc", "meta", "price", "extra"].forEach(function (k) { if (p[k] !== undefined) b[k] = p[k]; });
     return call("post_update", b).then(function (r) { var q = toPost(r); cachePut(q); return q; });
   }
   function deletePost(id) { return call("post_delete", { id: id }).then(function () { cacheDrop(id); }); }
