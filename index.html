@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109b">
+<link rel="stylesheet" href="assets/style.css?v=20261109e">
 </head>
 <body data-active="home">
 
@@ -117,18 +117,18 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261109b"></script>
-<script src="assets/db.js?v=20261109b"></script>
-<script src="assets/notify.js?v=20261109b"></script>
-<script src="assets/seed-trade.js?v=20261109b"></script>
-<script src="assets/seed-extra.js?v=20261109b"></script>
-<script src="assets/seed-new.js?v=20261109b"></script>
-<script src="assets/seed-comments.js?v=20261109b"></script>
-<script src="assets/admin-data.js?v=20261109b"></script>
-<script src="assets/guide-data.js?v=20261109b"></script>
-<script src="assets/programs-data.js?v=20261109b"></script>
-<script src="assets/school-housing-data.js?v=20261109b"></script>
-<script src="assets/jangnal-data.js?v=20261109b"></script>
+<script src="assets/common.js?v=20261109e"></script>
+<script src="assets/db.js?v=20261109e"></script>
+<script src="assets/notify.js?v=20261109e"></script>
+<script src="assets/seed-trade.js?v=20261109e"></script>
+<script src="assets/seed-extra.js?v=20261109e"></script>
+<script src="assets/seed-new.js?v=20261109e"></script>
+<script src="assets/seed-comments.js?v=20261109e"></script>
+<script src="assets/admin-data.js?v=20261109e"></script>
+<script src="assets/guide-data.js?v=20261109e"></script>
+<script src="assets/programs-data.js?v=20261109e"></script>
+<script src="assets/school-housing-data.js?v=20261109e"></script>
+<script src="assets/jangnal-data.js?v=20261109e"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -214,11 +214,12 @@
   // ── 모바일: 동네 소식 3줄 (인기글 1 + 최근 글 2) ──
   var LABEL = { "자유게시판":"자유", "질문하기":"질문", "생활정보":"정보", "최신뉴스":"뉴스", "취미·여행":"취미", "중고사고팔기":"중고", "구인구직":"구인", "부동산":"부동산", "제주상점":"상점", "특가공구":"공구", "동호회":"동호회", "축제정보":"축제" };
   var pop = posts.filter(function(p){ return TRADE_BOARDS.indexOf(p.board) < 0 && p.board !== "공지"; }).sort(function(a,b){ return viewsOf(b) - viewsOf(a); })[0];
-  var recent = posts.filter(function(p){ return p.board !== "공지" && (!pop || p.id !== pop.id); }).sort(byRecent).slice(0, 2);
+  if (pop && viewsOf(pop) < 30) pop = null;   // 실제로 많이 본 글이 생기기 전엔 '인기' 표시 안 함
+  var recent = posts.filter(function(p){ return p.board !== "공지" && (!pop || p.id !== pop.id); }).sort(byRecent).slice(0, pop ? 2 : 3);
   $("hm-feed").innerHTML = [pop].concat(recent).filter(Boolean).map(function(p, i){
-    var n = cc(p.id), lb = i === 0 ? "인기" : (LABEL[p.board] || p.board);
+    var n = cc(p.id), lb = (pop && i === 0) ? "인기" : (LABEL[p.board] || p.board);
     return '<a href="view.html?id=' + p.id + '"><em>' + esc(lb) + '</em><span>' + esc(p.title) + '</span><small>' + (n ? "💬" + n : fmtDate(p.date)) + '</small></a>';
-  }).join("") || '<p class="hm-empty">아직 글이 없어요</p>';
+  }).join("") || '<p class="hm-empty">아직 글이 없어요 · <a href="write.html" style="color:var(--sea-700);font-weight:700">첫 글 올리기 →</a></p>';
   // ── 모바일: 지원 프로그램 소식 3줄 (모집 중 → 상시 → 문의 → 대기 순) ──
   $("hm-prog").innerHTML = progs.slice(0, 3).map(function(p){
     var st = PROGRAM_STATUS[p.status] || ["", "", "#a3adb8"];

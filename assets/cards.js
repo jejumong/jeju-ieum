@@ -21,7 +21,7 @@ function renderSections(opts) {
   var html = "";
 
   if (!list.length) {
-    grid.innerHTML = '<p style="color:var(--muted);padding:24px">' + (opts.emptyText || "등록된 글이 없습니다.") + "</p>";
+    grid.innerHTML = opts.emptyHtml || ('<p style="color:var(--muted);padding:24px">' + (opts.emptyText || "등록된 글이 없습니다.") + "</p>");
     renderPager(grid, 0);
     return;
   }

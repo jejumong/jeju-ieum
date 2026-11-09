@@ -132,13 +132,15 @@ function noticeStripHtml(n) {
   SEED_POSTS.forEach(function (p) { p.sample = true; sampleIds[p.id] = 1; });
   if (typeof TRADE_SEEDS !== "undefined") TRADE_SEEDS.forEach(function (p) { p.sample = true; sampleIds[p.id] = 1; });
   var isAdmin = document.body && document.body.hasAttribute("data-admin");
-  if (isAdmin) return;
 
-  if (mode === "hide") {
-    SEED_POSTS.length = 0;
-    if (typeof TRADE_SEEDS !== "undefined") TRADE_SEEDS.length = 0;
+  if (mode === "hide") {   // 예시 글을 사이트·관리자 콘솔 모두에서 지움 (운영자가 확인한 실제 정보 keep 만 남김)
+    var keep = function (p) { return p.keep; };
+    var a = SEED_POSTS.filter(keep); SEED_POSTS.length = 0; Array.prototype.push.apply(SEED_POSTS, a);
+    if (typeof TRADE_SEEDS !== "undefined") { var b = TRADE_SEEDS.filter(keep); TRADE_SEEDS.length = 0; Array.prototype.push.apply(TRADE_SEEDS, b); }
+    SEED_POSTS.forEach(function (p) { delete p.sample; });
     return;
   }
+  if (isAdmin) return;
   if (mode !== "label") return;
 
   var BOARD_PAGES = ["home", "community", "trade", "jobs", "realestate", "market", "shops", "clubs", "deals", "festivals"];

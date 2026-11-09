@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109b">
+<link rel="stylesheet" href="assets/style.css?v=20261109e">
 </head>
 <body data-active="community">
 
@@ -62,6 +62,7 @@
           </tr></thead>
           <tbody id="post-body"></tbody>
         </table>
+        <div id="post-empty"></div>
       </div>
 
       <div class="pg-row"><div class="pagination" id="pager"></div><a class="btn accent pg-write2" id="write-link2" href="write.html">✏️ 글쓰기</a></div>
@@ -69,14 +70,14 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261109b"></script>
-<script src="assets/db.js?v=20261109b"></script>
-<script src="assets/notify.js?v=20261109b"></script>
-<script src="assets/seed-trade.js?v=20261109b"></script>
-<script src="assets/seed-extra.js?v=20261109b"></script>
-<script src="assets/seed-new.js?v=20261109b"></script>
-<script src="assets/seed-comments.js?v=20261109b"></script>
-<script src="assets/admin-data.js?v=20261109b"></script>
+<script src="assets/common.js?v=20261109e"></script>
+<script src="assets/db.js?v=20261109e"></script>
+<script src="assets/notify.js?v=20261109e"></script>
+<script src="assets/seed-trade.js?v=20261109e"></script>
+<script src="assets/seed-extra.js?v=20261109e"></script>
+<script src="assets/seed-new.js?v=20261109e"></script>
+<script src="assets/seed-comments.js?v=20261109e"></script>
+<script src="assets/admin-data.js?v=20261109e"></script>
 <script>
 var params = new URLSearchParams(location.search);
 var board = params.get("board");
@@ -139,9 +140,10 @@ function render() {
     });
   }
 
-  if (!pageList.length && !rows) {
-    rows = '<tr><td colspan="6" style="padding:36px;color:var(--muted)">게시글이 없습니다. 첫 글을 남겨보세요!</td></tr>';
+  if (!pageList.length) {
+    document.getElementById("post-empty").innerHTML = '<div style="padding:12px">' + emptyInvite(board || null, "글") + '</div>';
   } else {
+    document.getElementById("post-empty").innerHTML = "";
     pageList.forEach(function(p, i){
       var no = list.length - start - i;
       var cmts = { length: commentCountOf(p.id) };

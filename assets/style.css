@@ -1966,3 +1966,11 @@ a.act-item:hover{border-color:var(--sea-200)}
 .me-link .me-n[hidden]{display:none}
 @media (max-width:680px){ .hm-feed a em.hm-st{min-width:46px;text-align:center} }
 @media (max-width:680px){ .hm-news + .hm-news{margin-top:24px} }
+
+/* 빈 게시판 안내 */
+.ji-empty{grid-column:1/-1;text-align:center;background:linear-gradient(160deg,var(--sea-50),#fff);border:1px dashed var(--sea-200);border-radius:var(--r-lg);padding:34px 22px;margin:8px 0}
+.ji-empty .je-ico{display:block;font-size:34px;margin-bottom:8px}
+.ji-empty b{display:block;font-size:17px;color:var(--ink);font-weight:800}
+.ji-empty p{max-width:420px;margin:8px auto 16px;font-size:14px;color:var(--ink-3);line-height:1.65}
+.ji-empty.f{background:none;border:0;padding:24px;color:var(--ink-3);font-size:14.5px}
+.empty-row:hover td{background:none!important}

@@ -237,7 +237,7 @@ case 'post_create': {
     }
   }
   $recent = one("SELECT COUNT(*) n FROM ji_posts WHERE author = ? AND created_at > (NOW() - INTERVAL 1 MINUTE)", [$u['id']])['n'];
-  if ($recent >= 3) fail('글을 너무 빨리 올리고 있어요. 잠시 후 다시 해 주세요.', 429);
+  if ($recent >= 3 && !is_mod($u)) fail('글을 너무 빨리 올리고 있어요. 잠시 후 다시 해 주세요.', 429);
   $id = uuid(); $t = now();
   q("INSERT INTO ji_posts (id, board, head, title, content, loc, meta, price, extra, author, author_nick, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
     [$id, $b, str($R['head'] ?? '', 30), $title, str($R['content'] ?? '', 20000), str($R['loc'] ?? '', 100), str($R['meta'] ?? '', 255),

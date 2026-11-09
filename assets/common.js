@@ -16,7 +16,7 @@ var SITE_CFG = {
   /* samples : 화면 구성을 보여 주려고 넣어 둔 예시 게시글을 어떻게 할지
        "label" = 보여 주되 '예시' 안내를 붙임 (지금)
        "hide"  = 모두 숨김 (정식 오픈 때 이걸로 바꾸세요) */
-  samples: "label",
+  samples: "hide",
   /* 무료 자동 알림 (브라우저 푸시) — OneSignal 무료 요금제의 App ID 를 넣으면 켜집니다.
      비워 두면 '관심 목록'(이 브라우저에 저장, 방문할 때 바뀐 점 표시)만 동작합니다.
      사이트가 jejumong.github.io/저장소이름/ 처럼 하위 폴더에 있으면 onesignalPath 에 "/저장소이름/" 을 넣으세요.
@@ -185,7 +185,7 @@ var SEED_POSTS = [
     content:"텃밭 애호박이 감당이 안 될 만큼 열려서 이웃분들께 나눔합니다. 김녕리 직접 수령 가능하신 분, 댓글 남겨주시면 순서대로 연락드릴게요." }
 ];
 
-var NOTICE = { id:"n1", board:"공지", head:"공지", title:"태풍 접근 시 지역별 재난정보 확인 방법 안내", author:"운영자", date:"2026-08-12", views:1204,
+var NOTICE = { id:"n1", board:"공지", head:"공지", title:"태풍 접근 시 지역별 재난정보 확인 방법 안내", author:"운영자", date:"2026-08-12",
   content:"태풍 북상 시 기상청 특보와 제주도 재난안전대책본부 공지를 함께 확인해주세요. 게시판에 떠도는 미확인 정보보다 공식 발표를 우선해 주시고, 정전·침수 등 피해 상황 공유 글은 '최신뉴스' 게시판을 이용해 주시기 바랍니다." };
 
 /* ── 내 글 · 내 댓글 권한과 수정·삭제 ── */
@@ -351,6 +351,18 @@ function addViews(id) {
   v[id] = (v[id] || 0) + 1;
   JI.set("views", v);
   return v[id];
+}
+/* ── 빈 게시판 안내 (첫 글 유도) ──
+   그 게시판에 글이 하나도 없으면 '첫 글 올리기' 안내, 글은 있는데 필터에 안 맞으면 짧은 안내 */
+function _josa(w, a, b) { var c = (w || "").charCodeAt((w || "").length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? a : b; }
+function emptyInvite(board, noun) {
+  noun = noun || "글";
+  var has = board && allPosts().some(function (p) { return p.board === board; });
+  if (has) return '<div class="ji-empty f">조건에 맞는 ' + noun + _josa(noun, "이", "가") + ' 없어요. 필터나 검색어를 바꿔 보세요.</div>';
+  var href = "write.html" + (board ? "?board=" + encodeURIComponent(board) : "");
+  return '<div class="ji-empty"><span class="je-ico">🌱</span><b>아직 첫 ' + noun + _josa(noun, "이", "가") + ' 없어요</b>' +
+    '<p>제주이음은 이제 막 문을 열었어요. 첫 ' + noun + _josa(noun, "을", "를") + ' 올려 주시면 이 자리에 가장 먼저 보여요. 등록은 무료예요.</p>' +
+    '<a class="btn primary" href="' + href + '">✏️ 첫 ' + noun + ' 올리기</a></div>';
 }
 function viewsOf(p) {
   var v = JI.get("views", {});

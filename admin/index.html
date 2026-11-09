@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109b">
+<link rel="stylesheet" href="../assets/style.css?v=20261109e">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -175,6 +175,15 @@ table.mem-t td small{font-size:13px}
   .mc-foot small{color:var(--ink-4);font-size:12px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
   .mc-foot .mb{white-space:nowrap;flex:none}
 }
+.op-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.op-bar label{font-size:14px;font-weight:600;display:flex;gap:6px;align-items:center}
+.op-row{display:flex;gap:12px;align-items:flex-start;padding:12px 4px;border-top:1px solid var(--line-2,#eef1f4)}
+.op-row.done{opacity:.6}
+.op-chk{flex:none;padding-top:18px}.op-chk input{width:18px;height:18px}
+.op-main{flex:1;min-width:0}.op-main small{display:block;color:var(--ink-4,#8a96a3);font-size:12px;font-weight:700}
+.op-main b{display:block;font-size:15px;margin:2px 0 4px}
+.op-main summary{font-size:13px;color:var(--sea-700,#1a5fae);cursor:pointer}
+.op-main pre{white-space:pre-wrap;font:inherit;font-size:13.5px;line-height:1.7;background:var(--bg-2,#f6f8fa);border-radius:10px;padding:12px;margin:8px 0 0}
 </style>
 </head>
 <body data-admin>
@@ -183,15 +192,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109b"></script>
-<script src="../assets/db.js?v=20261109b"></script>
-<script src="../assets/notify.js?v=20261109b"></script>
-<script src="../assets/seed-trade.js?v=20261109b"></script>
-<script src="../assets/seed-extra.js?v=20261109b"></script>
-<script src="../assets/seed-new.js?v=20261109b"></script>
-<script src="../assets/seed-comments.js?v=20261109b"></script>
-<script src="../assets/photos.js?v=20261109b"></script>
-<script src="../assets/admin-data.js?v=20261109b"></script>
+<script src="../assets/common.js?v=20261109e"></script>
+<script src="../assets/db.js?v=20261109e"></script>
+<script src="../assets/notify.js?v=20261109e"></script>
+<script src="../assets/seed-trade.js?v=20261109e"></script>
+<script src="../assets/seed-extra.js?v=20261109e"></script>
+<script src="../assets/seed-new.js?v=20261109e"></script>
+<script src="../assets/seed-comments.js?v=20261109e"></script>
+<script src="../assets/photos.js?v=20261109e"></script>
+<script src="../assets/admin-data.js?v=20261109e"></script>
+<script src="../assets/op-posts.js?v=20261109e"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -275,7 +285,7 @@ function restorePost(p){
 function cmtCount(p){ return typeof commentCountOf === "function" ? commentCountOf(p.id) : 0; }
 
 /* ── 화면 틀 ── */
-var view = ["dash","posts","notices","premium","inquiries","sellers","trash","members","alerts"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
+var view = ["dash","posts","notices","premium","inquiries","sellers","trash","members","alerts","opposts"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
 var MENU = [
   ["dash","대시보드"],["posts","게시글 관리"],["notices","공지 관리"],["premium","프리미엄 관리"],
   ["inquiries","문의·제보"],["sellers","판매자 승인"],["trash","삭제된 글"],["settings","설정"]
@@ -743,9 +753,44 @@ if (SRV) {
   };
 
   /* 회원 관리 (서버 모드에서만) */
-  MENU.splice(MENU.length - 1, 1, ["members", "회원 관리"], ["alerts", "알림 설정"]);
+  MENU.splice(MENU.length - 1, 1, ["opposts", "운영자 글"], ["members", "회원 관리"], ["alerts", "알림 설정"]);
   var _draw = draw;
-  draw = function(){ if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "settings") view = "members"; return _draw(); };
+  draw = function(){ if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "settings") view = "members"; return _draw(); };
+
+  /* 운영자 글: assets/op-posts.js 초안을 골라 내 계정으로 올림 (이미 올린 글은 표시) */
+  window.drawOpPosts = function(){
+    var L = window.OP_POSTS || [];
+    M().innerHTML = '<h1>운영자 글</h1><p class="sub">미리 준비한 정보 글 ' + L.length + '개예요. 올릴 글을 고르면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 게시판에 올라가요. 올린 뒤에도 글 화면에서 고치거나 지울 수 있어요.</p>' +
+      '<div class="panel"><div class="op-bar"><label><input type="checkbox" id="op-all"> 안 올린 글 모두 고르기</label><button class="btn accent" id="op-go" disabled>고른 글 올리기</button></div><div id="op-list">확인하는 중…</div></div>';
+    var boards = L.map(function(p){ return p.board; }).filter(function(b, i, a){ return a.indexOf(b) === i; });
+    Promise.all(boards.map(function(b){ return JIDB.call("post_list", { board: b }).catch(function(){ return []; }); })).then(function(rs){
+      var done = {};
+      rs.forEach(function(arr){ (arr || []).forEach(function(p){ if (p.extra && p.extra.op) done[p.extra.op] = p.id; }); });
+      var box = document.getElementById("op-list");
+      box.innerHTML = L.map(function(p, i){
+        var d = done[p.k];
+        return '<div class="op-row' + (d ? ' done' : '') + '"><label class="op-chk">' + (d ? '<span class="bd user">올림</span>' : '<input type="checkbox" class="op-c" data-i="' + i + '">') + '</label>' +
+          '<div class="op-main"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + '</small><b>' + esc(p.title) + '</b>' +
+          '<details><summary>내용 보기</summary><pre>' + esc(p.content) + '</pre></details></div>' +
+          (d ? '<a class="mb" href="../view.html?id=' + d + '" target="_blank">보기</a>' : '') + '</div>';
+      }).join("");
+      var go = document.getElementById("op-go"), all = document.getElementById("op-all");
+      function sync(){ var n = box.querySelectorAll(".op-c:checked").length; go.disabled = !n; go.textContent = n ? "고른 글 " + n + "개 올리기" : "고른 글 올리기"; }
+      box.onchange = sync;
+      all.onchange = function(){ box.querySelectorAll(".op-c").forEach(function(c){ c.checked = all.checked; }); sync(); };
+      go.onclick = function(){
+        var pick = [].map.call(box.querySelectorAll(".op-c:checked"), function(c){ return L[+c.dataset.i]; }).reverse();   // 목록 위쪽 글이 가장 최근 글로 보이게 거꾸로 올림
+        if (!pick.length || !confirm(pick.length + "개 글을 지금 게시판에 올릴까요?")) return;
+        go.disabled = true; var ok = 0;
+        (function next(i){
+          if (i >= pick.length) { toast(ok + "개 올렸어요"); return drawOpPosts(); }
+          var p = pick[i]; go.textContent = "올리는 중… " + (i + 1) + "/" + pick.length;
+          JIDB.call("post_create", { board: p.board, head: p.head || "", title: p.title, content: p.content, extra: { op: p.k } })
+            .then(function(){ ok++; next(i + 1); }, function(e){ alert("'" + p.title + "' 올리기 실패: " + e.message); drawOpPosts(); });
+        })(0);
+      };
+    });
+  };
 
   /* 알림 설정: 관리자·스텝이 각자 받을 알림 종류를 켜고 끔 */
   window.drawAlerts = function(){
