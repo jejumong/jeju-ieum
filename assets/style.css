@@ -2004,3 +2004,10 @@ a.act-item:hover{border-color:var(--sea-200)}
 .jm-meta{font-size:12.5px;color:var(--ink-4);margin-bottom:14px}
 .jm-body{white-space:pre-wrap;font-size:15px;line-height:1.75;color:var(--ink-2);background:var(--bg-2);border-radius:12px;padding:14px 16px;margin-bottom:16px;word-break:break-word}
 .jm-btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
+/* 역할 표시 */
+.me-av{position:relative;display:inline-flex}
+.me-role{position:absolute;right:-5px;bottom:-4px;font-style:normal;font-size:11px;line-height:1;background:#fff;border-radius:50%;padding:2px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.role-mark{font-size:12px;margin-left:2px;vertical-align:1px;cursor:default}
+.pc-hidden{position:absolute;left:10px;bottom:10px;background:rgba(20,28,38,.82);color:#fff;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px}
+.pv-hidden{background:#fff4e5;border:1px solid #ffd59a;color:#8a4b00;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600;margin:0 0 12px}

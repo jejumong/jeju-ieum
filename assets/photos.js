@@ -109,18 +109,19 @@ function photoCard(p, o) {
   var views = typeof viewsOf === "function" ? viewsOf(p) : (p.views || 0);
   var cm = typeof commentCountOf === "function" ? commentCountOf(p.id) : 0;
   var rb = typeof roleBadgeHtml === "function" ? roleBadgeHtml(p) : "";
-  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed ? " closed" : "") + (rb ? " jiw-" + (typeof authorRoleOf === "function" ? authorRoleOf(p).replace("admin", "staff") : "x") : "") + '" href="view.html?id=' + p.id + '">' +
+  return '<a class="item-card pc' + (o.pm ? " premium" : "") + (o.mine ? " mine" : "") + (o.closed || p.hidden ? " closed" : "") + (rb ? " jiw-" + (typeof authorRoleOf === "function" ? authorRoleOf(p).replace("admin", "staff") : "x") : "") + '" href="view.html?id=' + p.id + '">' +
     '<div class="pc-ph">' + cardImage(p) +
       (o.pm ? '<span class="pm-tag">⭐ 프리미엄</span>' : '') +
       (o.mine ? '<span class="mine-tag">' + (o.mine.indexOf("모임") > -1 ? "👑 " : "✍️ ") + e(o.mine) + '</span>' : '') +
       (o.badge ? '<span class="pc-badge ' + (o.badge.cls || "") + '">' + e(o.badge.text) + '</span>' : '') +
+      (p.hidden ? '<span class="pc-hidden">🔒 비공개 · 입점 기간 끝남</span>' : '') +
     '</div>' +
     '<div class="pc-body">' + (rb ? '<div class="pc-who">' + rb + '</div>' : '') +
       '<h3 class="pc-title">' + e(o.title || p.title) + '</h3>' +
       (o.info ? '<div class="pc-info">' + o.info + '</div>' : '') +
       (o.extra || '') +
       '<div class="pc-foot">' +
-        '<span class="pc-au"><i style="background:' + col + '">' + e(au.charAt(0)) + '</i>' + e(au) +
+        '<span class="pc-au"><i style="background:' + col + '">' + e(au.charAt(0)) + '</i>' + e(au) + roleMark(p) +
           '</span>' +
         '<span class="pc-st">' + (cm ? '<span>' + ICON_CMT + cm + '</span>' : '') +
           '<span>' + ICON_HEART + likesOf(p) + '</span><span>' + ICON_EYE + views.toLocaleString() + '</span></span>' +

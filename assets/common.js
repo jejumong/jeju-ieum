@@ -235,6 +235,12 @@ function _authorRole(p) {
   if (p.board === "부동산" && /공인|부동산|중개|토지|하우스/.test(p.author || "")) return "realtor";
   return "user";
 }
+/* 닉네임 옆 작은 역할 표시 (상점·공구판매자·중개인·운영진) */
+function roleMark(p) {
+  var r = p && p.db ? (p.authorRole || "user") : authorRoleOf(p);
+  var b = ROLE_BADGE[r]; if (!b || r === "direct") return "";
+  return ' <span class="role-mark ' + b[2] + '" title="' + b[1] + '">' + b[0] + '</span>';
+}
 function roleBadgeHtml(p) {
   var b = ROLE_BADGE[authorRoleOf(p)]; if (!b) return "";
   return '<span class="role-badge ' + b[2] + '" title="' + b[1] + ' 회원">' + b[0] + ' ' + b[1] + '</span>';
@@ -456,7 +462,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
   }).join("");
 
   var util = user
-    ? '<a href="profile.html" class="me-link" title="내 정보">' + avatarHtml(26) +
+    ? '<a href="profile.html" class="me-link" title="내 정보' + (ROLE_BADGE[user.role] ? ' · ' + ROLE_LABEL[user.role] : '') + '"><span class="me-av">' + avatarHtml(26) + (ROLE_BADGE[user.role] ? '<i class="me-role" title="' + ROLE_LABEL[user.role] + '">' + ROLE_BADGE[user.role][0] + '</i>' : '') + '</span>' +
       '<span class="me-nick">' + user.nick + '</span><span class="me-region">' + user.region + '</span></a>' +
       '<a class="btn soft hb-out" href="#" onclick="logout();return false">로그아웃</a>' +
       '<a class="btn primary hb-write" href="write.html"><span class="hb-ico" aria-hidden="true">✏️</span>글쓰기</a>'

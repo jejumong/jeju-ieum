@@ -33,8 +33,8 @@ var JIDB = (function () {
   function setUser(u) {
     var cur = JI.get("session", null);
     if (!u) { JI.set("auth", ""); if (cur) { JI.set("session", null); return true; } return false; }
-    var next = { id: u.id, email: u.email, nick: u.nick, region: u.region || "", role: u.role || "user" };
-    var changed = !cur || cur.id !== next.id || cur.nick !== next.nick || cur.region !== next.region || cur.role !== next.role;
+    var next = { id: u.id, email: u.email, nick: u.nick, region: u.region || "", role: u.role || "user", seller_until: u.seller_until || null };
+    var changed = !cur || cur.id !== next.id || cur.nick !== next.nick || cur.region !== next.region || cur.role !== next.role || (cur.seller_until || null) !== next.seller_until;
     if (changed) JI.set("session", next);
     return changed;
   }
@@ -67,7 +67,7 @@ var JIDB = (function () {
       price: r.price || "", author: r.author_nick, authorId: r.author, authorRole: r.author_role || "user", date: (r.created_at || "").slice(0, 10),
       time: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2), views: r.views || 0, db: true, extra: r.extra || {},
       // 게시판별 추가 정보 (부동산 집 종류·주소, 구인 급여 등)
-      htype: x.htype || "", addr: x.addr || "", start: x.start || "", end: x.end || "", lat: x.lat || "", lng: x.lng || "", hours: x.hours || "", tel: x.tel || "", menu: x.menu || "", perk: x.benefit || "", payType: x.payType || "", pay: x.pay || "", headPrev: x.headPrev || "", editedAt: r.updated_at !== r.created_at ? (r.updated_at || "").slice(0, 10) : ""
+      htype: x.htype || "", addr: x.addr || "", start: x.start || "", end: x.end || "", hidden: !!r.hidden, lat: x.lat || "", lng: x.lng || "", hours: x.hours || "", tel: x.tel || "", menu: x.menu || "", perk: x.benefit || "", payType: x.payType || "", pay: x.pay || "", headPrev: x.headPrev || "", editedAt: r.updated_at !== r.created_at ? (r.updated_at || "").slice(0, 10) : ""
     };
   }
 

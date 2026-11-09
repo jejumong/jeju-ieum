@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261110g">
+<link rel="stylesheet" href="../assets/style.css?v=20261110h">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -199,6 +199,7 @@ table.mem-t td small{font-size:13px}
 .bulk-bar.on{display:flex}.bulk-bar b{margin-right:auto;color:#b4372d}
 .mc-ck{width:18px;height:18px;flex:none}.mc-ck + b{flex:1}
 .req-click{cursor:pointer}.req-click:hover{border-color:var(--sea-200,#a6cef4)}.req-sum{font-weight:700;font-size:14.5px;margin:6px 0 2px}.req-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sp-btn{display:block;margin-top:4px;border:1px solid #dfe4ea;background:#fff;border-radius:8px;font:inherit;font-size:12px;padding:3px 8px;cursor:pointer;color:var(--ink-3);white-space:nowrap}.sp-btn.over{color:#b4372d;border-color:#f6d0cb;background:#fff4f2}
 </style>
 </head>
 <body data-admin>
@@ -207,17 +208,17 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261110g"></script>
-<script src="../assets/db.js?v=20261110g"></script>
-<script src="../assets/notify.js?v=20261110g"></script>
-<script src="../assets/seed-trade.js?v=20261110g"></script>
-<script src="../assets/seed-extra.js?v=20261110g"></script>
-<script src="../assets/seed-new.js?v=20261110g"></script>
-<script src="../assets/seed-comments.js?v=20261110g"></script>
-<script src="../assets/photos.js?v=20261110g"></script>
-<script src="../assets/admin-data.js?v=20261110g"></script>
-<script src="../assets/kmap.js?v=20261110g"></script>
-<script src="../assets/op-posts.js?v=20261110g"></script>
+<script src="../assets/common.js?v=20261110h"></script>
+<script src="../assets/db.js?v=20261110h"></script>
+<script src="../assets/notify.js?v=20261110h"></script>
+<script src="../assets/seed-trade.js?v=20261110h"></script>
+<script src="../assets/seed-extra.js?v=20261110h"></script>
+<script src="../assets/seed-new.js?v=20261110h"></script>
+<script src="../assets/seed-comments.js?v=20261110h"></script>
+<script src="../assets/photos.js?v=20261110h"></script>
+<script src="../assets/admin-data.js?v=20261110h"></script>
+<script src="../assets/kmap.js?v=20261110h"></script>
+<script src="../assets/op-posts.js?v=20261110h"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -469,7 +470,7 @@ function drawPostTable(){
     return '<tr>' + bkBox("posts", p.id) +
       '<td><span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></td>' +
       '<td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank" title="새 탭에서 보기">' + esc(p.title) + '</a>' +
-        '<small>' + esc(p.author) + ' · 댓글 ' + cmtCount(p) + '</small></td>' +
+        '<small>' + esc(p.author) + ' · 댓글 ' + cmtCount(p) + (p.hidden ? ' · <b style="color:#b4372d">🔒 비공개(판매 기간 끝남)</b>' : '') + '</small></td>' +
       '<td class="dt">' + esc(String(p.date || "").replace(/-/g, ".")) + (p.time ? '<small>' + esc(p.time) + '</small>' : '') + '</td>' +
       '<td><input class="num" type="number" min="0" value="' + viewsOf(p) + '" data-id="' + p.id + '" data-f="views"></td>' +
       '<td><input class="num" type="number" min="0" value="' + likesOf(p) + '" data-id="' + p.id + '" data-f="likes"></td>' +
@@ -948,6 +949,25 @@ if (SRV) {
       });
     }, function(e){ document.getElementById("al-box").textContent = e.message; });
   };
+  /* 상점·공구판매자 입점 기간 — 지나면 그 회원의 판매 글은 사이트에서 가려짐 (지우지 않음) */
+  window.sellerPeriod = function(u){
+    var t = new Date().toISOString().slice(0, 10), d = u.seller_until, over = d && d < t;
+    return '<button class="sp-btn' + (over ? ' over' : '') + '" onclick="setPeriod(\'' + u.id + '\')" title="입점 기간 바꾸기">' + (d ? (over ? '⛔ 기간 끝남 ' : '~') + d.slice(2).replace(/-/g, ".") : '기간 없음') + '</button>';
+  };
+  window.setPeriod = function(id){
+    var u = USERS.filter(function(x){ return x.id === id; })[0]; if (!u) return;
+    var add = function(days){ var b = new Date(); var base = u.seller_until && u.seller_until > b.toISOString().slice(0, 10) ? new Date(u.seller_until + "T00:00:00") : b; base.setDate(base.getDate() + days); return base.toISOString().slice(0, 10); };
+    showModal('<h3>' + esc(u.nick) + ' · 입점 기간</h3><p style="margin:0 0 12px;color:var(--ink-3);font-size:13.5px;line-height:1.6">기간이 지나면 이 회원의 ' + (u.role === "shop" ? "제주상점" : "특가공구") + ' 글은 <b>지우지 않고 사이트에서 가려져요</b>. 본인과 운영진에게만 보이고, 기간을 늘리면 다시 보여요. 새 글도 쓸 수 없어요.</p>' +
+      '<div class="fld"><label>마지막 날</label><input type="date" id="sp-d" value="' + (u.seller_until || "") + '"></div>' +
+      '<div class="toolbar" style="margin:0 0 14px"><button class="mb" data-add="7">+1주</button><button class="mb" data-add="30">+1개월</button><button class="mb" data-add="0">기한 없음</button><button class="mb" data-add="-1">오늘로 끝내기</button></div>' +
+      '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" id="sp-go">저장</button></div>');
+    document.querySelectorAll("[data-add]").forEach(function(b){ b.onclick = function(){ var n = +b.dataset.add, inp = document.getElementById("sp-d");
+      if (n === 0) inp.value = ""; else if (n === -1) { var y = new Date(); y.setDate(y.getDate() - 1); inp.value = y.toISOString().slice(0, 10); } else inp.value = add(n); }; });
+    document.getElementById("sp-go").onclick = function(){
+      var v = document.getElementById("sp-d").value || null;
+      JIDB.call("admin_seller_until", { id: id, until: v }).then(function(){ u.seller_until = v; closeModal(); toast(v ? "입점 기간을 " + v + "까지로 정했어요" : "기한 없음으로 정했어요"); drawMembers(); }, function(e){ alert(e.message); });
+    };
+  };
   window.sortMembers = function(k){ if ((window.MEM_SORT || "created") === k) MEM_DIR = -(window.MEM_DIR || -1); else { MEM_SORT = k; MEM_DIR = -1; } drawMembers(); };
   window.drawMembers = function(){
     var R = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝" };
@@ -975,7 +995,8 @@ if (SRV) {
         LIST.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
-            : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
+            : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>'
+          if ((u.role === "shop" || u.role === "dealer") && boss) roleCell += sellerPeriod(u);
           return '<tr>' + (boss ? bkBox("mem", u.id, u.role === "admin" || (me && u.id === me.id)) : '') + '<td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td>' +
             '<td>' + (u.posts ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'posts\')">' + u.posts + '</button>' : '0') + '</td>' +
             '<td>' + (u.comments ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'comments\')">' + u.comments + '</button>' : '0') + '</td>' +
@@ -987,7 +1008,8 @@ if (SRV) {
         '<div class="mem-cards">' + LIST.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
-            : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
+            : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>'
+          if ((u.role === "shop" || u.role === "dealer") && boss) roleCell += sellerPeriod(u);
           var ckm = boss && u.role !== "admin" && !(me && u.id === me.id) ? '<input type="checkbox" class="bk mc-ck" data-k="mem" data-id="' + u.id + '"' + (BSEL.mem[u.id] ? ' checked' : '') + '>' : '';
           return '<div class="mem-card"><div class="mc-top">' + ckm + '<b>' + esc(u.nick) + '</b>' + roleCell + '</div>' +
             '<div class="mc-mail">' + esc(u.email) + '</div>' +

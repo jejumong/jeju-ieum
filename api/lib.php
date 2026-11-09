@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 9;
+const JI_SCHEMA = 10;
 
 /* ── 응답 ── */
 function cors() {
@@ -126,6 +126,9 @@ function migrate($pdo) {
   if ($v < 8) {   // 취미여행·취미.여행 → 취미·여행 (가운데 점)
     $pdo->exec("UPDATE ji_posts SET board = '취미·여행' WHERE board IN ('취미여행', '취미.여행')");
   }
+  if ($v < 10) {   // 판매자 입점 기간 (비우면 기한 없음)
+    try { $pdo->exec("ALTER TABLE ji_users ADD COLUMN seller_until DATE NULL"); } catch (Throwable $e) {}
+  }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }
 
@@ -152,7 +155,7 @@ function me($req, $need = true) {
   if ($u !== false) { if (!$u && $need) fail('로그인이 필요해요', 401); return $u; }
   $u = null; $t = $req['_t'] ?? '';
   if (is_string($t) && strlen($t) === 64) {
-    $s = one("SELECT s.token, s.seen_at, u.id, u.email, u.nick, u.region, u.role FROM ji_sessions s JOIN ji_users u ON u.id = s.user_id
+    $s = one("SELECT s.token, s.seen_at, u.id, u.email, u.nick, u.region, u.role, u.seller_until FROM ji_sessions s JOIN ji_users u ON u.id = s.user_id
               WHERE s.token = ? AND s.seen_at > (NOW() - INTERVAL 60 DAY)", [token_hash($t)]);
     if ($s) {
       if (strtotime($s['seen_at']) < time() - 86400) q("UPDATE ji_sessions SET seen_at = ? WHERE token = ?", [now(), $s['token']]);
@@ -175,8 +178,8 @@ function admin($req, $strict = false) {
 }
 function can_write_board($u, $b) {
   if (is_mod($u)) return true;
-  if ($b === '제주상점') return ($u['role'] ?? '') === 'shop';
-  if ($b === '특가공구') return ($u['role'] ?? '') === 'dealer';
+  if ($b === '제주상점') return ($u['role'] ?? '') === 'shop' && seller_live('shop', $u['seller_until'] ?? null);
+  if ($b === '특가공구') return ($u['role'] ?? '') === 'dealer' && seller_live('dealer', $u['seller_until'] ?? null);
   if ($b === '축제정보') return false;   // 회원 축제 제보는 문의·제보로 받고 운영진이 검토해 게시
   return true;
 }
@@ -234,7 +237,17 @@ function remove_upload($path) {
   @unlink(upload_dir() . '/' . $path);
   q("DELETE FROM ji_uploads WHERE path = ?", [$path]);
 }
-function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user']; }
+function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user', 'seller_until' => $u['seller_until'] ?? null]; }
+/* 판매 게시판: 제주상점은 상점판매자, 특가공구는 공구판매자 — 입점 기간(seller_until)이 지났으면 '쉬는 중' */
+const SELLER_BOARDS = ['제주상점' => 'shop', '특가공구' => 'dealer'];
+function seller_live($role, $until) { return in_array($role, ['admin', 'staff'], true) ? true : ($until === null || $until === '' || $until >= date('Y-m-d')); }
+/* 글이 남에게 보이는지: 판매 게시판 글은 글쓴이가 지금 그 판매자이고 입점 기간 안일 때만 */
+function post_live($r) {
+  $need = SELLER_BOARDS[$r['board']] ?? null; if (!$need) return true;
+  $role = $r['author_role'] ?? 'user';
+  if (in_array($role, ['admin', 'staff'], true)) return true;
+  return $role === $need && seller_live($role, $r['author_until'] ?? null);
+}
 
 /* ── 알림 + 휴대폰 푸시 (OneSignal) ── */
 function notify($uid, $kind, $title, $body, $link, $pushTitle = null, $pushBody = null, $save = true) {

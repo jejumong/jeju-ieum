@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110g">
+<link rel="stylesheet" href="assets/style.css?v=20261110h">
 <style>
 .me-card{max-width:640px;margin:0 auto}
 .me-top{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 26px;margin-bottom:18px;flex-wrap:wrap;box-shadow:var(--sh-2)}
@@ -171,14 +171,14 @@
   <p style="text-align:center;margin:26px 0 6px"><a class="btn ghost" href="#" onclick="logout();return false">로그아웃</a></p>
 </main>
 
-<script src="assets/common.js?v=20261110g"></script>
-<script src="assets/db.js?v=20261110g"></script>
-<script src="assets/notify.js?v=20261110g"></script>
-<script src="assets/seed-trade.js?v=20261110g"></script>
-<script src="assets/seed-extra.js?v=20261110g"></script>
-<script src="assets/seed-new.js?v=20261110g"></script>
-<script src="assets/seed-comments.js?v=20261110g"></script>
-<script src="assets/admin-data.js?v=20261110g"></script>
+<script src="assets/common.js?v=20261110h"></script>
+<script src="assets/db.js?v=20261110h"></script>
+<script src="assets/notify.js?v=20261110h"></script>
+<script src="assets/seed-trade.js?v=20261110h"></script>
+<script src="assets/seed-extra.js?v=20261110h"></script>
+<script src="assets/seed-new.js?v=20261110h"></script>
+<script src="assets/seed-comments.js?v=20261110h"></script>
+<script src="assets/admin-data.js?v=20261110h"></script>
 <script>
 var user = currentUser();
 if (!user) {
@@ -247,7 +247,11 @@ function fill(){
   var all = users();
   var me = all[myIndex()] || user;
   paintAvatar();
-  document.getElementById("who").textContent = user.nick;
+  document.getElementById("who").innerHTML = esc(user.nick) + (ROLE_BADGE[user.role] ? ' <span class="role-badge ' + ROLE_BADGE[user.role][2] + '">' + ROLE_BADGE[user.role][0] + ' ' + ROLE_LABEL[user.role] + '</span>' : '');
+  if ((user.role === "shop" || user.role === "dealer") && user.seller_until) {
+    var over = user.seller_until < new Date().toISOString().slice(0, 10);
+    document.getElementById("who").insertAdjacentHTML("afterend", '<div style="font-size:13px;margin-top:4px;color:' + (over ? '#b4372d;font-weight:700' : 'var(--ink-3)') + '">' + (over ? '⛔ 입점 기간이 끝나 판매 글이 가려져 있어요 (' + user.seller_until + '까지였어요). 운영자에게 문의해 주세요.' : '🗓 입점 기간: ' + user.seller_until + '까지') + '</div>');
+  }
   document.getElementById("sub").textContent = user.region + (me.joined ? " · " + me.joined + " 가입" : "");
   document.getElementById("email-val").textContent = user.email;
   document.getElementById("nick").value = user.nick;

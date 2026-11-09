@@ -23,7 +23,7 @@ function post_out($r) {
   return ['id' => $r['id'], 'board' => $r['board'], 'head' => $r['head'], 'title' => $r['title'], 'content' => $r['content'],
     'loc' => $r['loc'], 'meta' => $r['meta'], 'price' => $r['price'], 'extra' => $x ?: new stdClass(),
     'author' => $r['author'], 'author_nick' => $r['author_nick'], 'author_role' => $r['author_role'] ?? 'user', 'views' => (int)$r['views'],
-    'created_at' => iso($r['created_at']), 'updated_at' => iso($r['updated_at'])];
+    'created_at' => iso($r['created_at']), 'updated_at' => iso($r['updated_at']), 'hidden' => !post_live($r)];
 }
 function likes_map() {
   $m = [];
@@ -307,17 +307,20 @@ case 'upload': {
 /* ───────── 글 ───────── */
 case 'post_list': {
   $b = str($R['board'] ?? '', 30); if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
-  out(array_map('post_out', all("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.board = ? ORDER BY p.created_at DESC LIMIT 300", [$b])));
+  $lv = me($R, false); $lmod = $lv && is_mod($lv);
+  out(array_map('post_out', array_values(array_filter(all("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.board = ? ORDER BY p.created_at DESC LIMIT 300", [$b]), function ($r) use ($lv, $lmod) { return $lmod || ($lv && $r['author'] === $lv['id']) || post_live($r); }))));
 }
 case 'post_get': {
   $id = $R['id'] ?? ''; if (!is_uuid($id)) out(null);
-  $r = one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id]); if (!$r) out(null);
+  $r = one("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id]); if (!$r) out(null);
+  if (!post_live($r)) { $gv = me($R, false); if (!$gv || ($gv['id'] !== $r['author'] && !is_mod($gv))) out(null); }
   if (!empty($R['view'])) { q("UPDATE ji_posts SET views = views + 1 WHERE id = ?", [$id]); $r['views']++; }
   out(post_out($r));
 }
 case 'post_create': {
   $u = me($R); $b = str($R['board'] ?? '', 30);
   if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
+  if (isset(SELLER_BOARDS[$b]) && ($u['role'] ?? '') === SELLER_BOARDS[$b] && !seller_live($u['role'], $u['seller_until'] ?? null)) fail('입점 기간이 끝나 새 글을 올릴 수 없어요. 운영자에게 문의해 주세요.', 403);
   if (!can_write_board($u, $b)) fail($b === '축제정보' ? '축제 정보는 운영자가 확인한 뒤 올려요. 축제 제보로 보내 주세요.' : '승인된 ' . ($b === '제주상점' ? '상점판매자' : '공구판매자') . '만 올릴 수 있어요', 403);
   $title = str($R['title'] ?? '', 120); if ($title === '') fail('제목을 입력해 주세요.');
   if ($b === '부동산') {
@@ -346,7 +349,7 @@ case 'post_create': {
   }
   $isTrade = in_array($b, ['구인구직', '중고사고팔기', '부동산', '제주상점', '특가공구'], true);
   alert_admins($isTrade ? 'trade' : 'post', ($isTrade ? '🏷️ ' : '📝 ') . $b . ' 새 글', $u['nick'] . '님: ' . mb_substr($title, 0, 60), 'view.html?id=' . $id, $u['id']);
-  out(post_out(one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
+  out(post_out(one("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
 }
 case 'post_update': {
   $u = me($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT * FROM ji_posts WHERE id = ?", [$id]) : null;
@@ -369,7 +372,7 @@ case 'post_update': {
   q("UPDATE ji_posts SET board = ?, head = ?, title = ?, content = ?, loc = ?, meta = ?, price = ?, extra = ?, updated_at = ? WHERE id = ?",
     [$board, str($R['head'] ?? $r['head'], 30), $title, str($R['content'] ?? $r['content'], 20000), str($R['loc'] ?? $r['loc'], 100),
      str($R['meta'] ?? $r['meta'], 255), str($R['price'] ?? $r['price'], 60), $extra, now(), $id]);
-  out(post_out(one("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
+  out(post_out(one("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
 }
 case 'post_delete': {
   $u = me($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT author FROM ji_posts WHERE id = ?", [$id]) : null;
@@ -386,7 +389,9 @@ case 'post_delete': {
 
 /* ───────── 전체 새 글 + 댓글 수 (화면 캐시용) ───────── */
 case 'feed': {
-  $rows = all("SELECT p.*, u.role author_role FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author ORDER BY p.created_at DESC LIMIT 600");
+  $rows = all("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author ORDER BY p.created_at DESC LIMIT 600");
+  $fv = me($R, false); $fmod = $fv && is_mod($fv);
+  $rows = array_values(array_filter($rows, function ($r) use ($fv, $fmod) { return $fmod || ($fv && $r['author'] === $fv['id']) || post_live($r); }));   // 입점 기간이 끝난 판매 글은 본인·운영진에게만
   foreach ($rows as &$r) if (mb_strlen($r['content']) > 400) $r['content'] = mb_substr($r['content'], 0, 400) . '…';   // 목록용: 앞부분만 (전문은 글 화면에서)
   unset($r);
   $counts = [];
@@ -581,7 +586,7 @@ case 'admin_overview': {
 case 'admin_users': {
   admin($R);
   out(array_map(function ($u) { $u['created_at'] = iso($u['created_at']); $u['last_login'] = iso($u['last_login']); return $u; },
-    all("SELECT u.id, u.email, u.nick, u.region, u.role, u.created_at, u.last_login,
+    all("SELECT u.id, u.email, u.nick, u.region, u.role, u.seller_until, u.created_at, u.last_login,
          (SELECT COUNT(*) FROM ji_posts p WHERE p.author = u.id) posts,
          (SELECT COUNT(*) FROM ji_comments c WHERE c.author = u.id) comments FROM ji_users u ORDER BY u.created_at DESC LIMIT 1000")));
 }
@@ -651,6 +656,11 @@ case 'admin_user_delete': {   // 관리자만: 회원 탈퇴 처리 (관리자 �
   q("DELETE FROM ji_club_joins WHERE applicant = ?", [$id]); q("DELETE FROM ji_settings WHERE k = ?", ['al:' . $id]);
   q("DELETE FROM ji_users WHERE id = ?", [$id]);
   out(true);
+}
+case 'admin_seller_until': {   // 판매자 입점 기간 정하기 (null = 기한 없음)
+  admin($R, true); $u = one("SELECT id FROM ji_users WHERE id = ?", [$R['id'] ?? '']); if (!$u) fail('회원을 찾을 수 없어요', 404);
+  $d = $R['until'] ?? null; if ($d !== null && $d !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) fail('날짜 형식이 올바르지 않아요');
+  q("UPDATE ji_users SET seller_until = ? WHERE id = ?", [$d ?: null, $u['id']]); out(true);
 }
 case 'admin_inquiry_set': {
   admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'seen', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
