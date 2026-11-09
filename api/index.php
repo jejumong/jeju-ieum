@@ -329,6 +329,10 @@ case 'post_create': {
       if ($n >= 3) fail('일반 회원은 매물을 동시에 3건까지 올릴 수 있어요. 지난 매물을 정리한 뒤 올려 주세요.');
     }
   }
+  if ($b === '제주상점' && !is_mod($u)) {   // 상점판매자: 제주상점 글은 24시간에 1번만
+    $last = one("SELECT created_at FROM ji_posts WHERE author = ? AND board = '제주상점' AND created_at > (NOW() - INTERVAL 24 HOUR) ORDER BY created_at DESC LIMIT 1", [$u['id']]);
+    if ($last) fail('제주상점 글은 24시간에 한 번만 올릴 수 있어요. ' . date('n월 j일 H:i', strtotime($last['created_at']) + 86400) . ' 이후에 다시 올려 주세요.', 429);
+  }
   $recent = one("SELECT COUNT(*) n FROM ji_posts WHERE author = ? AND created_at > (NOW() - INTERVAL 1 MINUTE)", [$u['id']])['n'];
   if ($recent >= 3 && !is_mod($u)) fail('글을 너무 빨리 올리고 있어요. 잠시 후 다시 해 주세요.', 429);
   $id = uuid(); $t = now();

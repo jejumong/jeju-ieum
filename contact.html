@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109z">
+<link rel="stylesheet" href="assets/style.css?v=20261110a">
 </head>
 <body data-active="contact">
 
@@ -57,12 +57,15 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261109z"></script>
-<script src="assets/db.js?v=20261109z"></script>
-<script src="assets/notify.js?v=20261109z"></script>
-<script src="assets/services-data.js?v=20261109z"></script>
+<script src="assets/common.js?v=20261110a"></script>
+<script src="assets/db.js?v=20261110a"></script>
+<script src="assets/notify.js?v=20261110a"></script>
+<script src="assets/services-data.js?v=20261110a"></script>
 <script>
 function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+/* 입점·제휴 문의는 '상점 등록(승인 요청)' 양식으로 받음 — 관리자 콘솔 '판매자 승인'으로 들어가고, 승인하면 상점판매자가 됨 */
+var SHOP_KIND = "입점·제휴 문의", SHOP_FORM = "seller-request.html?board=" + encodeURIComponent("제주상점");
+if (new URLSearchParams(location.search).get("type") === SHOP_KIND) location.replace(SHOP_FORM);
 var KINDS = [
   ["✍️", "정보 정정 요청", "바뀐 규칙, 틀린 날짜, 문 닫은 장소를 알려 주세요."],
   ["💡", "가이드 주제 제안", "이주 전에 알고 싶었던 것, 궁금한 주제를 남겨 주세요."],
@@ -70,7 +73,7 @@ var KINDS = [
   ["🏪", "입점·제휴 문의", "제주상점 입점, 특가공구 진행을 준비하고 있어요."]
 ];
 document.getElementById("kinds").innerHTML = KINDS.map(function(k){
-  return '<a class="trust" href="contact.html?type=' + encodeURIComponent(k[1]) + '#ask"><span class="ti">' + k[0] + '</span><b>' + k[1] + '</b><p>' + k[2] + '</p></a>';
+  return '<a class="trust" href="' + (k[1] === SHOP_KIND ? SHOP_FORM : 'contact.html?type=' + encodeURIComponent(k[1]) + '#ask') + '"><span class="ti">' + k[0] + '</span><b>' + k[1] + '</b><p>' + k[2] + '</p></a>';
 }).join("");
 
 var alt = [];
@@ -99,6 +102,11 @@ function alertMode(){
   n.style.display = on ? "flex" : "none";
 }
 sel.addEventListener("change", alertMode); alertMode();
+sel.addEventListener("change", function(){
+  if (sel.value !== SHOP_KIND) return;
+  if (confirm("입점·제휴 문의는 상점 등록 양식으로 받아요.\n가게 정보를 적어 보내면 관리자가 확인하고 상점판매자로 승인해 드려요.\n상점 등록 양식으로 갈까요?")) location.href = SHOP_FORM;
+  else sel.value = "";
+});
 
 document.getElementById("ask-form").addEventListener("submit", function(e){
   e.preventDefault();

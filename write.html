@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109z">
+<link rel="stylesheet" href="assets/style.css?v=20261110a">
 </head>
 <body data-active="">
 
@@ -166,15 +166,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261109z"></script>
-<script src="assets/common.js?v=20261109z"></script>
-<script src="assets/db.js?v=20261109z"></script>
-<script src="assets/notify.js?v=20261109z"></script>
-<script src="assets/seed-trade.js?v=20261109z"></script>
-<script src="assets/seed-extra.js?v=20261109z"></script>
-<script src="assets/seed-new.js?v=20261109z"></script>
-<script src="assets/seed-comments.js?v=20261109z"></script>
-<script src="assets/admin-data.js?v=20261109z"></script>
+<script src="assets/kmap.js?v=20261110a"></script>
+<script src="assets/common.js?v=20261110a"></script>
+<script src="assets/db.js?v=20261110a"></script>
+<script src="assets/notify.js?v=20261110a"></script>
+<script src="assets/seed-trade.js?v=20261110a"></script>
+<script src="assets/seed-extra.js?v=20261110a"></script>
+<script src="assets/seed-new.js?v=20261110a"></script>
+<script src="assets/seed-comments.js?v=20261110a"></script>
+<script src="assets/admin-data.js?v=20261110a"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -376,6 +376,15 @@ function toggleExtra() {
   var trade = ["구인구직", "부동산", "중고사고팔기", "특가공구"].indexOf(v) > -1;
   document.getElementById("extra-trade").style.display = trade ? "block" : "none";
   document.getElementById("fest-row").style.display = v === "축제정보" ? "block" : "none";
+  // 제주상점: 상점판매자는 24시간에 1번만 — 이미 올렸으면 미리 알려 줌 (서버에서도 막음)
+  var sn = document.getElementById("shop-limit-note"); if (sn) sn.remove();
+  if (v === "제주상점" && !editing && ["admin", "staff"].indexOf((currentUser() || {}).role) < 0) {
+    var me0 = currentUser() || {}, now0 = Date.now();
+    var last = allPosts().filter(function (p) { return p.board === "제주상점" && p.authorId && p.authorId === me0.id; })
+      .map(function (p) { return new Date(p.date + "T" + (p.time || "00:00") + ":00").getTime(); }).filter(function (t) { return now0 - t < 86400000; }).sort().pop();
+    document.getElementById("board-field").insertAdjacentHTML("afterend", '<div class="hint" id="shop-limit-note" style="margin:-4px 0 12px;' + (last ? 'color:#b4372d;font-weight:700' : '') + '">' +
+      (last ? '⏰ 24시간 안에 이미 상점 글을 올렸어요. ' + new Date(last + 86400000).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) + ' 이후에 다시 올릴 수 있어요.' : '🏪 제주상점 글은 24시간에 한 번 올릴 수 있어요.') + '</div>');
+  }
   if (v === "축제정보" && !editing) {   // 운영진은 '축제 등록', 회원은 '축제 제보'
     var mod = ["admin", "staff"].indexOf((currentUser() || {}).role) > -1;
     document.getElementById("page-title").textContent = mod ? "축제 등록" : "축제 제보";
