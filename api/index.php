@@ -205,6 +205,15 @@ case 'maint': {
     }
     out(['as' => $a['nick'], 'uploaded' => $n, 'skipped' => $skip]);
   }
+  if ($op === 'op_reorder') {   // 운영자 글 시각을 초안 순서대로 1분씩 벌려 정렬 (목록 위쪽 글이 가장 최근)
+    $keys = array_map(function($p){ return (string)($p['k'] ?? ''); }, (array)($R['posts'] ?? []));
+    $rows = all("SELECT id, extra, created_at FROM ji_posts WHERE extra LIKE '%\"op\"%'");
+    $map = []; $top = 0;
+    foreach ($rows as $r) { $x = json_decode($r['extra'] ?: '{}', true); if (!empty($x['op'])) { $map[$x['op']] = $r['id']; $top = max($top, strtotime($r['created_at'])); } }
+    $n = 0;
+    foreach ($keys as $i => $k) { if (!isset($map[$k])) continue; $t = date('Y-m-d H:i:s', $top - $i * 60); q("UPDATE ji_posts SET created_at = ?, updated_at = ? WHERE id = ?", [$t, $t, $map[$k]]); $n++; }
+    out(['reordered' => $n]);
+  }
   fail('op 가 올바르지 않아요');
 }
 case 'mail_check': {
