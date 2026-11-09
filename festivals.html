@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109u">
+<link rel="stylesheet" href="assets/style.css?v=20261109v">
 <style>
 /* ── 축제 지도 (이미지 + 점 오버레이) ── */
 .map-wrap{position:relative;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px;line-height:0;box-shadow:var(--sh-3)}
@@ -92,15 +92,15 @@
   <div style="display:flex;justify-content:flex-end;margin:22px 0 8px"><a class="btn accent" href="write.html?board=축제정보">✏️ 축제 제보</a></div>
 </main>
 
-<script src="assets/common.js?v=20261109u"></script>
-<script src="assets/db.js?v=20261109u"></script>
-<script src="assets/notify.js?v=20261109u"></script>
-<script src="assets/seed-trade.js?v=20261109u"></script>
-<script src="assets/seed-extra.js?v=20261109u"></script>
-<script src="assets/seed-new.js?v=20261109u"></script>
-<script src="assets/seed-comments.js?v=20261109u"></script>
-<script src="assets/photos.js?v=20261109u"></script>
-<script src="assets/admin-data.js?v=20261109u"></script>
+<script src="assets/common.js?v=20261109v"></script>
+<script src="assets/db.js?v=20261109v"></script>
+<script src="assets/notify.js?v=20261109v"></script>
+<script src="assets/seed-trade.js?v=20261109v"></script>
+<script src="assets/seed-extra.js?v=20261109v"></script>
+<script src="assets/seed-new.js?v=20261109v"></script>
+<script src="assets/seed-comments.js?v=20261109v"></script>
+<script src="assets/photos.js?v=20261109v"></script>
+<script src="assets/admin-data.js?v=20261109v"></script>
 <script>
 /* ── 축제별 지도 좌표(이미지 크기 대비 %)와 카드 이모지 ── */
 var FEST_META = {
@@ -126,13 +126,19 @@ function fests(){
 
 /* ── 좌표가 없는 글(운영자 등록 축제)은 장소 이름으로 대략 위치 잡기 (지도 이미지 % 기준) ── */
 var LOC_PX = [["우도",92,18],["성산",85,42],["세화",78,27],["월정",74.5,17],["김녕",66,18],["구좌",73,25],["함덕",56,19],["조천",59,25],["표선",80,61],["남원",63,62],["서귀포",53.5,71],["중문",41,73],["안덕",28.5,73],["모슬포",17,79],["대정",18,73],["한경",14,58],["저지",21.5,52.7],["협재",15,49],["한림",22,44],["애월",32,32],["한라산",49,42],["제주시",45.8,25]];
+/* 위도·경도 → 지도 그림 위치(%) — 읍면 위치 13곳으로 맞춘 근사식 */
+function llPx(lat, lng){
+  var px = 91.7334 * lng + 1.56141 * lat - 11611.55, py = -2.94373 * lng - 156.0781 * lat + 5631.30;
+  if (!(px > 0 && px < 100 && py > 0 && py < 100)) return null;
+  return { px: Math.max(4, Math.min(96, px)), py: Math.max(4, Math.min(96, py)) };
+}
 function locPx(loc){ loc = loc || ""; for (var i = 0; i < LOC_PX.length; i++) if (loc.indexOf(LOC_PX[i][0]) > -1) return { px: LOC_PX[i][1], py: LOC_PX[i][2] }; return null; }
 
 /* ── 지도에 축제 점 얹기 ── */
 (function drawDots(){
   var layer = document.getElementById("dot-layer");
   fests().forEach(function(p){
-    var m = FEST_META[p.id] || (p.px ? { px:p.px, py:p.py, e:p.emoji } : locPx(p.loc));
+    var m = FEST_META[p.id] || (p.px ? { px:p.px, py:p.py, e:p.emoji } : (p.lat && p.lng ? llPx(+p.lat, +p.lng) : locPx((p.loc || "") + " " + (p.addr || ""))));
     if (!m) return; // 위치를 알 수 없는 축제는 지도에서 뺌
     var b = document.createElement("button");
     b.className = "fest-dot";

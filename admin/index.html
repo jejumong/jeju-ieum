@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109u">
+<link rel="stylesheet" href="../assets/style.css?v=20261109v">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -201,16 +201,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109u"></script>
-<script src="../assets/db.js?v=20261109u"></script>
-<script src="../assets/notify.js?v=20261109u"></script>
-<script src="../assets/seed-trade.js?v=20261109u"></script>
-<script src="../assets/seed-extra.js?v=20261109u"></script>
-<script src="../assets/seed-new.js?v=20261109u"></script>
-<script src="../assets/seed-comments.js?v=20261109u"></script>
-<script src="../assets/photos.js?v=20261109u"></script>
-<script src="../assets/admin-data.js?v=20261109u"></script>
-<script src="../assets/op-posts.js?v=20261109u"></script>
+<script src="../assets/common.js?v=20261109v"></script>
+<script src="../assets/db.js?v=20261109v"></script>
+<script src="../assets/notify.js?v=20261109v"></script>
+<script src="../assets/seed-trade.js?v=20261109v"></script>
+<script src="../assets/seed-extra.js?v=20261109v"></script>
+<script src="../assets/seed-new.js?v=20261109v"></script>
+<script src="../assets/seed-comments.js?v=20261109v"></script>
+<script src="../assets/photos.js?v=20261109v"></script>
+<script src="../assets/admin-data.js?v=20261109v"></script>
+<script src="../assets/op-posts.js?v=20261109v"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -498,7 +498,11 @@ function askDelete(id){
 function doDelete(id){ var p = findAny(id); if (p) deletePost(p); closeModal(); toast("삭제했습니다"); draw(); }
 function showModal(html){ document.getElementById("modal-box").innerHTML = html; document.getElementById("modal").classList.add("on"); }
 function closeModal(){ document.getElementById("modal").classList.remove("on"); }
-document.getElementById("modal").addEventListener("click", function(e){ if (e.target === this) closeModal(); });
+/* 바깥(어두운 곳)을 눌렀다 뗄 때만 닫기 — 창 안에서 글자를 끌어 선택하다 바깥에서 떼도 닫히지 않게 */
+(function(){ var m = document.getElementById("modal"), downOut = false;
+  m.addEventListener("mousedown", function(e){ downOut = e.target === m; });
+  m.addEventListener("click", function(e){ if (e.target === m && downOut) closeModal(); downOut = false; });
+})();
 
 /* ── 공지 관리 ── */
 function allNoticeItems(){
@@ -737,7 +741,7 @@ if (SRV) {
   };
 
   /* 문의 상세 보기 */
-  var IQ_FIELDS = [["type","종류"],["title","축제 이름"],["kind","분류"],["start","시작일"],["end","종료일"],["loc","장소"],["service","신청 서비스"],["name","이름"],["contact","연락처"],["stage","상황"],["when","시기"],["email","이메일"],["region","지역"],["people","인원"],["budget","예산"]];
+  var IQ_FIELDS = [["type","종류"],["title","축제 이름"],["kind","분류"],["start","시작일"],["end","종료일"],["loc","장소"],["addr","주소"],["service","신청 서비스"],["name","이름"],["contact","연락처"],["stage","상황"],["when","시기"],["email","이메일"],["region","지역"],["people","인원"],["budget","예산"]];
   /* 자세히 보기를 열면 '확인함' 으로 — 메뉴 숫자와 주황 표시가 사라짐 */
   function markSeen(q){
     if (q.status !== "new") return;
@@ -753,7 +757,7 @@ if (SRV) {
   window.showIq = function(id){
     var q = JI.get("inquiries", []).filter(function(x){ return x.id === id; })[0]; if (!q) return;
     markSeen(q);
-    var known = { id:1, status:1, date:1, user_id:1, user_nick:1, replied_at:1, msg:1, agree:1, photos:1 };
+    var known = { id:1, status:1, date:1, user_id:1, user_nick:1, replied_at:1, msg:1, agree:1, photos:1, lat:1, lng:1 };
     IQ_FIELDS.forEach(function(f){ known[f[0]] = 1; });
     var rows = IQ_FIELDS.filter(function(f){ return q[f[0]]; }).map(function(f){ return [f[1], q[f[0]]]; })
       .concat(Object.keys(q).filter(function(k){ return !known[k] && q[k] !== "" && q[k] != null && typeof q[k] !== "object"; }).map(function(k){ return [k, q[k]]; }));
@@ -778,7 +782,8 @@ if (SRV) {
       '<p style="margin:-4px 0 12px;color:var(--ink-3);font-size:13.5px">내용을 확인하고 고친 뒤 게시하면 운영자 이름으로 축제 목록에 올라가요.</p>' +
       '<div class="fld"><label>축제 이름</label><input id="pf-title" value="' + esc(q.title || "") + '"></div>' +
       '<div class="row2"><div class="fld"><label>분류</label><select id="pf-kind"><option value="">선택 안 함</option>' + FEST_KINDS.map(function(k){ return '<option' + (k === q.kind ? ' selected' : '') + '>' + k + '</option>'; }).join("") + '</select></div>' +
-        '<div class="fld"><label>장소</label><input id="pf-loc" value="' + esc(q.loc || "") + '"></div></div>' +
+        '<div class="fld"><label>장소 이름</label><input id="pf-loc" value="' + esc(q.loc || "") + '"></div></div>' +
+      '<div class="fld"><label>정확한 주소 ' + (q.lat ? '<small style="color:#13865a;font-weight:600">· 지도 위치 있음</small>' : '<small style="color:#d6453a;font-weight:600">· 지도 위치 없음 (주소의 읍면 이름으로 대략 표시)</small>') + '</label><input id="pf-addr" value="' + esc(q.addr || "") + '"></div>' +
       '<div class="row2"><div class="fld"><label>시작일</label><input type="date" id="pf-start" value="' + esc(q.start || "") + '"></div>' +
         '<div class="fld"><label>종료일</label><input type="date" id="pf-end" value="' + esc(q.end || "") + '"></div></div>' +
       '<div class="fld"><label>내용</label><textarea id="pf-content">' + esc(q.msg || "") + '</textarea></div>' +
@@ -794,7 +799,7 @@ if (SRV) {
       var photos = [].filter.call(document.querySelectorAll(".pf-p"), function(c){ return c.checked; }).map(function(c){ return ph[+c.dataset.i]; });
       var btn = this; btn.disabled = true; btn.textContent = "게시하는 중…";
       var notify = document.getElementById("pf-notify"), wantMsg = notify && notify.checked;
-      JIDB.call("post_create", { board: "축제정보", head: v("kind"), title: title, content: v("content") || title, loc: v("loc"), extra: { start: st, end: en, photos: photos }, from_iq: q.id })
+      JIDB.call("post_create", { board: "축제정보", head: v("kind"), title: title, content: v("content") || title, loc: v("loc"), extra: (function(){ var x = { start: st, end: en, photos: photos, addr: v("addr") }; if (q.lat && v("addr") === (q.addr || "")) { x.lat = +q.lat; x.lng = +q.lng; } return x; })(), from_iq: q.id })
         .then(function(post){
           var jobs = [JIDB.call("admin_inquiry_set", { id: q.id, status: "done" })];
           if (wantMsg) jobs.push(JIDB.sendMessage(q.user_id, "보내 주신 축제 제보 '" + title + "'를 축제 목록에 올렸어요. 고맙습니다!\n" + SITE + "view.html?id=" + post.id).catch(function(){}));

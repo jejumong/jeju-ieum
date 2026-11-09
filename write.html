@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109u">
+<link rel="stylesheet" href="assets/style.css?v=20261109v">
 </head>
 <body data-active="">
 
@@ -126,11 +126,19 @@
           <input type="date" id="fest-end">
         </div>
       </div>
-      <div class="field">
-        <label for="fest-loc">장소</label>
-        <input type="text" id="fest-loc" placeholder="예: 제주도립미술관 일원">
-        <div class="hint">기간을 적으면 축제 목록에 진행중·예정·종료가 자동으로 표시돼요.</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fest-loc">장소 이름</label>
+          <input type="text" id="fest-loc" placeholder="예: 제주도립미술관">
+        </div>
+        <div class="field">
+          <label for="fest-addr">정확한 주소 <span class="req">*</span></label>
+          <div style="display:flex;gap:8px"><input type="text" id="fest-addr" placeholder="주소 찾기를 눌러 주세요" style="flex:1;min-width:0" readonly>
+            <button type="button" class="btn ghost" id="fest-addr-btn" style="flex:none">주소 찾기</button></div>
+        </div>
       </div>
+      <div class="hint" id="fest-pos-hint" style="margin:-6px 0 6px">주소를 고르면 축제 지도에 위치가 표시돼요. 장소 이름만 아는 경우 <a href="#" id="fest-name-find" style="color:var(--sea-700);font-weight:700;text-decoration:underline">장소 이름으로 찾기</a>를 눌러 보세요.</div>
+      <div id="fest-map" style="margin-bottom:14px"></div>
     </div>
 
     <div class="field">
@@ -158,15 +166,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261109u"></script>
-<script src="assets/common.js?v=20261109u"></script>
-<script src="assets/db.js?v=20261109u"></script>
-<script src="assets/notify.js?v=20261109u"></script>
-<script src="assets/seed-trade.js?v=20261109u"></script>
-<script src="assets/seed-extra.js?v=20261109u"></script>
-<script src="assets/seed-new.js?v=20261109u"></script>
-<script src="assets/seed-comments.js?v=20261109u"></script>
-<script src="assets/admin-data.js?v=20261109u"></script>
+<script src="assets/kmap.js?v=20261109v"></script>
+<script src="assets/common.js?v=20261109v"></script>
+<script src="assets/db.js?v=20261109v"></script>
+<script src="assets/notify.js?v=20261109v"></script>
+<script src="assets/seed-trade.js?v=20261109v"></script>
+<script src="assets/seed-extra.js?v=20261109v"></script>
+<script src="assets/seed-new.js?v=20261109v"></script>
+<script src="assets/seed-comments.js?v=20261109v"></script>
+<script src="assets/admin-data.js?v=20261109v"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -237,6 +245,7 @@ function fillEdit(editing) {
     document.getElementById("fest-start").value = editing.start || (editing.extra && editing.extra.start) || "";
     document.getElementById("fest-end").value = editing.end || (editing.extra && editing.extra.end) || "";
     document.getElementById("fest-loc").value = editing.loc || "";
+    if (editing.board === "축제정보") { var ex = editing.extra || {}; document.getElementById("fest-addr").value = editing.addr || ex.addr || ""; if (ex.lat) FEST_POS = { lat: +ex.lat, lng: +ex.lng }; }
   if (typeof toggleExtra === "function") toggleExtra();
   // 이미 올린 사진 불러오기
   if (editing.extra && editing.extra.photos && editing.extra.photos.length) {
@@ -308,6 +317,41 @@ document.getElementById("addr-check").addEventListener("click", function () {
   var v = document.getElementById("addr").value.trim();
   if (!v) { alert("주소를 입력해 주세요."); return; }
   JIMap.show(document.getElementById("addr-map"), v);
+});
+
+/* 축제 장소: 다음 우편번호(주소 찾기) → 카카오 좌표 → 축제 지도에 점 */
+var FEST_POS = null;
+function festSetAddr(addr, pos) {
+  document.getElementById("fest-addr").value = addr || "";
+  FEST_POS = pos ? { lat: pos.lat, lng: pos.lng } : null;
+  var h = document.getElementById("fest-pos-hint");
+  h.innerHTML = pos ? "📍 위치를 찾았어요 — 축제 지도에 이 위치로 표시돼요." : (addr ? "주소는 넣었지만 지도 위치를 찾지 못했어요. 주소를 다시 골라 주세요." : h.innerHTML);
+  if (addr) JIMap.show(document.getElementById("fest-map"), addr);
+}
+function festGeocode(q) {
+  return JIMap.load().then(function (ok) { return ok ? JIMap.find(q) : null; });
+}
+document.getElementById("fest-addr-btn").addEventListener("click", function () {
+  function open() {
+    new daum.Postcode({ oncomplete: function (d) {
+      var addr = d.roadAddress || d.jibunAddress || d.address;
+      if (!document.getElementById("fest-loc").value && d.buildingName) document.getElementById("fest-loc").value = d.buildingName;
+      festGeocode(addr).then(function (pos) { festSetAddr(addr, pos); });
+    } }).open();
+  }
+  if (window.daum && daum.Postcode) return open();
+  var sc = document.createElement("script"); sc.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+  sc.onload = open; sc.onerror = function () { alert("주소 찾기를 불러오지 못했어요. 잠시 후 다시 해 주세요."); };
+  document.head.appendChild(sc);
+});
+document.getElementById("fest-name-find").addEventListener("click", function (e) {
+  e.preventDefault();
+  var q = document.getElementById("fest-loc").value.trim();
+  if (!q) { alert("장소 이름을 먼저 적어 주세요."); document.getElementById("fest-loc").focus(); return; }
+  festGeocode(q.indexOf("제주") > -1 ? q : "제주 " + q).then(function (pos) {
+    if (!pos) { alert("'" + q + "' 위치를 찾지 못했어요. 주소 찾기를 이용해 주세요."); return; }
+    festSetAddr(pos.addr, pos);
+  });
 });
 
 /* 게시판별 말머리 — 부동산은 매물 종류(학교 근처·일년살이 포함) */
@@ -436,7 +480,9 @@ function submitPost() {
     fs = document.getElementById("fest-start").value; fe = document.getElementById("fest-end").value;
     if (!fs || !fe) { alert("축제 시작일과 종료일을 골라 주세요."); document.getElementById(fs ? "fest-end" : "fest-start").focus(); return; }
     if (fe < fs) { alert("종료일이 시작일보다 빨라요."); document.getElementById("fest-end").focus(); return; }
-    loc = (document.getElementById("fest-loc").value || "").trim(); price = "";
+    var faddr = (document.getElementById("fest-addr").value || "").trim();
+    if (!faddr) { alert("주소 찾기로 축제 장소의 주소를 골라 주세요."); document.getElementById("fest-addr-btn").focus(); return; }
+    loc = (document.getElementById("fest-loc").value || "").trim() || faddr; price = ""; addr = faddr;
   }
   var payType = "", pay = "";
   if (board === "구인구직") {
@@ -452,8 +498,8 @@ function submitPost() {
     if (PH_BUSY) { alert("사진을 올리는 중이에요. 다 올라간 뒤 보내 주세요."); return; }
     var fb = document.getElementById("submit-btn"); fb.disabled = true;
     JIDB.call("inquiry_add", { data: { type: "축제 제보", name: user.nick || "", contact: user.email || "", title: title, kind: head === "선택 안 함" ? "" : head,
-      start: fs, end: fe, loc: loc, msg: content, photos: PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; }) } }).then(function () {
-      alert("제보를 보냈어요. 운영자가 확인한 뒤 축제 목록에 올릴게요. 고마워요!");
+      start: fs, end: fe, loc: loc, addr: addr, lat: FEST_POS ? FEST_POS.lat : "", lng: FEST_POS ? FEST_POS.lng : "", msg: content, photos: PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; }) } }).then(function () {
+      alert("제보를 보냈어요. 운영자가 확인한 뒤 축제 목록에 올릴게요. 고맙습니다!");
       location.href = "festivals.html";
     }).catch(function (e) { fb.disabled = false; alert("보내지 못했어요: " + (e.message || e)); });
     return;
@@ -478,7 +524,7 @@ function submitPost() {
     }
     var btn = document.getElementById("submit-btn"); btn.disabled = true;
     extra.htype = htype; extra.addr = addr; extra.payType = payType; extra.pay = pay;
-    if (board === "축제정보") { extra.start = fs; extra.end = fe; } else { delete extra.start; delete extra.end; }
+    if (board === "축제정보") { extra.start = fs; extra.end = fe; if (FEST_POS) { extra.lat = FEST_POS.lat; extra.lng = FEST_POS.lng; } } else { delete extra.start; delete extra.end; delete extra.lat; delete extra.lng; }
     extra.photos = PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; });
     var data = { board: board, head: head === "선택 안 함" ? "" : head, title: title, content: content, price: price, loc: loc, meta: (editing && editing.meta) || "", extra: extra };
     (editing && editing.db ? JIDB.updatePost(editing.id, data) : JIDB.createPost(data)).then(function (p) {
