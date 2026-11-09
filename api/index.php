@@ -694,6 +694,16 @@ case 'notis': {
     all("SELECT * FROM ji_notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50", [$u['id']])));
 }
 case 'noti_unread': { $u = me($R, false); out($u ? (int)one("SELECT COUNT(*) n FROM ji_notifications WHERE user_id = ? AND is_read = 0", [$u['id']])['n'] : 0); }
+case 'noti_read': {   // 고른 알림만 읽음으로
+  $u = me($R); $n = 0;
+  foreach (array_slice((array)($R['ids'] ?? []), 0, 200) as $id) if (is_uuid($id)) { q("UPDATE ji_notifications SET is_read = 1 WHERE id = ? AND user_id = ?", [$id, $u['id']]); $n++; }
+  out($n);
+}
+case 'msg_read_many': {   // 고른 쪽지만 읽음으로
+  $u = me($R); $n = 0;
+  foreach (array_slice((array)($R['ids'] ?? []), 0, 200) as $id) if (is_uuid($id)) { q("UPDATE ji_messages SET read_at = ? WHERE id = ? AND receiver = ? AND read_at IS NULL", [now(), $id, $u['id']]); $n++; }
+  out($n);
+}
 case 'noti_read_all': { $u = me($R); q("UPDATE ji_notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0", [$u['id']]); out(true); }
 
 default: fail('알 수 없는 요청이에요', 404);

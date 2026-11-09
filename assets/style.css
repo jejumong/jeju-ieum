@@ -1983,3 +1983,12 @@ a.act-item:hover{border-color:var(--sea-200)}
 .chip.h-free{background:#f0f2f5;color:#4d5967}
 .chip.h-news{background:#eef0fd;color:#4150c2}
 .chip.h-place{background:#fdf0e6;color:#a8560f}
+
+/* 알림·쪽지 선택 */
+.sel-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 2px 6px}
+.sel-bar label{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--ink-2);margin-right:auto;cursor:pointer}
+.sel-bar input,.sel-item > input{width:18px;height:18px;accent-color:var(--sea);cursor:pointer;flex:none}
+.sel-bar .btn{padding:7px 12px;font-size:13px}.sel-bar .btn[disabled]{opacity:.45;cursor:default}
+.act-item.sel-item{display:flex;gap:12px;align-items:flex-start}
+.sel-item > input{margin-top:3px}
+.sel-main{flex:1;min-width:0;display:block;text-decoration:none;color:inherit}

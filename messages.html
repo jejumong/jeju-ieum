@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109x">
+<link rel="stylesheet" href="assets/style.css?v=20261109y">
 </head>
 <body data-active="">
 
@@ -38,9 +38,9 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261109x"></script>
-<script src="assets/db.js?v=20261109x"></script>
-<script src="assets/notify.js?v=20261109x"></script>
+<script src="assets/common.js?v=20261109y"></script>
+<script src="assets/db.js?v=20261109y"></script>
+<script src="assets/notify.js?v=20261109y"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
@@ -48,7 +48,15 @@
   function when(t){ var d = new Date(t); return (d.getMonth()+1) + "." + d.getDate() + " " + d.toTimeString().slice(0,5); }
   var empty = function(t){ return '<div class="act-empty">' + t + '</div>'; };
   var P = new URLSearchParams(location.search), TO_ID = P.get("to_id") || "";
-  var BOX = { "in": [], sent: [] };
+  var BOX = { "in": [], sent: [] }, MSEL = {};
+  function selBar(p, sel, total){
+    var r = $(p + "-read"), al = $(p + "-all"); if (!r) return;
+    r.disabled = !sel; r.textContent = sel ? "선택한 " + sel + "개 읽음으로 표시" : "선택한 읽음으로 표시";
+    if (al) { al.checked = sel > 0 && sel === total; al.indeterminate = sel > 0 && sel < total; }
+  }
+  function readMsgs(ids){
+    return JIDB.call("msg_read_many", { ids: ids }).then(function(){ BOX["in"].forEach(function(m){ if (ids.indexOf(m.id) > -1) m.read = true; }); MSEL = {}; draw("in"); JIDB.refreshUnread(); });
+  }
 
   if (!JIDB.enabled) { document.querySelector("main").insertAdjacentHTML("beforeend", empty("회원 시스템 준비 중이에요.")); $("m-tabs").style.display = "none"; return; }
 
@@ -70,17 +78,21 @@
 
   function item(m, box){
     var who = box === "in" ? m.from_nick : m.to_nick, op = m.from_nick === "제주이음 운영자";
-    return '<div class="act-item msg-item' + (box === "in" && !m.read ? " unread" : "") + (op ? " msg-op" : "") + '" data-id="' + m.id + '" data-box="' + box + '">' +
-      '<div class="ai-t"><b>' + (box === "in" ? "" : "→ ") + esc(who) + (op ? ' <span class="msg-badge">운영자</span>' : '') + '</b><span>' + when(m.created_at) + (box === "sent" ? (m.read ? " · 읽음" : " · 안 읽음") : "") + '</span></div>' +
+    return '<div class="act-item msg-item' + (box === "in" ? " sel-item" : "") + (box === "in" && !m.read ? " unread" : "") + (op ? " msg-op" : "") + '" data-id="' + m.id + '" data-box="' + box + '">' +
+      (box === "in" ? '<input type="checkbox" class="mk" data-id="' + m.id + '"' + (MSEL[m.id] ? ' checked' : '') + ' aria-label="선택">' : '') + '<div class="sel-main"><div class="ai-t"><b>' + (box === "in" ? "" : "→ ") + esc(who) + (op ? ' <span class="msg-badge">운영자</span>' : '') + '</b><span>' + when(m.created_at) + (box === "sent" ? (m.read ? " · 읽음" : " · 안 읽음") : "") + '</span></div>' +
       '<p class="msg-prev">' + esc(m.body.split("\n")[0].slice(0, 80)) + '</p>' +
       '<div class="msg-full" hidden><p class="msg-body">' + esc(m.body) + '</p><div class="ai-btns">' +
         (box === "in" ? '<button type="button" class="btn primary" data-reply="' + m.id + '">답장</button>' : '') +
-        '<button type="button" class="btn ghost" data-del="' + m.id + '">삭제</button></div></div></div>';
+        '<button type="button" class="btn ghost" data-del="' + m.id + '">삭제</button></div></div></div></div>';
   }
   function draw(box){
     var l = BOX[box];
     if (box === "in") { var n = l.filter(function(m){ return !m.read; }).length; $("n-in").textContent = n || ""; }
-    $("l-" + box).innerHTML = l.length ? l.map(function(m){ return item(m, box); }).join("")
+    var sel = Object.keys(MSEL).length, un = l.filter(function(m){ return !m.read; }).length;
+    var bar = box === "in" && l.length ? '<div class="sel-bar"><label><input type="checkbox" id="mk-all"' + (sel && sel === l.length ? ' checked' : '') + '> 전체 선택</label>' +
+      '<button type="button" class="btn ghost" id="mk-read"' + (sel ? '' : ' disabled') + '>' + (sel ? '선택한 ' + sel + '개 읽음으로 표시' : '선택한 읽음으로 표시') + '</button>' +
+      '<button type="button" class="btn ghost" id="mk-allread"' + (un ? '' : ' disabled') + '>모두 읽음</button></div>' : '';
+    $("l-" + box).innerHTML = l.length ? bar + l.map(function(m){ return item(m, box); }).join("")
       : empty(box === "in" ? "받은 쪽지가 없어요." : "보낸 쪽지가 없어요. 글쓴이 이름 옆 <b>✉️ 쪽지</b> 버튼이나 '쪽지 쓰기'로 보낼 수 있어요.");
   }
   function load(box){ return JIDB.messages(box).then(function(l){ BOX[box] = l; draw(box); }); }
@@ -102,9 +114,17 @@
       if (!confirm("이 쪽지를 삭제할까요?")) return;
       JIDB.deleteMessage(d.dataset.del).then(function(){ load("in"); load("sent"); }); return;
     }
-    var it = e.target.closest(".msg-item"); if (it && !e.target.closest("button")) open(it);
+    if (e.target.id === "mk-read") return readMsgs(Object.keys(MSEL));
+    if (e.target.id === "mk-allread") return readMsgs(BOX["in"].filter(function(m){ return !m.read; }).map(function(m){ return m.id; }));
+    var it = e.target.closest(".msg-item"); if (it && !e.target.closest("button") && !e.target.closest("input")) open(it);
   });
 
+  $("l-in").addEventListener("change", function(e){
+    var t = e.target;
+    if (t.classList.contains("mk")) { if (t.checked) MSEL[t.dataset.id] = 1; else delete MSEL[t.dataset.id]; }
+    if (t.id === "mk-all") { MSEL = {}; if (t.checked) BOX["in"].forEach(function(m){ MSEL[m.id] = 1; }); document.querySelectorAll("#l-in .mk").forEach(function(c){ c.checked = t.checked; }); }
+    selBar("mk", Object.keys(MSEL).length, BOX["in"].length);   // 목록은 다시 그리지 않고 위 버튼만 바꿈 (열어 둔 쪽지 유지)
+  });
   $("m-send").onclick = function(){
     var to = $("m-to").value.trim(), body = $("m-body").value.trim();
     if (!to) { alert("받는 사람 닉네임을 적어 주세요."); $("m-to").focus(); return; }

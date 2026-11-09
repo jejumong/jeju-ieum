@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109x">
+<link rel="stylesheet" href="assets/style.css?v=20261109y">
 </head>
 <body data-active="">
 
@@ -32,9 +32,9 @@
   <section class="act-panel" id="p-sent"><div class="act-list" id="l-sent"></div></section>
 </main>
 
-<script src="assets/common.js?v=20261109x"></script>
-<script src="assets/db.js?v=20261109x"></script>
-<script src="assets/notify.js?v=20261109x"></script>
+<script src="assets/common.js?v=20261109y"></script>
+<script src="assets/db.js?v=20261109y"></script>
+<script src="assets/notify.js?v=20261109y"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
@@ -76,16 +76,39 @@
     drawPush();
 
     // 알림
-    JIDB.notifications().then(function(list){
-      var unread = list.filter(function(n){ return !n.read; }).length;
-      // 가입 신청 알림은 '받은 가입 신청' 탭 숫자로만 보여 주고, 알림 탭 숫자에서는 뺌
-      var other = list.filter(function(n){ return !n.read && n.kind !== "join_request"; }).length;
+    var NOTI = [], NSEL = {};
+    function drawNoti(){
+      var other = NOTI.filter(function(n){ return !n.read && n.kind !== "join_request"; }).length;   // 가입 신청 알림은 '받은 가입 신청' 탭 숫자로
       $("n-noti").textContent = other || "";
-      $("l-noti").innerHTML = list.length ? list.map(function(n){
-        return '<a class="act-item' + (n.read ? "" : " unread") + '" href="' + esc(n.link || "#") + '"><div class="ai-t"><b>' + esc(n.title) + '</b><span>' + when(n.created_at) + '</span></div><p>' + esc(n.body) + '</p></a>';
-      }).join("") : empty("아직 알림이 없어요.");
-      if (unread) JIDB.markAllRead().then(function(){ JIDB.refreshUnread(); });
+      var unread = NOTI.filter(function(n){ return !n.read; }).length, sel = Object.keys(NSEL).length;
+      $("l-noti").innerHTML = NOTI.length ? '<div class="sel-bar"><label><input type="checkbox" id="nk-all"' + (sel && sel === NOTI.length ? ' checked' : '') + '> 전체 선택</label>' +
+          '<button type="button" class="btn ghost" id="nk-read"' + (sel ? '' : ' disabled') + '>' + (sel ? '선택한 ' + sel + '개 읽음으로 표시' : '선택한 읽음으로 표시') + '</button>' +
+          '<button type="button" class="btn ghost" id="nk-allread"' + (unread ? '' : ' disabled') + '>모두 읽음</button></div>' +
+        NOTI.map(function(n){
+          return '<div class="act-item sel-item' + (n.read ? "" : " unread") + '"><input type="checkbox" class="nk" data-id="' + n.id + '"' + (NSEL[n.id] ? ' checked' : '') + ' aria-label="선택">' +
+            '<a class="sel-main" data-nid="' + n.id + '" href="' + esc(n.link || "#") + '"><div class="ai-t"><b>' + esc(n.title) + '</b><span>' + when(n.created_at) + '</span></div><p>' + esc(n.body) + '</p></a></div>';
+        }).join("") : empty("아직 알림이 없어요.");
+    }
+    function readNoti(ids){
+      return JIDB.call("noti_read", { ids: ids }).then(function(){ NOTI.forEach(function(n){ if (ids.indexOf(n.id) > -1) n.read = true; }); NSEL = {}; drawNoti(); JIDB.refreshUnread(); });
+    }
+    $("l-noti").addEventListener("change", function(e){
+      var t = e.target;
+      if (t.classList.contains("nk")) { if (t.checked) NSEL[t.dataset.id] = 1; else delete NSEL[t.dataset.id]; }
+      if (t.id === "nk-all") { NSEL = {}; if (t.checked) NOTI.forEach(function(n){ NSEL[n.id] = 1; }); document.querySelectorAll("#l-noti .nk").forEach(function(c){ c.checked = t.checked; }); }
+      var sel = Object.keys(NSEL).length, r = $("nk-read"), al = $("nk-all");
+      r.disabled = !sel; r.textContent = sel ? "선택한 " + sel + "개 읽음으로 표시" : "선택한 읽음으로 표시";
+      al.checked = sel > 0 && sel === NOTI.length; al.indeterminate = sel > 0 && sel < NOTI.length;
     });
+    $("l-noti").addEventListener("click", function(e){
+      if (e.target.id === "nk-read") return readNoti(Object.keys(NSEL));
+      if (e.target.id === "nk-allread") return JIDB.markAllRead().then(function(){ NOTI.forEach(function(n){ n.read = true; }); NSEL = {}; drawNoti(); JIDB.refreshUnread(); });
+      var a = e.target.closest("a[data-nid]"); if (!a) return;
+      var n = NOTI.filter(function(x){ return x.id === a.dataset.nid; })[0]; if (!n || n.read) return;   // 누른 알림은 읽음으로 바꾸고 이동
+      e.preventDefault(); var href = a.getAttribute("href");
+      JIDB.call("noti_read", { ids: [n.id] }).catch(function(){}).then(function(){ JIDB.refreshUnread(); if (href && href !== "#") location.href = href; else { n.read = true; drawNoti(); } });
+    });
+    JIDB.notifications().then(function(list){ NOTI = list; drawNoti(); });
 
     // 받은 가입 신청 (내가 만든 모임)
     function drawReceived(){
