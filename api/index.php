@@ -69,6 +69,8 @@ case 'signup': {
   if (mb_strlen($nick) < 2) fail('닉네임은 2~10자로 입력해 주세요.');
   if (one("SELECT id FROM ji_users WHERE email = ?", [$email])) fail('이미 가입된 이메일입니다.');
   if (one("SELECT id FROM ji_users WHERE nick = ?", [$nick])) fail('이미 사용 중인 닉네임입니다.');
+  // 관리자 계정이 이미 있으면 ADMIN_EMAILS 의 다른 주소로 새로 가입해 관리자가 되는 것을 막음 (이메일 인증이 없어서)
+  if (in_array($email, $CFG['admins'], true) && one("SELECT id FROM ji_users WHERE role = 'admin'")) fail('이 이메일로는 가입할 수 없어요.');
   $role = in_array($email, $CFG['admins'], true) ? 'admin' : 'user';
   $id = uuid();
   q("INSERT INTO ji_users (id, email, pass, nick, region, role, created_at, last_login) VALUES (?,?,?,?,?,?,?,?)",
