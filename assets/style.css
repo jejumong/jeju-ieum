@@ -2035,3 +2035,7 @@ a.act-item:hover{border-color:var(--sea-200)}
 .nb-sbar input{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit;font-size:14px;background:var(--bg-2)}
 .nb-types{display:flex;gap:5px;flex-wrap:wrap}.nb-types button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--ink-2)}
 .nb-types button.on{background:var(--sea);color:#fff;border-color:var(--sea)}
+.nb-tip{font-size:13px;color:var(--ink-3);line-height:1.6;margin:-2px 0 10px;background:var(--sea-50);border-radius:10px;padding:8px 12px}
+.nb-tip.warn{background:#fff6e6;color:#8a5300}
+.nb-sec h5{font-size:13.5px;margin:12px 0 6px;color:var(--ink-2)}.nb-sec h5 small{font-weight:600;color:var(--ink-4)}
+.nb-home{border:2px solid var(--sea-100);border-radius:14px;padding:12px 14px}

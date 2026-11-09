@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110o">
+<link rel="stylesheet" href="assets/style.css?v=20261110p">
 <meta name="description" content="제주 작은학교 살리기 마을 공동주택, 학교 연계 주택, 농어촌유학 학교, 체류형 지원을 한곳에 정리했습니다. 주소·입주 조건·비용·문의처와 빈자리 무료 알림.">
 <link rel="canonical" href="https://jejuieum.com/school.html">
 </head>
@@ -64,14 +64,14 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261110o"></script>
-<script src="assets/db.js?v=20261110o"></script>
-<script src="assets/seed-trade.js?v=20261110o"></script>
-<script src="assets/admin-data.js?v=20261110o"></script>
-<script src="assets/school-housing-data.js?v=20261110o"></script>
-<script src="assets/programs-data.js?v=20261110o"></script>
-<script src="assets/notify.js?v=20261110o"></script>
-<script src="assets/kmap.js?v=20261110o"></script>
+<script src="assets/common.js?v=20261110p"></script>
+<script src="assets/db.js?v=20261110p"></script>
+<script src="assets/seed-trade.js?v=20261110p"></script>
+<script src="assets/admin-data.js?v=20261110p"></script>
+<script src="assets/school-housing-data.js?v=20261110p"></script>
+<script src="assets/programs-data.js?v=20261110p"></script>
+<script src="assets/notify.js?v=20261110p"></script>
+<script src="assets/kmap.js?v=20261110p"></script>
 <script>
 /* ── 학교 연계·체류형 집 ── */
 (function(){
@@ -264,10 +264,21 @@
       '<div class="jm-meta">학교에서 가까운 숙소·생활 시설과 제주이음 매물을 모았어요. 숙소·시설은 카카오맵 정보예요.</div>' +
       '<div class="nb-r">반경 <button type="button" data-r="2000">2km</button><button type="button" data-r="3000" class="on">3km</button><button type="button" data-r="5000">5km</button></div>' +
       '<div id="nb-map" class="nb-map"><p class="km-none">지도를 불러오는 중…</p></div>' +
-      '<div class="nb-sec"><h4>🏠 제주이음 연세·매물 <small id="nb-re-n"></small></h4><div id="nb-re">찾는 중…</div></div>' +
+      '<div class="nb-sec nb-home"><h4>🏡 6개월 이상 살 집</h4>' +
+        '<p class="nb-tip">농어촌유학은 6개월 단위이고 <b>배정 후 전입신고</b>를 해야 확정돼요. 연세·단기임대 집이나 마을 공동주택을 먼저 알아보세요.</p>' +
+        houseBlock() +
+        '<h5>제주이음 연세·단기임대 매물 <small id="nb-re-n"></small></h5><div id="nb-re">찾는 중…</div></div>' +
       '<div class="nb-sec"><h4>📍 생활 시설까지 거리 <small>(학교에서 가장 가까운 곳)</small></h4><div id="nb-life" class="nb-life">찾는 중…</div></div>' +
-      '<div class="nb-sec"><h4>🧳 한달살기 숙소 <small id="nb-cnt"></small></h4><div id="nb-stay" class="nb-stay">찾는 중…</div></div>');
+      '<div class="nb-sec"><h4>🧳 집 구하기 전 임시 숙소 <small id="nb-cnt"></small></h4>' +
+        '<p class="nb-tip warn">⚠️ 펜션·민박(독채) 위주로 보여 드려요. <b>장기 숙박이 되는지, 전입신고가 되는지</b>는 숙소에 꼭 물어보세요.</p>' +
+        '<div id="nb-stay" class="nb-stay">찾는 중…</div></div>');
     box.classList.add("nb-box");
+    function houseBlock(){   // 이 학교의 마을 공동주택·학부모 주택 (학교 연계 집 목록)
+      var hs = SCHOOL_HOUSES.filter(function(h){ return h.school.indexOf(s) > -1; });
+      return '<h5>마을 공동주택·학부모 주택</h5>' + (hs.length ? hs.map(function(h){
+        return '<a class="nb-item" href="school.html?house=' + encodeURIComponent(h.id) + '" onclick="jiModalClose()"><b>' + esc(h.name) + '</b><span>' + esc([h.village, h.units, h.tel ? h.telLabel + " " + h.tel : ""].filter(Boolean).join(" · ")) + '</span><em>자세히</em></a>';
+      }).join("") : '<p class="nb-none">이 학교에 연계된 마을 공동주택은 아직 목록에 없어요. 리사무소에 빈집이 있는지 물어보는 것도 방법이에요.</p>');
+    }
     var topic = "yuhak_" + idx;
     function bellBtn(){ var on = window.JINotify && JINotify.isOn(topic);
       return '<button type="button" class="btn ' + (on ? 'soft' : 'primary') + ' nb-bell" id="nb-bell">' + (on ? '🔔 이 학교 주변 매물 알림 켜짐' : '🔔 이 학교 주변 새 매물 알림 받기') + '</button>'; }
@@ -310,7 +321,8 @@
           var dLat = R / 111000, dLng = R / (111000 * Math.cos(lat * Math.PI / 180));
           var job = STAY_CACHE[key] || (STAY_CACHE[key] = rectAll([lat - dLat, lng - dLng], [lat + dLat, lng + dLng], 0).then(function(rows){
             var seen = {}, out = [];
-            rows.forEach(function(p){ if (seen[p.id]) return; seen[p.id] = 1; p.dist = Math.round(hav(lat, lng, +p.y, +p.x)); if (p.dist <= R) out.push(p); });
+            rows.forEach(function(p){ if (seen[p.id]) return; seen[p.id] = 1; if (/게스트하우스|호텔|모텔|리조트|여관|캠핑/.test(p.category_name || "")) return;   // 가족 장기 체류에 안 맞는 곳은 뺌
+              p.dist = Math.round(hav(lat, lng, +p.y, +p.x)); if (p.dist <= R) out.push(p); });
             return out.sort(function(a, b){ return a.dist - b.dist; });
           }));
           job.then(function(all){
@@ -321,7 +333,7 @@
           });
         }
         var STAYS = [], stayQ = "", stayT = "";
-        var TYPES = ["펜션", "민박", "게스트하우스", "호텔", "리조트", "모텔"];
+        var TYPES = ["펜션", "민박"];
         function typeOf(p){ var c = p.category_name || ""; for (var i = 0; i < TYPES.length; i++) if (c.indexOf(TYPES[i]) > -1) return TYPES[i]; return "기타"; }
         function drawStays(){
           var cnt = {}; STAYS.forEach(function(p){ var t = typeOf(p); cnt[t] = (cnt[t] || 0) + 1; });
@@ -342,7 +354,7 @@
           marks.forEach(function(m, i){ var p = STAYS[i]; m.setVisible(!stayT && !stayQ || list.indexOf(p) > -1); });
           document.getElementById("nb-stay").innerHTML = list.length ? list.map(function(p){
             return '<a class="nb-item" href="' + esc(p.place_url) + '" target="_blank" rel="noopener"><b>' + esc(p.place_name) + '</b><span>' + esc((p.category_name || "").split(" > ").pop()) + (p.phone ? ' · ' + esc(p.phone) : '') + '</span><em>' + km(p.dist) + '</em></a>';
-          }).join("") : '<p class="nb-none">' + (STAYS.length ? '조건에 맞는 숙소가 없어요.' : '반경 ' + km(R) + ' 안에 등록된 숙소가 없어요. 반경을 넓혀 보세요.') + '</p>';
+          }).join("") : '<p class="nb-none">' + (STAYS.length ? '조건에 맞는 숙소가 없어요.' : '반경 ' + km(R) + ' 안에 펜션·민박이 없어요. 반경을 넓혀 보세요.') + '</p>';
         }
         var LIFE = [["🏥 소아과", "kw", "소아청소년과"], ["🚑 응급실", "kw", "응급실"], ["💊 약국", "PM9"], ["🛒 마트", "MT1"], ["🏪 편의점", "CS2"], ["👶 어린이집·유치원", "PS3"], ["📚 학원", "AC5"], ["🏦 은행", "BK9"]];
         var lifeOut = LIFE.map(function(){ return null; }), left = LIFE.length;
