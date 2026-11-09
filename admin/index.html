@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261110a">
+<link rel="stylesheet" href="../assets/style.css?v=20261110b">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -198,6 +198,7 @@ table.mem-t td small{font-size:13px}
 .bulk-bar{display:none;align-items:center;gap:8px;flex-wrap:wrap;background:#fff4f2;border:1px solid #f6d0cb;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:14px}
 .bulk-bar.on{display:flex}.bulk-bar b{margin-right:auto;color:#b4372d}
 .mc-ck{width:18px;height:18px;flex:none}.mc-ck + b{flex:1}
+.req-click{cursor:pointer}.req-click:hover{border-color:var(--sea-200,#a6cef4)}.req-sum{font-weight:700;font-size:14.5px;margin:6px 0 2px}.req-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 </style>
 </head>
 <body data-admin>
@@ -206,16 +207,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261110a"></script>
-<script src="../assets/db.js?v=20261110a"></script>
-<script src="../assets/notify.js?v=20261110a"></script>
-<script src="../assets/seed-trade.js?v=20261110a"></script>
-<script src="../assets/seed-extra.js?v=20261110a"></script>
-<script src="../assets/seed-new.js?v=20261110a"></script>
-<script src="../assets/seed-comments.js?v=20261110a"></script>
-<script src="../assets/photos.js?v=20261110a"></script>
-<script src="../assets/admin-data.js?v=20261110a"></script>
-<script src="../assets/op-posts.js?v=20261110a"></script>
+<script src="../assets/common.js?v=20261110b"></script>
+<script src="../assets/db.js?v=20261110b"></script>
+<script src="../assets/notify.js?v=20261110b"></script>
+<script src="../assets/seed-trade.js?v=20261110b"></script>
+<script src="../assets/seed-extra.js?v=20261110b"></script>
+<script src="../assets/seed-new.js?v=20261110b"></script>
+<script src="../assets/seed-comments.js?v=20261110b"></script>
+<script src="../assets/photos.js?v=20261110b"></script>
+<script src="../assets/admin-data.js?v=20261110b"></script>
+<script src="../assets/op-posts.js?v=20261110b"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -649,9 +650,23 @@ function drawSellers(){
       var act = r.status === "pending"
         ? '<div class="acts"><button class="mb pri" onclick="decide(\'' + r.id + '\',\'approved\')">승인</button><button class="mb del" onclick="decide(\'' + r.id + '\',\'rejected\')">반려</button></div>'
         : (r.status === "approved" ? '<span class="st-ok">✓ 승인됨</span>' : '<span class="st-no">✕ 반려됨</span>');
-      return '<div class="req"><div class="rh"><b>' + esc(r.nick) + '</b><span class="bd">' + esc(r.board) + '</span><span style="margin-left:auto;color:var(--ink-4);font-size:12.5px">' + esc(r.date) + ' · ' + esc(r.email) + '</span></div>' +
-        '<div class="msg">' + esc(r.message) + '</div>' + act + '</div>';
+      var d = r.details || {}, sum = [d["상호명"], d["업종"], d["위치"] || d["공구상품"]].filter(Boolean).join(" · ");
+      return '<div class="req req-click" onclick="if(!event.target.closest(\'button\'))showReq(\'' + r.id + '\')"><div class="rh"><b>' + esc(r.nick) + '</b><span class="bd">' + esc(r.board) + '</span><span style="margin-left:auto;color:var(--ink-4);font-size:12.5px">' + esc(r.date) + ' · ' + esc(r.email) + '</span></div>' +
+        (sum ? '<div class="req-sum">' + esc(sum) + '</div>' : '') + '<div class="msg req-clamp">' + esc(r.message) + '</div><span class="iq-more">자세히 보기 ›</span>' + act + '</div>';
     }).join("") : '<div class="empty">해당하는 요청이 없습니다.</div>') + '</div>';
+}
+/* 판매자 승인 요청 자세히 보기 */
+function showReq(id){
+  var r = JI.get("seller_requests", []).filter(function(x){ return x.id === id; })[0]; if (!r) return;
+  var d = r.details || {}, rows = Object.keys(d).filter(function(k){ return d[k] !== "" && d[k] != null; });
+  var L = { pending: "대기중", approved: "승인됨", rejected: "반려됨" };
+  showModal('<h3>' + esc(r.board) + ' 승인 요청 <span class="bd">' + esc(L[r.status] || r.status) + '</span></h3>' +
+    '<div class="iq-meta">' + esc(r.date) + ' · 회원 <b>' + esc(r.nick) + '</b> · ' + esc(r.email) + (r.region ? ' · ' + esc(r.region) : '') + '</div>' +
+    (rows.length ? '<table class="iq-dl">' + rows.map(function(k){ return '<tr><th>' + esc(k) + '</th><td>' + esc(d[k]) + '</td></tr>'; }).join("") + '</table>' : '') +
+    '<div class="iq-msg">' + (esc(r.note || (rows.length ? "" : r.message)) || '<span style="color:var(--ink-4)">남긴 말 없음</span>') + '</div>' +
+    '<div class="bt">' + (r.uid && typeof msgTo === "function" ? '<button class="mb" style="margin-right:auto" onclick="msgTo(\'' + r.uid + '\',\'' + esc(r.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>' : '') +
+      (r.status === "pending" ? '<button class="mb del" onclick="closeModal();decide(\'' + r.id + '\',\'rejected\')">반려</button><button class="mb pri" onclick="closeModal();decide(\'' + r.id + '\',\'approved\')">승인</button>' : '') +
+      '<button class="mb" onclick="closeModal()">닫기</button></div>');
 }
 function decide(id, status){
   var reqs = JI.get("seller_requests", []);
@@ -1030,8 +1045,9 @@ if (SRV) {
       JIDB.call("admin_sellers").then(function(l){
         _set.call(JI, "seller_requests", l.reverse().map(function(r){
           var det = r.details && typeof r.details === "object" ? Object.keys(r.details).map(function(k){ return k + ": " + r.details[k]; }).join("\n") : "";
-          return { id: r.id, board: r.board, nick: r.applicant_nick, email: r.email, region: r.region, status: r.status,
-            date: (r.created_at || "").slice(0, 10), message: (det ? det + "\n" : "") + (r.message || "") };
+          return { id: r.id, board: r.board, nick: r.applicant_nick, email: r.email, region: r.region, status: r.status, uid: r.applicant,
+            date: (r.created_at || "").slice(0, 16).replace("T", " "), details: r.details && typeof r.details === "object" ? r.details : null, note: r.message || "",
+            message: (det ? det + "\n" : "") + (r.message || "") };
         }));
       }),
       JIDB.call("admin_users").then(function(l){ USERS = l; })
