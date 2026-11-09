@@ -35,7 +35,7 @@ jobs:
           python3 -c 'import json,os
           s=lambda v:[x.strip() for x in v.split(",") if x.strip()]
           d={"key":os.environ["KEY"],"op":os.environ["OP"],"ids":s(os.environ["IDS"]),"cids":s(os.environ["CIDS"])}
-          if d["op"] in ("op_upload","op_reorder"): d["posts"]=json.load(open("op.json"))
+          if d["op"] in ("op_upload","op_reorder","op_sync"): d["posts"]=json.load(open("op.json"))
           json.dump(d,open("body.json","w"))'
           curl -sS --max-time 40 -H "Content-Type: text/plain" --data-binary @body.json "https://andend07.mycafe24.com/jeju/api/?a=maint" > r.json
           python3 -c 'import json

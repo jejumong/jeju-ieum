@@ -205,6 +205,18 @@ case 'maint': {
     }
     out(['as' => $a['nick'], 'uploaded' => $n, 'skipped' => $skip]);
   }
+  if ($op === 'op_sync') {   // 초안 파일에서 고친 제목·본문·말머리를 이미 올린 운영자 글에 반영 (게시판은 그대로)
+    $map = [];
+    foreach (all("SELECT id, title, content, head, extra FROM ji_posts WHERE extra LIKE '%\"op\"%'") as $r) { $x = json_decode($r['extra'] ?: '{}', true); if (!empty($x['op'])) $map[$x['op']] = $r; }
+    $n = []; 
+    foreach ((array)($R['posts'] ?? []) as $p) {
+      $k = (string)($p['k'] ?? ''); if (!isset($map[$k]) || !in_array($k, (array)($R['ids'] ?? []), true)) continue; $r = $map[$k];   // ids 에 적은 글만 (관리자 콘솔에서 고친 다른 글은 건드리지 않음)
+      $t = str($p['title'] ?? '', 120); $c = str($p['content'] ?? '', 20000); $h = str($p['head'] ?? '', 30);
+      if ($t === $r['title'] && $c === $r['content'] && $h === $r['head']) continue;
+      q("UPDATE ji_posts SET title = ?, content = ?, head = ?, updated_at = ? WHERE id = ?", [$t, $c, $h, now(), $r['id']]); $n[] = $k;
+    }
+    out(['updated' => $n]);
+  }
   if ($op === 'op_reorder') {   // 운영자 글 시각을 초안 순서대로 1분씩 벌려 정렬 (목록 위쪽 글이 가장 최근)
     $keys = array_map(function($p){ return (string)($p['k'] ?? ''); }, (array)($R['posts'] ?? []));
     $rows = all("SELECT id, extra, created_at FROM ji_posts WHERE extra LIKE '%\"op\"%'");
