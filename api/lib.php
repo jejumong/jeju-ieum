@@ -167,6 +167,21 @@ function me($req, $need = true) {
 }
 /* 역할: user 일반 · realtor 부동산 중개인 · shop 상점판매자 · dealer 공구판매자 · staff 스텝 · admin 관리자 */
 const JI_ROLES = ['user', 'realtor', 'shop', 'dealer', 'staff', 'admin'];
+/* 알림 주제(태그)를 켠 기기에 푸시 — 예: 학교 주변 새 매물 'yuhak_3' */
+function push_tag($tag, $title, $body, $link) {
+  global $CFG;
+  if (empty($CFG['onesignal_key']) || !function_exists('curl_init')) return;
+  $payload = json_encode(['app_id' => $CFG['onesignal_app'], 'target_channel' => 'push',
+    'filters' => [['field' => 'tag', 'key' => $tag, 'relation' => 'exists']],
+    'headings' => ['en' => $title, 'ko' => $title], 'contents' => ['en' => $body, 'ko' => $body],
+    'url' => rtrim($CFG['site_url'], '/') . '/' . ltrim($link, '/')], JSON_UNESCAPED_UNICODE);
+  $c = curl_init('https://api.onesignal.com/notifications');
+  curl_setopt_array($c, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 3, CURLOPT_TIMEOUT => 4,
+    CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Key ' . $CFG['onesignal_key']]]);
+  @curl_exec($c); @curl_close($c);
+}
+/* 농어촌유학 학교 (school-housing-data.js 의 YUHAK_SCHOOLS 와 같은 순서) */
+const YUHAK_BASES = ['귀덕', '송당', '평대', '하도', '성읍', '신례', '창천', '흥산', '구좌중앙', '종달', '한동', '대정서', '무릉', '수산'];
 /* 운영자처럼 보이는 닉네임은 일반 회원이 못 씀 */
 function reserved_nick($n) { $k = preg_replace('/\s+/u', '', mb_strtolower($n)); return (bool)preg_match('/제주이음|운영자|관리자|운영진|admin/u', $k); }
 function is_mod($u) { return in_array($u['role'] ?? '', ['admin', 'staff'], true); }   // 글·댓글 관리 가능

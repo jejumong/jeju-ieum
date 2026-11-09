@@ -347,6 +347,11 @@ case 'post_create': {
     $x = $R['extra']; $x['photos'] = attach_photos($id, $u['id'], $x['photos'], is_mod($u));
     q("UPDATE ji_posts SET extra = ? WHERE id = ?", [json_encode($x, JSON_UNESCAPED_UNICODE), $id]);
   }
+  if ($b === '부동산') {   // 학교 주변 매물 알림: 글·주소에 학교 마을 이름이 있으면 그 학교 알림을 켠 사람에게
+    $txt = $title . ' ' . ($R['content'] ?? '') . ' ' . ($R['loc'] ?? '') . ' ' . (($R['extra'] ?? [])['addr'] ?? '');
+    foreach (YUHAK_BASES as $i => $base) if (mb_strpos($txt, $base) !== false)
+      push_tag('yuhak_' . $i, '제주이음 · ' . $base . '초 주변 새 매물', mb_substr($title, 0, 60), 'view.html?id=' . $id);
+  }
   $isTrade = in_array($b, ['구인구직', '중고사고팔기', '부동산', '제주상점', '특가공구'], true);
   alert_admins($isTrade ? 'trade' : 'post', ($isTrade ? '🏷️ ' : '📝 ') . $b . ' 새 글', $u['nick'] . '님: ' . mb_substr($title, 0, 60), 'view.html?id=' . $id, $u['id']);
   out(post_out(one("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));

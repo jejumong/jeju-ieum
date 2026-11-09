@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110k">
+<link rel="stylesheet" href="assets/style.css?v=20261110l">
 <meta name="description" content="제주 작은학교 살리기 마을 공동주택, 학교 연계 주택, 농어촌유학 학교, 체류형 지원을 한곳에 정리했습니다. 주소·입주 조건·비용·문의처와 빈자리 무료 알림.">
 <link rel="canonical" href="https://jejuieum.com/school.html">
 </head>
@@ -64,13 +64,14 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261110k"></script>
-<script src="assets/db.js?v=20261110k"></script>
-<script src="assets/seed-trade.js?v=20261110k"></script>
-<script src="assets/admin-data.js?v=20261110k"></script>
-<script src="assets/school-housing-data.js?v=20261110k"></script>
-<script src="assets/programs-data.js?v=20261110k"></script>
-<script src="assets/notify.js?v=20261110k"></script>
+<script src="assets/common.js?v=20261110l"></script>
+<script src="assets/db.js?v=20261110l"></script>
+<script src="assets/seed-trade.js?v=20261110l"></script>
+<script src="assets/admin-data.js?v=20261110l"></script>
+<script src="assets/school-housing-data.js?v=20261110l"></script>
+<script src="assets/programs-data.js?v=20261110l"></script>
+<script src="assets/notify.js?v=20261110l"></script>
+<script src="assets/kmap.js?v=20261110l"></script>
 <script>
 /* ── 학교 연계·체류형 집 ── */
 (function(){
@@ -246,12 +247,102 @@
       .filter(function(p){ return ((p.title||"") + (p.content||"") + (p.loc||"")).indexOf(s.replace(/초$/, "")) > -1; }).length;
     return '<div class="yu"><div class="yu-top"><b>' + esc(full) + '</b>' + (house ? '<span class="hst ask">연계 주택 있음</span>' : '') + '</div>' +
       '<div class="yu-links">' +
-        '<a href="https://map.kakao.com/?q=' + q("제주 " + full) + '" target="_blank" rel="noopener">🗺️ 위치</a>' +
-        '<a href="https://search.naver.com/search.naver?query=' + q(full + " 근처 연세") + '" target="_blank" rel="noopener">🏠 연세 검색</a>' +
-        '<a href="https://search.naver.com/search.naver?query=' + q(full + " 한달살기") + '" target="_blank" rel="noopener">🧳 한달살기 검색</a>' +
+        '<button type="button" class="yu-main" data-nb="' + esc(s) + '">🏡 학교 주변 살기 정보 <small>숙소 · 생활 시설 · 매물</small></button>' +
+        '<a href="https://map.kakao.com/?q=' + q("제주 " + full) + '" target="_blank" rel="noopener">🗺️ 카카오맵</a>' +
         '<a href="realestate.html?q=' + q(s.replace(/초$/, "")) + '">💬 제주이음 매물 ' + mine + '</a>' +
       '</div></div>';
   }).join("");
+
+  document.getElementById("yu-grid").addEventListener("click", function(e){ var b = e.target.closest("[data-nb]"); if (b) nearby(b.dataset.nb); });
+
+  /* ── 학교 주변 살기 정보: 반경 안 숙소(카카오) · 생활 시설 거리 · 제주이음 매물 + 알림 ── */
+  function km(m){ m = +m; return m < 1000 ? m + "m" : (m / 1000).toFixed(1).replace(/\.0$/, "") + "km"; }
+  function hav(a, b, c, d){ var R = 6371000, r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2); return 2 * R * Math.asin(Math.sqrt(x * x + Math.cos(a * r) * Math.cos(c * r) * y * y)); }
+  function nearby(s){
+    var full = s.replace(/초$/, "초등학교"), base = s.replace(/초$/, ""), idx = YUHAK_SCHOOLS.indexOf(s), R = 3000;
+    var box = jiModal('<div class="jm-h">🏫 ' + esc(full) + ' 주변 살기 정보</div>' +
+      '<div class="jm-meta">학교에서 가까운 숙소·생활 시설과 제주이음 매물을 모았어요. 숙소·시설은 카카오맵 정보예요.</div>' +
+      '<div class="nb-r">반경 <button type="button" data-r="2000">2km</button><button type="button" data-r="3000" class="on">3km</button><button type="button" data-r="5000">5km</button></div>' +
+      '<div id="nb-map" class="nb-map"><p class="km-none">지도를 불러오는 중…</p></div>' +
+      '<div class="nb-sec"><h4>🏠 제주이음 연세·매물 <small id="nb-re-n"></small></h4><div id="nb-re">찾는 중…</div></div>' +
+      '<div class="nb-sec"><h4>📍 생활 시설까지 거리 <small>(학교에서 가장 가까운 곳)</small></h4><div id="nb-life" class="nb-life">찾는 중…</div></div>' +
+      '<div class="nb-sec"><h4>🧳 한달살기 숙소 <small id="nb-cnt"></small></h4><div id="nb-stay" class="nb-stay">찾는 중…</div></div>');
+    box.classList.add("nb-box");
+    var topic = "yuhak_" + idx;
+    function bellBtn(){ var on = window.JINotify && JINotify.isOn(topic);
+      return '<button type="button" class="btn ' + (on ? 'soft' : 'primary') + ' nb-bell" id="nb-bell">' + (on ? '🔔 이 학교 주변 매물 알림 켜짐' : '🔔 이 학교 주변 새 매물 알림 받기') + '</button>'; }
+    function bindBell(){ var b = document.getElementById("nb-bell"); if (b) b.onclick = function(){ JINotify.openSheet({ topic: topic, label: full + " 주변 매물", status: "", onChange: function(){ var w = document.getElementById("nb-bell"); if (w) { w.outerHTML = bellBtn(); bindBell(); } } }); }; }
+    JIMap.load().then(function(ok){
+      if (!ok) { document.getElementById("nb-map").innerHTML = '<p class="km-none">지도를 불러오지 못했어요. <a href="https://map.kakao.com/?q=' + q("제주 " + full) + '" target="_blank" rel="noopener">카카오맵에서 보기</a></p>'; ["nb-life", "nb-stay"].forEach(function(id){ document.getElementById(id).textContent = "지도 정보를 불러오지 못했어요."; }); drawRe(null); return; }
+      var K = kakao.maps, svc = new K.services.Places(), geo = new K.services.Geocoder();
+      svc.keywordSearch(full, function(r, st){
+        var hit = st === K.services.Status.OK ? (r.filter(function(x){ return x.address_name.indexOf("제주") > -1 && x.place_name.indexOf(full) > -1; })[0] || r.filter(function(x){ return x.address_name.indexOf("제주") > -1; })[0]) : null;
+        if (!hit) { document.getElementById("nb-map").innerHTML = '<p class="km-none">학교 위치를 찾지 못했어요.</p>'; drawRe(null); return; }
+        var lat = +hit.y, lng = +hit.x, C = new K.LatLng(lat, lng);
+        var el = document.getElementById("nb-map"); el.innerHTML = "";
+        var map = new K.Map(el, { center: C, level: 7 });
+        new K.Marker({ map: map, position: C, title: full, image: new K.MarkerImage("https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", new K.Size(24, 35)) });
+        var circle = new K.Circle({ map: map, center: C, radius: R, strokeWeight: 2, strokeColor: "#1f74d0", strokeOpacity: .7, fillColor: "#1f74d0", fillOpacity: .06 });
+        var marks = [], info = new K.InfoWindow({ removable: true });
+        function stays(){
+          marks.forEach(function(m){ m.setMap(null); }); marks = []; var all = [];
+          document.getElementById("nb-stay").textContent = "찾는 중…";
+          svc.categorySearch("AD5", function(d, st2, pg){
+            if (st2 === K.services.Status.OK) all = all.concat(d);
+            if (st2 === K.services.Status.OK && pg && pg.hasNextPage && all.length < 45) return pg.nextPage();
+            document.getElementById("nb-cnt").textContent = all.length ? "· 반경 " + km(R) + " 안 " + all.length + (all.length >= 45 ? "곳 이상" : "곳") : "";
+            all.forEach(function(p){ var m = new K.Marker({ map: map, position: new K.LatLng(+p.y, +p.x), title: p.place_name }); marks.push(m);
+              K.event.addListener(m, "click", function(){ info.setContent('<div style="padding:6px 10px;font-size:13px;white-space:nowrap"><b>' + esc(p.place_name) + '</b><br>' + km(p.distance) + ' · <a href="' + p.place_url + '" target="_blank">카카오맵</a></div>'); info.open(map, m); }); });
+            document.getElementById("nb-stay").innerHTML = all.length ? all.map(function(p){
+              return '<a class="nb-item" href="' + esc(p.place_url) + '" target="_blank" rel="noopener"><b>' + esc(p.place_name) + '</b><span>' + esc((p.category_name || "").split(" > ").pop()) + (p.phone ? ' · ' + esc(p.phone) : '') + '</span><em>' + km(p.distance) + '</em></a>';
+            }).join("") : '<p class="nb-none">반경 ' + km(R) + ' 안에 등록된 숙소가 없어요. 반경을 넓혀 보세요.</p>';
+          }, { location: C, radius: R, sort: K.services.SortBy.DISTANCE });
+        }
+        var LIFE = [["🏥 소아과", "kw", "소아청소년과"], ["🚑 응급실", "kw", "응급실"], ["💊 약국", "PM9"], ["🛒 마트", "MT1"], ["🏪 편의점", "CS2"], ["👶 어린이집·유치원", "PS3"], ["📚 학원", "AC5"], ["🏦 은행", "BK9"]];
+        var lifeOut = LIFE.map(function(){ return null; }), left = LIFE.length;
+        function lifeDraw(){ document.getElementById("nb-life").innerHTML = LIFE.map(function(l, i){ var p = lifeOut[i];
+          return '<div class="nb-l"><b>' + l[0] + '</b>' + (p ? '<a href="' + esc(p.place_url) + '" target="_blank" rel="noopener"><em>' + km(p.distance) + '</em> ' + esc(p.place_name) + '</a>' : '<span>' + (left ? '…' : '20km 안에 없음') + '</span>') + '</div>'; }).join(""); }
+        LIFE.forEach(function(l, i){
+          var cb = function(d, st3){ if (st3 === K.services.Status.OK && d.length) lifeOut[i] = d[0]; left--; lifeDraw(); };
+          var opt = { location: C, radius: 20000, sort: K.services.SortBy.DISTANCE, size: 1 };
+          if (l[1] === "kw") svc.keywordSearch(l[2], cb, opt); else svc.categorySearch(l[1], cb, opt);
+        });
+        lifeDraw(); stays();
+        document.querySelectorAll(".nb-r [data-r]").forEach(function(b){ b.onclick = function(){
+          document.querySelectorAll(".nb-r [data-r]").forEach(function(x){ x.classList.toggle("on", x === b); });
+          R = +b.dataset.r; circle.setRadius(R); map.setLevel(R > 3000 ? 8 : R > 2000 ? 7 : 6); map.setCenter(C); stays(); drawRe({ lat: lat, lng: lng, geo: geo });
+        }; });
+        drawRe({ lat: lat, lng: lng, geo: geo });
+      });
+    });
+    /* 제주이음 매물: 주소로 거리 계산 (반경 안) + 글에 학교·마을 이름이 있으면 함께 */
+    function drawRe(P){
+      var list = userPostsOf("부동산").concat(TRADE_SEEDS.filter(function(p){ return p.board === "부동산"; }));
+      var near = [], pend = 0, cache = {};
+      try { cache = JSON.parse(sessionStorage.getItem("nb_geo") || "{}"); } catch (e) {}
+      function out(){
+        if (pend) return;
+        try { sessionStorage.setItem("nb_geo", JSON.stringify(cache)); } catch (e) {}
+        near.sort(function(a, b){ return (a.d == null ? 1e9 : a.d) - (b.d == null ? 1e9 : b.d); });
+        document.getElementById("nb-re-n").textContent = near.length ? "· " + near.length + "건" : "";
+        document.getElementById("nb-re").innerHTML = (near.length ? near.map(function(x){ var p = x.p;
+          return '<a class="nb-item" href="view.html?id=' + encodeURIComponent(p.id) + '"><b>' + esc(p.title) + '</b><span>' + esc([p.head, p.price, p.loc].filter(Boolean).join(" · ")) + '</span><em>' + (x.d != null ? km(Math.round(x.d)) : '동네') + '</em></a>';
+        }).join("") : '<p class="nb-none">아직 이 학교 반경 ' + km(R) + ' 안에 올라온 매물이 없어요.</p>') +
+          '<div class="nb-acts">' + bellBtn() + '<a class="btn ghost" href="write.html?board=' + encodeURIComponent("부동산") + '">✏️ 매물 올리기</a></div>';
+        bindBell();
+      }
+      list.forEach(function(p){
+        var txt = (p.title || "") + (p.content || "") + (p.loc || "") + (p.addr || ""), named = txt.indexOf(base) > -1;
+        var a = p.addr || "";
+        if (P && a) {
+          var put = function(c){ var d = c ? hav(P.lat, P.lng, c[0], c[1]) : null; if ((d != null && d <= R) || named) near.push({ p: p, d: d }); };
+          if (cache[a] !== undefined) put(cache[a]);
+          else { pend++; P.geo.addressSearch(a, function(r, st){ cache[a] = st === kakao.maps.services.Status.OK && r.length ? [+r[0].y, +r[0].x] : null; put(cache[a]); pend--; out(); }); }
+        } else if (named) near.push({ p: p, d: null });
+      });
+      out();
+    }
+  }
 
   // 3) 체류형 지원 (장기체류·정착 지원 프로그램에서 집과 관련된 것)
   var KEYS = ["농어촌유학", "작은학교", "귀농인의 집", "농어촌민박", "청춘정거장"];
