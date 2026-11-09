@@ -2039,3 +2039,13 @@ a.act-item:hover{border-color:var(--sea-200)}
 .nb-tip.warn{background:#fff6e6;color:#8a5300}
 .nb-sec h5{font-size:13.5px;margin:12px 0 6px;color:var(--ink-2)}.nb-sec h5 small{font-weight:600;color:var(--ink-4)}
 .nb-home{border:2px solid var(--sea-100);border-radius:14px;padding:12px 14px}
+
+/* 생활·장터 전체: 상자를 누르면 게시판으로 */
+.trade-hub .hub-box{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s}
+.trade-hub .hub-box:hover{border-color:var(--sea-300,#9ed4cf);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.trade-hub .hub-box:active{transform:scale(.99)}
+.trade-hub a.hub-go{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:inherit}
+.trade-hub .hub-arrow{font-size:26px;line-height:1;font-weight:700;color:var(--sea-700);padding:0 2px 0 10px}
+@media (max-width:680px){
+  body[data-active="trade"] nav.subnav{display:none!important}
+}

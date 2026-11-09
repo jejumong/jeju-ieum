@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110r">
+<link rel="stylesheet" href="assets/style.css?v=20261110s">
 </head>
 <body data-active="trade">
 
@@ -34,14 +34,14 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261110r"></script>
-<script src="assets/db.js?v=20261110r"></script>
-<script src="assets/notify.js?v=20261110r"></script>
-<script src="assets/seed-trade.js?v=20261110r"></script>
-<script src="assets/seed-extra.js?v=20261110r"></script>
-<script src="assets/seed-new.js?v=20261110r"></script>
-<script src="assets/seed-comments.js?v=20261110r"></script>
-<script src="assets/admin-data.js?v=20261110r"></script>
+<script src="assets/common.js?v=20261110s"></script>
+<script src="assets/db.js?v=20261110s"></script>
+<script src="assets/notify.js?v=20261110s"></script>
+<script src="assets/seed-trade.js?v=20261110s"></script>
+<script src="assets/seed-extra.js?v=20261110s"></script>
+<script src="assets/seed-new.js?v=20261110s"></script>
+<script src="assets/seed-comments.js?v=20261110s"></script>
+<script src="assets/admin-data.js?v=20261110s"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
@@ -70,12 +70,18 @@
       return '<li>' + (isPremium(p) ? '<span class="chip new">AD</span>' : (p.loc ? '<span class="chip region">' + esc(String(p.loc).split(" ")[0]) + '</span>' : '')) +
         '<a href="view.html?id=' + p.id + '">' + esc(p.title) + '</a>' + (pr ? '<span class="price">' + pr + '</span>' : '<span class="meta">' + fmtDate(p.date) + '</span>') + '</li>';
     }).join("");
-    return '<section class="card' + (b[4] ? " " + b[4] : "") + '"><div class="card-head"><h2><span class="ti">' + b[2] + '</span>' + b[0] + ' <span class="tc">' + list.length + '</span></h2>' +
-      '<a href="' + b[1] + '" class="more">전체 보기 +</a></div>' +
+    return '<section class="card hub-box' + (b[4] ? " " + b[4] : "") + '" data-href="' + b[1] + '"><a class="card-head hub-go" href="' + b[1] + '"><h2><span class="ti">' + b[2] + '</span>' + b[0] + ' <span class="tc">' + list.length + '</span></h2>' +
+      '<span class="hub-arrow" aria-hidden="true">›</span></a>' +
       '<p style="font-size:13px;color:var(--ink-4);margin:-4px 0 6px">' + b[3] + '</p>' +
       '<ul>' + (items || '<li style="color:var(--ink-4)">아직 글이 없어요 · <a href="' + writeHref(b[0]) + '" style="color:var(--sea-700);font-weight:700">첫 글 올리기 →</a></li>') + '</ul></section>';
   }).join("");
   document.getElementById("hub").appendChild(document.querySelector(".biz-strip")); // 6개 + 입점 안내
+  // 상자 아무 곳이나 누르면 그 게시판으로 (글 제목·버튼을 누르면 그 글로)
+  document.getElementById("hub").addEventListener("click", function(e){
+    if (e.target.closest("a,button")) return;
+    var box = e.target.closest(".hub-box");
+    if (box) location.href = box.getAttribute("data-href");
+  });
 })();
 window.onJIData = function(){ location.reload(); };   // 새 글이 생기면 한 번 새로 그림
 </script>
