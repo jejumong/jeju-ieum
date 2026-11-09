@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109o">
+<link rel="stylesheet" href="../assets/style.css?v=20261109p">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -184,6 +184,7 @@ table.mem-t td small{font-size:13px}
 .op-main b{display:block;font-size:15px;margin:2px 0 4px}
 .op-main summary{font-size:13px;color:var(--sea-700,#1a5fae);cursor:pointer}
 .op-main pre{white-space:pre-wrap;font:inherit;font-size:13.5px;line-height:1.7;background:var(--bg-2,#f6f8fa);border-radius:10px;padding:12px;margin:8px 0 0}
+.mem-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}.mem-bar .mem-cnt{margin-left:auto;font-size:13px;color:var(--ink-3)}
 </style>
 </head>
 <body data-admin>
@@ -192,16 +193,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109o"></script>
-<script src="../assets/db.js?v=20261109o"></script>
-<script src="../assets/notify.js?v=20261109o"></script>
-<script src="../assets/seed-trade.js?v=20261109o"></script>
-<script src="../assets/seed-extra.js?v=20261109o"></script>
-<script src="../assets/seed-new.js?v=20261109o"></script>
-<script src="../assets/seed-comments.js?v=20261109o"></script>
-<script src="../assets/photos.js?v=20261109o"></script>
-<script src="../assets/admin-data.js?v=20261109o"></script>
-<script src="../assets/op-posts.js?v=20261109o"></script>
+<script src="../assets/common.js?v=20261109p"></script>
+<script src="../assets/db.js?v=20261109p"></script>
+<script src="../assets/notify.js?v=20261109p"></script>
+<script src="../assets/seed-trade.js?v=20261109p"></script>
+<script src="../assets/seed-extra.js?v=20261109p"></script>
+<script src="../assets/seed-new.js?v=20261109p"></script>
+<script src="../assets/seed-comments.js?v=20261109p"></script>
+<script src="../assets/photos.js?v=20261109p"></script>
+<script src="../assets/admin-data.js?v=20261109p"></script>
+<script src="../assets/op-posts.js?v=20261109p"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -824,6 +825,23 @@ if (SRV) {
     var R = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝" };
     var me = JIDB.me(), boss = me && me.role === "admin";
     var cnt = {}; USERS.forEach(function(u){ cnt[u.role] = (cnt[u.role] || 0) + 1; });
+    /* 정렬·지역 거르기 */
+    var RO = ["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"], ri = function(r){ var k = RO.indexOf(r); return k > -1 ? k : (r ? 50 : 99); };
+    var srt = window.MEM_SORT || "new", flt = window.MEM_REGION || "";
+    var regions = USERS.map(function(u){ return u.region || ""; }).filter(function(r, k, a){ return r && a.indexOf(r) === k; }).sort(function(a, b){ return ri(a) - ri(b) || (a < b ? -1 : 1); });
+    var LIST = USERS.filter(function(u){ return !flt || (flt === "-" ? !u.region : u.region === flt); }).slice().sort(function(a, b){
+      var ca = a.created_at || "", cb = b.created_at || "", byNew = ca < cb ? 1 : ca > cb ? -1 : 0;
+      if (srt === "old") return -byNew;
+      if (srt === "region") return ri(a.region) - ri(b.region) || ((a.region || "") < (b.region || "") ? -1 : (a.region || "") > (b.region || "") ? 1 : 0) || byNew;
+      if (srt === "posts") return (b.posts || 0) - (a.posts || 0) || byNew;
+      if (srt === "comments") return (b.comments || 0) - (a.comments || 0) || byNew;
+      return byNew;
+    });
+    var opt = function(v, t, cur){ return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>' + t + '</option>'; };
+    var bar = '<div class="toolbar mem-bar"><select onchange="MEM_SORT=this.value;drawMembers()">' +
+      opt("new", "가입일 최신순", srt) + opt("old", "가입일 오래된순", srt) + opt("region", "지역별", srt) + opt("posts", "글 많은 순", srt) + opt("comments", "댓글 많은 순", srt) + '</select>' +
+      '<select onchange="MEM_REGION=this.value;drawMembers()">' + opt("", "전체 지역", flt) + regions.map(function(r){ return opt(r, r, flt); }).join("") + opt("-", "지역 없음", flt) + '</select>' +
+      '<span class="mem-cnt">' + LIST.length + '명</span></div>';
     M().innerHTML = '<h1>회원 관리</h1><p class="sub">가입한 회원 ' + USERS.length + '명 · ' + Object.keys(ROLE_LABEL).filter(function(k){ return cnt[k]; }).map(function(k){ return ROLE_LABEL[k] + ' ' + cnt[k]; }).join(" · ") + '</p>' +
       '<div class="panel role-help"><b>역할별 권한</b><ul>' +
         '<li><b>일반</b> — 커뮤니티·거래 글쓰기, 댓글, 쪽지</li>' +
@@ -831,8 +849,8 @@ if (SRV) {
         '<li><b>상점판매자</b> — 제주상점 글쓰기 · <b>공구판매자</b> — 특가공구 글쓰기</li>' +
         '<li><b>스텝</b> — 관리자 페이지 이용, 남의 글·댓글 정리 (회원 역할은 못 바꿈)</li>' +
         '<li><b>관리자</b> — 모든 권한. GitHub Secrets 의 ADMIN_EMAILS 로만 정해져요</li></ul></div>' +
-      '<div class="panel">' + (USERS.length ? '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>댓글</th><th>가입일</th><th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
-        USERS.map(function(u){
+      '<div class="panel">' + (USERS.length ? bar + (LIST.length ? '' : '<div class="empty">이 지역 회원이 없어요.</div>') + '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>댓글</th><th>가입일</th><th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
+        LIST.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
             : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
@@ -844,7 +862,7 @@ if (SRV) {
             '<td>' + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</td></tr>';
         }).join("") + '</tbody></table></div>' +
         /* 휴대폰: 회원마다 카드 한 장 */
-        '<div class="mem-cards">' + USERS.map(function(u){
+        '<div class="mem-cards">' + LIST.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
             : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
