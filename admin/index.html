@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109w">
+<link rel="stylesheet" href="../assets/style.css?v=20261109x">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -194,6 +194,10 @@ table.mem-t td small{font-size:13px}
 .pf-ph{position:relative;cursor:pointer}.pf-ph input{position:absolute;top:6px;left:6px;width:18px;height:18px}
 .iq-pub{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin:0 0 12px;font-size:13.5px;color:var(--ink-3)}
 .iq-ftitle{display:block;font-size:15px;margin:0 0 2px}.iq-pubbed{font-size:12px;font-weight:700;color:#13865a}
+.adm-t th.ck,.adm-t td.ck{width:34px;padding-left:10px;padding-right:0}.adm-t .ck input{width:17px;height:17px;cursor:pointer;vertical-align:middle}
+.bulk-bar{display:none;align-items:center;gap:8px;flex-wrap:wrap;background:#fff4f2;border:1px solid #f6d0cb;border-radius:12px;padding:10px 14px;margin:0 0 12px;font-size:14px}
+.bulk-bar.on{display:flex}.bulk-bar b{margin-right:auto;color:#b4372d}
+.mc-ck{width:18px;height:18px;flex:none}.mc-ck + b{flex:1}
 </style>
 </head>
 <body data-admin>
@@ -202,16 +206,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109w"></script>
-<script src="../assets/db.js?v=20261109w"></script>
-<script src="../assets/notify.js?v=20261109w"></script>
-<script src="../assets/seed-trade.js?v=20261109w"></script>
-<script src="../assets/seed-extra.js?v=20261109w"></script>
-<script src="../assets/seed-new.js?v=20261109w"></script>
-<script src="../assets/seed-comments.js?v=20261109w"></script>
-<script src="../assets/photos.js?v=20261109w"></script>
-<script src="../assets/admin-data.js?v=20261109w"></script>
-<script src="../assets/op-posts.js?v=20261109w"></script>
+<script src="../assets/common.js?v=20261109x"></script>
+<script src="../assets/db.js?v=20261109x"></script>
+<script src="../assets/notify.js?v=20261109x"></script>
+<script src="../assets/seed-trade.js?v=20261109x"></script>
+<script src="../assets/seed-extra.js?v=20261109x"></script>
+<script src="../assets/seed-new.js?v=20261109x"></script>
+<script src="../assets/seed-comments.js?v=20261109x"></script>
+<script src="../assets/photos.js?v=20261109x"></script>
+<script src="../assets/admin-data.js?v=20261109x"></script>
+<script src="../assets/op-posts.js?v=20261109x"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -385,6 +389,47 @@ function thSort(label, key, cur, dir, fn, attr){
   var on = key === cur;
   return '<th' + (attr || '') + '><button class="th-s' + (on ? ' on' : '') + '" onclick="' + fn + '(\'' + key + '\')">' + label + '<i>' + (on ? (dir < 0 ? '▼' : '▲') : '↕') + '</i></button></th>';
 }
+/* ── 선택해서 한꺼번에 지우기 (게시글·문의·회원) ── */
+var BSEL = { posts: {}, iq: {}, mem: {} };
+var BULK_NOUN = { posts: "글", iq: "문의·제보", mem: "회원" };
+function bkBox(k, id, off){ return '<td class="ck">' + (off ? '' : '<input type="checkbox" class="bk" data-k="' + k + '" data-id="' + id + '"' + (BSEL[k][id] ? ' checked' : '') + '>') + '</td>'; }
+function bkAll(k){ return '<th class="ck"><input type="checkbox" class="bk-all" data-k="' + k + '" title="이 화면 전체 선택"></th>'; }
+function bkBar(k){ return '<div class="bulk-bar" id="bulk-' + k + '"></div>'; }
+function paintBulk(k){
+  var el = document.getElementById("bulk-" + k); if (!el) return;
+  var n = Object.keys(BSEL[k]).length;
+  el.classList.toggle("on", n > 0);
+  el.innerHTML = n ? '<b>' + n + '개 선택됨</b><button class="mb" onclick="bkClear(\'' + k + '\')">선택 해제</button><button class="mb del" onclick="bkDelete(\'' + k + '\')">🗑 선택한 ' + BULK_NOUN[k] + ' ' + n + '개 삭제</button>' : '';
+  var boxes = document.querySelectorAll('.bk[data-k="' + k + '"]'), all = document.querySelector('.bk-all[data-k="' + k + '"]');
+  if (all) { var on = [].filter.call(boxes, function(b){ return b.checked; }).length; all.checked = boxes.length > 0 && on === boxes.length; all.indeterminate = on > 0 && on < boxes.length; }
+}
+function bkClear(k){ BSEL[k] = {}; document.querySelectorAll('.bk[data-k="' + k + '"]').forEach(function(b){ b.checked = false; }); paintBulk(k); }
+document.addEventListener("change", function(e){
+  var t = e.target;
+  if (t.classList.contains("bk")) { if (t.checked) BSEL[t.dataset.k][t.dataset.id] = 1; else delete BSEL[t.dataset.k][t.dataset.id];
+    document.querySelectorAll('.bk[data-k="' + t.dataset.k + '"][data-id="' + t.dataset.id + '"]').forEach(function(b){ b.checked = t.checked; }); paintBulk(t.dataset.k); }
+  if (t.classList.contains("bk-all")) { document.querySelectorAll('.bk[data-k="' + t.dataset.k + '"]').forEach(function(b){ b.checked = t.checked; if (t.checked) BSEL[t.dataset.k][b.dataset.id] = 1; else delete BSEL[t.dataset.k][b.dataset.id]; }); paintBulk(t.dataset.k); }
+});
+function bkDelete(k){
+  var ids = Object.keys(BSEL[k]); if (!ids.length) return;
+  var extra = k === "mem" ? '<label style="display:flex;gap:6px;align-items:center;margin:0 0 14px;font-size:14px"><input type="checkbox" id="bk-content"> 이 회원들이 쓴 글·댓글도 함께 지우기</label>' : '';
+  var note = { posts: "회원이 쓴 글은 댓글과 함께 완전히 지워지고, 기본 글은 '삭제된 글'로 옮겨져요.", iq: "지운 문의·제보는 되살릴 수 없어요.", mem: "회원 계정이 지워져 다시 로그인할 수 없어요. 되살릴 수 없어요." }[k];
+  showModal('<h3>' + BULK_NOUN[k] + ' ' + ids.length + '개를 삭제할까요?</h3><p style="margin:0 0 14px;color:var(--ink-2);line-height:1.6">' + note + '</p>' + extra +
+    '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb del" id="bk-go">삭제</button></div>');
+  document.getElementById("bk-go").onclick = function(){
+    var btn = this; btn.disabled = true; btn.textContent = "지우는 중…";
+    var withC = k === "mem" && document.getElementById("bk-content").checked, fail = 0;
+    var one = function(id){
+      if (k === "posts") { var p = findAny(id); if (!p) return Promise.resolve(); if (p.db && window.JIDB && JIDB.enabled) return JIDB.deletePost(id); deletePost(p); return Promise.resolve(); }
+      if (k === "iq") return SRV ? JIDB.call("admin_inquiry_delete", { id: id }) : Promise.resolve(JI.set("inquiries", JI.get("inquiries", []).filter(function(q){ return q.id !== id; })));
+      return JIDB.call("admin_user_delete", { id: id, with_content: withC });
+    };
+    ids.reduce(function(pr, id){ return pr.then(function(){ return one(id).catch(function(){ fail++; }); }); }, Promise.resolve()).then(function(){
+      BSEL[k] = {}; closeModal(); toast((ids.length - fail) + "개 삭제했어요" + (fail ? " · " + fail + "개는 못 지웠어요" : ""));
+      if (typeof reloadAll === "function" && SRV) reloadAll(); else draw();
+    });
+  };
+}
 function sortPosts(k){ if (postSort === k) postDir = -postDir; else { postSort = k; postDir = -1; } postPage = 1; drawPostTable(); }
 function filteredPosts(){
   var list = everyPost();
@@ -407,7 +452,7 @@ function drawPosts(){
       '<select id="f-board">' + boardOptions(postBoard, true) + '</select>' +
       '<input type="search" id="f-q" placeholder="제목·작성자·내용 검색" value="' + esc(postQ) + '">' +
       '<span class="total" id="f-total"></span></div>' +
-    '<div class="tbl-wrap" id="post-table"></div><div class="pager" id="pager"></div></div>';
+    bkBar("posts") + '<div class="tbl-wrap" id="post-table"></div><div class="pager" id="pager"></div></div>';
   document.getElementById("f-board").value = postBoard;
   document.getElementById("f-board").onchange = function(){ postBoard = this.value; postPage = 1; drawPostTable(); };
   document.getElementById("f-q").oninput = function(){ postQ = this.value.trim(); postPage = 1; drawPostTable(); };
@@ -419,7 +464,7 @@ function drawPostTable(){
   if (postPage > pages) postPage = pages;
   var rows = list.slice((postPage-1)*PER, postPage*PER).map(function(p){
     var canPm = PREMIUM_BOARDS.indexOf(p.board) > -1;
-    return '<tr>' +
+    return '<tr>' + bkBox("posts", p.id) +
       '<td><span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></td>' +
       '<td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank" title="새 탭에서 보기">' + esc(p.title) + '</a>' +
         '<small>' + esc(p.author) + ' · 댓글 ' + cmtCount(p) + '</small></td>' +
@@ -432,12 +477,13 @@ function drawPostTable(){
   }).join("");
   document.getElementById("f-total").textContent = "총 " + list.length.toLocaleString() + "건";
   document.getElementById("post-table").innerHTML = list.length
-    ? '<table class="adm-t"><thead><tr><th>게시판</th><th>제목</th>' + thSort("날짜", "date", postSort, postDir, "sortPosts") + thSort("조회수", "views", postSort, postDir, "sortPosts") + thSort("좋아요", "likes", postSort, postDir, "sortPosts") + '<th>프리미엄</th><th>관리</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    ? '<table class="adm-t"><thead><tr>' + bkAll("posts") + '<th>게시판</th><th>제목</th>' + thSort("날짜", "date", postSort, postDir, "sortPosts") + thSort("조회수", "views", postSort, postDir, "sortPosts") + thSort("좋아요", "likes", postSort, postDir, "sortPosts") + '<th>프리미엄</th><th>관리</th></tr></thead><tbody>' + rows + '</tbody></table>'
     : '<div class="empty">조건에 맞는 글이 없습니다.</div>';
   var pg = "";
   for (var i = 1; i <= pages; i++) pg += '<button class="' + (i===postPage?'on':'') + '" onclick="postPage=' + i + ';drawPostTable();window.scrollTo(0,0)">' + i + '</button>';
   document.getElementById("pager").innerHTML = pages > 1 ? pg : "";
   bindRowControls(document.getElementById("post-table"));
+  paintBulk("posts");
 }
 function bindRowControls(root){
   root.querySelectorAll("input.num").forEach(function(inp){
@@ -729,9 +775,9 @@ if (SRV) {
   drawInquiries = function(){
     var list = JI.get("inquiries", []).slice().reverse();
     M().innerHTML = '<h1>문의·제보</h1><p class="sub">정보 정정 요청, 가이드 제보, 입점·제휴 문의가 모입니다.</p>' + IQ_HELP +
-      '<div class="panel">' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>날짜</th><th>종류</th><th>보낸 사람</th><th>내용</th><th>상태</th><th></th></tr></thead><tbody>' +
+      '<div class="panel">' + (list.length ? bkBar("iq") + '<div class="tbl-wrap"><table class="adm-t"><thead><tr>' + bkAll("iq") + '<th>날짜</th><th>종류</th><th>보낸 사람</th><th>내용</th><th>상태</th><th></th></tr></thead><tbody>' +
         list.map(function(q){
-          return '<tr class="iq-row' + (q.status === "new" ? ' iq-new' : '') + '" data-iq="' + q.id + '"><td style="white-space:nowrap">' + (q.status === "new" ? '<span class="iq-dot" title="안 읽음"></span>' : '') + esc(q.date) + '</td><td>' + iqType(q) + '</td>' +
+          return '<tr class="iq-row' + (q.status === "new" ? ' iq-new' : '') + '" data-iq="' + q.id + '">' + bkBox("iq", q.id) + '<td style="white-space:nowrap">' + (q.status === "new" ? '<span class="iq-dot" title="안 읽음"></span>' : '') + esc(q.date) + '</td><td>' + iqType(q) + '</td>' +
             '<td><b>' + esc(q.name) + '</b>' + (q.user_nick ? ' <span class="bd user">회원 ' + esc(q.user_nick) + '</span>' : ' <small>(비회원)</small>') + '<br><small>' + esc(q.contact) + '</small></td>' +
             '<td class="ttl iq-cell" onclick="showIq(\'' + q.id + '\')" title="눌러서 자세히 보기"><small>' + esc([q.stage, q.when].filter(Boolean).join(" · ")) + '</small>' +
               (q.type === "축제 제보" ? '<b class="iq-ftitle">' + esc(q.pub_title || q.title || "") + '</b>' + (q.pub_title ? ' <span class="iq-pubbed">✅ 게시됨' + (q.pub_title !== q.title && q.title ? ' · 제보 제목: ' + esc(q.title) : '') + '</span>' : '') : '') +
@@ -741,6 +787,7 @@ if (SRV) {
             '<td><div class="acts">' + (q.type === "축제 제보" && !q.pub_title ? '<button class="mb pri" onclick="pubFest(\'' + q.id + '\')">게시하기</button>' : '') + (q.user_id ? '<button class="mb" onclick="msgTo(\'' + q.user_id + '\',\'' + esc(q.user_nick || q.name).replace(/'/g, "") + '\',\'' + q.id + '\')">답장하기</button>' : '') +
             '<button class="mb" onclick="delIq(\'' + q.id + '\')">삭제</button></div></td></tr>';
         }).join("") + '</tbody></table></div>' : '<div class="empty">아직 들어온 신청이 없습니다.</div>') + '</div>';
+    paintBulk("iq");
   };
 
   /* 문의 상세 보기 */
@@ -903,12 +950,12 @@ if (SRV) {
         '<li><b>상점판매자</b> — 제주상점 글쓰기 · <b>공구판매자</b> — 특가공구 글쓰기</li>' +
         '<li><b>스텝</b> — 관리자 페이지 이용, 남의 글·댓글 정리 (회원 역할은 못 바꿈)</li>' +
         '<li><b>관리자</b> — 모든 권한. GitHub Secrets 의 ADMIN_EMAILS 로만 정해져요</li></ul></div>' +
-      '<div class="panel">' + (USERS.length ? '<div class="mem-sort-m">정렬 ' + ["created:가입일", "region:지역", "posts:글", "comments:댓글"].map(function(x){ x = x.split(":"); return '<button class="th-s' + (srt === x[0] ? ' on' : '') + '" onclick="sortMembers(\'' + x[0] + '\')">' + x[1] + '<i>' + (srt === x[0] ? (dir < 0 ? '▼' : '▲') : '↕') + '</i></button>'; }).join("") + '</div>' + '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr><th>닉네임</th><th>이메일</th>' + TH("지역", "region") + TH("글", "posts") + TH("댓글", "comments") + TH("가입일", "created") + '<th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
+      '<div class="panel">' + (USERS.length ? '<div class="mem-sort-m">정렬 ' + ["created:가입일", "region:지역", "posts:글", "comments:댓글"].map(function(x){ x = x.split(":"); return '<button class="th-s' + (srt === x[0] ? ' on' : '') + '" onclick="sortMembers(\'' + x[0] + '\')">' + x[1] + '<i>' + (srt === x[0] ? (dir < 0 ? '▼' : '▲') : '↕') + '</i></button>'; }).join("") + '</div>' + (boss ? bkBar("mem") : '') + '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr>' + (boss ? bkAll("mem") : '') + '<th>닉네임</th><th>이메일</th>' + TH("지역", "region") + TH("글", "posts") + TH("댓글", "comments") + TH("가입일", "created") + '<th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
         LIST.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
             : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
-          return '<tr><td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td>' +
+          return '<tr>' + (boss ? bkBox("mem", u.id, u.role === "admin" || (me && u.id === me.id)) : '') + '<td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td>' +
             '<td>' + (u.posts ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'posts\')">' + u.posts + '</button>' : '0') + '</td>' +
             '<td>' + (u.comments ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'comments\')">' + u.comments + '</button>' : '0') + '</td>' +
             '<td style="white-space:nowrap">' + esc((u.created_at||"").slice(0,10)) + '</td><td style="white-space:nowrap">' + esc((u.last_login||"").slice(0,10)) + '</td>' +
@@ -920,7 +967,8 @@ if (SRV) {
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
             : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
-          return '<div class="mem-card"><div class="mc-top"><b>' + esc(u.nick) + '</b>' + roleCell + '</div>' +
+          var ckm = boss && u.role !== "admin" && !(me && u.id === me.id) ? '<input type="checkbox" class="bk mc-ck" data-k="mem" data-id="' + u.id + '"' + (BSEL.mem[u.id] ? ' checked' : '') + '>' : '';
+          return '<div class="mem-card"><div class="mc-top">' + ckm + '<b>' + esc(u.nick) + '</b>' + roleCell + '</div>' +
             '<div class="mc-mail">' + esc(u.email) + '</div>' +
             '<div class="mc-meta"><span>📍 ' + esc(u.region || "-") + '</span>' +
               '<span>글 ' + (u.posts ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'posts\')">' + u.posts + '</button>' : '0') + '</span>' +
@@ -930,6 +978,7 @@ if (SRV) {
         }).join("") + '</div>'
         : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
       '<div class="panel"><h2>관리자 비밀번호</h2><p style="margin:0;color:var(--ink-3)">관리자 페이지는 사이트 회원 계정으로 들어와요. 비밀번호는 사이트의 <a href="' + SITE + 'profile.html" target="_blank">내 정보</a>에서 바꿀 수 있어요.</p></div>';
+    paintBulk("mem");
   };
   /* 회원이 쓴 글·댓글 목록 */
   window.showActivity = function(uid, kind){

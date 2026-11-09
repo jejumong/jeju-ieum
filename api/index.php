@@ -609,6 +609,23 @@ case 'admin_inquiry_pub': {   // 축제 제보를 게시한 뒤: 게시한 제�
   $d['pub_title'] = str($R['title'] ?? '', 120); $d['pub_id'] = is_uuid($R['post_id'] ?? '') ? $R['post_id'] : ''; $d['pub_at'] = date('Y-m-d H:i');
   q("UPDATE ji_inquiries SET data = ?, status = 'done' WHERE id = ?", [json_encode($d, JSON_UNESCAPED_UNICODE), $R['id']]); out(true);
 }
+case 'admin_user_delete': {   // 관리자만: 회원 탈퇴 처리 (관리자 계정·자기 자신은 못 지움). with_content 면 그 회원의 글·댓글도 지움
+  $me = admin($R, true); $id = $R['id'] ?? ''; $u = is_uuid($id) ? one("SELECT id, nick, role FROM ji_users WHERE id = ?", [$id]) : null;
+  if (!$u) fail('회원을 찾을 수 없어요', 404);
+  if ($u['role'] === 'admin' || $u['id'] === $me['id']) fail('관리자 계정은 지울 수 없어요', 403);
+  if (!empty($R['with_content'])) {
+    foreach (all("SELECT id FROM ji_posts WHERE author = ?", [$id]) as $p) {
+      q("DELETE FROM ji_posts WHERE id = ?", [$p['id']]); q("DELETE FROM ji_comments WHERE post_id = ?", [$p['id']]);
+      q("DELETE FROM ji_club_joins WHERE club_id = ?", [$p['id']]); q("DELETE FROM ji_club_notices WHERE club_id = ?", [$p['id']]); q("DELETE FROM ji_likes WHERE post_id = ?", [$p['id']]);
+      foreach (all("SELECT path FROM ji_uploads WHERE post_id = ?", [$p['id']]) as $o) remove_upload($o['path']);
+    }
+    q("DELETE FROM ji_comments WHERE author = ?", [$id]);
+  }
+  q("DELETE FROM ji_sessions WHERE user_id = ?", [$id]); q("DELETE FROM ji_notifications WHERE user_id = ?", [$id]);
+  q("DELETE FROM ji_club_joins WHERE applicant = ?", [$id]); q("DELETE FROM ji_settings WHERE k = ?", ['al:' . $id]);
+  q("DELETE FROM ji_users WHERE id = ?", [$id]);
+  out(true);
+}
 case 'admin_inquiry_set': {
   admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['new', 'seen', 'contacted', 'done'], true)) fail('상태가 올바르지 않아요');
   q("UPDATE ji_inquiries SET status = ? WHERE id = ?", [$st, $R['id'] ?? '']); out(true);
