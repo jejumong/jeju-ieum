@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109a">
+<link rel="stylesheet" href="../assets/style.css?v=20261109b">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -142,6 +142,26 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 .al-row input:checked + i::after{left:23px}
 .al-row input:focus-visible + i{outline:2px solid var(--sea-600);outline-offset:2px}
 .al-note{font-size:13px;color:var(--ink-3);margin:14px 4px 0;line-height:1.6}
+
+a.brand{text-decoration:none;color:inherit;cursor:pointer}
+/* 회원 관리: PC 는 한 줄로 */
+table.mem-t td,table.mem-t th{white-space:nowrap;overflow-wrap:normal;word-break:keep-all}
+table.mem-t td small{font-size:13px}
+.mem-cards{display:none}
+@media (max-width:760px){
+  .mem-wrap{display:none}
+  .mem-cards{display:flex;flex-direction:column;gap:10px}
+  .mem-card{border:1px solid #e6e9ee;border-radius:14px;padding:13px 14px;background:#fff}
+  .mc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .mc-top b{font-size:16px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mc-top select{max-width:140px}
+  .mc-mail{font-size:13.5px;color:var(--ink-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mc-meta{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:13.5px;color:var(--ink-2)}
+  .mc-meta span{white-space:nowrap}
+  .mc-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid #f0f2f5}
+  .mc-foot small{color:var(--ink-4);font-size:12px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .mc-foot .mb{white-space:nowrap;flex:none}
+}
 </style>
 </head>
 <body data-admin>
@@ -150,15 +170,15 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109a"></script>
-<script src="../assets/db.js?v=20261109a"></script>
-<script src="../assets/notify.js?v=20261109a"></script>
-<script src="../assets/seed-trade.js?v=20261109a"></script>
-<script src="../assets/seed-extra.js?v=20261109a"></script>
-<script src="../assets/seed-new.js?v=20261109a"></script>
-<script src="../assets/seed-comments.js?v=20261109a"></script>
-<script src="../assets/photos.js?v=20261109a"></script>
-<script src="../assets/admin-data.js?v=20261109a"></script>
+<script src="../assets/common.js?v=20261109b"></script>
+<script src="../assets/db.js?v=20261109b"></script>
+<script src="../assets/notify.js?v=20261109b"></script>
+<script src="../assets/seed-trade.js?v=20261109b"></script>
+<script src="../assets/seed-extra.js?v=20261109b"></script>
+<script src="../assets/seed-new.js?v=20261109b"></script>
+<script src="../assets/seed-comments.js?v=20261109b"></script>
+<script src="../assets/photos.js?v=20261109b"></script>
+<script src="../assets/admin-data.js?v=20261109b"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -251,7 +271,7 @@ function boot(){
   var pending = JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length;
   document.getElementById("root").innerHTML =
     '<div class="adm"><aside class="side">' +
-      '<div class="brand">' + LOGOMARK + '<div>제주이음<small>ADMIN CONSOLE</small></div></div>' +
+      '<a class="brand" href="index.html#dash" onclick="return goHome()" title="대시보드로 (새로고침)">' + LOGOMARK + '<div>제주이음<small>ADMIN CONSOLE</small></div></a>' +
       '<nav>' + MENU.map(function(m){
         return '<button data-v="' + m[0] + '" class="' + (view===m[0]?"on":"") + '" onclick="go(\'' + m[0] + '\')">' + m[1] +
           (m[0]==="sellers" && pending ? '<span class="cnt">' + pending + '</span>' : '') + (m[0]==="inquiries" && newIq() ? '<span class="cnt">' + newIq() + '</span>' : '') + '</button>';
@@ -260,6 +280,7 @@ function boot(){
     '</aside><main class="main" id="main"></main></div>';
   draw();
 }
+function goHome(){ try { history.replaceState(null, "", "#dash"); } catch (e) { location.hash = "dash"; } location.reload(); return false; }
 function go(v){ view = v; try { history.replaceState(null, "", "#" + v); } catch (e) {} boot(); window.scrollTo(0,0); }
 function draw(){ ({inquiries:drawInquiries,dash:drawDash,posts:drawPosts,notices:drawNotices,premium:drawPremium,sellers:drawSellers,trash:drawTrash,settings:drawSettings})[view](); }
 function M(){ return document.getElementById("main"); }
@@ -735,7 +756,7 @@ if (SRV) {
         '<li><b>상점판매자</b> — 제주상점 글쓰기 · <b>공구판매자</b> — 특가공구 글쓰기</li>' +
         '<li><b>스텝</b> — 관리자 페이지 이용, 남의 글·댓글 정리 (회원 역할은 못 바꿈)</li>' +
         '<li><b>관리자</b> — 모든 권한. GitHub Secrets 의 ADMIN_EMAILS 로만 정해져요</li></ul></div>' +
-      '<div class="panel">' + (USERS.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>댓글</th><th>가입일</th><th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
+      '<div class="panel">' + (USERS.length ? '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>댓글</th><th>가입일</th><th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
         USERS.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
@@ -746,7 +767,21 @@ if (SRV) {
             '<td style="white-space:nowrap">' + esc((u.created_at||"").slice(0,10)) + '</td><td style="white-space:nowrap">' + esc((u.last_login||"").slice(0,10)) + '</td>' +
             '<td>' + roleCell + '</td>' +
             '<td>' + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</td></tr>';
-        }).join("") + '</tbody></table></div>' : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
+        }).join("") + '</tbody></table></div>' +
+        /* 휴대폰: 회원마다 카드 한 장 */
+        '<div class="mem-cards">' + USERS.map(function(u){
+          var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
+            : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
+            : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>';
+          return '<div class="mem-card"><div class="mc-top"><b>' + esc(u.nick) + '</b>' + roleCell + '</div>' +
+            '<div class="mc-mail">' + esc(u.email) + '</div>' +
+            '<div class="mc-meta"><span>📍 ' + esc(u.region || "-") + '</span>' +
+              '<span>글 ' + (u.posts ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'posts\')">' + u.posts + '</button>' : '0') + '</span>' +
+              '<span>댓글 ' + (u.comments ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'comments\')">' + u.comments + '</button>' : '0') + '</span></div>' +
+            '<div class="mc-foot"><small>가입 ' + esc((u.created_at||"").slice(0,10)) + ' · 최근 ' + esc((u.last_login||"").slice(0,10) || "-") + '</small>' +
+              (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</div></div>';
+        }).join("") + '</div>'
+        : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
       '<div class="panel"><h2>관리자 비밀번호</h2><p style="margin:0;color:var(--ink-3)">관리자 페이지는 사이트 회원 계정으로 들어와요. 비밀번호는 사이트의 <a href="' + SITE + 'profile.html" target="_blank">내 정보</a>에서 바꿀 수 있어요.</p></div>';
   };
   /* 회원이 쓴 글·댓글 목록 */
