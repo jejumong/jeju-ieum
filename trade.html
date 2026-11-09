@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110d">
+<link rel="stylesheet" href="assets/style.css?v=20261110e">
 </head>
 <body data-active="trade">
 
@@ -34,14 +34,14 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261110d"></script>
-<script src="assets/db.js?v=20261110d"></script>
-<script src="assets/notify.js?v=20261110d"></script>
-<script src="assets/seed-trade.js?v=20261110d"></script>
-<script src="assets/seed-extra.js?v=20261110d"></script>
-<script src="assets/seed-new.js?v=20261110d"></script>
-<script src="assets/seed-comments.js?v=20261110d"></script>
-<script src="assets/admin-data.js?v=20261110d"></script>
+<script src="assets/common.js?v=20261110e"></script>
+<script src="assets/db.js?v=20261110e"></script>
+<script src="assets/notify.js?v=20261110e"></script>
+<script src="assets/seed-trade.js?v=20261110e"></script>
+<script src="assets/seed-extra.js?v=20261110e"></script>
+<script src="assets/seed-new.js?v=20261110e"></script>
+<script src="assets/seed-comments.js?v=20261110e"></script>
+<script src="assets/admin-data.js?v=20261110e"></script>
 <script>
 (function(){
   function esc(s){ var d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
@@ -73,7 +73,7 @@
     return '<section class="card' + (b[4] ? " " + b[4] : "") + '"><div class="card-head"><h2><span class="ti">' + b[2] + '</span>' + b[0] + ' <span class="tc">' + list.length + '</span></h2>' +
       '<a href="' + b[1] + '" class="more">전체 보기 +</a></div>' +
       '<p style="font-size:13px;color:var(--ink-4);margin:-4px 0 6px">' + b[3] + '</p>' +
-      '<ul>' + (items || '<li style="color:var(--ink-4)">아직 글이 없어요 · <a href="write.html?board=' + encodeURIComponent(b[0]) + '" style="color:var(--sea-700);font-weight:700">첫 글 올리기 →</a></li>') + '</ul></section>';
+      '<ul>' + (items || '<li style="color:var(--ink-4)">아직 글이 없어요 · <a href="' + writeHref(b[0]) + '" style="color:var(--sea-700);font-weight:700">첫 글 올리기 →</a></li>') + '</ul></section>';
   }).join("");
   document.getElementById("hub").appendChild(document.querySelector(".biz-strip")); // 6개 + 입점 안내
 })();

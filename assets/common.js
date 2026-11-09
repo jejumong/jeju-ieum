@@ -365,11 +365,16 @@ var HEAD_CLS = { "h-info": ["정보", "꿀팁", "행정", "쇼핑·택배", "집
   "h-place": ["맛집·카페", "가볼 만한 곳"],
   "done": ["해결"] };
 function headCls(h) { for (var k in HEAD_CLS) if (HEAD_CLS[k].indexOf(h) > -1) return k; return "region"; }
+/* 글쓰기 주소 — 승인제 게시판(제주상점·특가공구)은 승인 전이면 '상점 등록·공구 신청' 양식으로 바로 (상단 버튼과 같게) */
+function writeHref(board) {
+  if (board && typeof isRestrictedBoard === "function" && isRestrictedBoard(board) && !isApprovedSeller(board)) return "seller-request.html?board=" + encodeURIComponent(board);
+  return "write.html" + (board ? "?board=" + encodeURIComponent(board) : "");
+}
 function emptyInvite(board, noun) {
   noun = noun || "글";
   var has = board && allPosts().some(function (p) { return p.board === board; });
   if (has) return '<div class="ji-empty f">조건에 맞는 ' + noun + _josa(noun, "이", "가") + ' 없어요. 필터나 검색어를 바꿔 보세요.</div>';
-  var href = "write.html" + (board ? "?board=" + encodeURIComponent(board) : "");
+  var href = writeHref(board);
   return '<div class="ji-empty"><span class="je-ico">🌱</span><b>아직 첫 ' + noun + _josa(noun, "이", "가") + ' 없어요</b>' +
     '<p>제주이음은 이제 막 문을 열었어요. 첫 ' + noun + _josa(noun, "을", "를") + ' 올려 주시면 이 자리에 가장 먼저 보여요. 등록은 무료예요.</p>' +
     '<a class="btn primary" href="' + href + '">✏️ 첫 ' + noun + ' 올리기</a></div>';
