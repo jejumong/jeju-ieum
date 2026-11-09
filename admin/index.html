@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261109p">
+<link rel="stylesheet" href="../assets/style.css?v=20261109q">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -184,7 +184,11 @@ table.mem-t td small{font-size:13px}
 .op-main b{display:block;font-size:15px;margin:2px 0 4px}
 .op-main summary{font-size:13px;color:var(--sea-700,#1a5fae);cursor:pointer}
 .op-main pre{white-space:pre-wrap;font:inherit;font-size:13.5px;line-height:1.7;background:var(--bg-2,#f6f8fa);border-radius:10px;padding:12px;margin:8px 0 0}
-.mem-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}.mem-bar .mem-cnt{margin-left:auto;font-size:13px;color:var(--ink-3)}
+.th-s{border:0;background:none;font:inherit;font-weight:inherit;color:inherit;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;letter-spacing:inherit}
+.th-s i{font-style:normal;font-size:10px;opacity:.35}.th-s.on{color:var(--sea-700,#1a5fae)}.th-s.on i{opacity:1}
+.adm-t td.dt{white-space:nowrap;font-size:13px;color:var(--ink-2,#3a4652)}.adm-t td.dt small{display:block;font-size:11.5px;color:var(--ink-4,#8a96a3)}
+.mem-sort-m{display:none;gap:14px;align-items:center;font-size:13px;color:var(--ink-3);margin:0 0 10px;flex-wrap:wrap}
+@media(max-width:760px){.mem-sort-m{display:flex}}
 </style>
 </head>
 <body data-admin>
@@ -193,16 +197,16 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261109p"></script>
-<script src="../assets/db.js?v=20261109p"></script>
-<script src="../assets/notify.js?v=20261109p"></script>
-<script src="../assets/seed-trade.js?v=20261109p"></script>
-<script src="../assets/seed-extra.js?v=20261109p"></script>
-<script src="../assets/seed-new.js?v=20261109p"></script>
-<script src="../assets/seed-comments.js?v=20261109p"></script>
-<script src="../assets/photos.js?v=20261109p"></script>
-<script src="../assets/admin-data.js?v=20261109p"></script>
-<script src="../assets/op-posts.js?v=20261109p"></script>
+<script src="../assets/common.js?v=20261109q"></script>
+<script src="../assets/db.js?v=20261109q"></script>
+<script src="../assets/notify.js?v=20261109q"></script>
+<script src="../assets/seed-trade.js?v=20261109q"></script>
+<script src="../assets/seed-extra.js?v=20261109q"></script>
+<script src="../assets/seed-new.js?v=20261109q"></script>
+<script src="../assets/seed-comments.js?v=20261109q"></script>
+<script src="../assets/photos.js?v=20261109q"></script>
+<script src="../assets/admin-data.js?v=20261109q"></script>
+<script src="../assets/op-posts.js?v=20261109q"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -370,15 +374,22 @@ function drawDash(){
 function stat(k,v){ return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
 
 /* ── 게시글 관리 ── */
-var postBoard = "all", postQ = "", postSort = "new", postPage = 1, PER = 20;
+var postBoard = "all", postQ = "", postSort = "date", postDir = -1, postPage = 1, PER = 20;
+/* 표 머리글 정렬 버튼 (누를 때마다 내림↔오름) */
+function thSort(label, key, cur, dir, fn, attr){
+  var on = key === cur;
+  return '<th' + (attr || '') + '><button class="th-s' + (on ? ' on' : '') + '" onclick="' + fn + '(\'' + key + '\')">' + label + '<i>' + (on ? (dir < 0 ? '▼' : '▲') : '↕') + '</i></button></th>';
+}
+function sortPosts(k){ if (postSort === k) postDir = -postDir; else { postSort = k; postDir = -1; } postPage = 1; drawPostTable(); }
 function filteredPosts(){
   var list = everyPost();
   if (postBoard !== "all") list = list.filter(function(p){ return p.board === postBoard; });
   if (postQ) { var k = postQ.toLowerCase(); list = list.filter(function(p){ return ((p.title||"")+" "+(p.author||"")+" "+(p.content||"")).toLowerCase().indexOf(k) > -1; }); }
   list = list.slice();
-  if (postSort === "views") list.sort(function(a,b){ return viewsOf(b) - viewsOf(a); });
-  else if (postSort === "likes") list.sort(function(a,b){ return likesOf(b) - likesOf(a); });
-  else list.sort(function(a,b){ var x = a.date + (a.time || ''), y = b.date + (b.time || ''); return x < y ? 1 : x > y ? -1 : (a.id < b.id ? 1 : -1); });
+  var byDate = function(a,b){ var x = a.date + (a.time || ''), y = b.date + (b.time || ''); return x < y ? 1 : x > y ? -1 : (a.id < b.id ? 1 : -1); };   // 최신 먼저
+  if (postSort === "views") list.sort(function(a,b){ return (viewsOf(b) - viewsOf(a)) * -postDir || byDate(a,b); });
+  else if (postSort === "likes") list.sort(function(a,b){ return (likesOf(b) - likesOf(a)) * -postDir || byDate(a,b); });
+  else list.sort(function(a,b){ return byDate(a,b) * -postDir; });
   return list;
 }
 function boardOptions(sel, withAll){
@@ -389,14 +400,11 @@ function drawPosts(){
   M().innerHTML = '<h1>게시글 관리</h1><p class="sub">모든 게시판의 글을 열람하고 수정·삭제할 수 있습니다. 조회수·좋아요 칸은 숫자를 바꾸고 Enter를 누르면 바로 저장됩니다.</p>' +
     '<div class="panel"><div class="toolbar">' +
       '<select id="f-board">' + boardOptions(postBoard, true) + '</select>' +
-      '<select id="f-sort"><option value="new">최신순</option><option value="views">조회수순</option><option value="likes">좋아요순</option></select>' +
       '<input type="search" id="f-q" placeholder="제목·작성자·내용 검색" value="' + esc(postQ) + '">' +
       '<span class="total" id="f-total"></span></div>' +
     '<div class="tbl-wrap" id="post-table"></div><div class="pager" id="pager"></div></div>';
   document.getElementById("f-board").value = postBoard;
-  document.getElementById("f-sort").value = postSort;
   document.getElementById("f-board").onchange = function(){ postBoard = this.value; postPage = 1; drawPostTable(); };
-  document.getElementById("f-sort").onchange = function(){ postSort = this.value; postPage = 1; drawPostTable(); };
   document.getElementById("f-q").oninput = function(){ postQ = this.value.trim(); postPage = 1; drawPostTable(); };
   drawPostTable();
 }
@@ -409,7 +417,8 @@ function drawPostTable(){
     return '<tr>' +
       '<td><span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></td>' +
       '<td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank" title="새 탭에서 보기">' + esc(p.title) + '</a>' +
-        '<small>' + esc(p.author) + ' · ' + esc(p.date) + (p.time ? ' ' + esc(p.time) : '') + ' · 댓글 ' + cmtCount(p) + '</small></td>' +
+        '<small>' + esc(p.author) + ' · 댓글 ' + cmtCount(p) + '</small></td>' +
+      '<td class="dt">' + esc(String(p.date || "").replace(/-/g, ".")) + (p.time ? '<small>' + esc(p.time) + '</small>' : '') + '</td>' +
       '<td><input class="num" type="number" min="0" value="' + viewsOf(p) + '" data-id="' + p.id + '" data-f="views"></td>' +
       '<td><input class="num" type="number" min="0" value="' + likesOf(p) + '" data-id="' + p.id + '" data-f="likes"></td>' +
       '<td><label class="sw' + (canPm?'':' na') + '" title="' + (canPm?'프리미엄 상단 노출':'커뮤니티 게시판은 프리미엄이 없습니다') + '"><input type="checkbox" data-pm="' + p.id + '"' + (isPremium(p)?' checked':'') + '><i></i></label></td>' +
@@ -418,7 +427,7 @@ function drawPostTable(){
   }).join("");
   document.getElementById("f-total").textContent = "총 " + list.length.toLocaleString() + "건";
   document.getElementById("post-table").innerHTML = list.length
-    ? '<table class="adm-t"><thead><tr><th>게시판</th><th>제목</th><th>조회수</th><th>좋아요</th><th>프리미엄</th><th>관리</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    ? '<table class="adm-t"><thead><tr><th>게시판</th><th>제목</th>' + thSort("날짜", "date", postSort, postDir, "sortPosts") + thSort("조회수", "views", postSort, postDir, "sortPosts") + thSort("좋아요", "likes", postSort, postDir, "sortPosts") + '<th>프리미엄</th><th>관리</th></tr></thead><tbody>' + rows + '</tbody></table>'
     : '<div class="empty">조건에 맞는 글이 없습니다.</div>';
   var pg = "";
   for (var i = 1; i <= pages; i++) pg += '<button class="' + (i===postPage?'on':'') + '" onclick="postPage=' + i + ';drawPostTable();window.scrollTo(0,0)">' + i + '</button>';
@@ -821,27 +830,22 @@ if (SRV) {
       });
     }, function(e){ document.getElementById("al-box").textContent = e.message; });
   };
+  window.sortMembers = function(k){ if ((window.MEM_SORT || "created") === k) MEM_DIR = -(window.MEM_DIR || -1); else { MEM_SORT = k; MEM_DIR = -1; } drawMembers(); };
   window.drawMembers = function(){
     var R = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝" };
     var me = JIDB.me(), boss = me && me.role === "admin";
     var cnt = {}; USERS.forEach(function(u){ cnt[u.role] = (cnt[u.role] || 0) + 1; });
-    /* 정렬·지역 거르기 */
+    /* 머리글 화살표로 정렬 */
     var RO = ["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"], ri = function(r){ var k = RO.indexOf(r); return k > -1 ? k : (r ? 50 : 99); };
-    var srt = window.MEM_SORT || "new", flt = window.MEM_REGION || "";
-    var regions = USERS.map(function(u){ return u.region || ""; }).filter(function(r, k, a){ return r && a.indexOf(r) === k; }).sort(function(a, b){ return ri(a) - ri(b) || (a < b ? -1 : 1); });
-    var LIST = USERS.filter(function(u){ return !flt || (flt === "-" ? !u.region : u.region === flt); }).slice().sort(function(a, b){
+    var srt = window.MEM_SORT || "created", dir = window.MEM_DIR || -1;
+    var LIST = USERS.slice().sort(function(a, b){
       var ca = a.created_at || "", cb = b.created_at || "", byNew = ca < cb ? 1 : ca > cb ? -1 : 0;
-      if (srt === "old") return -byNew;
-      if (srt === "region") return ri(a.region) - ri(b.region) || ((a.region || "") < (b.region || "") ? -1 : (a.region || "") > (b.region || "") ? 1 : 0) || byNew;
-      if (srt === "posts") return (b.posts || 0) - (a.posts || 0) || byNew;
-      if (srt === "comments") return (b.comments || 0) - (a.comments || 0) || byNew;
-      return byNew;
+      if (srt === "region") return (ri(a.region) - ri(b.region) || ((a.region || "") < (b.region || "") ? -1 : (a.region || "") > (b.region || "") ? 1 : 0)) * -dir || byNew;   // 처음 누르면 북→동→서→남
+      if (srt === "posts") return ((b.posts || 0) - (a.posts || 0)) * -dir || byNew;
+      if (srt === "comments") return ((b.comments || 0) - (a.comments || 0)) * -dir || byNew;
+      return byNew * -dir;
     });
-    var opt = function(v, t, cur){ return '<option value="' + v + '"' + (v === cur ? ' selected' : '') + '>' + t + '</option>'; };
-    var bar = '<div class="toolbar mem-bar"><select onchange="MEM_SORT=this.value;drawMembers()">' +
-      opt("new", "가입일 최신순", srt) + opt("old", "가입일 오래된순", srt) + opt("region", "지역별", srt) + opt("posts", "글 많은 순", srt) + opt("comments", "댓글 많은 순", srt) + '</select>' +
-      '<select onchange="MEM_REGION=this.value;drawMembers()">' + opt("", "전체 지역", flt) + regions.map(function(r){ return opt(r, r, flt); }).join("") + opt("-", "지역 없음", flt) + '</select>' +
-      '<span class="mem-cnt">' + LIST.length + '명</span></div>';
+    var TH = function(l, k){ return thSort(l, k, srt, dir, "sortMembers"); };
     M().innerHTML = '<h1>회원 관리</h1><p class="sub">가입한 회원 ' + USERS.length + '명 · ' + Object.keys(ROLE_LABEL).filter(function(k){ return cnt[k]; }).map(function(k){ return ROLE_LABEL[k] + ' ' + cnt[k]; }).join(" · ") + '</p>' +
       '<div class="panel role-help"><b>역할별 권한</b><ul>' +
         '<li><b>일반</b> — 커뮤니티·거래 글쓰기, 댓글, 쪽지</li>' +
@@ -849,7 +853,7 @@ if (SRV) {
         '<li><b>상점판매자</b> — 제주상점 글쓰기 · <b>공구판매자</b> — 특가공구 글쓰기</li>' +
         '<li><b>스텝</b> — 관리자 페이지 이용, 남의 글·댓글 정리 (회원 역할은 못 바꿈)</li>' +
         '<li><b>관리자</b> — 모든 권한. GitHub Secrets 의 ADMIN_EMAILS 로만 정해져요</li></ul></div>' +
-      '<div class="panel">' + (USERS.length ? bar + (LIST.length ? '' : '<div class="empty">이 지역 회원이 없어요.</div>') + '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr><th>닉네임</th><th>이메일</th><th>지역</th><th>글</th><th>댓글</th><th>가입일</th><th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
+      '<div class="panel">' + (USERS.length ? '<div class="mem-sort-m">정렬 ' + ["created:가입일", "region:지역", "posts:글", "comments:댓글"].map(function(x){ x = x.split(":"); return '<button class="th-s' + (srt === x[0] ? ' on' : '') + '" onclick="sortMembers(\'' + x[0] + '\')">' + x[1] + '<i>' + (srt === x[0] ? (dir < 0 ? '▼' : '▲') : '↕') + '</i></button>'; }).join("") + '</div>' + '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr><th>닉네임</th><th>이메일</th>' + TH("지역", "region") + TH("글", "posts") + TH("댓글", "comments") + TH("가입일", "created") + '<th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
         LIST.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
