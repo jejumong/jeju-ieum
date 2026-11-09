@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109k">
+<link rel="stylesheet" href="assets/style.css?v=20261109l">
 </head>
 <body data-active="">
 
@@ -140,19 +140,27 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261109k"></script>
-<script src="assets/common.js?v=20261109k"></script>
-<script src="assets/db.js?v=20261109k"></script>
-<script src="assets/notify.js?v=20261109k"></script>
-<script src="assets/seed-trade.js?v=20261109k"></script>
-<script src="assets/seed-extra.js?v=20261109k"></script>
-<script src="assets/seed-new.js?v=20261109k"></script>
-<script src="assets/seed-comments.js?v=20261109k"></script>
-<script src="assets/admin-data.js?v=20261109k"></script>
+<script src="assets/kmap.js?v=20261109l"></script>
+<script src="assets/common.js?v=20261109l"></script>
+<script src="assets/db.js?v=20261109l"></script>
+<script src="assets/notify.js?v=20261109l"></script>
+<script src="assets/seed-trade.js?v=20261109l"></script>
+<script src="assets/seed-extra.js?v=20261109l"></script>
+<script src="assets/seed-new.js?v=20261109l"></script>
+<script src="assets/seed-comments.js?v=20261109l"></script>
+<script src="assets/admin-data.js?v=20261109l"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
 var editing = null;
+/* 커뮤니티 게시판만 고를 수 있게 (거래·승인제 게시판은 목록에서 뺌) */
+function communityOnly(hint) {
+  var bs = document.getElementById("board"), keep = bs.value;
+  [].slice.call(bs.querySelectorAll("optgroup")).forEach(function (g) { if (!/^커뮤니티/.test(g.label)) g.remove(); });
+  if (COMMUNITY_MOVE.indexOf(keep) > -1) bs.value = keep;
+  var bl = document.querySelector('label[for="board"]'); if (bl) bl.innerHTML = '게시판 선택 <span class="req">*</span> <small style="font-weight:500;color:var(--ink-4)">' + hint + '</small>';
+  var ln = document.querySelector(".board-lock-note"); if (ln) ln.remove();
+}
 var COMMUNITY_MOVE = ["자유게시판", "질문하기", "최신뉴스", "생활정보", "취미·여행", "교육", "건강웰빙", "제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"];
 
 if (!user) {
@@ -221,10 +229,7 @@ if (user && editId && window.JIDB && JIDB.enabled && JIDB.isUuid(editId)) {
     if (!p || !user.id || p.authorId !== user.id) { alert("수정할 수 없는 글입니다."); location.href = "index.html"; return; }
     editing = p; fillEdit(p);
     if (COMMUNITY_MOVE.indexOf(p.board) > -1) {   // 커뮤니티 글은 커뮤니티 안의 다른 게시판으로 옮길 수 있음
-      var bs = document.getElementById("board");
-      [].slice.call(bs.querySelectorAll("optgroup")).forEach(function (g) { if (!/^커뮤니티/.test(g.label)) g.remove(); });
-      var bl = document.querySelector('label[for="board"]'); if (bl) bl.innerHTML = '게시판 <span class="req">*</span> <small style="font-weight:500;color:var(--ink-4)">다른 커뮤니티 게시판으로 옮길 수 있어요</small>';
-      var ln = document.querySelector(".board-lock-note"); if (ln) ln.remove();
+      communityOnly("다른 커뮤니티 게시판으로 옮길 수 있어요");
     } else lockBoard(p.board);
   });
 } else if (user && editId) {
@@ -268,7 +273,8 @@ function lockBoard(b) {
     document.querySelector(".board-fixed").style.display = "none";
   }
 }
-if (pre && !editing && !isRestrictedBoard(pre)) lockBoard(pre);
+if (pre && !editing && COMMUNITY_MOVE.indexOf(pre) > -1) communityOnly("커뮤니티 안의 다른 게시판도 고를 수 있어요");   // 커뮤니티에서 들어오면 커뮤니티 게시판끼리 고르기
+else if (pre && !editing && !isRestrictedBoard(pre)) lockBoard(pre);
 
 document.getElementById("board").addEventListener("change", function () {
   toggleExtra();

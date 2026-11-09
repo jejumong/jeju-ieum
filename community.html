@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109k">
+<link rel="stylesheet" href="assets/style.css?v=20261109l">
 </head>
 <body data-active="community">
 
@@ -21,7 +21,7 @@
     <h1 id="board-title">커뮤니티</h1>
     <p id="board-desc">제주 곳곳의 이웃들과 나누는 동네 이야기</p>
   </div>
-  <a class="btn accent pg-write" id="write-link" href="write.html">✏️ 글쓰기</a>
+  <a class="btn accent pg-write" id="write-link" href="write.html?board=%EC%9E%90%EC%9C%A0%EA%B2%8C%EC%8B%9C%ED%8C%90">✏️ 글쓰기</a>
 </div></div>
 
 <main class="wrap">
@@ -65,19 +65,19 @@
         <div id="post-empty"></div>
       </div>
 
-      <div class="pg-row"><div class="pagination" id="pager"></div><a class="btn accent pg-write2" id="write-link2" href="write.html">✏️ 글쓰기</a></div>
+      <div class="pg-row"><div class="pagination" id="pager"></div><a class="btn accent pg-write2" id="write-link2" href="write.html?board=%EC%9E%90%EC%9C%A0%EA%B2%8C%EC%8B%9C%ED%8C%90">✏️ 글쓰기</a></div>
     </section>
   </div>
 </main>
 
-<script src="assets/common.js?v=20261109k"></script>
-<script src="assets/db.js?v=20261109k"></script>
-<script src="assets/notify.js?v=20261109k"></script>
-<script src="assets/seed-trade.js?v=20261109k"></script>
-<script src="assets/seed-extra.js?v=20261109k"></script>
-<script src="assets/seed-new.js?v=20261109k"></script>
-<script src="assets/seed-comments.js?v=20261109k"></script>
-<script src="assets/admin-data.js?v=20261109k"></script>
+<script src="assets/common.js?v=20261109l"></script>
+<script src="assets/db.js?v=20261109l"></script>
+<script src="assets/notify.js?v=20261109l"></script>
+<script src="assets/seed-trade.js?v=20261109l"></script>
+<script src="assets/seed-extra.js?v=20261109l"></script>
+<script src="assets/seed-new.js?v=20261109l"></script>
+<script src="assets/seed-comments.js?v=20261109l"></script>
+<script src="assets/admin-data.js?v=20261109l"></script>
 <script>
 var params = new URLSearchParams(location.search);
 var board = params.get("board");
