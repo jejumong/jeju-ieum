@@ -1981,3 +1981,5 @@ a.act-item:hover{border-color:var(--sea-200)}
 .chip.h-review{background:#f1ecfd;color:#6a44c9}
 .chip.h-share{background:#e5f6f7;color:#0d7f86}
 .chip.h-free{background:#f0f2f5;color:#4d5967}
+.chip.h-news{background:#eef0fd;color:#4150c2}
+.chip.h-place{background:#fdf0e6;color:#a8560f}

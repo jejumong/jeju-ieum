@@ -356,7 +356,15 @@ function addViews(id) {
    그 게시판에 글이 하나도 없으면 '첫 글 올리기' 안내, 글은 있는데 필터에 안 맞으면 짧은 안내 */
 function _josa(w, a, b) { var c = (w || "").charCodeAt((w || "").length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28) ? a : b; }
 // 말머리별 색 (공지는 빨강 계열이라 겹치지 않게)
-function headCls(h) { return ({ "정보":"h-info", "질문":"h-ask", "후기":"h-review", "나눔":"h-share", "자유":"h-free" })[h] || "region"; }
+var HEAD_CLS = { "h-info": ["정보", "꿀팁", "행정", "쇼핑·택배", "집 관리", "학교", "방과후·학원", "농어촌유학", "병원·약국", "먹거리"],
+  "h-ask": ["질문", "집·이사", "아이·학교", "병원·건강", "일·돈", "생활"],
+  "h-review": ["후기", "고민", "마음 건강"],
+  "h-share": ["나눔", "바다", "오름·숲길", "운동", "체험"],
+  "h-free": ["자유", "일상", "인사", "취미"],
+  "h-news": ["뉴스", "공고", "날씨·재난", "교통", "동네소식"],
+  "h-place": ["맛집·카페", "가볼 만한 곳"],
+  "done": ["해결"] };
+function headCls(h) { for (var k in HEAD_CLS) if (HEAD_CLS[k].indexOf(h) > -1) return k; return "region"; }
 function emptyInvite(board, noun) {
   noun = noun || "글";
   var has = board && allPosts().some(function (p) { return p.board === board; });

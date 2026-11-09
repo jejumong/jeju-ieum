@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109l">
+<link rel="stylesheet" href="assets/style.css?v=20261109m">
 </head>
 <body data-active="">
 
@@ -140,15 +140,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261109l"></script>
-<script src="assets/common.js?v=20261109l"></script>
-<script src="assets/db.js?v=20261109l"></script>
-<script src="assets/notify.js?v=20261109l"></script>
-<script src="assets/seed-trade.js?v=20261109l"></script>
-<script src="assets/seed-extra.js?v=20261109l"></script>
-<script src="assets/seed-new.js?v=20261109l"></script>
-<script src="assets/seed-comments.js?v=20261109l"></script>
-<script src="assets/admin-data.js?v=20261109l"></script>
+<script src="assets/kmap.js?v=20261109m"></script>
+<script src="assets/common.js?v=20261109m"></script>
+<script src="assets/db.js?v=20261109m"></script>
+<script src="assets/notify.js?v=20261109m"></script>
+<script src="assets/seed-trade.js?v=20261109m"></script>
+<script src="assets/seed-extra.js?v=20261109m"></script>
+<script src="assets/seed-new.js?v=20261109m"></script>
+<script src="assets/seed-comments.js?v=20261109m"></script>
+<script src="assets/admin-data.js?v=20261109m"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -296,6 +296,14 @@ function toggleExtra() {
     "구인구직": ["구인", "알바", "재택"],
     "중고사고팔기": ["팝니다", "삽니다", "교환", "나눔", "기타"],
     "동호회": ["운동·아웃도어", "문화·취미", "육아·가족", "봉사·마을", "공부·자기계발", "기타"],
+    "자유게시판": ["선택 안 함", "자유", "일상", "인사", "후기", "나눔", "고민"],
+    "질문하기": ["선택 안 함", "질문", "집·이사", "아이·학교", "병원·건강", "일·돈", "생활", "해결"],
+    "최신뉴스": ["선택 안 함", "뉴스", "공고", "행정", "날씨·재난", "교통"],
+    "생활정보": ["선택 안 함", "정보", "꿀팁", "행정", "쇼핑·택배", "집 관리", "후기"],
+    "취미·여행": ["선택 안 함", "오름·숲길", "바다", "맛집·카페", "가볼 만한 곳", "취미", "정보", "후기"],
+    "교육": ["선택 안 함", "정보", "학교", "방과후·학원", "체험", "농어촌유학", "질문"],
+    "건강웰빙": ["선택 안 함", "정보", "병원·약국", "운동", "마음 건강", "먹거리", "질문"],
+    "제주북쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"], "제주동쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"], "제주서쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"], "제주남쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"],
     "_": ["선택 안 함", "자유", "질문", "정보", "후기", "나눔"]
   };
   var v = document.getElementById("board").value;
@@ -323,7 +331,8 @@ function toggleExtra() {
   var hs = document.getElementById("head"), cur = hs.value;
   if (!toggleExtra.done && typeof editing !== "undefined" && editing && editing.head) cur = editing.head;
   toggleExtra.done = true;
-  var opts = HEADS[v] || HEADS._;
+  var opts = (HEADS[v] || HEADS._).slice();
+  if (cur && cur !== "선택 안 함" && opts.indexOf(cur) < 0 && editing && editing.head === cur) opts.push(cur);   // 예전 말머리로 쓴 글을 고칠 때 말머리가 사라지지 않게
   hs.innerHTML = opts.map(function (o) { return "<option" + (o === cur ? " selected" : "") + ">" + o + "</option>"; }).join("");
   document.getElementById("head-label").innerHTML = v === "동호회" ? '모임 분류 <span class="req">*</span>' : (HEADS[v] && HEADS[v][0] !== "선택 안 함" ? '말머리 <span class="req">*</span>' : "말머리");
   var hint = document.getElementById("head-hint");
