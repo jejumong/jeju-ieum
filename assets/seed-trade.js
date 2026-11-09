@@ -167,7 +167,8 @@ function festStatus(p, today) {
 function activeFestivals() {
   var list = userPostsOf("축제정보").concat(TRADE_SEEDS.filter(function (p) { return p.board === "축제정보"; }));
   return list.filter(function (p) {
-    p.head = festStatus(p);
+    if (p.kind === undefined) p.kind = /^(진행중|예정|마감|만료)$/.test(p.head || "") ? "" : (p.head || "");   // 글쓴이가 고른 축제 말머리는 kind 에 보관 (head 는 진행 상태로 바뀜)
+    p.head = (p.start && p.end) || !p.kind ? festStatus(p) : "제보";   // 날짜 없는 회원 제보는 '제보'로 표시
     if (p.start && p.end) p.period = fmtPeriod(p.start, p.end);
     return p.head !== "만료";
   });
