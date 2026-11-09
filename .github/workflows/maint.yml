@@ -42,7 +42,7 @@ jobs:
           d=json.load(open("r.json"))
           if not d.get("ok"): print("오류:", d); raise SystemExit(1)
           d=d["data"]
-          if "posts" in d:
+          if isinstance(d.get("posts"), list):
               print("== 글", len(d["posts"]), "개")
               for p in d["posts"]: print(p["id"], "|", p["board"], "|", p["author_nick"], "|", p["created_at"], "|", p["title"])
               print("== 댓글", len(d["comments"]), "개")
