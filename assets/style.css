@@ -2011,3 +2011,5 @@ a.act-item:hover{border-color:var(--sea-200)}
 .role-mark{font-size:12px;margin-left:2px;vertical-align:1px;cursor:default}
 .pc-hidden{position:absolute;left:10px;bottom:10px;background:rgba(20,28,38,.82);color:#fff;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px}
 .pv-hidden{background:#fff4e5;border:1px solid #ffd59a;color:#8a4b00;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600;margin:0 0 12px}
+.pg.pg-hit{box-shadow:0 0 0 3px var(--sea),0 10px 30px rgba(31,116,208,.25);transition:box-shadow .3s}
+.pg[id^=prog-]{scroll-margin-top:140px}

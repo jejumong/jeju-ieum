@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110j">
+<link rel="stylesheet" href="assets/style.css?v=20261110k">
 </head>
 <body data-active="stay">
 
@@ -96,11 +96,11 @@
   <div class="g-grid" id="stay-guides"></div>
 </main>
 
-<script src="assets/common.js?v=20261110j"></script>
-<script src="assets/db.js?v=20261110j"></script>
-<script src="assets/guide-data.js?v=20261110j"></script>
-<script src="assets/programs-data.js?v=20261110j"></script>
-<script src="assets/notify.js?v=20261110j"></script>
+<script src="assets/common.js?v=20261110k"></script>
+<script src="assets/db.js?v=20261110k"></script>
+<script src="assets/guide-data.js?v=20261110k"></script>
+<script src="assets/programs-data.js?v=20261110k"></script>
+<script src="assets/notify.js?v=20261110k"></script>
 <script>
 /* ── 새 공고 무료 알림 (모집 시작이 반영되면 자동 발송) ── */
 (function(){
@@ -140,7 +140,7 @@ function drawPrograms(){
   drawPager(pages);
   document.getElementById("programs").innerHTML = shown.map(function(p){
     var st = PROGRAM_STATUS[p.status];
-    return '<article class="pg s-' + p.status + '"><div class="pg-head"><span class="chip region">' + esc(p.cat) + '</span>' +
+    return '<article class="pg s-' + p.status + '"' + (p.id ? ' id="prog-' + p.id + '"' : '') + '><div class="pg-head"><span class="chip region">' + esc(p.cat) + '</span>' +
       (p.tags||[]).map(function(t){ return '<span class="chip stage">' + esc(t) + '</span>'; }).join("") +
       '<span class="pst ' + st[1] + ' pg-st">' + st[0] + '</span></div>' +
       '<h3>' + (p.id ? '<a href="program/' + p.id + '.html">' + esc(p.name) + '</a>' : esc(p.name)) + '</h3><div class="pg-org">' + esc(p.org) + '</div>' +
@@ -173,6 +173,22 @@ document.getElementById("pg-filter").addEventListener("click", function(e){
   drawCats(); drawPrograms();
 });
 drawCats(); drawPrograms();
+/* stay.html#prog-p05 처럼 들어오면 그 프로그램이 있는 쪽으로 넘기고 그 자리로 스크롤 */
+function goProgram(){
+  var m = (location.hash || "").match(/^#prog-(\w+)$/); if (!m) return;
+  var list = PROGRAMS.filter(function(p){ return inCat(p, pgCat) && (!pgStatus || p.status === pgStatus); })
+    .sort(function(a, b){ return (b.top ? 1 : 0) - (a.top ? 1 : 0) || ORDER[a.status] - ORDER[b.status]; });
+  var k = list.findIndex(function(p){ return p.id === m[1]; });
+  if (k < 0) { pgCat = ""; pgStatus = ""; drawCats(); return setTimeout(goProgram, 0); }
+  pgPage = Math.floor(k / PROGRAMS_PER_PAGE) + 1; drawPrograms();
+  var el = document.getElementById("prog-" + m[1]); if (!el) return;
+  el.classList.add("open", "pg-hit");
+  setTimeout(function(){ el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 120);
+  setTimeout(function(){ el.classList.remove("pg-hit"); }, 2600);
+}
+goProgram();
+window.addEventListener("hashchange", goProgram);
+
 
 /* ── 예산 계산기 ── */
 var carMode = "rent";
