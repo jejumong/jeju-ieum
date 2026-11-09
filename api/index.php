@@ -588,6 +588,62 @@ case 'admin_overview': {
        'inquiries_new' => (int)one("SELECT COUNT(*) n FROM ji_inquiries WHERE status = 'new'")['n'],
        'sellers_pending' => (int)one("SELECT COUNT(*) n FROM ji_seller_requests WHERE status = 'pending'")['n']]);
 }
+case 'hit': {   // 방문 기록 한 줄 (로그인 필요 없음, 개인정보 없음)
+  $vid = $R['vid'] ?? ''; $path = (string)($R['path'] ?? '');
+  $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+  if (!preg_match('/^[a-z0-9]{16}$/', $vid) || $path === '' || preg_match('/bot|crawl|spider|slurp|headless/i', $ua)) out(true);
+  $path = mb_substr($path, 0, 120);
+  // 같은 사람이 같은 페이지를 10초 안에 다시 열면 한 번만
+  if (one("SELECT id FROM ji_hits WHERE vid = ? AND path = ? AND at > (NOW() - INTERVAL 10 SECOND) LIMIT 1", [$vid, $path])) out(true);
+  q("INSERT INTO ji_hits (at, vid, nw, path, title, ref, dev) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [now(), $vid, !empty($R['nw']) ? 1 : 0, $path, mb_substr((string)($R['title'] ?? ''), 0, 80), mb_substr((string)($R['ref'] ?? ''), 0, 40), ($R['dev'] ?? '') === 'm' ? 'm' : 'p']);
+  if (mt_rand(1, 500) === 1) q("DELETE FROM ji_hits WHERE at < (NOW() - INTERVAL 400 DAY)");
+  out(true);
+}
+case 'admin_traffic': {   // 관리자: 실시간·오늘·어제 방문 통계
+  admin($R);
+  $today = date('Y-m-d'); $yest = date('Y-m-d', strtotime('-1 day'));
+  $nowT = date('H:i:s');
+  $day = function ($d) {
+    $r = one("SELECT COUNT(*) pv, COUNT(DISTINCT vid) uv, COUNT(DISTINCT CASE WHEN nw = 1 THEN vid END) nv,
+      COUNT(DISTINCT CASE WHEN dev = 'm' THEN vid END) mob FROM ji_hits WHERE at >= ? AND at < ? + INTERVAL 1 DAY", [$d, $d]);
+    return ['pv' => (int)$r['pv'], 'uv' => (int)$r['uv'], 'nv' => (int)$r['nv'], 'mob' => (int)$r['mob']];
+  };
+  $hours = function ($d) {
+    $h = array_fill(0, 24, ['pv' => 0, 'uv' => 0]);
+    foreach (all("SELECT HOUR(at) h, COUNT(*) pv, COUNT(DISTINCT vid) uv FROM ji_hits WHERE at >= ? AND at < ? + INTERVAL 1 DAY GROUP BY HOUR(at)", [$d, $d]) as $r)
+      $h[(int)$r['h']] = ['pv' => (int)$r['pv'], 'uv' => (int)$r['uv']];
+    return $h;
+  };
+  $pages = function ($d) {
+    return array_map(function ($r) { return ['path' => $r['path'], 'title' => $r['title'], 'pv' => (int)$r['pv'], 'uv' => (int)$r['uv']]; },
+      all("SELECT path, MAX(title) title, COUNT(*) pv, COUNT(DISTINCT vid) uv FROM ji_hits WHERE at >= ? AND at < ? + INTERVAL 1 DAY GROUP BY path ORDER BY pv DESC LIMIT 15", [$d, $d]));
+  };
+  $refs = function ($d) {
+    return array_map(function ($r) { return ['ref' => $r['ref'], 'n' => (int)$r['n']]; },
+      all("SELECT ref, COUNT(DISTINCT vid) n FROM ji_hits WHERE at >= ? AND at < ? + INTERVAL 1 DAY AND ref <> '' GROUP BY ref ORDER BY n DESC LIMIT 12", [$d, $d]));
+  };
+  $cnt = function ($table, $d, $where = '') {
+    return (int)one("SELECT COUNT(*) n FROM $table WHERE created_at >= ? AND created_at < ? + INTERVAL 1 DAY $where", [$d, $d])['n'];
+  };
+  $act = function ($d) use ($cnt) {
+    return ['users' => $cnt('ji_users', $d), 'posts' => $cnt('ji_posts', $d), 'comments' => $cnt('ji_comments', $d),
+      'inquiries' => $cnt('ji_inquiries', $d), 'messages' => $cnt('ji_messages', $d, "AND kind = 'dm'"), 'likes' => $cnt('ji_likes', $d)];
+  };
+  $days = [];
+  foreach (all("SELECT DATE(at) d, COUNT(*) pv, COUNT(DISTINCT vid) uv FROM ji_hits WHERE at >= (CURDATE() - INTERVAL 29 DAY) GROUP BY DATE(at) ORDER BY d") as $r)
+    $days[$r['d']] = ['pv' => (int)$r['pv'], 'uv' => (int)$r['uv']];
+  $live = all("SELECT path, MAX(title) title, COUNT(DISTINCT vid) n FROM ji_hits WHERE at > (NOW() - INTERVAL 5 MINUTE) GROUP BY path ORDER BY n DESC LIMIT 8");
+  $yNow = one("SELECT COUNT(*) pv, COUNT(DISTINCT vid) uv FROM ji_hits WHERE at >= ? AND at <= ?", [$yest, $yest . ' ' . $nowT]);
+  out(['now' => iso(now()), 'today' => $today, 'yesterday' => $yest,
+    'live' => (int)one("SELECT COUNT(DISTINCT vid) n FROM ji_hits WHERE at > (NOW() - INTERVAL 5 MINUTE)")['n'],
+    'live_pages' => array_map(function ($r) { return ['path' => $r['path'], 'title' => $r['title'], 'n' => (int)$r['n']]; }, $live),
+    't' => $day($today), 'y' => $day($yest), 'y_same' => ['pv' => (int)$yNow['pv'], 'uv' => (int)$yNow['uv']],
+    't_hours' => $hours($today), 'y_hours' => $hours($yest),
+    't_pages' => $pages($today), 'y_pages' => $pages($yest), 't_refs' => $refs($today), 'y_refs' => $refs($yest),
+    't_act' => $act($today), 'y_act' => $act($yest), 'days' => $days ?: new stdClass(),
+    'since' => one("SELECT MIN(at) m FROM ji_hits")['m']]);
+}
 case 'admin_users': {
   admin($R);
   out(array_map(function ($u) { $u['created_at'] = iso($u['created_at']); $u['last_login'] = iso($u['last_login']);

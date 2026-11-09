@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261110w">
+<link rel="stylesheet" href="../assets/style.css?v=20261110x">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -201,6 +201,43 @@ table.mem-t td small{font-size:13px}
 .req-click{cursor:pointer}.req-click:hover{border-color:var(--sea-200,#a6cef4)}.req-sum{font-weight:700;font-size:14.5px;margin:6px 0 2px}.req-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .sp-btn{display:block;margin-top:4px;border:1px solid #dfe4ea;background:#fff;border-radius:8px;font:inherit;font-size:12px;padding:3px 8px;cursor:pointer;color:var(--ink-3);white-space:nowrap}.sp-btn.over{color:#b4372d;border-color:#f6d0cb;background:#fff4f2}
 .sp-now{background:#f6f8fa;border-radius:10px;padding:10px 12px;font-size:14px;margin:-4px 0 12px}.sp-sum{font-size:14px;margin:0 0 12px;color:var(--ink-2)}.sp-h{margin:16px 0 6px;font-size:14px}.sp-log th{width:auto}.sp-log td,.sp-log th{font-size:13px;padding:5px 6px}
+/* 방문 통계 */
+.tf-live{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-3);margin:-6px 0 16px}
+.tf-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.5);animation:tfp 1.6s infinite}
+@keyframes tfp{70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.stat .d{font-size:12.5px;font-weight:700;margin-top:4px;color:var(--ink-4)}
+.stat .d.up{color:#16a34a}.stat .d.dn{color:#dc2626}
+.stat.live{border-color:#bbf7d0;background:#f0fdf4}
+.tf-bars{display:flex;align-items:flex-end;gap:3px;height:150px;padding-top:8px}
+.tf-bars .c{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:1px;height:100%;position:relative}
+.tf-bars .c i{display:block;width:45%;min-height:1px;border-radius:3px 3px 0 0;background:var(--sea,#1e88e5)}
+.tf-bars .c i.y{background:#cbd5e1}
+.tf-bars .c.now i:not(.y){background:#0f172a}
+.tf-bars .c:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#0f172a;color:#fff;font-size:11.5px;padding:4px 7px;border-radius:6px;z-index:2;margin-bottom:4px}
+.tf-ax{display:flex;gap:3px;font-size:10.5px;color:var(--ink-4);margin-top:4px}
+.tf-ax span{flex:1;text-align:center}
+.tf-lg{display:flex;gap:14px;font-size:12.5px;color:var(--ink-3);margin-bottom:6px}
+.tf-lg b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:var(--sea,#1e88e5)}
+.tf-lg b.y{background:#cbd5e1}
+.tf-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tf-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f3f6;font-size:14px}
+.tf-row:last-child{border-bottom:0}
+.tf-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tf-row .nm small{color:var(--ink-4);margin-left:6px}
+.tf-row .bar{width:90px;height:6px;border-radius:3px;background:#eef2f6;overflow:hidden}
+.tf-row .bar i{display:block;height:100%;background:var(--sea,#1e88e5)}
+.tf-row .n{width:56px;text-align:right;font-weight:800}
+.tf-seg{display:inline-flex;background:#f1f3f6;border-radius:999px;padding:3px;margin-left:8px;vertical-align:middle}
+.tf-seg button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:700;padding:4px 12px;border-radius:999px;cursor:pointer;color:var(--ink-3)}
+.tf-seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tf-act{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.tf-act div{background:#f8fafc;border-radius:10px;padding:12px;text-align:center;font-size:12.5px;color:var(--ink-3);font-weight:600}
+.tf-act b{display:block;font-size:20px;color:var(--ink);margin-top:2px}
+.tf-act small{display:block;font-size:11.5px;color:var(--ink-4);font-weight:600;margin-top:2px}
+.dash-tf{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:14px;cursor:pointer}
+.dash-tf b{font-size:17px}
+.dash-tf .go{margin-left:auto;font-weight:800;color:var(--sea-700)}
+@media (max-width:900px){ .tf-2{grid-template-columns:1fr} .tf-act{grid-template-columns:repeat(3,1fr)} .tf-row .bar{display:none} }
 </style>
 </head>
 <body data-admin>
@@ -209,17 +246,17 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261110w"></script>
-<script src="../assets/db.js?v=20261110w"></script>
-<script src="../assets/notify.js?v=20261110w"></script>
-<script src="../assets/seed-trade.js?v=20261110w"></script>
-<script src="../assets/seed-extra.js?v=20261110w"></script>
-<script src="../assets/seed-new.js?v=20261110w"></script>
-<script src="../assets/seed-comments.js?v=20261110w"></script>
-<script src="../assets/photos.js?v=20261110w"></script>
-<script src="../assets/admin-data.js?v=20261110w"></script>
-<script src="../assets/kmap.js?v=20261110w"></script>
-<script src="../assets/op-posts.js?v=20261110w"></script>
+<script src="../assets/common.js?v=20261110x"></script>
+<script src="../assets/db.js?v=20261110x"></script>
+<script src="../assets/notify.js?v=20261110x"></script>
+<script src="../assets/seed-trade.js?v=20261110x"></script>
+<script src="../assets/seed-extra.js?v=20261110x"></script>
+<script src="../assets/seed-new.js?v=20261110x"></script>
+<script src="../assets/seed-comments.js?v=20261110x"></script>
+<script src="../assets/photos.js?v=20261110x"></script>
+<script src="../assets/admin-data.js?v=20261110x"></script>
+<script src="../assets/kmap.js?v=20261110x"></script>
+<script src="../assets/op-posts.js?v=20261110x"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -303,7 +340,7 @@ function restorePost(p){
 function cmtCount(p){ return typeof commentCountOf === "function" ? commentCountOf(p.id) : 0; }
 
 /* ── 화면 틀 ── */
-var view = ["dash","posts","notices","premium","inquiries","sellers","trash","members","alerts","opposts"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
+var view = ["dash","traffic","posts","notices","premium","inquiries","sellers","trash","members","alerts","opposts"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
 var MENU = [
   ["dash","대시보드"],["posts","게시글 관리"],["notices","공지 관리"],["premium","프리미엄 관리"],
   ["inquiries","문의·제보"],["sellers","판매자 승인"],["trash","삭제된 글"],["settings","설정"]
@@ -890,8 +927,9 @@ if (SRV) {
 
   /* 회원 관리 (서버 모드에서만) */
   MENU.splice(MENU.length - 1, 1, ["opposts", "운영자 글"], ["members", "회원 관리"], ["alerts", "알림 설정"]);
+  MENU.splice(1, 0, ["traffic", "방문 통계"]);
   var _draw = draw;
-  draw = function(){ if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "settings") view = "members"; return _draw(); };
+  draw = function(){ if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "settings") view = "members"; return _draw(); };
 
   /* 운영자 글: assets/op-posts.js 초안을 골라 내 계정으로 올림 (이미 올린 글은 표시) */
   window.drawOpPosts = function(){
@@ -1084,6 +1122,95 @@ if (SRV) {
   drawDash = function(){
     _drawDash();
     if (STATS) { var vs = M().querySelectorAll(".stat .v"); if (vs[2]) vs[2].textContent = STATS.users.toLocaleString() + (STATS.users_week ? " (+" + STATS.users_week + ")" : ""); }
+  };
+
+
+  /* ── 방문 통계: 실시간(최근 5분)·오늘·어제 ── */
+  var TF = null, tfDay = "t", tfTimer = null;
+  function tfNum(n){ return (n || 0).toLocaleString(); }
+  function tfDiff(a, b, label){
+    if (!b) return '<div class="d">' + label + ' 기록 없음</div>';
+    var p = Math.round((a - b) / b * 100);
+    return '<div class="d ' + (p > 0 ? "up" : p < 0 ? "dn" : "") + '">' + label + ' ' + tfNum(b) + ' · ' + (p > 0 ? "▲" : p < 0 ? "▼" : "") + Math.abs(p) + '%</div>';
+  }
+  function tfName(path, title){
+    var t = title || path;
+    return '<a href="' + SITE + path.replace(/^\//, "") + '" target="_blank" title="' + esc(path) + '">' + esc(t) + '</a>' + (title ? '<small>' + esc(path.replace(/^\//, "").replace(/\.html/, "").slice(0, 30) || "홈") + '</small>' : '');
+  }
+  function tfList(rows, key, nameFn, unit){
+    if (!rows || !rows.length) return '<div class="empty">아직 기록이 없어요.</div>';
+    var mx = Math.max.apply(null, rows.map(function(r){ return r[key]; })) || 1;
+    return rows.map(function(r){
+      return '<div class="tf-row"><span class="nm">' + nameFn(r) + '</span><span class="bar"><i style="width:' + Math.round(r[key] / mx * 100) + '%"></i></span><span class="n">' + tfNum(r[key]) + unit + '</span></div>';
+    }).join("");
+  }
+  window.loadTraffic = function(){
+    return JIDB.call("admin_traffic").then(function(r){ TF = r; return r; });
+  };
+  window.tfSetDay = function(d){ tfDay = d; drawTraffic(true); };
+  window.drawTraffic = function(noFetch){
+    clearInterval(tfTimer);
+    tfTimer = setInterval(function(){ if (view !== "traffic") { clearInterval(tfTimer); return; } loadTraffic().then(function(){ if (view === "traffic") paintTraffic(); }); }, 30000);
+    if (TF) paintTraffic(); else M().innerHTML = '<h1>방문 통계</h1><p class="sub">불러오는 중…</p>';
+    if (!noFetch) loadTraffic().then(function(){ if (view === "traffic") paintTraffic(); }, function(e){ M().innerHTML = '<h1>방문 통계</h1><div class="panel">불러오지 못했어요: ' + esc(e.message) + '</div>'; });
+  };
+  function paintTraffic(){
+    var r = TF, t = r.t, y = r.y, hr = new Date().getHours();
+    var sx = window.scrollY;
+    // 시간대별 (오늘 vs 어제)
+    var hmax = Math.max.apply(null, r.t_hours.concat(r.y_hours).map(function(h){ return h.uv; })) || 1;
+    var hours = '<div class="tf-bars">' + r.t_hours.map(function(h, i){
+      var yh = r.y_hours[i];
+      return '<div class="c' + (i === hr ? " now" : "") + '" data-t="' + i + '시 · 오늘 ' + h.uv + '명/' + h.pv + '회 · 어제 ' + yh.uv + '명/' + yh.pv + '회">' +
+        '<i class="y" style="height:' + (yh.uv / hmax * 100) + '%"></i><i style="height:' + (i > hr ? 0 : h.uv / hmax * 100) + '%"></i></div>';
+    }).join("") + '</div><div class="tf-ax">' + r.t_hours.map(function(h, i){ return '<span>' + (i % 3 === 0 ? i : "") + '</span>'; }).join("") + '</div>';
+    // 최근 30일
+    var dk = [], d0 = new Date(r.today + "T00:00:00");
+    for (var i = 29; i >= 0; i--) { var d = new Date(d0); d.setDate(d.getDate() - i); dk.push(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2)); }
+    var dmax = Math.max.apply(null, dk.map(function(k){ return (r.days[k] || {}).uv || 0; })) || 1;
+    var days = '<div class="tf-bars">' + dk.map(function(k, i){
+      var v = r.days[k] || { uv: 0, pv: 0 };
+      return '<div class="c' + (i === 29 ? " now" : "") + '" data-t="' + k.slice(5).replace("-", ".") + ' · 방문자 ' + v.uv + '명 · 페이지뷰 ' + v.pv + '회"><i style="width:70%;height:' + (v.uv / dmax * 100) + '%"></i></div>';
+    }).join("") + '</div><div class="tf-ax">' + dk.map(function(k, i){ return '<span>' + (i % 5 === 4 || i === 29 ? k.slice(5).replace("-", ".") : "") + '</span>'; }).join("") + '</div>';
+    var D = tfDay === "t" ? { pages: r.t_pages, refs: r.t_refs } : { pages: r.y_pages, refs: r.y_refs };
+    var seg = '<span class="tf-seg"><button class="' + (tfDay === "t" ? "on" : "") + '" onclick="tfSetDay(\'t\')">오늘</button><button class="' + (tfDay === "y" ? "on" : "") + '" onclick="tfSetDay(\'y\')">어제</button></span>';
+    var A = [["users","새 회원"],["posts","새 글"],["comments","댓글"],["likes","좋아요"],["messages","쪽지"],["inquiries","문의·제보"]];
+    var since = r.since ? r.since.slice(0, 10).replace(/-/g, ".") : "";
+    M().innerHTML = '<h1>방문 통계</h1>' +
+      '<div class="tf-live"><span class="tf-dot"></span>30초마다 자동으로 새로 고쳐요 · ' + esc((r.now || "").slice(11, 16)) + ' 기준' + (since ? ' · ' + since + '부터 기록' : '') +
+        ' <button class="mb" onclick="drawTraffic()">지금 새로 고침</button></div>' +
+      '<div class="stats">' +
+        '<div class="stat live"><div class="k">지금 보고 있는 사람</div><div class="v">' + tfNum(r.live) + '명</div><div class="d">최근 5분 안에 페이지를 연 사람</div></div>' +
+        '<div class="stat"><div class="k">오늘 방문자</div><div class="v">' + tfNum(t.uv) + '명</div>' + tfDiff(t.uv, r.y_same.uv, "어제 이 시각") + '</div>' +
+        '<div class="stat"><div class="k">오늘 페이지뷰</div><div class="v">' + tfNum(t.pv) + '회</div>' + tfDiff(t.pv, r.y_same.pv, "어제 이 시각") + '</div>' +
+        '<div class="stat"><div class="k">어제 하루</div><div class="v">' + tfNum(y.uv) + '명</div><div class="d">페이지뷰 ' + tfNum(y.pv) + '회 · 처음 온 사람 ' + tfNum(y.nv) + '명</div></div>' +
+      '</div>' +
+      '<div class="panel"><h2>오늘 활동 <small style="font-weight:600;color:var(--ink-4)">(아래 작은 글씨는 어제)</small></h2><div class="tf-act">' + A.map(function(a){
+        return '<div>' + a[1] + '<b>' + tfNum(r.t_act[a[0]]) + '</b><small>어제 ' + tfNum(r.y_act[a[0]]) + '</small></div>'; }).join("") + '</div>' +
+        '<p class="sub" style="margin:12px 0 0">오늘 방문자 중 처음 온 사람 <b>' + tfNum(t.nv) + '명</b> · 휴대폰 <b>' + (t.uv ? Math.round(t.mob / t.uv * 100) : 0) + '%</b> / PC ' + (t.uv ? 100 - Math.round(t.mob / t.uv * 100) : 0) + '%</p></div>' +
+      '<div class="panel"><h2>시간대별 방문자</h2><div class="tf-lg"><span><b></b>오늘</span><span><b class="y"></b>어제</span></div>' + hours + '</div>' +
+      '<div class="tf-2">' +
+        '<div class="panel"><h2>지금 보고 있는 페이지 <small style="font-weight:600;color:var(--ink-4)">최근 5분</small></h2>' + tfList(r.live_pages, "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
+        '<div class="panel"><h2>들어온 곳 ' + seg + '</h2>' + tfList(D.refs, "n", function(x){ return esc(x.ref); }, "명") + '</div>' +
+      '</div>' +
+      '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList(D.pages, "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
+      '<div class="panel"><h2>최근 30일 방문자</h2>' + days + '</div>' +
+      '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
+    window.scrollTo(0, sx);
+  }
+
+  /* 대시보드 맨 위: 실시간 한 줄 */
+  var _drawDash2 = drawDash;
+  drawDash = function(){
+    _drawDash2();
+    var h1 = M().querySelector("h1 + .sub"); if (!h1) return;
+    var box = document.createElement("div"); box.className = "dash-tf"; box.onclick = function(){ go("traffic"); };
+    box.innerHTML = '<span class="tf-dot"></span> 방문 통계 불러오는 중…';
+    h1.after(box);
+    loadTraffic().then(function(r){
+      box.innerHTML = '<span class="tf-dot"></span><span>지금 <b>' + tfNum(r.live) + '</b>명</span><span>오늘 방문자 <b>' + tfNum(r.t.uv) + '</b>명 · ' + tfNum(r.t.pv) + '회</span>' +
+        '<span>어제 <b>' + tfNum(r.y.uv) + '</b>명 · ' + tfNum(r.y.pv) + '회</span><span>오늘 가입 <b>' + tfNum(r.t_act.users) + '</b> · 새 글 <b>' + tfNum(r.t_act.posts) + '</b></span><span class="go">방문 통계 →</span>';
+    }, function(){ box.remove(); });
   };
 
   logoutAdmin = function(){ location.href = SITE + "index.html"; };

@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 10;
+const JI_SCHEMA = 11;
 
 /* ── 응답 ── */
 function cors() {
@@ -128,6 +128,12 @@ function migrate($pdo) {
   }
   if ($v < 10) {   // 판매자 입점 기간 (비우면 기한 없음)
     try { $pdo->exec("ALTER TABLE ji_users ADD COLUMN seller_until DATE NULL"); } catch (Throwable $e) {}
+  }
+  if ($v < 11) {   // 방문 기록 (관리자 '방문 통계')
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ji_hits (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY, at DATETIME NOT NULL, vid CHAR(16) NOT NULL, nw TINYINT(1) NOT NULL DEFAULT 0,
+      path VARCHAR(120) NOT NULL, title VARCHAR(80) NOT NULL DEFAULT '', ref VARCHAR(40) NOT NULL DEFAULT '', dev CHAR(1) NOT NULL DEFAULT 'p',
+      INDEX (at), INDEX (vid, at))$T");
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }

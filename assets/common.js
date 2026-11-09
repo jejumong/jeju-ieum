@@ -643,3 +643,39 @@ document.addEventListener("click", function (e) {
   // 같은 항목의 버튼이 여러 곳에 있어도 함께 갱신
   document.querySelectorAll('[data-join="' + id + '"][data-kind]').forEach(paintJoinBtn);
 });
+
+/* ── 방문 기록 (관리자 콘솔 '방문 통계'용) ──
+   개인정보 없이: 브라우저마다 무작위 번호 하나, 본 페이지, 들어온 곳(검색·SNS 이름), 휴대폰/PC 만 보냄.
+   관리자 화면·관리자 계정·로봇·내 컴퓨터 테스트는 세지 않음 */
+(function () {
+  try {
+    var api = (window.SITE_CFG || {}).apiUrl;
+    if (!api || /\/admin\//.test(location.pathname) || /^(localhost|127\.)/.test(location.hostname)) return;
+    if (navigator.webdriver || /bot|crawl|spider|slurp|headless|preview|lighthouse/i.test(navigator.userAgent)) return;
+    var s = JI.get("session", null); if (s && s.role === "admin") return;
+    var vid = "", nw = 0;
+    try { vid = localStorage.getItem("ji_vid") || ""; } catch (e) {}
+    if (!/^[a-z0-9]{16}$/.test(vid)) {
+      vid = ""; for (var i = 0; i < 16; i++) vid += "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)];
+      nw = 1; try { localStorage.setItem("ji_vid", vid); } catch (e) {}
+    }
+    // 들어온 곳: 이번 방문의 첫 페이지에서만 (사이트 안 이동은 빼고)
+    var ref = "";
+    var first = true; try { first = !sessionStorage.getItem("ji_sess"); sessionStorage.setItem("ji_sess", "1"); } catch (e) {}
+    if (first) {
+      var h = ""; try { h = document.referrer ? new URL(document.referrer).hostname.replace(/^www\.|^m\./, "") : ""; } catch (e) {}
+      var P = new URLSearchParams(location.search);
+      ref = P.get("utm_source") || (!h ? "직접 방문" : h.indexOf("jejuieum") > -1 || h === location.hostname ? "" :
+        /naver/.test(h) ? "네이버" : /google/.test(h) ? "구글" : /daum|kakao/.test(h) ? "다음·카카오" :
+        /instagram/.test(h) ? "인스타그램" : /facebook|fb\./.test(h) ? "페이스북" : /youtube|youtu\.be/.test(h) ? "유튜브" :
+        /band\.us/.test(h) ? "밴드" : /bing/.test(h) ? "빙" : /threads/.test(h) ? "스레드" : h);
+    }
+    var path = location.pathname.replace(/\/index\.html$/, "/") || "/";
+    var id = new URLSearchParams(location.search).get("id"); if (id) path += "?id=" + id.slice(0, 40);
+    var body = JSON.stringify({ vid: vid, nw: nw, path: path.slice(0, 120), title: (document.title || "").replace(/\s*[—|-]\s*제주이음\s*$/, "").slice(0, 80),
+      ref: ref.slice(0, 40), dev: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "m" : "p" });
+    setTimeout(function () {
+      fetch(api.replace(/\/?$/, "/") + "?a=hit", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: body, keepalive: true }).catch(function () {});
+    }, 600);
+  } catch (e) {}
+})();
