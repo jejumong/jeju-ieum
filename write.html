@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110e">
+<link rel="stylesheet" href="assets/style.css?v=20261110f">
 </head>
 <body data-active="">
 
@@ -115,6 +115,21 @@
       </div>
     </div>
 
+    <div id="shop-row" style="display:none">
+      <div class="field">
+        <label for="s-addr">가게 주소 <span class="req">*</span> <small style="font-weight:500;color:var(--ink-4)">— 상점 글에 지도로 보여요</small></label>
+        <div style="display:flex;gap:8px"><input type="text" id="s-addr" placeholder="주소 찾기를 눌러 주세요" style="flex:1;min-width:0">
+          <button type="button" class="btn ghost" id="s-addr-btn" style="flex:none">주소 찾기</button></div>
+        <div id="s-map" style="margin-top:8px"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="s-hours">영업 시간</label><input type="text" id="s-hours" maxlength="60" placeholder="예: 10:00~18:00, 화요일 휴무"></div>
+        <div class="field"><label for="s-tel">가게 전화 <small style="font-weight:500;color:var(--ink-4)">(공개)</small></label><input type="text" id="s-tel" maxlength="20" inputmode="tel" placeholder="예: 064-000-0000"></div>
+      </div>
+      <div class="field"><label for="s-menu">대표 메뉴·상품·서비스</label><input type="text" id="s-menu" maxlength="120" placeholder="예: 보말칼국수 12,000원 · 전복죽 15,000원"></div>
+      <div class="field"><label for="s-benefit">제주이음 이웃 혜택 <small style="font-weight:500;color:var(--ink-4)">(선택 — 카드에 표시돼요)</small></label><input type="text" id="s-benefit" maxlength="40" placeholder="예: 음료 1잔 서비스"></div>
+    </div>
+
     <div id="fest-row" style="display:none">
       <div class="field-row">
         <div class="field">
@@ -166,15 +181,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261110e"></script>
-<script src="assets/common.js?v=20261110e"></script>
-<script src="assets/db.js?v=20261110e"></script>
-<script src="assets/notify.js?v=20261110e"></script>
-<script src="assets/seed-trade.js?v=20261110e"></script>
-<script src="assets/seed-extra.js?v=20261110e"></script>
-<script src="assets/seed-new.js?v=20261110e"></script>
-<script src="assets/seed-comments.js?v=20261110e"></script>
-<script src="assets/admin-data.js?v=20261110e"></script>
+<script src="assets/kmap.js?v=20261110f"></script>
+<script src="assets/common.js?v=20261110f"></script>
+<script src="assets/db.js?v=20261110f"></script>
+<script src="assets/notify.js?v=20261110f"></script>
+<script src="assets/seed-trade.js?v=20261110f"></script>
+<script src="assets/seed-extra.js?v=20261110f"></script>
+<script src="assets/seed-new.js?v=20261110f"></script>
+<script src="assets/seed-comments.js?v=20261110f"></script>
+<script src="assets/admin-data.js?v=20261110f"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -245,6 +260,7 @@ function fillEdit(editing) {
     document.getElementById("fest-start").value = editing.start || (editing.extra && editing.extra.start) || "";
     document.getElementById("fest-end").value = editing.end || (editing.extra && editing.extra.end) || "";
     document.getElementById("fest-loc").value = editing.loc || "";
+    if (editing.board === "제주상점") { var sx = editing.extra || {}; document.getElementById("s-addr").value = editing.addr || sx.addr || ""; ["hours", "tel", "menu", "benefit"].forEach(function (k) { document.getElementById("s-" + k).value = sx[k] || ""; }); if (sx.lat) SHOP_POS = { lat: +sx.lat, lng: +sx.lng }; }
     if (editing.board === "축제정보") { var ex = editing.extra || {}; document.getElementById("fest-addr").value = editing.addr || ex.addr || ""; if (ex.lat) FEST_POS = { lat: +ex.lat, lng: +ex.lng }; }
   if (typeof toggleExtra === "function") toggleExtra();
   // 이미 올린 사진 불러오기
@@ -304,7 +320,7 @@ function lockBoard(b) {
   }
 }
 if (pre && !editing && COMMUNITY_MOVE.indexOf(pre) > -1) communityOnly("커뮤니티 안의 다른 게시판도 고를 수 있어요");   // 커뮤니티에서 들어오면 커뮤니티 게시판끼리 고르기
-else if (pre && !editing && !isRestrictedBoard(pre)) lockBoard(pre);
+else if (pre && !editing && (!isRestrictedBoard(pre) || isApprovedSeller(pre))) lockBoard(pre);
 
 document.getElementById("board").addEventListener("change", function () {
   toggleExtra();
@@ -318,6 +334,21 @@ document.getElementById("addr-check").addEventListener("click", function () {
   if (!v) { alert("주소를 입력해 주세요."); return; }
   JIMap.show(document.getElementById("addr-map"), v);
 });
+
+/* 상점 주소: 다음 우편번호 → 좌표 → 지도 */
+var SHOP_POS = null;
+function shopSetAddr(addr) {
+  document.getElementById("s-addr").value = addr; SHOP_POS = null;
+  festGeocode(addr).then(function (p) { if (p) SHOP_POS = { lat: p.lat, lng: p.lng }; });
+  JIMap.show(document.getElementById("s-map"), addr);
+}
+document.getElementById("s-addr-btn").addEventListener("click", function () {
+  function open() { new daum.Postcode({ oncomplete: function (d) { shopSetAddr(d.roadAddress || d.jibunAddress || d.address); if (!document.getElementById("title").value && d.buildingName) document.getElementById("title").value = d.buildingName; } }).open(); }
+  if (window.daum && daum.Postcode) return open();
+  var sc = document.createElement("script"); sc.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+  sc.onload = open; sc.onerror = function () { alert("주소 찾기를 불러오지 못했어요. 주소를 직접 적어 주세요."); }; document.head.appendChild(sc);
+});
+document.getElementById("s-addr").addEventListener("change", function () { if (this.value.trim()) shopSetAddr(this.value.trim()); });
 
 /* 축제 장소: 다음 우편번호(주소 찾기) → 카카오 좌표 → 축제 지도에 점 */
 var FEST_POS = null;
@@ -369,6 +400,7 @@ function toggleExtra() {
     "교육": ["선택 안 함", "질문", "정보", "학교", "방과후·학원", "체험", "농어촌유학"],
     "건강웰빙": ["선택 안 함", "질문", "정보", "병원·약국", "운동", "마음 건강", "먹거리"],
     "제주북쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"], "제주동쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"], "제주서쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"], "제주남쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"],
+    "제주상점": ["맛집·카페", "생활·수리", "건강·의료", "교육·학원", "농수산 직판", "숙박·체험", "기타"],
     "축제정보": ["선택 안 함", "축제", "공연·음악", "전시·문화", "체험·행사", "마켓·장터", "먹거리", "자연·계절"],
     "_": ["선택 안 함", "자유", "질문", "정보", "후기", "나눔"]
   };
@@ -376,13 +408,20 @@ function toggleExtra() {
   var trade = ["구인구직", "부동산", "중고사고팔기", "특가공구"].indexOf(v) > -1;
   document.getElementById("extra-trade").style.display = trade ? "block" : "none";
   document.getElementById("fest-row").style.display = v === "축제정보" ? "block" : "none";
+  var shop = v === "제주상점";
+  document.getElementById("shop-row").style.display = shop ? "block" : "none";
+  document.querySelector('label[for="title"]').innerHTML = (shop ? "상호명 (가게 이름)" : "제목") + ' <span class="req">*</span>';
+  document.getElementById("title").placeholder = shop ? "예: 세화 귤빛농장" : "핵심이 드러나는 제목을 적어주세요";
+  document.querySelector('label[for="content"]').innerHTML = (shop ? "가게 소개" : "내용") + ' <span class="req">*</span>';
+  if (shop) document.getElementById("content").placeholder = "어떤 가게인지 소개해 주세요.\n\n· 무엇을 파는지, 어떤 점이 좋은지\n· 예약·주문 방법, 배송 여부 등";
+  if (shop && !editing) { document.getElementById("page-title").textContent = "상점 등록"; document.title = "상점 등록 — 제주이음"; document.getElementById("page-desc").textContent = "등록하면 제주상점에 바로 올라가요"; }
   // 제주상점: 상점판매자는 24시간에 1번만 — 이미 올렸으면 미리 알려 줌 (서버에서도 막음)
   var sn = document.getElementById("shop-limit-note"); if (sn) sn.remove();
   if (v === "제주상점" && !editing && ["admin", "staff"].indexOf((currentUser() || {}).role) < 0) {
     var me0 = currentUser() || {}, now0 = Date.now();
     var last = allPosts().filter(function (p) { return p.board === "제주상점" && p.authorId && p.authorId === me0.id; })
       .map(function (p) { return new Date(p.date + "T" + (p.time || "00:00") + ":00").getTime(); }).filter(function (t) { return now0 - t < 86400000; }).sort().pop();
-    document.getElementById("board-field").insertAdjacentHTML("afterend", '<div class="hint" id="shop-limit-note" style="margin:-4px 0 12px;' + (last ? 'color:#b4372d;font-weight:700' : '') + '">' +
+    document.getElementById("board-field").parentNode.insertAdjacentHTML("beforebegin", '<div class="hint" id="shop-limit-note" style="margin:0 0 14px;padding:10px 14px;border-radius:12px;background:' + (last ? '#fff1ef;color:#b4372d;font-weight:700' : 'var(--sea-50);color:var(--sea-700)') + '">' +
       (last ? '⏰ 24시간 안에 이미 상점 글을 올렸어요. ' + new Date(last + 86400000).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) + ' 이후에 다시 올릴 수 있어요.' : '🏪 제주상점 글은 24시간에 한 번 올릴 수 있어요.') + '</div>');
   }
   if (v === "축제정보" && !editing) {   // 운영진은 '축제 등록', 회원은 '축제 제보'
@@ -419,13 +458,13 @@ function toggleExtra() {
   var opts = (HEADS[v] || HEADS._).slice();
   if (cur && cur !== "선택 안 함" && opts.indexOf(cur) < 0 && editing && editing.head === cur) opts.push(cur);   // 예전 말머리로 쓴 글을 고칠 때 말머리가 사라지지 않게
   hs.innerHTML = opts.map(function (o) { return "<option" + (o === cur ? " selected" : "") + ">" + o + "</option>"; }).join("");
-  document.getElementById("head-label").innerHTML = v === "동호회" ? '모임 분류 <span class="req">*</span>' : (HEADS[v] && HEADS[v][0] !== "선택 안 함" ? '말머리 <span class="req">*</span>' : "말머리");
+  document.getElementById("head-label").innerHTML = v === "동호회" ? '모임 분류 <span class="req">*</span>' : v === "제주상점" ? '업종 <span class="req">*</span>' : (HEADS[v] && HEADS[v][0] !== "선택 안 함" ? '말머리 <span class="req">*</span>' : "말머리");
   var hint = document.getElementById("head-hint");
   if (hint) hint.style.display = v === "부동산" ? "block" : "none";
 }
 function toggleRestrictHint() {
   var v = document.getElementById("board").value;
-  document.getElementById("restrict-hint").style.display = isRestrictedBoard(v) ? "block" : "none";
+  document.getElementById("restrict-hint").style.display = isRestrictedBoard(v) && !isApprovedSeller(v) ? "block" : "none";
 }
 
 /* ── 사진 첨부 ── */
@@ -484,6 +523,11 @@ function submitPost() {
   var loc = (document.getElementById("loc").value || "").trim();
   var htype = board === "부동산" ? document.getElementById("htype").value : "";
   var addr = (board === "부동산" || board === "구인구직") ? (document.getElementById("addr").value || "").trim() : "";
+  if (board === "제주상점") {
+    addr = (document.getElementById("s-addr").value || "").trim();
+    if (!addr) { alert("가게 주소를 적어 주세요."); document.getElementById("s-addr-btn").focus(); return; }
+    var sm = addr.match(/([가-힣]+(?:읍|면|동))(?:\s|$)/); loc = sm ? sm[1] : addr.split(/\s+/).slice(0, 2).join(" ");
+  }
   var fs = "", fe = "";
   if (board === "축제정보") {
     fs = document.getElementById("fest-start").value; fe = document.getElementById("fest-end").value;
@@ -533,6 +577,7 @@ function submitPost() {
     }
     var btn = document.getElementById("submit-btn"); btn.disabled = true;
     extra.htype = htype; extra.addr = addr; extra.payType = payType; extra.pay = pay;
+    if (board === "제주상점") { extra.hours = document.getElementById("s-hours").value.trim(); extra.tel = document.getElementById("s-tel").value.trim(); extra.menu = document.getElementById("s-menu").value.trim(); extra.benefit = document.getElementById("s-benefit").value.trim(); if (SHOP_POS) { extra.lat = SHOP_POS.lat; extra.lng = SHOP_POS.lng; } }
     if (board === "축제정보") { extra.start = fs; extra.end = fe; if (FEST_POS) { extra.lat = FEST_POS.lat; extra.lng = FEST_POS.lng; } } else { delete extra.start; delete extra.end; delete extra.lat; delete extra.lng; }
     extra.photos = PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; });
     var data = { board: board, head: head === "선택 안 함" ? "" : head, title: title, content: content, price: price, loc: loc, meta: (editing && editing.meta) || "", extra: extra };

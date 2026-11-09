@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110e">
+<link rel="stylesheet" href="assets/style.css?v=20261110f">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -77,15 +77,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261110e"></script>
-<script src="assets/common.js?v=20261110e"></script>
-<script src="assets/db.js?v=20261110e"></script>
-<script src="assets/notify.js?v=20261110e"></script>
-<script src="assets/seed-trade.js?v=20261110e"></script>
-<script src="assets/seed-extra.js?v=20261110e"></script>
-<script src="assets/seed-new.js?v=20261110e"></script>
-<script src="assets/seed-comments.js?v=20261110e"></script>
-<script src="assets/admin-data.js?v=20261110e"></script>
+<script src="assets/kmap.js?v=20261110f"></script>
+<script src="assets/common.js?v=20261110f"></script>
+<script src="assets/db.js?v=20261110f"></script>
+<script src="assets/notify.js?v=20261110f"></script>
+<script src="assets/seed-trade.js?v=20261110f"></script>
+<script src="assets/seed-extra.js?v=20261110f"></script>
+<script src="assets/seed-new.js?v=20261110f"></script>
+<script src="assets/seed-comments.js?v=20261110f"></script>
+<script src="assets/admin-data.js?v=20261110f"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -144,7 +144,7 @@ if (!post) {
       (post.payType ? '<span>급여 <b>' + esc(payText(post)) + '</b></span>' : '') +
       (post.addr ? '<span>근무지 <b>' + esc(post.addr) + '</b></span>' : '') +
       '</div>';
-  } else if (post.price || post.loc || post.period) {
+  } else if (post.board !== "제주상점" && (post.price || post.loc || post.period)) {
     extra = '<div class="pv-extra">' +
       (post.period ? '<span>기간 <b>' + esc(post.period) + '</b></span>' : '') +
       (post.price ? '<span>가격 <b>' + esc(/^\d+$/.test(String(post.price)) ? (+post.price).toLocaleString() : post.price) + (/원$/.test(post.price) ? '' : '원') + '</b></span>' : '') +
@@ -173,6 +173,7 @@ if (!post) {
         '<span>' + (post.head === "채용완료" ? "목록에 '채용완료'로 흐리게 표시되고 있어요." : "사람을 구했으면 채용완료로 바꿔 주세요. 목록에 바로 표시돼요.") + '</span></div>' +
         '<button type="button" class="btn ' + (post.head === "채용완료" ? "ghost" : "primary") + '" onclick="closeJob()">' + (post.head === "채용완료" ? "다시 모집하기" : "✅ 채용완료로 바꾸기") + '</button></div>'
       : '') +
+    (post.board === "제주상점" ? '<div class="pv-shop">' + [["🏷️ 업종", post.head], ["📍 주소", post.addr], ["🕘 영업 시간", post.hours], ["📞 전화", post.tel], ["🍽️ 대표 메뉴", post.menu], ["🎁 이웃 혜택", post.perk]].filter(function (r) { return r[1]; }).map(function (r) { return '<div><b>' + r[0] + '</b><span>' + esc(r[1]) + '</span></div>'; }).join("") + '</div>' + (post.addr ? '<div class="pv-map"><h3>가게 위치</h3><div id="pv-map"></div></div>' : '') : '') +
     (post.board === "부동산" || (post.board === "구인구직" && post.addr) ? '<div class="pv-map"><h3>' + (post.board === "구인구직" ? "근무지 위치" : "매물 위치") + '</h3><div id="pv-map"></div></div>' : '') +
     joinBlock(post) +
     '<div class="pv-actions"><a class="btn ghost" href="' + backHref + '" onclick="return goBackList(this)">‹ ' + esc(backName) + ' 목록</a>' +
@@ -182,7 +183,7 @@ if (!post) {
         '<button class="mini-btn danger-btn" onclick="removePost()">삭제</button></div>'
       : '') +
     '</div>';
-  if (post.board === "구인구직" && post.addr) JIMap.show(document.getElementById("pv-map"), post.addr);
+  if ((post.board === "구인구직" || post.board === "제주상점") && post.addr) JIMap.show(document.getElementById("pv-map"), post.addr);
   if (post.board === "부동산") {
     var mq = post.addr || (post.loc ? "제주특별자치도 " + post.loc : "");
     if (mq) JIMap.show(document.getElementById("pv-map"), mq, { approx: !post.addr });

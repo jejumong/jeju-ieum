@@ -666,11 +666,14 @@ case 'admin_sellers': {
 case 'admin_seller_decide': {
   admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['approved', 'rejected'], true)) fail('처리 방법이 올바르지 않아요');
   $r = one("SELECT * FROM ji_seller_requests WHERE id = ?", [$R['id'] ?? '']); if (!$r) fail('요청을 찾을 수 없어요', 404);
+  $was = $r['status'];
   q("UPDATE ji_seller_requests SET status = ? WHERE id = ?", [$st, $r['id']]);
-  if ($st === 'approved') q("UPDATE ji_users SET role = ? WHERE id = ? AND role IN ('user','realtor','shop','dealer')", [$r['board'] === '제주상점' ? 'shop' : 'dealer', $r['applicant']]);
+  $role = $r['board'] === '제주상점' ? 'shop' : 'dealer';
+  if ($st === 'approved') q("UPDATE ji_users SET role = ? WHERE id = ? AND role IN ('user','realtor','shop','dealer')", [$role, $r['applicant']]);
+  if ($st === 'rejected' && $was === 'approved') q("UPDATE ji_users SET role = 'user' WHERE id = ? AND role = ?", [$r['applicant'], $role]);   // 승인 취소 → 일반 회원으로
   $link = $r['board'] === '제주상점' ? 'shops.html' : 'deals.html';
-  notify($r['applicant'], 'seller_' . $st, $st === 'approved' ? $r['board'] . ' 승인 완료 🎉' : $r['board'] . ' 요청 결과',
-    $st === 'approved' ? '이제 ' . $r['board'] . '에 글을 올릴 수 있어요. (사이트를 새로고침하면 바로 반영돼요)' : '이번에는 승인이 어렵다는 답을 받았어요. 자세한 내용은 문의해 주세요.', $link);
+  notify($r['applicant'], 'seller_' . $st, $st === 'approved' ? $r['board'] . ' 승인 완료 🎉' : ($was === 'approved' ? $r['board'] . ' 승인 취소' : $r['board'] . ' 요청 결과'),
+    $st === 'approved' ? '이제 ' . $r['board'] . '에 ' . ($role === 'shop' ? '상점 글' : '공구 글') . '을 올릴 수 있어요. (사이트를 새로고침하면 바로 반영돼요)' : ($was === 'approved' ? $r['board'] . ' 글쓰기 승인이 취소되었어요. 자세한 내용은 문의해 주세요.' : '이번에는 승인이 어렵다는 답을 받았어요. 자세한 내용은 문의해 주세요.'), $link);
   out(true);
 }
 

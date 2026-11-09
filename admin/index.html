@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261110e">
+<link rel="stylesheet" href="../assets/style.css?v=20261110f">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -207,17 +207,17 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261110e"></script>
-<script src="../assets/db.js?v=20261110e"></script>
-<script src="../assets/notify.js?v=20261110e"></script>
-<script src="../assets/seed-trade.js?v=20261110e"></script>
-<script src="../assets/seed-extra.js?v=20261110e"></script>
-<script src="../assets/seed-new.js?v=20261110e"></script>
-<script src="../assets/seed-comments.js?v=20261110e"></script>
-<script src="../assets/photos.js?v=20261110e"></script>
-<script src="../assets/admin-data.js?v=20261110e"></script>
-<script src="../assets/kmap.js?v=20261110e"></script>
-<script src="../assets/op-posts.js?v=20261110e"></script>
+<script src="../assets/common.js?v=20261110f"></script>
+<script src="../assets/db.js?v=20261110f"></script>
+<script src="../assets/notify.js?v=20261110f"></script>
+<script src="../assets/seed-trade.js?v=20261110f"></script>
+<script src="../assets/seed-extra.js?v=20261110f"></script>
+<script src="../assets/seed-new.js?v=20261110f"></script>
+<script src="../assets/seed-comments.js?v=20261110f"></script>
+<script src="../assets/photos.js?v=20261110f"></script>
+<script src="../assets/admin-data.js?v=20261110f"></script>
+<script src="../assets/kmap.js?v=20261110f"></script>
+<script src="../assets/op-posts.js?v=20261110f"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -650,7 +650,7 @@ function drawSellers(){
     (list.length ? list.map(function(r){
       var act = r.status === "pending"
         ? '<div class="acts"><button class="mb pri" onclick="decide(\'' + r.id + '\',\'approved\')">승인</button><button class="mb del" onclick="decide(\'' + r.id + '\',\'rejected\')">반려</button></div>'
-        : (r.status === "approved" ? '<span class="st-ok">✓ 승인됨</span>' : '<span class="st-no">✕ 반려됨</span>');
+        : (r.status === "approved" ? '<span class="st-ok">✓ 승인됨 · ' + (r.board === "제주상점" ? "상점판매자" : "공구판매자") + '</span>' : '<span class="st-no">✕ 반려됨</span>') + ' <small style="color:var(--ink-4)">— 눌러서 상태 바꾸기</small>';
       var d = r.details || {}, sum = [d["상호명"], d["업종"], d["위치"] || d["공구상품"]].filter(Boolean).join(" · ");
       return '<div class="req req-click" onclick="if(!event.target.closest(\'button\'))showReq(\'' + r.id + '\')"><div class="rh"><b>' + esc(r.nick) + '</b><span class="bd">' + esc(r.board) + '</span><span style="margin-left:auto;color:var(--ink-4);font-size:12.5px">' + esc(r.date) + ' · ' + esc(r.email) + '</span></div>' +
         (sum ? '<div class="req-sum">' + esc(sum) + '</div>' : '') + '<div class="msg req-clamp">' + esc(r.message) + '</div><span class="iq-more">자세히 보기 ›</span>' + act + '</div>';
@@ -669,7 +669,8 @@ function showReq(id){
     (mapQ ? '<div id="req-map" style="margin:0 0 12px"></div>' : '') +
     '<div class="iq-msg">' + (esc(r.note || (rows.length ? "" : r.message)) || '<span style="color:var(--ink-4)">남긴 말 없음</span>') + '</div>' +
     '<div class="bt">' + (r.uid && typeof msgTo === "function" ? '<button class="mb" style="margin-right:auto" onclick="msgTo(\'' + r.uid + '\',\'' + esc(r.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>' : '') +
-      (r.status === "pending" ? '<button class="mb del" onclick="closeModal();decide(\'' + r.id + '\',\'rejected\')">반려</button><button class="mb pri" onclick="closeModal();decide(\'' + r.id + '\',\'approved\')">승인</button>' : '') +
+      (r.status !== "rejected" ? '<button class="mb del" onclick="closeModal();decide(\'' + r.id + '\',\'rejected\')">' + (r.status === "approved" ? "승인 취소 (반려로)" : "반려") + '</button>' : '') +
+      (r.status !== "approved" ? '<button class="mb pri" onclick="closeModal();decide(\'' + r.id + '\',\'approved\')">' + (r.status === "rejected" ? "다시 승인" : "승인") + '</button>' : '') +
       '<button class="mb" onclick="closeModal()">닫기</button></div>');
   if (mapQ && window.JIMap) JIMap.show(document.getElementById("req-map"), mapQ);
 }
@@ -881,7 +882,7 @@ if (SRV) {
   /* 판매자 승인 */
   decide = function(id, status){
     JIDB.call("admin_seller_decide", { id: id, status: status }).then(function(){
-      toast(status === "approved" ? "승인했습니다 — 역할이 상점·공구판매자로 바뀌고 알림이 갔어요" : "반려했습니다"); reloadAll();
+      toast(status === "approved" ? "승인했습니다 — 역할이 상점·공구판매자로 바뀌고 알림이 갔어요" : "반려했습니다 — 승인했던 회원이면 일반 회원으로 돌아가요"); reloadAll();
     }, function(e){ alert(e.message); });
   };
 

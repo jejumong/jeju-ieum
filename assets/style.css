@@ -1992,3 +1992,5 @@ a.act-item:hover{border-color:var(--sea-200)}
 .act-item.sel-item{display:flex;gap:12px;align-items:flex-start}
 .sel-item > input{margin-top:3px}
 .sel-main{flex:1;min-width:0;display:block;text-decoration:none;color:inherit}
+.pv-shop{display:grid;gap:8px;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:6px 0 16px;font-size:14.5px}
+.pv-shop div{display:flex;gap:12px}.pv-shop b{flex:none;width:92px;color:var(--ink-3);font-weight:700}.pv-shop span{color:var(--ink);white-space:pre-wrap}
