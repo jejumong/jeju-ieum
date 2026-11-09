@@ -205,6 +205,20 @@ case 'maint': {
     }
     out(['as' => $a['nick'], 'uploaded' => $n, 'skipped' => $skip]);
   }
+  if ($op === 'admins') {   // 관리자 계정 확인 (기록이 공개될 수 있어 이메일은 가림)
+    $mask = function($e){ $p = explode('@', $e); return mb_substr($p[0], 0, 2) . '***@' . ($p[1] ?? ''); };
+    out(['admins' => array_map(function($u) use ($mask) { return ['nick' => $u['nick'], 'email' => $mask($u['email'])]; }, all("SELECT nick, email FROM ji_users WHERE role = 'admin'")),
+         'help_taken' => (bool)one("SELECT id FROM ji_users WHERE email = 'help@jejuieum.com'")]);
+  }
+  if ($op === 'admin_email') {   // 관리자 계정이 하나일 때만, 그 계정의 로그인 이메일을 바꿈
+    $new = strtolower(trim((string)(((array)($R['ids'] ?? []))[0] ?? '')));
+    if (!filter_var($new, FILTER_VALIDATE_EMAIL)) fail('이메일 형식이 아니에요');
+    $ad = all("SELECT id, nick FROM ji_users WHERE role = 'admin'");
+    if (count($ad) !== 1) fail('관리자 계정이 ' . count($ad) . '개라 자동으로 바꾸지 않았어요');
+    if (one("SELECT id FROM ji_users WHERE email = ? AND id <> ?", [$new, $ad[0]['id']])) fail('이미 다른 계정이 쓰는 이메일이에요');
+    q("UPDATE ji_users SET email = ? WHERE id = ?", [$new, $ad[0]['id']]);
+    out(['changed' => $ad[0]['nick']]);
+  }
   if ($op === 'op_sync') {   // 초안 파일에서 고친 제목·본문·말머리를 이미 올린 운영자 글에 반영 (게시판은 그대로)
     $map = [];
     foreach (all("SELECT id, board, title, content, head, extra FROM ji_posts WHERE extra LIKE '%\"op\"%'") as $r) { $x = json_decode($r['extra'] ?: '{}', true); if (!empty($x['op'])) $map[$x['op']] = $r; }
