@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261109m">
+<link rel="stylesheet" href="assets/style.css?v=20261109n">
 </head>
 <body data-active="">
 
@@ -140,15 +140,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261109m"></script>
-<script src="assets/common.js?v=20261109m"></script>
-<script src="assets/db.js?v=20261109m"></script>
-<script src="assets/notify.js?v=20261109m"></script>
-<script src="assets/seed-trade.js?v=20261109m"></script>
-<script src="assets/seed-extra.js?v=20261109m"></script>
-<script src="assets/seed-new.js?v=20261109m"></script>
-<script src="assets/seed-comments.js?v=20261109m"></script>
-<script src="assets/admin-data.js?v=20261109m"></script>
+<script src="assets/kmap.js?v=20261109n"></script>
+<script src="assets/common.js?v=20261109n"></script>
+<script src="assets/db.js?v=20261109n"></script>
+<script src="assets/notify.js?v=20261109n"></script>
+<script src="assets/seed-trade.js?v=20261109n"></script>
+<script src="assets/seed-extra.js?v=20261109n"></script>
+<script src="assets/seed-new.js?v=20261109n"></script>
+<script src="assets/seed-comments.js?v=20261109n"></script>
+<script src="assets/admin-data.js?v=20261109n"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -301,9 +301,9 @@ function toggleExtra() {
     "최신뉴스": ["선택 안 함", "뉴스", "공고", "행정", "날씨·재난", "교통"],
     "생활정보": ["선택 안 함", "정보", "꿀팁", "행정", "쇼핑·택배", "집 관리", "후기"],
     "취미·여행": ["선택 안 함", "오름·숲길", "바다", "맛집·카페", "가볼 만한 곳", "취미", "정보", "후기"],
-    "교육": ["선택 안 함", "정보", "학교", "방과후·학원", "체험", "농어촌유학", "질문"],
-    "건강웰빙": ["선택 안 함", "정보", "병원·약국", "운동", "마음 건강", "먹거리", "질문"],
-    "제주북쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"], "제주동쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"], "제주서쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"], "제주남쪽": ["선택 안 함", "동네소식", "질문", "정보", "맛집·카페", "나눔", "자유"],
+    "교육": ["선택 안 함", "질문", "정보", "학교", "방과후·학원", "체험", "농어촌유학"],
+    "건강웰빙": ["선택 안 함", "질문", "정보", "병원·약국", "운동", "마음 건강", "먹거리"],
+    "제주북쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"], "제주동쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"], "제주서쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"], "제주남쪽": ["선택 안 함", "자유", "질문", "동네소식", "정보", "맛집·카페", "나눔"],
     "_": ["선택 안 함", "자유", "질문", "정보", "후기", "나눔"]
   };
   var v = document.getElementById("board").value;
