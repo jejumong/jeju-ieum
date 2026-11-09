@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110l">
+<link rel="stylesheet" href="assets/style.css?v=20261110m">
 <meta name="description" content="제주 작은학교 살리기 마을 공동주택, 학교 연계 주택, 농어촌유학 학교, 체류형 지원을 한곳에 정리했습니다. 주소·입주 조건·비용·문의처와 빈자리 무료 알림.">
 <link rel="canonical" href="https://jejuieum.com/school.html">
 </head>
@@ -64,14 +64,14 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261110l"></script>
-<script src="assets/db.js?v=20261110l"></script>
-<script src="assets/seed-trade.js?v=20261110l"></script>
-<script src="assets/admin-data.js?v=20261110l"></script>
-<script src="assets/school-housing-data.js?v=20261110l"></script>
-<script src="assets/programs-data.js?v=20261110l"></script>
-<script src="assets/notify.js?v=20261110l"></script>
-<script src="assets/kmap.js?v=20261110l"></script>
+<script src="assets/common.js?v=20261110m"></script>
+<script src="assets/db.js?v=20261110m"></script>
+<script src="assets/seed-trade.js?v=20261110m"></script>
+<script src="assets/admin-data.js?v=20261110m"></script>
+<script src="assets/school-housing-data.js?v=20261110m"></script>
+<script src="assets/programs-data.js?v=20261110m"></script>
+<script src="assets/notify.js?v=20261110m"></script>
+<script src="assets/kmap.js?v=20261110m"></script>
 <script>
 /* ── 학교 연계·체류형 집 ── */
 (function(){
@@ -281,6 +281,7 @@
         var lat = +hit.y, lng = +hit.x, C = new K.LatLng(lat, lng);
         var el = document.getElementById("nb-map"); el.innerHTML = "";
         var map = new K.Map(el, { center: C, level: 7 });
+        [80, 300, 700].forEach(function(t){ setTimeout(function(){ map.relayout(); map.setCenter(C); }, t); });   // 창이 열리는 동안 크기가 바뀌어도 학교가 가운데 오게
         new K.Marker({ map: map, position: C, title: full, image: new K.MarkerImage("https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", new K.Size(24, 35)) });
         var circle = new K.Circle({ map: map, center: C, radius: R, strokeWeight: 2, strokeColor: "#1f74d0", strokeOpacity: .7, fillColor: "#1f74d0", fillOpacity: .06 });
         var marks = [], info = new K.InfoWindow({ removable: true });
