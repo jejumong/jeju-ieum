@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261110m">
+<link rel="stylesheet" href="assets/style.css?v=20261110n">
 <meta name="description" content="제주 작은학교 살리기 마을 공동주택, 학교 연계 주택, 농어촌유학 학교, 체류형 지원을 한곳에 정리했습니다. 주소·입주 조건·비용·문의처와 빈자리 무료 알림.">
 <link rel="canonical" href="https://jejuieum.com/school.html">
 </head>
@@ -64,14 +64,14 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261110m"></script>
-<script src="assets/db.js?v=20261110m"></script>
-<script src="assets/seed-trade.js?v=20261110m"></script>
-<script src="assets/admin-data.js?v=20261110m"></script>
-<script src="assets/school-housing-data.js?v=20261110m"></script>
-<script src="assets/programs-data.js?v=20261110m"></script>
-<script src="assets/notify.js?v=20261110m"></script>
-<script src="assets/kmap.js?v=20261110m"></script>
+<script src="assets/common.js?v=20261110n"></script>
+<script src="assets/db.js?v=20261110n"></script>
+<script src="assets/seed-trade.js?v=20261110n"></script>
+<script src="assets/admin-data.js?v=20261110n"></script>
+<script src="assets/school-housing-data.js?v=20261110n"></script>
+<script src="assets/programs-data.js?v=20261110n"></script>
+<script src="assets/notify.js?v=20261110n"></script>
+<script src="assets/kmap.js?v=20261110n"></script>
 <script>
 /* ── 학교 연계·체류형 집 ── */
 (function(){
@@ -285,19 +285,64 @@
         new K.Marker({ map: map, position: C, title: full, image: new K.MarkerImage("https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png", new K.Size(24, 35)) });
         var circle = new K.Circle({ map: map, center: C, radius: R, strokeWeight: 2, strokeColor: "#1f74d0", strokeOpacity: .7, fillColor: "#1f74d0", fillOpacity: .06 });
         var marks = [], info = new K.InfoWindow({ removable: true });
+        /* 카카오 장소 검색은 한 번에 45곳까지만 줘요 → 영역을 4칸씩 나눠 다시 찾아 모두 모음 */
+        var STAY_CACHE = {}, stayRun = 0;
+        function rectAll(sw, ne, depth){
+          return new Promise(function(res){
+            var got = [], b = new K.LatLngBounds(new K.LatLng(sw[0], sw[1]), new K.LatLng(ne[0], ne[1]));
+            svc.categorySearch("AD5", function(d, st2, pg){
+              if (st2 !== K.services.Status.OK) return res(got);
+              if (pg && pg.current === 1 && pg.totalCount > 45 && depth < 4) {   // 너무 많으면 4칸으로 나눔
+                var mlat = (sw[0] + ne[0]) / 2, mlng = (sw[1] + ne[1]) / 2;
+                return Promise.all([[sw, [mlat, mlng]], [[sw[0], mlng], [mlat, ne[1]]], [[mlat, sw[1]], [ne[0], mlng]], [[mlat, mlng], ne]]
+                  .map(function(q){ return rectAll(q[0], q[1], depth + 1); })).then(function(rs){ res([].concat.apply([], rs)); });
+              }
+              got = got.concat(d);
+              if (pg && pg.hasNextPage) pg.nextPage(); else res(got);
+            }, { bounds: b });
+          });
+        }
         function stays(){
-          marks.forEach(function(m){ m.setMap(null); }); marks = []; var all = [];
-          document.getElementById("nb-stay").textContent = "찾는 중…";
-          svc.categorySearch("AD5", function(d, st2, pg){
-            if (st2 === K.services.Status.OK) all = all.concat(d);
-            if (st2 === K.services.Status.OK && pg && pg.hasNextPage && all.length < 45) return pg.nextPage();
-            document.getElementById("nb-cnt").textContent = all.length ? "· 반경 " + km(R) + " 안 " + all.length + (all.length >= 45 ? "곳 이상" : "곳") : "";
+          marks.forEach(function(m){ m.setMap(null); }); marks = [];
+          var run = ++stayRun, key = R;
+          document.getElementById("nb-stay").innerHTML = '<p class="nb-none">숙소를 모두 찾는 중이에요… (많으면 몇 초 걸려요)</p>';
+          document.getElementById("nb-cnt").textContent = "";
+          var dLat = R / 111000, dLng = R / (111000 * Math.cos(lat * Math.PI / 180));
+          var job = STAY_CACHE[key] || (STAY_CACHE[key] = rectAll([lat - dLat, lng - dLng], [lat + dLat, lng + dLng], 0).then(function(rows){
+            var seen = {}, out = [];
+            rows.forEach(function(p){ if (seen[p.id]) return; seen[p.id] = 1; p.dist = Math.round(hav(lat, lng, +p.y, +p.x)); if (p.dist <= R) out.push(p); });
+            return out.sort(function(a, b){ return a.dist - b.dist; });
+          }));
+          job.then(function(all){
+            if (run !== stayRun) return;
             all.forEach(function(p){ var m = new K.Marker({ map: map, position: new K.LatLng(+p.y, +p.x), title: p.place_name }); marks.push(m);
-              K.event.addListener(m, "click", function(){ info.setContent('<div style="padding:6px 10px;font-size:13px;white-space:nowrap"><b>' + esc(p.place_name) + '</b><br>' + km(p.distance) + ' · <a href="' + p.place_url + '" target="_blank">카카오맵</a></div>'); info.open(map, m); }); });
-            document.getElementById("nb-stay").innerHTML = all.length ? all.map(function(p){
-              return '<a class="nb-item" href="' + esc(p.place_url) + '" target="_blank" rel="noopener"><b>' + esc(p.place_name) + '</b><span>' + esc((p.category_name || "").split(" > ").pop()) + (p.phone ? ' · ' + esc(p.phone) : '') + '</span><em>' + km(p.distance) + '</em></a>';
-            }).join("") : '<p class="nb-none">반경 ' + km(R) + ' 안에 등록된 숙소가 없어요. 반경을 넓혀 보세요.</p>';
-          }, { location: C, radius: R, sort: K.services.SortBy.DISTANCE });
+              K.event.addListener(m, "click", function(){ info.setContent('<div style="padding:6px 10px;font-size:13px;white-space:nowrap"><b>' + esc(p.place_name) + '</b><br>' + km(p.dist) + ' · <a href="' + p.place_url + '" target="_blank">카카오맵</a></div>'); info.open(map, m); }); });
+            STAYS = all; drawStays();
+          });
+        }
+        var STAYS = [], stayQ = "", stayT = "";
+        var TYPES = ["펜션", "민박", "게스트하우스", "호텔", "리조트", "모텔"];
+        function typeOf(p){ var c = p.category_name || ""; for (var i = 0; i < TYPES.length; i++) if (c.indexOf(TYPES[i]) > -1) return TYPES[i]; return "기타"; }
+        function drawStays(){
+          var cnt = {}; STAYS.forEach(function(p){ var t = typeOf(p); cnt[t] = (cnt[t] || 0) + 1; });
+          var list = STAYS.filter(function(p){ return (!stayT || typeOf(p) === stayT) && (!stayQ || (p.place_name + " " + (p.address_name || "")).indexOf(stayQ) > -1); });
+          document.getElementById("nb-cnt").textContent = STAYS.length ? "· 반경 " + km(R) + " 안 " + STAYS.length + "곳" : "";
+          var bar = document.getElementById("nb-stay-bar");
+          if (!bar) { document.getElementById("nb-stay").insertAdjacentHTML("beforebegin", '<div id="nb-stay-bar" class="nb-sbar"></div>'); bar = document.getElementById("nb-stay-bar"); }
+          bar.innerHTML = STAYS.length ? '<input type="search" id="nb-q" placeholder="숙소 이름·주소로 찾기" value="' + esc(stayQ) + '">' +
+            '<div class="nb-types"><button type="button" data-t=""' + (!stayT ? ' class="on"' : '') + '>전체 ' + STAYS.length + '</button>' +
+            TYPES.concat(["기타"]).filter(function(t){ return cnt[t]; }).map(function(t){ return '<button type="button" data-t="' + t + '"' + (stayT === t ? ' class="on"' : '') + '>' + t + ' ' + cnt[t] + '</button>'; }).join("") + '</div>' : '';
+          var q = document.getElementById("nb-q");
+          if (q) { q.oninput = function(){ stayQ = this.value.trim(); drawStayList(); }; }
+          bar.querySelectorAll("[data-t]").forEach(function(b){ b.onclick = function(){ stayT = b.dataset.t; drawStays(); }; });
+          drawStayList();
+        }
+        function drawStayList(){
+          var list = STAYS.filter(function(p){ return (!stayT || typeOf(p) === stayT) && (!stayQ || (p.place_name + " " + (p.address_name || "")).indexOf(stayQ) > -1); });
+          marks.forEach(function(m, i){ var p = STAYS[i]; m.setVisible(!stayT && !stayQ || list.indexOf(p) > -1); });
+          document.getElementById("nb-stay").innerHTML = list.length ? list.map(function(p){
+            return '<a class="nb-item" href="' + esc(p.place_url) + '" target="_blank" rel="noopener"><b>' + esc(p.place_name) + '</b><span>' + esc((p.category_name || "").split(" > ").pop()) + (p.phone ? ' · ' + esc(p.phone) : '') + '</span><em>' + km(p.dist) + '</em></a>';
+          }).join("") : '<p class="nb-none">' + (STAYS.length ? '조건에 맞는 숙소가 없어요.' : '반경 ' + km(R) + ' 안에 등록된 숙소가 없어요. 반경을 넓혀 보세요.') + '</p>';
         }
         var LIFE = [["🏥 소아과", "kw", "소아청소년과"], ["🚑 응급실", "kw", "응급실"], ["💊 약국", "PM9"], ["🛒 마트", "MT1"], ["🏪 편의점", "CS2"], ["👶 어린이집·유치원", "PS3"], ["📚 학원", "AC5"], ["🏦 은행", "BK9"]];
         var lifeOut = LIFE.map(function(){ return null; }), left = LIFE.length;
