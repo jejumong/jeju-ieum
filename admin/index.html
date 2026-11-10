@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261111g">
+<link rel="stylesheet" href="../assets/style.css?v=20261111h">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -272,17 +272,17 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261111g"></script>
-<script src="../assets/db.js?v=20261111g"></script>
-<script src="../assets/notify.js?v=20261111g"></script>
-<script src="../assets/seed-trade.js?v=20261111g"></script>
-<script src="../assets/seed-extra.js?v=20261111g"></script>
-<script src="../assets/seed-new.js?v=20261111g"></script>
-<script src="../assets/seed-comments.js?v=20261111g"></script>
-<script src="../assets/photos.js?v=20261111g"></script>
-<script src="../assets/admin-data.js?v=20261111g"></script>
-<script src="../assets/kmap.js?v=20261111g"></script>
-<script src="../assets/op-posts.js?v=20261111g"></script>
+<script src="../assets/common.js?v=20261111h"></script>
+<script src="../assets/db.js?v=20261111h"></script>
+<script src="../assets/notify.js?v=20261111h"></script>
+<script src="../assets/seed-trade.js?v=20261111h"></script>
+<script src="../assets/seed-extra.js?v=20261111h"></script>
+<script src="../assets/seed-new.js?v=20261111h"></script>
+<script src="../assets/seed-comments.js?v=20261111h"></script>
+<script src="../assets/photos.js?v=20261111h"></script>
+<script src="../assets/admin-data.js?v=20261111h"></script>
+<script src="../assets/kmap.js?v=20261111h"></script>
+<script src="../assets/op-posts.js?v=20261111h"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1256,8 +1256,8 @@ if (SRV) {
         '<p class="sub" style="margin:12px 0 0">오늘 방문자 중 처음 온 사람 <b>' + tfNum(t.nv) + '명</b> · 휴대폰 <b>' + (t.uv ? Math.round(t.mob / t.uv * 100) : 0) + '%</b> / PC ' + (t.uv ? 100 - Math.round(t.mob / t.uv * 100) : 0) + '%</p></div>' +
       '<div class="panel"><h2>시간대별 방문자</h2><div class="tf-lg"><span><b></b>오늘</span><span><b class="y"></b>어제</span></div>' + hours + '</div>' +
       '<div class="tf-2">' +
-        '<div class="panel"><h2>지금 보고 있는 페이지 <small style="font-weight:600;color:var(--ink-4)">최근 5분</small></h2>' + tfList(r.live_pages, "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
-        '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList(D.pages, "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
+        '<div class="panel"><h2>지금 보고 있는 페이지 <small style="font-weight:600;color:var(--ink-4)">최근 5분</small></h2>' + tfList((r.live_pages || []).slice(0, 10), "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
+        '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList((D.pages || []).slice(0, 10), "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
       '</div>' + tmPanels() +
       '<div class="panel"><h2>최근 30일 방문자</h2>' + days + '</div>' +
       '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
