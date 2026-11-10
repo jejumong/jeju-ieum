@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261111n">
+<link rel="stylesheet" href="../assets/style.css?v=20261111o">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -281,17 +281,17 @@ table.mem-t td small{font-size:13px}
 <div class="toast" id="toast"></div>
 
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261111n"></script>
-<script src="../assets/db.js?v=20261111n"></script>
-<script src="../assets/notify.js?v=20261111n"></script>
-<script src="../assets/seed-trade.js?v=20261111n"></script>
-<script src="../assets/seed-extra.js?v=20261111n"></script>
-<script src="../assets/seed-new.js?v=20261111n"></script>
-<script src="../assets/seed-comments.js?v=20261111n"></script>
-<script src="../assets/photos.js?v=20261111n"></script>
-<script src="../assets/admin-data.js?v=20261111n"></script>
-<script src="../assets/kmap.js?v=20261111n"></script>
-<script src="../assets/op-posts.js?v=20261111n"></script>
+<script src="../assets/common.js?v=20261111o"></script>
+<script src="../assets/db.js?v=20261111o"></script>
+<script src="../assets/notify.js?v=20261111o"></script>
+<script src="../assets/seed-trade.js?v=20261111o"></script>
+<script src="../assets/seed-extra.js?v=20261111o"></script>
+<script src="../assets/seed-new.js?v=20261111o"></script>
+<script src="../assets/seed-comments.js?v=20261111o"></script>
+<script src="../assets/photos.js?v=20261111o"></script>
+<script src="../assets/admin-data.js?v=20261111o"></script>
+<script src="../assets/kmap.js?v=20261111o"></script>
+<script src="../assets/op-posts.js?v=20261111o"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -375,7 +375,7 @@ function restorePost(p){
 function cmtCount(p){ return typeof commentCountOf === "function" ? commentCountOf(p.id) : 0; }
 
 /* ── 화면 틀 ── */
-var view = ["dash","traffic","posts","notices","premium","inquiries","sellers","trash","members","alerts","opposts"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
+var view = ["dash","traffic","account","posts","notices","premium","inquiries","sellers","trash","members","alerts","opposts"].indexOf((location.hash || "").slice(1)) > -1 ? location.hash.slice(1) : "dash";
 var MENU = [
   ["dash","대시보드"],["posts","게시글 관리"],["notices","공지 관리"],["premium","프리미엄 관리"],
   ["inquiries","문의·제보"],["sellers","판매자 승인"],["trash","삭제된 글"],["settings","설정"]
@@ -961,10 +961,10 @@ if (SRV) {
   };
 
   /* 회원 관리 (서버 모드에서만) */
-  MENU.splice(MENU.length - 1, 1, ["opposts", "운영자 글"], ["members", "회원 관리"], ["alerts", "알림 설정"]);
+  MENU.splice(MENU.length - 1, 1, ["opposts", "운영자 글"], ["members", "회원 관리"], ["alerts", "알림 설정"], ["account", "관리자 정보 수정"]);
   MENU.splice(1, 0, ["traffic", "방문 통계"]);
   var _draw = draw;
-  draw = function(){ if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "settings") view = "members"; return _draw(); };
+  draw = function(){ if (view === "account") return drawAccount(); if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "settings") view = "members"; return _draw(); };
 
   /* 운영자 글: assets/op-posts.js 초안을 골라 내 계정으로 올림 (이미 올린 글은 표시) */
   window.drawOpPosts = function(){
@@ -1119,29 +1119,8 @@ if (SRV) {
             '<div class="mc-foot"><small>가입 ' + esc((u.created_at||"").slice(0,10)) + ' · 최근 ' + esc((u.last_login||"").slice(0,10) || "-") + '</small>' +
               (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</div></div>';
         }).join("") + '</div>'
-        : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
-      '<div class="panel" id="pw-panel"><h2>관리자 비밀번호 바꾸기</h2>' +
-        '<p style="margin:0 0 12px;color:var(--ink-3)">' + esc((JIDB.me() || {}).email || "") + ' 계정의 비밀번호를 바꿔요. 바꾸면 이 창을 뺀 다른 기기·브라우저(사이트 포함)는 로그아웃돼요.</p>' +
-        '<form id="pw-f" class="pw-f" autocomplete="off">' +
-          '<label>현재 비밀번호<input type="password" id="pw-cur" autocomplete="current-password" required></label>' +
-          '<label>새 비밀번호 (8자 이상)<input type="password" id="pw-new" autocomplete="new-password" minlength="8" required></label>' +
-          '<label>새 비밀번호 확인<input type="password" id="pw-new2" autocomplete="new-password" minlength="8" required></label>' +
-          '<div class="pw-act"><span class="pw-msg" id="pw-msg"></span><button class="btn primary" type="submit">비밀번호 바꾸기</button></div>' +
-        '</form></div>';
-    var pf = document.getElementById("pw-f");
-    if (pf) pf.onsubmit = function(e){
-      e.preventDefault();
-      var cur = document.getElementById("pw-cur").value, n1 = document.getElementById("pw-new").value, n2 = document.getElementById("pw-new2").value;
-      var msg = document.getElementById("pw-msg"); msg.className = "pw-msg";
-      if (n1.length < 8) { msg.textContent = "새 비밀번호는 8자 이상이어야 해요."; msg.classList.add("bad"); return; }
-      if (n1 !== n2) { msg.textContent = "새 비밀번호가 서로 달라요."; msg.classList.add("bad"); return; }
-      if (n1 === cur) { msg.textContent = "지금 비밀번호와 다른 비밀번호로 정해 주세요."; msg.classList.add("bad"); return; }
-      var b = pf.querySelector("button"); b.disabled = true; b.textContent = "바꾸는 중…";
-      JIDB.call("password_change", { cur: cur, "new": n1 }).then(function(){
-        pf.reset(); msg.textContent = "비밀번호를 바꿨어요. 다음 로그인부터 새 비밀번호를 써 주세요."; msg.classList.add("ok");
-      }, function(err){ msg.textContent = err.message; msg.classList.add("bad"); })
-        .then(function(){ b.disabled = false; b.textContent = "비밀번호 바꾸기"; });
-    };
+        : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>';
+
     paintBulk("mem");
   };
   /* 회원이 쓴 글·댓글 목록 */
@@ -1308,6 +1287,32 @@ if (SRV) {
     }, function(){ box.remove(); });
   };
 
+  /* 관리자 정보 수정 (비밀번호) */
+  window.drawAccount = function(){
+    M().innerHTML = '<h1>관리자 정보 수정</h1><p class="sub">관리자 계정 비밀번호를 바꿔요.</p>' +
+      '<div class="panel" id="pw-panel"><h2>관리자 비밀번호 바꾸기</h2>' +
+        '<p style="margin:0 0 12px;color:var(--ink-3)">' + esc((JIDB.me() || {}).email || "") + ' 계정의 비밀번호를 바꿔요. 바꾸면 이 창을 뺀 다른 기기·브라우저(사이트 포함)는 로그아웃돼요.</p>' +
+        '<form id="pw-f" class="pw-f" autocomplete="off">' +
+          '<label>현재 비밀번호<input type="password" id="pw-cur" autocomplete="current-password" required></label>' +
+          '<label>새 비밀번호 (8자 이상)<input type="password" id="pw-new" autocomplete="new-password" minlength="8" required></label>' +
+          '<label>새 비밀번호 확인<input type="password" id="pw-new2" autocomplete="new-password" minlength="8" required></label>' +
+          '<div class="pw-act"><span class="pw-msg" id="pw-msg"></span><button class="btn primary" type="submit">비밀번호 바꾸기</button></div>' +
+        '</form></div>';
+    var pf = document.getElementById("pw-f");
+    if (pf) pf.onsubmit = function(e){
+      e.preventDefault();
+      var cur = document.getElementById("pw-cur").value, n1 = document.getElementById("pw-new").value, n2 = document.getElementById("pw-new2").value;
+      var msg = document.getElementById("pw-msg"); msg.className = "pw-msg";
+      if (n1.length < 8) { msg.textContent = "새 비밀번호는 8자 이상이어야 해요."; msg.classList.add("bad"); return; }
+      if (n1 !== n2) { msg.textContent = "새 비밀번호가 서로 달라요."; msg.classList.add("bad"); return; }
+      if (n1 === cur) { msg.textContent = "지금 비밀번호와 다른 비밀번호로 정해 주세요."; msg.classList.add("bad"); return; }
+      var b = pf.querySelector("button"); b.disabled = true; b.textContent = "바꾸는 중…";
+      JIDB.call("password_change", { cur: cur, "new": n1 }).then(function(){
+        pf.reset(); msg.textContent = "비밀번호를 바꿨어요. 다음 로그인부터 새 비밀번호를 써 주세요."; msg.classList.add("ok");
+      }, function(err){ msg.textContent = err.message; msg.classList.add("bad"); })
+        .then(function(){ b.disabled = false; b.textContent = "비밀번호 바꾸기"; });
+    };
+  };
   logoutAdmin = function(){ JIDB.signOut().then(function(){ adminLogin(); }); };
   /* 관리자 콘솔 전용 로그인 — 사이트 로그인과 따로 */
   window.adminLogin = function(msg){
