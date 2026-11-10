@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261110z">
+<link rel="stylesheet" href="../assets/style.css?v=20261111a">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -241,6 +241,29 @@ table.mem-t td small{font-size:13px}
 .dash-tf b{font-size:17px}
 .dash-tf .go{margin-left:auto;font-weight:800;color:var(--sea-700)}
 @media (max-width:900px){ .tf-2{grid-template-columns:1fr} .tf-act{grid-template-columns:repeat(3,1fr)} .tf-row .bar{display:none} }
+.tm-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:26px 0 12px}
+.tm-head h2{font-size:19px;font-weight:800;margin:0}
+.tm-head .tf-seg{margin:0}
+.tm-range{font-size:13px;color:var(--ink-4);font-weight:600}
+.tm-stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#eef2f6}
+.tm-stack i{display:block;height:100%}
+.tm-leg{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:13.5px;color:var(--ink-2)}
+.tm-leg b{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.tm-leg em{font-style:normal;font-weight:800}
+.tm-leg small{color:var(--ink-4)}
+.tm-h3{font-size:14px;font-weight:800;margin:16px 0 4px;color:var(--ink-2)}
+.tm-rank{list-style:none;margin:0;padding:0}
+.tm-rank li{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f1f3f6;font-size:14px}
+.tm-rank li:last-child{border-bottom:0}
+.tm-rank .no{flex:none;width:26px;height:26px;border-radius:8px;background:#f1f3f6;display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--ink-3)}
+.tm-rank .no.top{background:#1e88e5;color:#fff}
+.tm-rank .nm{flex:1;min-width:0;display:flex;flex-direction:column}
+.tm-rank .nm a{color:var(--ink);font-weight:700;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tm-rank .nm a:hover{color:var(--sea)}
+.tm-rank .nm small{font-size:12px;color:var(--ink-4)}
+.tm-rank .n{flex:none;font-weight:800}
+.panel h2 .tf-seg{margin-left:8px}
+@media (max-width:760px){ .panel h2 .tf-seg{display:flex;margin:8px 0 0;width:max-content;max-width:100%;overflow-x:auto} .tm-rank .nm a{white-space:normal} }
 </style>
 </head>
 <body data-admin>
@@ -249,17 +272,17 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261110z"></script>
-<script src="../assets/db.js?v=20261110z"></script>
-<script src="../assets/notify.js?v=20261110z"></script>
-<script src="../assets/seed-trade.js?v=20261110z"></script>
-<script src="../assets/seed-extra.js?v=20261110z"></script>
-<script src="../assets/seed-new.js?v=20261110z"></script>
-<script src="../assets/seed-comments.js?v=20261110z"></script>
-<script src="../assets/photos.js?v=20261110z"></script>
-<script src="../assets/admin-data.js?v=20261110z"></script>
-<script src="../assets/kmap.js?v=20261110z"></script>
-<script src="../assets/op-posts.js?v=20261110z"></script>
+<script src="../assets/common.js?v=20261111a"></script>
+<script src="../assets/db.js?v=20261111a"></script>
+<script src="../assets/notify.js?v=20261111a"></script>
+<script src="../assets/seed-trade.js?v=20261111a"></script>
+<script src="../assets/seed-extra.js?v=20261111a"></script>
+<script src="../assets/seed-new.js?v=20261111a"></script>
+<script src="../assets/seed-comments.js?v=20261111a"></script>
+<script src="../assets/photos.js?v=20261111a"></script>
+<script src="../assets/admin-data.js?v=20261111a"></script>
+<script src="../assets/kmap.js?v=20261111a"></script>
+<script src="../assets/op-posts.js?v=20261111a"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1129,7 +1152,7 @@ if (SRV) {
 
 
   /* ── 방문 통계: 실시간(최근 5분)·오늘·어제 ── */
-  var TF = null, tfDay = "t", tfTimer = null;
+  var TF = null, tfDay = "t", tfTimer = null, TM = null, tmP = "t", tmRank = "views";
   function tfNum(n){ return (n || 0).toLocaleString(); }
   function tfDiff(a, b, label){
     if (!b) return '<div class="d">' + label + ' 기록 없음</div>';
@@ -1148,8 +1171,48 @@ if (SRV) {
     }).join("");
   }
   window.loadTraffic = function(){
-    return JIDB.call("admin_traffic").then(function(r){ TF = r; return r; });
+    return Promise.all([JIDB.call("admin_traffic"), JIDB.call("admin_traffic_more", { p: tmP }).catch(function(){ return null; })])
+      .then(function(a){ TF = a[0]; TM = a[1]; return TF; });
   };
+  window.tmSet = function(k, v){
+    if (k === "rank") { tmRank = v; paintTraffic(); return; }
+    tmP = v; JIDB.call("admin_traffic_more", { p: tmP }).then(function(r){ TM = r; if (view === "traffic") paintTraffic(); });
+  };
+  function tmPanels(){
+    var m = TM; if (!m) return "";
+    var segP = '<span class="tf-seg">' + [["t","오늘"],["y","어제"],["7","최근 7일"],["30","최근 30일"]].map(function(x){
+      return '<button class="' + (tmP === x[0] ? "on" : "") + '" onclick="tmSet(\'p\',\'' + x[0] + '\')">' + x[1] + '</button>'; }).join("") + '</span>';
+    var pct = function(n, t){ return t ? Math.round(n / t * 100) : 0; };
+    var kv = function(rows, unit){ return tfList(rows, "n", function(x){ return esc(x.k); }, unit || "명"); };
+    // 유입 경로
+    var G = m.groups, gt = Object.keys(G).reduce(function(a, k){ return a + G[k]; }, 0), GC = { "검색": "#1e88e5", "SNS·메신저": "#f59e0b", "직접 방문": "#64748b", "다른 사이트": "#a855f7" };
+    var stack = '<div class="tm-stack">' + Object.keys(G).filter(function(k){ return G[k]; }).map(function(k){ return '<i style="width:' + pct(G[k], gt) + '%;background:' + GC[k] + '" title="' + k + ' ' + G[k] + '명"></i>'; }).join("") + '</div>' +
+      '<div class="tm-leg">' + Object.keys(G).map(function(k){ return '<span><b style="background:' + GC[k] + '"></b>' + k + ' <em>' + pct(G[k], gt) + '%</em> <small>' + tfNum(G[k]) + '명</small></span>'; }).join("") + '</div>';
+    // 기기
+    var dv = { m: 0, p: 0 }; (m.dev || []).forEach(function(x){ dv[x.k] = x.n; }); var dt = dv.m + dv.p;
+    var dev = '<div class="tm-stack"><i style="width:' + pct(dv.m, dt) + '%;background:#1e88e5"></i><i style="width:' + pct(dv.p, dt) + '%;background:#94a3b8"></i></div>' +
+      '<div class="tm-leg"><span><b style="background:#1e88e5"></b>📱 휴대폰 <em>' + pct(dv.m, dt) + '%</em> <small>' + tfNum(dv.m) + '명</small></span><span><b style="background:#94a3b8"></b>💻 PC <em>' + pct(dv.p, dt) + '%</em> <small>' + tfNum(dv.p) + '명</small></span></div>';
+    // 순위
+    var RK = { views: ["조회수", m.rank_views, "회"], comments: ["댓글", m.rank_comments, "개"], likes: ["좋아요", m.rank_likes, "개"], total: ["누적 조회수", m.rank_total, "회"] };
+    var cur = RK[tmRank];
+    var segR = '<span class="tf-seg">' + Object.keys(RK).map(function(k){ return '<button class="' + (tmRank === k ? "on" : "") + '" onclick="tmSet(\'rank\',\'' + k + '\')">' + RK[k][0] + '</button>'; }).join("") + '</span>';
+    var rank = (cur[1] && cur[1].length) ? '<ol class="tm-rank">' + cur[1].map(function(x, i){
+      return '<li><span class="no' + (i < 3 ? " top" : "") + '">' + (i + 1) + '</span><span class="nm"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(x.id) + '" target="_blank">' + esc(x.title) + '</a><small>' + esc(x.board) + ' · ' + esc(x.nick || "") + '</small></span><span class="n">' + tfNum(x.n) + cur[2] + '</span></li>';
+    }).join("") + '</ol>' : '<div class="empty">' + (tmRank === "total" ? "아직 글이 없어요." : "이 기간에는 기록이 없어요.") + '</div>';
+    var range = m.from === m.to ? m.from.replace(/-/g, ".") : m.from.slice(5).replace("-", ".") + " ~ " + m.to.slice(5).replace("-", ".");
+    return '<div class="tm-head"><h2>자세히 보기</h2>' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span></div>' +
+      '<div class="panel"><h2>유입 경로</h2>' + stack + '<div style="margin-top:14px">' + kv(m.refs) + '</div></div>' +
+      '<div class="tf-2">' +
+        '<div class="panel"><h2>검색 유입 <small style="font-weight:600;color:var(--ink-4)">검색 사이트별 방문자</small></h2>' + kv(m.search) +
+          '<h3 class="tm-h3">검색어</h3>' + (m.kws.length ? tfList(m.kws, "n", function(x){ return esc(x.k) + ' <small>' + esc(x.ref) + '</small>'; }, "명") :
+            '<div class="empty" style="padding:14px">아직 잡힌 검색어가 없어요. 구글은 검색어를 알려 주지 않고, 네이버도 일부만 알려 줘요.</div>') + '</div>' +
+        '<div class="panel"><h2>검색으로 처음 들어온 페이지</h2>' + tfList(m.landing, "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
+      '</div>' +
+      '<div class="panel"><h2>기기별 분포</h2>' + dev +
+        '<div class="tf-2" style="margin-top:16px"><div><h3 class="tm-h3">운영체제</h3>' + kv(m.os) + '</div><div><h3 class="tm-h3">브라우저·앱</h3>' + kv(m.br) + '</div></div></div>' +
+      '<div class="panel"><h2>글 순위 ' + segR + '</h2>' + rank +
+        '<p class="sub" style="margin:10px 0 0">조회수·댓글·좋아요는 위에서 고른 기간 기준이고, 누적 조회수는 글이 올라온 뒤 전체 합계예요.</p></div>';
+  }
   window.tfSetDay = function(d){ tfDay = d; drawTraffic(true); };
   window.drawTraffic = function(noFetch){
     clearInterval(tfTimer);
@@ -1194,9 +1257,8 @@ if (SRV) {
       '<div class="panel"><h2>시간대별 방문자</h2><div class="tf-lg"><span><b></b>오늘</span><span><b class="y"></b>어제</span></div>' + hours + '</div>' +
       '<div class="tf-2">' +
         '<div class="panel"><h2>지금 보고 있는 페이지 <small style="font-weight:600;color:var(--ink-4)">최근 5분</small></h2>' + tfList(r.live_pages, "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
-        '<div class="panel"><h2>들어온 곳 ' + seg + '</h2>' + tfList(D.refs, "n", function(x){ return esc(x.ref); }, "명") + '</div>' +
-      '</div>' +
-      '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList(D.pages, "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
+        '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList(D.pages, "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
+      '</div>' + tmPanels() +
       '<div class="panel"><h2>최근 30일 방문자</h2>' + days + '</div>' +
       '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
     window.scrollTo(0, sx);

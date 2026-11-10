@@ -595,8 +595,9 @@ case 'hit': {   // 방문 기록 한 줄 (로그인 필요 없음, 개인정보 
   $path = mb_substr($path, 0, 120);
   // 같은 사람이 같은 페이지를 10초 안에 다시 열면 한 번만
   if (one("SELECT id FROM ji_hits WHERE vid = ? AND path = ? AND at > (NOW() - INTERVAL 10 SECOND) LIMIT 1", [$vid, $path])) out(true);
-  q("INSERT INTO ji_hits (at, vid, nw, path, title, ref, dev) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [now(), $vid, !empty($R['nw']) ? 1 : 0, $path, mb_substr((string)($R['title'] ?? ''), 0, 80), mb_substr((string)($R['ref'] ?? ''), 0, 40), ($R['dev'] ?? '') === 'm' ? 'm' : 'p']);
+  q("INSERT INTO ji_hits (at, vid, nw, path, title, ref, dev, os, br, kw) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [now(), $vid, !empty($R['nw']) ? 1 : 0, $path, mb_substr((string)($R['title'] ?? ''), 0, 80), mb_substr((string)($R['ref'] ?? ''), 0, 40), ($R['dev'] ?? '') === 'm' ? 'm' : 'p',
+     mb_substr((string)($R['os'] ?? ''), 0, 12), mb_substr((string)($R['br'] ?? ''), 0, 12), mb_substr(trim((string)($R['kw'] ?? '')), 0, 60)]);
   if (mt_rand(1, 500) === 1) q("DELETE FROM ji_hits WHERE at < (NOW() - INTERVAL 400 DAY)");
   out(true);
 }
@@ -643,6 +644,62 @@ case 'admin_traffic': {   // 관리자: 실시간·오늘·어제 방문 통계
     't_pages' => $pages($today), 'y_pages' => $pages($yest), 't_refs' => $refs($today), 'y_refs' => $refs($yest),
     't_act' => $act($today), 'y_act' => $act($yest), 'days' => $days ?: new stdClass(),
     'since' => one("SELECT MIN(at) m FROM ji_hits")['m']]);
+}
+case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기기·글 순위
+  admin($R);
+  $p = (string)($R['p'] ?? 't');
+  $today = date('Y-m-d');
+  if ($p === 'y') { $from = date('Y-m-d', strtotime('-1 day')); $to = $today; }
+  elseif ($p === '7') { $from = date('Y-m-d', strtotime('-6 day')); $to = date('Y-m-d', strtotime('+1 day')); }
+  elseif ($p === '30') { $from = date('Y-m-d', strtotime('-29 day')); $to = date('Y-m-d', strtotime('+1 day')); }
+  else { $p = 't'; $from = $today; $to = date('Y-m-d', strtotime('+1 day')); }
+  $W = "at >= ? AND at < ?"; $A = [$from, $to];
+  $grp = function ($col, $lim = 12, $extra = '') use ($W, $A) {
+    return array_map(function ($r) { return ['k' => $r['k'], 'n' => (int)$r['n']]; },
+      all("SELECT $col k, COUNT(DISTINCT vid) n FROM ji_hits WHERE $W $extra GROUP BY $col ORDER BY n DESC LIMIT $lim", $A));
+  };
+  $refs = $grp('ref', 30, "AND ref <> ''");
+  $SE = ['네이버', '구글', '다음', '빙', '줌'];
+  $SNS = ['카카오', '카카오톡', '인스타그램', '페이스북', '유튜브', '밴드', '스레드', 'X'];
+  $groups = ['검색' => 0, 'SNS·메신저' => 0, '직접 방문' => 0, '다른 사이트' => 0];
+  foreach ($refs as $r) {
+    $g = in_array($r['k'], $SE) ? '검색' : (in_array($r['k'], $SNS) ? 'SNS·메신저' : ($r['k'] === '직접 방문' ? '직접 방문' : '다른 사이트'));
+    $groups[$g] += $r['n'];
+  }
+  $in = implode(',', array_fill(0, count($SE), '?'));
+  $search = array_map(function ($r) { return ['k' => $r['k'], 'n' => (int)$r['n'], 'pv' => (int)$r['pv']]; },
+    all("SELECT ref k, COUNT(DISTINCT vid) n, COUNT(*) pv FROM ji_hits WHERE $W AND ref IN ($in) GROUP BY ref ORDER BY n DESC", array_merge($A, $SE)));
+  $kws = array_map(function ($r) { return ['k' => $r['k'], 'ref' => $r['ref'], 'n' => (int)$r['n']]; },
+    all("SELECT kw k, MAX(ref) ref, COUNT(DISTINCT vid) n FROM ji_hits WHERE $W AND kw <> '' GROUP BY kw ORDER BY n DESC LIMIT 20", $A));
+  $land = array_map(function ($r) { return ['path' => $r['path'], 'title' => $r['title'], 'n' => (int)$r['n']]; },
+    all("SELECT path, MAX(title) title, COUNT(DISTINCT vid) n FROM ji_hits WHERE $W AND ref IN ($in) GROUP BY path ORDER BY n DESC LIMIT 10", array_merge($A, $SE)));
+  // 글 순위: 조회(기간 안 방문 기록) · 댓글 · 좋아요
+  $title = function ($ids) {
+    if (!$ids) return [];
+    $m = [];
+    foreach (all("SELECT id, title, board, author_nick, views FROM ji_posts WHERE id IN (" . implode(',', array_fill(0, count($ids), '?')) . ")", $ids) as $r) $m[$r['id']] = $r;
+    return $m;
+  };
+  $rank = function ($rows) use ($title) {
+    $m = $title(array_column($rows, 'id'));
+    $o = [];
+    foreach ($rows as $r) {
+      if (!isset($m[$r['id']])) continue;
+      $o[] = ['id' => $r['id'], 'title' => $m[$r['id']]['title'], 'board' => $m[$r['id']]['board'], 'nick' => $m[$r['id']]['author_nick'], 'n' => (int)$r['n']];
+      if (count($o) >= 10) break;
+    }
+    return $o;
+  };
+  $views = $rank(all("SELECT SUBSTRING(path, 15) id, COUNT(*) n FROM ji_hits WHERE $W AND path LIKE '/view.html?id=%' GROUP BY path ORDER BY n DESC LIMIT 30", $A));
+  $cmts = $rank(all("SELECT post_id id, COUNT(*) n FROM ji_comments WHERE created_at >= ? AND created_at < ? GROUP BY post_id ORDER BY n DESC LIMIT 30", $A));
+  $likes = $rank(all("SELECT post_id id, COUNT(*) n FROM ji_likes WHERE active = 1 AND created_at >= ? AND created_at < ? GROUP BY post_id ORDER BY n DESC LIMIT 30", $A));
+  $allViews = array_map(function ($r) { return ['id' => $r['id'], 'title' => $r['title'], 'board' => $r['board'], 'nick' => $r['author_nick'], 'n' => (int)$r['views']]; },
+    all("SELECT id, title, board, author_nick, views FROM ji_posts ORDER BY views DESC LIMIT 10"));
+  $tot = (int)one("SELECT COUNT(DISTINCT vid) n FROM ji_hits WHERE $W", $A)['n'];
+  out(['p' => $p, 'from' => $from, 'to' => date('Y-m-d', strtotime($to . ' -1 day')), 'uv' => $tot,
+    'groups' => $groups, 'refs' => $refs, 'search' => $search, 'kws' => $kws, 'landing' => $land,
+    'dev' => $grp('dev', 2), 'os' => $grp('os', 6, "AND os <> ''"), 'br' => $grp('br', 10, "AND br <> ''"),
+    'rank_views' => $views, 'rank_comments' => $cmts, 'rank_likes' => $likes, 'rank_total' => $allViews]);
 }
 case 'admin_users': {
   admin($R);

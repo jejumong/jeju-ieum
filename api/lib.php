@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 11;
+const JI_SCHEMA = 12;
 
 /* ── 응답 ── */
 function cors() {
@@ -134,6 +134,11 @@ function migrate($pdo) {
       id BIGINT AUTO_INCREMENT PRIMARY KEY, at DATETIME NOT NULL, vid CHAR(16) NOT NULL, nw TINYINT(1) NOT NULL DEFAULT 0,
       path VARCHAR(120) NOT NULL, title VARCHAR(80) NOT NULL DEFAULT '', ref VARCHAR(40) NOT NULL DEFAULT '', dev CHAR(1) NOT NULL DEFAULT 'p',
       INDEX (at), INDEX (vid, at))$T");
+  }
+  if ($v < 12) {   // 방문 기록: 운영체제·브라우저·검색어
+    foreach (["os VARCHAR(12) NOT NULL DEFAULT ''", "br VARCHAR(12) NOT NULL DEFAULT ''", "kw VARCHAR(60) NOT NULL DEFAULT ''"] as $col) {
+      try { $pdo->exec("ALTER TABLE ji_hits ADD COLUMN $col"); } catch (Exception $e) {}
+    }
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }

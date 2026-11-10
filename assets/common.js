@@ -661,20 +661,28 @@ document.addEventListener("click", function (e) {
       nw = 1; try { localStorage.setItem("ji_vid", vid); } catch (e) {}
     }
     // 들어온 곳: 이번 방문의 첫 페이지에서만 (사이트 안 이동은 빼고)
-    var ref = "";
+    var ua = navigator.userAgent;
+    var os = /iPhone|iPad|iPod/.test(ua) ? "iOS" : /Android/.test(ua) ? "Android" : /Windows/.test(ua) ? "Windows" : /Macintosh|Mac OS X/.test(ua) ? "Mac" : "기타";
+    var br = /NAVER\(inapp|NAVER/.test(ua) ? "네이버앱" : /KAKAOTALK/i.test(ua) ? "카카오톡" : /Instagram/.test(ua) ? "인스타그램" : /FBAN|FBAV/.test(ua) ? "페이스북" :
+      /SamsungBrowser/.test(ua) ? "삼성인터넷" : /Whale/.test(ua) ? "웨일" : /Edg\//.test(ua) ? "엣지" : /Firefox|FxiOS/.test(ua) ? "파이어폭스" :
+      /CriOS|Chrome/.test(ua) ? "크롬" : /Safari/.test(ua) ? "사파리" : "기타";
+    var ref = "", kw = "";
     var first = true; try { first = !sessionStorage.getItem("ji_sess"); sessionStorage.setItem("ji_sess", "1"); } catch (e) {}
     if (first) {
-      var h = ""; try { h = document.referrer ? new URL(document.referrer).hostname.replace(/^www\.|^m\./, "") : ""; } catch (e) {}
+      var h = "", RQ = null; try { if (document.referrer) { var RU = new URL(document.referrer); h = RU.hostname.replace(/^www\.|^m\./, ""); RQ = RU.searchParams; } } catch (e) {}
       var P = new URLSearchParams(location.search);
-      ref = P.get("utm_source") || (!h ? "직접 방문" : h.indexOf("jejuieum") > -1 || h === location.hostname ? "" :
-        /naver/.test(h) ? "네이버" : /google/.test(h) ? "구글" : /daum|kakao/.test(h) ? "다음·카카오" :
+      if (RQ && /naver|google|daum|bing|zum|yahoo/.test(h)) kw = RQ.get("query") || RQ.get("q") || RQ.get("p") || "";
+      kw = P.get("utm_term") || kw;
+      if (!h && /카카오톡|인스타그램|페이스북/.test(br)) h = br;
+      ref = P.get("utm_source") || (!h ? "직접 방문" : /^(카카오톡|인스타그램|페이스북)$/.test(h) ? h : h.indexOf("jejuieum") > -1 || h === location.hostname ? "" :
+        /naver/.test(h) ? "네이버" : /google/.test(h) ? "구글" : /daum/.test(h) ? "다음" : /kakao/.test(h) ? "카카오" : /zum/.test(h) ? "줌" :
         /instagram/.test(h) ? "인스타그램" : /facebook|fb\./.test(h) ? "페이스북" : /youtube|youtu\.be/.test(h) ? "유튜브" :
         /band\.us/.test(h) ? "밴드" : /bing/.test(h) ? "빙" : /threads/.test(h) ? "스레드" : h);
     }
     var path = location.pathname.replace(/\/index\.html$/, "/") || "/";
     var id = new URLSearchParams(location.search).get("id"); if (id) path += "?id=" + id.slice(0, 40);
     var body = JSON.stringify({ vid: vid, nw: nw, path: path.slice(0, 120), title: (document.title || "").replace(/\s*[—|-]\s*제주이음\s*$/, "").slice(0, 80),
-      ref: ref.slice(0, 40), dev: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "m" : "p" });
+      ref: ref.slice(0, 40), kw: kw.slice(0, 60), os: os, br: br, dev: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "m" : "p" });
     setTimeout(function () {
       fetch(api.replace(/\/?$/, "/") + "?a=hit", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: body, keepalive: true }).catch(function () {});
     }, 600);
