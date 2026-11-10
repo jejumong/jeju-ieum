@@ -307,7 +307,7 @@ Sitemap: ${SITE}sitemap.xml
 /* ───────── 최상위 페이지 링크 미리보기(카카오톡·문자) 태그 ───────── */
 {
   const DEF = "제주에 살고 있거나 살아보려는 사람들을 위한 생활 정보와 동네 커뮤니티. 가이드·한달살기·학교 연계 집·부동산·오일장 달력.";
-  const NOINDEX = ["write.html", "login.html", "signup.html", "forgot.html", "reset.html", "messages.html", "activity.html", "profile.html", "mypage.html"];
+  const NOINDEX = ["404.html", "write.html", "login.html", "signup.html", "forgot.html", "reset.html", "messages.html", "activity.html", "profile.html", "mypage.html"];
   for (const f of fs.readdirSync(ROOT).filter((x) => x.endsWith(".html"))) {
     let h = fs.readFileSync(path.join(ROOT, f), "utf8");
     const t = (h.match(/<title>([^<]*)<\/title>/) || [])[1]; if (!t) continue;

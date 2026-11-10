@@ -499,7 +499,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
           '<a href="info/index.html">제주 생활 정보 모음</a>' +
           '<a href="community.html">동네 커뮤니티</a>' +
         '</div>' +
-        '<div class="footer-col"><h4>부동산·거래</h4>' +
+        '<div class="footer-col"><h4>부동산·장터</h4>' +
           '<a href="realestate.html">부동산 매물</a>' +
           '<a href="jobs.html">구인구직</a>' +
           '<a href="market.html">중고사고팔기</a>' +
@@ -538,7 +538,10 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
       }).join("") + "</div></nav>";
     document.querySelector("header.site").insertAdjacentHTML("afterend", sub);
     var on = document.querySelector(".subnav a.on");
-    if (on && on.scrollIntoView && window.innerWidth < 700) on.parentNode.scrollLeft = on.offsetLeft - 60;
+    if (on && window.innerWidth < 700) {   // 고른 탭이 화면 밖이면 보이게 (앞쪽 탭이면 맨 앞부터)
+      var pn = on.parentNode, rel = on.getBoundingClientRect().left - pn.getBoundingClientRect().left + pn.scrollLeft;
+      pn.scrollLeft = rel + on.offsetWidth > pn.clientWidth - 16 ? Math.max(0, rel - 40) : 0;
+    }
     var cr = document.querySelector(".page-head .crumb");
     if (cr && active !== "trade" && active !== "realestate") cr.innerHTML = cr.innerHTML.replace('</a> ›', '</a> › <a href="trade.html">생활·장터</a> ›');
   }

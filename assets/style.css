@@ -2143,3 +2143,5 @@ a.act-item:hover{border-color:var(--sea-200)}
   .footer-brand .fb-logo .fb-img{height:22px}
   .footer-brand .fb-yt,.footer-brand .fb-yt.fb-about{flex:none;white-space:nowrap;display:inline-flex;align-items:center;line-height:1.2}
 }
+
+@media (max-width:680px){ .footer-links{gap:14px} .footer-links a{margin-right:0!important} }
