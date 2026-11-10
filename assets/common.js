@@ -496,6 +496,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="htt
           '<a href="school.html">학교 연계 집</a>' +
           '<a href="tools.html">생활도구</a>' +
           '<a href="festivals.html">축제정보</a>' +
+          '<a href="info/index.html">제주 생활 정보 모음</a>' +
           '<a href="community.html">동네 커뮤니티</a>' +
         '</div>' +
         '<div class="footer-col"><h4>부동산·거래</h4>' +

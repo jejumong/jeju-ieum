@@ -18,6 +18,8 @@ const wr = (f, s) => { const p = path.join(ROOT, f); fs.mkdirSync(path.dirname(p
 let host = "jejuieum.com";
 try { host = rd("CNAME").trim() || host; } catch (e) {}
 const SITE = "https://" + host + "/";
+/* 검색 사이트 소유 확인 코드 — 네이버 서치어드바이저·구글 서치 콘솔에서 받은 content 값만 넣으세요 */
+const VERIFY = { naver: "", google: "" };
 
 /* 데이터 파일을 브라우저처럼 읽기 */
 const ctx = { console };
@@ -216,6 +218,50 @@ wr("program/index.html", page({
 </main>`
 }));
 
+/* ───────── 운영자 정보 글 (assets/op-posts.js) → info/<k>.html ───────── */
+const octx = { window: {} }; vm.createContext(octx);
+vm.runInContext(rd("assets/op-posts.js"), octx, { filename: "op-posts.js" });
+const OPS = (octx.window.OP_POSTS || []).filter((p) => p.k && p.title);
+const linkify = (t) => esc(t).replace(/https?:\/\/[^\s<]+/g, (u) => {
+  const href = u.replace(/&amp;/g, "&"); const local = href.replace(SITE, "");
+  return `<a href="${href.indexOf(SITE) === 0 ? esc(local) : esc(href)}"${href.indexOf(SITE) === 0 ? "" : ' target="_blank" rel="noopener"'}>${u}</a>`;
+});
+const opBody = (c) => String(c || "").split(/\n{2,}/).map((para) => `<p>${linkify(para).replace(/\n/g, "<br>")}</p>`).join("");
+const boardHref = (b) => "community.html?board=" + encodeURIComponent(b);
+for (const o of OPS) {
+  const file = `info/${o.k}.html`;
+  const desc = cut(o.content, 150);
+  const rel = OPS.filter((x) => x.k !== o.k && x.board === o.board).slice(0, 5);
+  wr(file, page({
+    file, title: `${o.title} — 제주이음`, desc, active: "community",
+    jsonld: { "@context": "https://schema.org", "@type": "Article", headline: o.title, description: desc, inLanguage: "ko",
+      author: { "@type": "Organization", name: "제주이음" }, publisher: { "@type": "Organization", name: "제주이음" }, mainEntityOfPage: SITE + file },
+    body: `<main class="wrap" style="padding-top:28px;max-width:820px">
+  <div class="crumb"><a href="index.html">홈</a> › <a href="info/index.html">제주 생활 정보</a> › <a href="${boardHref(o.board)}">${esc(o.board)}</a></div>
+  <article class="art">
+    <header class="art-head"><div class="chips"><span class="chip region">${esc(o.board)}</span>${o.head ? `<span class="chip stage">${esc(o.head)}</span>` : ""}</div>
+      <h1>${esc(o.title)}</h1><div class="art-meta"><span class="by">제주이음</span></div></header>
+    <div class="art-body">${opBody(o.content)}</div>
+  </article>
+  <div class="callout" style="margin:24px 0"><span class="ci">💬</span><div><b>이 이야기, 더 나눠요</b><p>궁금한 점이나 다른 경험은 <a href="${boardHref(o.board)}">${esc(o.board)} 게시판</a>에 남겨 주세요.</p></div></div>
+  ${rel.length ? `<section><h2 style="font-size:18px;margin:28px 0 10px">${esc(o.board)}의 다른 글</h2><ul class="dots">${rel.map((x) => `<li><a href="info/${x.k}.html">${esc(x.title)}</a></li>`).join("")}</ul></section>` : ""}
+  <p style="margin:28px 0"><a class="btn ghost" href="info/index.html">← 제주 생활 정보 전체 보기</a></p>
+</main>`
+  }));
+}
+{
+  const groups = [...new Set(OPS.map((o) => o.board))];
+  wr("info/index.html", page({
+    file: "info/index.html", title: "제주 생활 정보 모음 — 제주이음", desc: `제주에 살면서 알아 두면 좋은 생활 정보 ${OPS.length}편. 집·교육·건강·여행·동네 소식까지 주제별로 모았어요.`, active: "community", ogType: "website",
+    body: `<main class="wrap" style="padding-top:28px;max-width:820px">
+  <div class="crumb"><a href="index.html">홈</a> › 제주 생활 정보</div>
+  <h1 style="font-size:28px;margin:6px 0 6px">제주 생활 정보 모음</h1>
+  <p style="color:var(--ink-3);margin:0 0 20px">제주이음 운영자가 정리한 생활 정보 ${OPS.length}편이에요.</p>
+  ${groups.map((g) => `<section style="margin:0 0 24px"><h2 style="font-size:18px;margin:0 0 8px">${esc(g)}</h2><ul class="dots">${OPS.filter((o) => o.board === g).map((o) => `<li><a href="info/${o.k}.html">${esc(o.title)}</a></li>`).join("")}</ul></section>`).join("")}
+</main>`
+  }));
+}
+
 /* ───────── sitemap.xml · robots.txt ───────── */
 const today = new Date().toISOString().slice(0, 10);
 const urls = [
@@ -225,18 +271,36 @@ const urls = [
   ["house/index.html", SCHOOL_HOUSES_CHECKED, "0.8"], ["program/index.html", PROGRAMS_CHECKED, "0.8"],
   ...GUIDES.map((g) => [`guide/${g.id}.html`, g.updated, "0.8"]),
   ...SCHOOL_HOUSES.map((h) => [`house/${h.id}.html`, SCHOOL_HOUSES_CHECKED, "0.7"]),
-  ...PROGRAMS.filter((p) => p.id).map((p) => [`program/${p.id}.html`, PROGRAMS_CHECKED, "0.7"])
+  ...PROGRAMS.filter((p) => p.id).map((p) => [`program/${p.id}.html`, PROGRAMS_CHECKED, "0.7"]),
+  ["festivals.html", today, "0.6"], ["info/index.html", today, "0.7"],
+  ...OPS.map((o) => [`info/${o.k}.html`, today, "0.6"])
 ];
 wr("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(([u, d, pr]) => `  <url><loc>${esc(SITE + u)}</loc><lastmod>${/^\d{4}-\d{2}-\d{2}$/.test(d) ? d : today}</lastmod><priority>${pr}</priority></url>`).join("\n")}
 </urlset>
 `);
+/* RSS (네이버 서치어드바이저 'RSS 제출'용) — 가이드·지원 프로그램·생활 정보 글 */
+{
+  const rfc = (d) => new Date((d || today) + "T09:00:00+09:00").toUTCString();
+  const items = [
+    ...GUIDES.map((g) => ({ t: g.title, u: `guide/${g.id}.html`, d: cut(g.lead, 200), date: g.updated })),
+    ...PROGRAMS.filter((p) => p.id).map((p) => ({ t: p.title || p.name, u: `program/${p.id}.html`, d: cut(p.summary || p.desc || p.who || "", 200), date: PROGRAMS_CHECKED })),
+    ...OPS.map((o) => ({ t: o.title, u: `info/${o.k}.html`, d: cut(o.content, 200), date: today }))
+  ].filter((x) => x.t);
+  wr("rss.xml", `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+<title>제주이음 — 제주살이 생활 정보</title><link>${SITE}</link><description>제주에 살고 있거나 살아보려는 사람들을 위한 생활 정보</description><language>ko</language>
+${items.map((x) => `<item><title>${esc(x.t)}</title><link>${esc(SITE + x.u)}</link><guid>${esc(SITE + x.u)}</guid><description>${esc(x.d)}</description><pubDate>${rfc(x.date)}</pubDate></item>`).join("\n")}
+</channel></rss>
+`);
+}
 wr("robots.txt", `User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /write.html
 Disallow: /mypage.html
+Disallow: /api/
 
 Sitemap: ${SITE}sitemap.xml
 `);
@@ -249,9 +313,15 @@ Sitemap: ${SITE}sitemap.xml
     const t = (h.match(/<title>([^<]*)<\/title>/) || [])[1]; if (!t) continue;
     const d = (h.match(/<meta name="description" content="([^"]*)"/) || [])[1] || DEF;
     const url = SITE + (f === "index.html" ? "" : f);
-    const block = `<!--og--><meta property="og:type" content="website"><meta property="og:site_name" content="제주이음"><meta property="og:title" content="${t}"><meta property="og:description" content="${d}"><meta property="og:url" content="${url}"><meta property="og:image" content="${SITE}assets/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image">${NOINDEX.includes(f) ? '<meta name="robots" content="noindex">' : ""}<!--/og-->`;
+    const block = `<!--og--><meta property="og:type" content="website"><meta property="og:site_name" content="제주이음"><meta property="og:title" content="${t}"><meta property="og:description" content="${d}"><meta property="og:url" content="${url}"><meta property="og:image" content="${SITE}assets/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:locale" content="ko_KR"><meta name="twitter:card" content="summary_large_image">${NOINDEX.includes(f) ? '<meta name="robots" content="noindex">' : (f === "view.html" ? "" : `<link rel="canonical" href="${url}">`)}` +
+      (f === "index.html" ? (VERIFY.naver ? `<meta name="naver-site-verification" content="${esc(VERIFY.naver)}">` : "") + (VERIFY.google ? `<meta name="google-site-verification" content="${esc(VERIFY.google)}">` : "") +
+        `<link rel="alternate" type="application/rss+xml" title="제주이음" href="${SITE}rss.xml">` +
+        `<script type="application/ld+json">${JSON.stringify([{ "@context": "https://schema.org", "@type": "WebSite", name: "제주이음", alternateName: "Jeju Ieum", url: SITE,
+          potentialAction: { "@type": "SearchAction", target: SITE + "guide.html?q={search_term_string}", "query-input": "required name=search_term_string" } },
+          { "@context": "https://schema.org", "@type": "Organization", name: "제주이음", url: SITE, logo: SITE + "assets/icons/icon-512.png", email: "help@jejuieum.com" }])}</script>` : "") + `<!--/og-->`;
     h = /<!--og-->[\s\S]*?<!--\/og-->/.test(h) ? h.replace(/<!--og-->[\s\S]*?<!--\/og-->/, block) : h.replace(/(<title>[^<]*<\/title>)/, `$1\n${block}`);
     fs.writeFileSync(path.join(ROOT, f), h);
   }
 }
+console.log(`생활 정보 ${OPS.length}편, `);
 console.log(`만든 페이지: 가이드 ${GUIDES.length}, 학교 연계 집 ${SCHOOL_HOUSES.length}, 지원 프로그램 ${PROGRAMS.filter((p) => p.id).length}, 사이트맵 주소 ${urls.length}개 (${SITE})`);

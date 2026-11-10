@@ -3,5 +3,6 @@ Allow: /
 Disallow: /admin/
 Disallow: /write.html
 Disallow: /mypage.html
+Disallow: /api/
 
 Sitemap: https://jejuieum.com/sitemap.xml
