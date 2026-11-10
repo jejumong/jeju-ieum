@@ -405,7 +405,7 @@ function viewsOf(p) {
 function fmtDate(d) { return d ? d.slice(5).replace("-", ".") : ""; }
 
 /* ── 레이아웃 주입 ── */
-var LOGOMARK = '<svg class="logomark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="lmg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#3d9bf0"/><stop offset="1" stop-color="#1559b8"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lmg)"/><path d="M8.5 23.2c-.6-3 2.2-6 6.3-7.2 3.3-1 7-1.3 10.5-.8 3.6.5 6.6 2 7 4.4.4 2.3-2 4.5-5.6 5.7-3.4 1.1-7.4 1.4-10.8.9-3.8-.5-6.9-1.4-7.4-3Z" fill="#fff"/><path d="M17.6 20.4 20 16.8l2.4 3.6Z" fill="#1559b8" opacity=".55"/><circle cx="30" cy="10.5" r="3.6" fill="#ff8a1f"/></svg>';
+var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M30 54.4V74H90V56.8M90 40.8V12H30V38.4" stroke="currentColor" stroke-width="4.4"/><path d="M6 64 C20 58 30 44 44 36 C52 32 56 44 60 52 C64 60 74 60 84 52 C92 46 100 47 114 54" stroke="currentColor" stroke-width="4.6" stroke-linecap="round"/><circle cx="73" cy="29" r="6" fill="#F28A2E"/></svg>';
 
 (function () {
   if (document.body.hasAttribute("data-admin")) return; /* 관리자 콘솔은 사이트 머리·꼬리말 없이 */

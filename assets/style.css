@@ -2117,3 +2117,16 @@ a.act-item:hover{border-color:var(--sea-200)}
   .gd .gd-stages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
   .gd .gd-stages a{justify-content:center;padding:12px 10px}
 }
+
+/* 새 로고 (틀을 넘는 한 줄) */
+.logomark{color:#0D2440}
+.logo .logomark{width:54px;height:45px;filter:none;color:#0D2440}
+.logo .mark{font-weight:500;letter-spacing:.26em;color:#0D2440;font-size:24px;margin-right:-.26em}
+.logo .mark em{color:inherit}
+.footer-brand .fb-logo .logomark{width:28px;height:23px;color:#fff}
+.footer-brand .fb-logo .fb-name{font-weight:500;letter-spacing:.22em}
+.art-meta .by svg{width:31px;height:26px;color:#0D2440}
+@media (max-width:680px){
+  .logo .logomark{width:36px;height:30px}
+  .logo .mark{font-size:18px;letter-spacing:.2em;margin-right:-.2em}
+}
