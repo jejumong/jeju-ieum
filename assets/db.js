@@ -8,8 +8,10 @@ var JIDB = (function () {
   var cfg = window.SITE_CFG || {};
   var API = (cfg.apiUrl || "").replace(/\/?$/, "/");
   var enabled = !!cfg.apiUrl;
+  // 관리자 콘솔은 사이트와 로그인을 따로 보관 (admin/index.html 에서 JI_AUTH_NS = "admin")
+  var ADM = window.JI_AUTH_NS === "admin", AK = ADM ? "auth_admin" : "auth", SK = ADM ? "session_admin" : "session";
 
-  function token() { return JI.get("auth", "") || ""; }
+  function token() { return JI.get(AK, "") || ""; }
 
   /* 서버 호출: text/plain 으로 보내 브라우저 사전 확인(OPTIONS)을 건너뜀 */
   function call(action, body) {
@@ -22,7 +24,7 @@ var JIDB = (function () {
     }, function () { throw new Error("서버에 연결하지 못했어요. 인터넷 연결을 확인해 주세요."); })
       .then(function (j) {
         if (!j.ok) {
-          if (j.error === "로그인이 필요해요" && t) { JI.set("auth", ""); JI.set("session", null); }
+          if (j.error === "로그인이 필요해요" && t) { JI.set(AK, ""); JI.set(SK, null); }
           throw new Error(j.error || "요청을 처리하지 못했어요");
         }
         return j.data;
@@ -31,18 +33,18 @@ var JIDB = (function () {
 
   /* 로그인 상태를 JI session 과 맞추기 → 바뀌었으면 true */
   function setUser(u) {
-    var cur = JI.get("session", null);
-    if (!u) { JI.set("auth", ""); if (cur) { JI.set("session", null); return true; } return false; }
+    var cur = JI.get(SK, null);
+    if (!u) { JI.set(AK, ""); if (cur) { JI.set(SK, null); return true; } return false; }
     var next = { id: u.id, email: u.email, nick: u.nick, region: u.region || "", role: u.role || "user", seller_until: u.seller_until || null };
     var changed = !cur || cur.id !== next.id || cur.nick !== next.nick || cur.region !== next.region || cur.role !== next.role || (cur.seller_until || null) !== next.seller_until;
-    if (changed) JI.set("session", next);
+    if (changed) JI.set(SK, next);
     return changed;
   }
 
   var ready;
   if (enabled) {
-    var cur = JI.get("session", null);
-    if (cur && !token()) { JI.set("session", null); cur = null; }   // 예전 방식(Supabase·브라우저 전용) 로그인 정리
+    var cur = JI.get(SK, null);
+    if (cur && !token()) { JI.set(SK, null); cur = null; }   // 예전 방식(Supabase·브라우저 전용) 로그인 정리
     ready = (token() ? call("me").then(setUser, function () { return false; })   /* 일시적인 연결 오류면 로그인 유지 (만료는 call 안에서 정리) */ : Promise.resolve(setUser(null)))
       .then(function (changed) {
         // 다른 탭·기기에서 로그인 상태가 바뀌었으면 화면을 한 번 새로 그림
@@ -56,7 +58,7 @@ var JIDB = (function () {
     ready = Promise.resolve(false);
   }
 
-  function me() { var u = JI.get("session", null); return u && u.id && token() ? u : null; }
+  function me() { var u = JI.get(SK, null); return u && u.id && token() ? u : null; }
   function isUuid(s) { return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s || ""); }
 
   /* 서버 글 → 화면에서 쓰는 글 모양으로 */
@@ -96,21 +98,21 @@ var JIDB = (function () {
   /* ── 회원 ── */
   function signUp(email, pw, nick, region) {
     return call("signup", { email: email, pw: pw, nick: nick, region: region }).then(function (r) {
-      JI.set("auth", r.token); setUser(r.user); linkPush(); return { needConfirm: false };
+      JI.set(AK, r.token); setUser(r.user); linkPush(); return { needConfirm: false };
     });
   }
   function signIn(email, pw) {
-    return call("login", { email: email, pw: pw }).then(function (r) { JI.set("auth", r.token); setUser(r.user); linkPush(); return true; });
+    return call("login", { email: email, pw: pw }).then(function (r) { JI.set(AK, r.token); setUser(r.user); linkPush(); return true; });
   }
   function signOut() {
     var p = token() ? call("logout").catch(function () {}) : Promise.resolve();
-    JI.set("auth", ""); JI.set("session", null);
-    try { if (window.OneSignal && OneSignal.logout) OneSignal.logout(); } catch (e) {}
+    JI.set(AK, ""); JI.set(SK, null);
+    try { if (!ADM && window.OneSignal && OneSignal.logout) OneSignal.logout(); } catch (e) {}
     return p;
   }
   function updateProfile(fields) {
     return call("profile_update", fields).then(function (r) {
-      var s = JI.get("session", {}); s.nick = r.nick; s.region = r.region; JI.set("session", s);
+      var s = JI.get(SK, {}); s.nick = r.nick; s.region = r.region; JI.set(SK, s);
     });
   }
 

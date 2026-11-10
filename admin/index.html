@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261111l">
+<link rel="stylesheet" href="../assets/style.css?v=20261111m">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -272,17 +272,18 @@ table.mem-t td small{font-size:13px}
 <div class="modal" id="modal"><div class="box" id="modal-box"></div></div>
 <div class="toast" id="toast"></div>
 
-<script src="../assets/common.js?v=20261111l"></script>
-<script src="../assets/db.js?v=20261111l"></script>
-<script src="../assets/notify.js?v=20261111l"></script>
-<script src="../assets/seed-trade.js?v=20261111l"></script>
-<script src="../assets/seed-extra.js?v=20261111l"></script>
-<script src="../assets/seed-new.js?v=20261111l"></script>
-<script src="../assets/seed-comments.js?v=20261111l"></script>
-<script src="../assets/photos.js?v=20261111l"></script>
-<script src="../assets/admin-data.js?v=20261111l"></script>
-<script src="../assets/kmap.js?v=20261111l"></script>
-<script src="../assets/op-posts.js?v=20261111l"></script>
+<script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
+<script src="../assets/common.js?v=20261111m"></script>
+<script src="../assets/db.js?v=20261111m"></script>
+<script src="../assets/notify.js?v=20261111m"></script>
+<script src="../assets/seed-trade.js?v=20261111m"></script>
+<script src="../assets/seed-extra.js?v=20261111m"></script>
+<script src="../assets/seed-new.js?v=20261111m"></script>
+<script src="../assets/seed-comments.js?v=20261111m"></script>
+<script src="../assets/photos.js?v=20261111m"></script>
+<script src="../assets/admin-data.js?v=20261111m"></script>
+<script src="../assets/kmap.js?v=20261111m"></script>
+<script src="../assets/op-posts.js?v=20261111m"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1278,7 +1279,33 @@ if (SRV) {
     }, function(){ box.remove(); });
   };
 
-  logoutAdmin = function(){ location.href = SITE + "index.html"; };
+  logoutAdmin = function(){ JIDB.signOut().then(function(){ adminLogin(); }); };
+  /* 관리자 콘솔 전용 로그인 — 사이트 로그인과 따로 */
+  window.adminLogin = function(msg){
+    document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK +
+      '<h2>관리자 로그인</h2><p>관리자 콘솔은 사이트와 따로 로그인해요.</p>' +
+      '<form id="al-f"><input id="al-e" type="email" placeholder="관리자 이메일" autocomplete="username" required>' +
+      '<input id="al-p" type="password" placeholder="비밀번호" autocomplete="current-password" required>' +
+      '<div class="err" id="al-err">' + esc(msg || "") + '</div>' +
+      '<button class="btn primary block" type="submit">로그인</button></form>' +
+      '<p style="margin:14px 0 0;text-align:center"><a href="' + SITE + 'index.html">사이트로 돌아가기</a></p></div></div>';
+    document.getElementById("al-f").onsubmit = function(e){
+      e.preventDefault();
+      var b = this.querySelector("button"); b.disabled = true; b.textContent = "확인 중…";
+      JIDB.call("login", { email: document.getElementById("al-e").value.trim(), pw: document.getElementById("al-p").value }).then(function(r){
+        if (!r.user || (r.user.role !== "admin" && r.user.role !== "staff")) {
+          // 관리자가 아니면 방금 만든 로그인은 바로 끝내고 저장하지 않음
+          return fetch((window.SITE_CFG.apiUrl || "").replace(/\/?$/, "/") + "?a=logout", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify({ _t: r.token }) })
+            .catch(function(){}).then(function(){ throw new Error("관리자 계정이 아니에요."); });
+        }
+        JI.set("auth_admin", r.token);
+        JI.set("session_admin", { id: r.user.id, email: r.user.email, nick: r.user.nick, region: r.user.region || "", role: r.user.role });
+        document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>불러오는 중…</h2></div></div>';
+        return reloadAll();
+      }).catch(function(err){ b.disabled = false; b.textContent = "로그인"; document.getElementById("al-err").textContent = err.message; });
+    };
+    setTimeout(function(){ var el = document.getElementById("al-e"); if (el) el.focus(); }, 50);
+  };
 
   /* 서버에서 모두 불러와 브라우저 캐시에 채운 뒤 화면 그리기 */
   window.reloadAll = function(){
@@ -1303,13 +1330,8 @@ if (SRV) {
 
   JIDB.ready.then(function(){
     var u = JIDB.me();
-    if (!u) { location.href = SITE + "login.html?next=" + encodeURIComponent("admin/index.html"); return; }
-    if (u.role !== "admin" && u.role !== "staff") {
-      document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>관리자만 들어올 수 있어요</h2>' +
-        '<p>' + esc(u.nick) + '님은 관리자 계정이 아니에요.<br>GitHub Secrets 의 ADMIN_EMAILS 에 넣은 이메일로 가입·로그인해 주세요.</p>' +
-        '<a class="btn primary block" href="' + SITE + 'index.html">사이트로 돌아가기</a></div></div>';
-      return;
-    }
+    if (!u) { adminLogin(); return; }
+    if (u.role !== "admin" && u.role !== "staff") { JIDB.signOut().then(function(){ adminLogin("관리자 계정이 아니에요."); }); return; }
     document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>불러오는 중…</h2></div></div>';
     reloadAll().catch(function(e){ alert("관리자 데이터를 불러오지 못했어요: " + e.message); });
   });

@@ -113,7 +113,7 @@ var JI = {
 };
 
 /* ── 인증 ── */
-function currentUser() { return JI.get("session", null); }
+function currentUser() { return JI.get(window.JI_AUTH_NS === "admin" ? "session_admin" : "session", null); }
 function logout() {
   var done = function () { JI.set("session", null); alert("로그아웃되었습니다."); location.href = "index.html"; };
   if (window.JIDB && JIDB.enabled) JIDB.signOut().then(done, done); else done();
