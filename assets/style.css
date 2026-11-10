@@ -2132,5 +2132,5 @@ a.act-item:hover{border-color:var(--sea-200)}
 }
 
 /* 머리글 로고: 이미지 파일 */
-.logo .logo-img{display:block;height:46px;width:auto}
+.logo .logo-img{display:block;height:42px;width:auto}
 @media (max-width:680px){ .logo .logo-img{height:34px} }
