@@ -19,7 +19,7 @@ let host = "jejuieum.com";
 try { host = rd("CNAME").trim() || host; } catch (e) {}
 const SITE = "https://" + host + "/";
 /* 검색 사이트 소유 확인 코드 — 네이버 서치어드바이저·구글 서치 콘솔에서 받은 content 값만 넣으세요 */
-const VERIFY = { naver: "", google: "" };
+const VERIFY = { naver: "3b73622b436e93a4e1a921eb9892866ec26c3c9a", google: "mo-kGsbHg_0b9emuUzXw8n43Bw42tgV9h3Ljwi1o2jc" };
 
 /* 데이터 파일을 브라우저처럼 읽기 */
 const ctx = { console };
