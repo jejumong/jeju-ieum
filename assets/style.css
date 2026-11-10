@@ -2137,3 +2137,9 @@ a.act-item:hover{border-color:var(--sea-200)}
 
 /* 바닥글 로고: 이미지 파일 */
 .footer-brand .fb-logo .fb-img{display:block;height:30px;width:auto}
+@media (max-width:680px){
+  .footer-brand{flex-wrap:nowrap;gap:6px}
+  .footer-brand .fb-logo{margin:0 auto 0 0;flex:none}
+  .footer-brand .fb-logo .fb-img{height:22px}
+  .footer-brand .fb-yt,.footer-brand .fb-yt.fb-about{flex:none;white-space:nowrap;display:inline-flex;align-items:center;line-height:1.2}
+}
