@@ -2134,3 +2134,6 @@ a.act-item:hover{border-color:var(--sea-200)}
 /* 머리글 로고: 이미지 파일 */
 .logo .logo-img{display:block;height:40px;width:auto}
 @media (max-width:680px){ .logo .logo-img{height:30px} }
+
+/* 바닥글 로고: 이미지 파일 */
+.footer-brand .fb-logo .fb-img{display:block;height:30px;width:auto}

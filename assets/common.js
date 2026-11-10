@@ -484,7 +484,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
     '<footer class="site">' +
       '<div class="footer-top">' +
         '<div class="footer-brand">' +
-          '<div class="fb-logo">' + LOGOMARK + '<span class="fb-name">제주이음</span></div>' +
+          '<div class="fb-logo"><img class="fb-img" src="assets/logo-footer.png?v=1" alt="제주이음" width="700" height="139"></div>' +
           '<p>제주에 살고 있거나 살아보려는 사람들을 위한 생활 정보 채널이자 동네 커뮤니티입니다. ' +
           '모든 가이드에는 업데이트 날짜와 출처를 적습니다.</p>' +
           '<a class="fb-yt" href="' + SITE_CFG.youtube + '" target="_blank" rel="noopener">▶ 유튜브 제주몽</a>' +
