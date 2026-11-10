@@ -471,7 +471,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
   var top =
     '<header class="site">' +
       '<div class="header-inner">' +
-        '<a href="index.html" class="logo" aria-label="제주이음 홈">' + LOGOMARK + '<span class="mark">제주<em>이음</em></span></a>' +
+        '<a href="index.html" class="logo" aria-label="제주이음 홈"><img class="logo-img" src="assets/logo-header.png?v=1" alt="제주이음" width="652" height="139"></a>' +
         '<div class="search"><span class="s-ico" aria-hidden="true"><svg viewBox="0 0 20 20" width="17" height="17"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="m13 13 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>' +
           '<input type="text" id="gsearch" placeholder="태풍 대비, 신구간, 소아과… 제주 생활을 찾아보세요"><button type="button" onclick="goSearch()">검색</button></div>' +
         '<div class="header-actions"><button type="button" class="hd-share" onclick="JIShare.open()" aria-label="이 페이지 공유하기" title="공유하기">' + SHARE_ICO + '<span>공유</span></button>' + util + '</div>' +
