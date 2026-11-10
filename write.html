@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261111j">
+<link rel="stylesheet" href="assets/style.css?v=20261111k">
 </head>
 <body data-active="">
 
@@ -181,15 +181,15 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261111j"></script>
-<script src="assets/common.js?v=20261111j"></script>
-<script src="assets/db.js?v=20261111j"></script>
-<script src="assets/notify.js?v=20261111j"></script>
-<script src="assets/seed-trade.js?v=20261111j"></script>
-<script src="assets/seed-extra.js?v=20261111j"></script>
-<script src="assets/seed-new.js?v=20261111j"></script>
-<script src="assets/seed-comments.js?v=20261111j"></script>
-<script src="assets/admin-data.js?v=20261111j"></script>
+<script src="assets/kmap.js?v=20261111k"></script>
+<script src="assets/common.js?v=20261111k"></script>
+<script src="assets/db.js?v=20261111k"></script>
+<script src="assets/notify.js?v=20261111k"></script>
+<script src="assets/seed-trade.js?v=20261111k"></script>
+<script src="assets/seed-extra.js?v=20261111k"></script>
+<script src="assets/seed-new.js?v=20261111k"></script>
+<script src="assets/seed-comments.js?v=20261111k"></script>
+<script src="assets/admin-data.js?v=20261111k"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -208,7 +208,10 @@ if (!user) {
   if (confirm("글쓰기는 로그인 후 이용할 수 있어요.\n로그인 페이지로 이동할까요?")) {
     location.href = "login.html?next=" + encodeURIComponent("write.html" + location.search);
   } else {
-    location.href = "index.html";
+    // 취소: 왔던 게시판으로 돌아가기 (없으면 그 게시판 목록, 그것도 없으면 첫 화면)
+    var _b = new URLSearchParams(location.search).get("board");
+    if (document.referrer && document.referrer.indexOf(location.origin) === 0 && history.length > 1) history.back();
+    else location.replace(_b && COMMUNITY_MOVE.indexOf(_b) > -1 ? "community.html?board=" + encodeURIComponent(_b) : "index.html");
   }
 }
 

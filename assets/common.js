@@ -669,6 +669,8 @@ document.addEventListener("click", function (e) {
     var br = /NAVER\(inapp|NAVER/.test(ua) ? "네이버앱" : /KAKAOTALK/i.test(ua) ? "카카오톡" : /Instagram/.test(ua) ? "인스타그램" : /FBAN|FBAV/.test(ua) ? "페이스북" :
       /SamsungBrowser/.test(ua) ? "삼성인터넷" : /Whale/.test(ua) ? "웨일" : /Edg\//.test(ua) ? "엣지" : /Firefox|FxiOS/.test(ua) ? "파이어폭스" :
       /CriOS|Chrome/.test(ua) ? "크롬" : /Safari/.test(ua) ? "사파리" : "기타";
+    // 홈 화면에 추가한 아이콘으로 연 경우 (아이폰은 이때 브라우저 이름이 안 붙어요)
+    try { if (navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches)) br = "홈 화면 앱"; } catch (e) {}
     var ref = "", kw = "";
     var first = true; try { first = !sessionStorage.getItem("ji_sess"); sessionStorage.setItem("ji_sess", "1"); } catch (e) {}
     if (first) {
@@ -691,3 +693,13 @@ document.addEventListener("click", function (e) {
     }, 600);
   } catch (e) {}
 })();
+
+/* 로그인 안 한 채 '글쓰기'를 누르면 지금 페이지에서 바로 물어보기 — 취소하면 그 자리에 그대로 */
+document.addEventListener("click", function (e) {
+  var a = e.target.closest && e.target.closest('a[href^="write.html"]');
+  if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+  var u = currentUser(); if (u && u.id) return;
+  e.preventDefault();
+  if (confirm("글쓰기는 로그인 후 이용할 수 있어요.\n로그인 페이지로 이동할까요?"))
+    location.href = "login.html?next=" + encodeURIComponent(a.getAttribute("href"));
+});
