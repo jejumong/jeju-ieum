@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261111m">
+<link rel="stylesheet" href="../assets/style.css?v=20261111n">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -264,6 +264,14 @@ table.mem-t td small{font-size:13px}
 .tm-rank .n{flex:none;font-weight:800}
 .panel h2 .tf-seg{margin-left:8px}
 @media (max-width:760px){ .panel h2 .tf-seg{display:flex;margin:8px 0 0;width:max-content;max-width:100%;overflow-x:auto} .tm-rank .nm a{white-space:normal} }
+.pw-f{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:820px}
+.pw-f label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.pw-f label small{font-weight:500;color:var(--ink-4)}
+.pw-f input{border:1px solid #dfe4ea;border-radius:10px;padding:10px 12px;font:inherit;font-size:14.5px}
+.pw-act{grid-column:1/-1;display:flex;align-items:center;justify-content:flex-end;gap:12px}
+.pw-msg{font-size:13px;font-weight:600}
+.pw-msg.ok{color:#16a34a}.pw-msg.bad{color:#dc2626}
+@media (max-width:760px){.pw-f{grid-template-columns:1fr}.pw-act{flex-direction:column;align-items:stretch}.pw-act .btn{width:100%}}
 </style>
 </head>
 <body data-admin>
@@ -273,17 +281,17 @@ table.mem-t td small{font-size:13px}
 <div class="toast" id="toast"></div>
 
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261111m"></script>
-<script src="../assets/db.js?v=20261111m"></script>
-<script src="../assets/notify.js?v=20261111m"></script>
-<script src="../assets/seed-trade.js?v=20261111m"></script>
-<script src="../assets/seed-extra.js?v=20261111m"></script>
-<script src="../assets/seed-new.js?v=20261111m"></script>
-<script src="../assets/seed-comments.js?v=20261111m"></script>
-<script src="../assets/photos.js?v=20261111m"></script>
-<script src="../assets/admin-data.js?v=20261111m"></script>
-<script src="../assets/kmap.js?v=20261111m"></script>
-<script src="../assets/op-posts.js?v=20261111m"></script>
+<script src="../assets/common.js?v=20261111n"></script>
+<script src="../assets/db.js?v=20261111n"></script>
+<script src="../assets/notify.js?v=20261111n"></script>
+<script src="../assets/seed-trade.js?v=20261111n"></script>
+<script src="../assets/seed-extra.js?v=20261111n"></script>
+<script src="../assets/seed-new.js?v=20261111n"></script>
+<script src="../assets/seed-comments.js?v=20261111n"></script>
+<script src="../assets/photos.js?v=20261111n"></script>
+<script src="../assets/admin-data.js?v=20261111n"></script>
+<script src="../assets/kmap.js?v=20261111n"></script>
+<script src="../assets/op-posts.js?v=20261111n"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1112,7 +1120,28 @@ if (SRV) {
               (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</div></div>';
         }).join("") + '</div>'
         : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>' +
-      '<div class="panel"><h2>관리자 비밀번호</h2><p style="margin:0;color:var(--ink-3)">관리자 페이지는 사이트 회원 계정으로 들어와요. 비밀번호는 사이트의 <a href="' + SITE + 'profile.html" target="_blank">내 정보</a>에서 바꿀 수 있어요.</p></div>';
+      '<div class="panel" id="pw-panel"><h2>관리자 비밀번호 바꾸기</h2>' +
+        '<p style="margin:0 0 12px;color:var(--ink-3)">' + esc((JIDB.me() || {}).email || "") + ' 계정의 비밀번호를 바꿔요. 바꾸면 이 창을 뺀 다른 기기·브라우저(사이트 포함)는 로그아웃돼요.</p>' +
+        '<form id="pw-f" class="pw-f" autocomplete="off">' +
+          '<label>현재 비밀번호<input type="password" id="pw-cur" autocomplete="current-password" required></label>' +
+          '<label>새 비밀번호 (8자 이상)<input type="password" id="pw-new" autocomplete="new-password" minlength="8" required></label>' +
+          '<label>새 비밀번호 확인<input type="password" id="pw-new2" autocomplete="new-password" minlength="8" required></label>' +
+          '<div class="pw-act"><span class="pw-msg" id="pw-msg"></span><button class="btn primary" type="submit">비밀번호 바꾸기</button></div>' +
+        '</form></div>';
+    var pf = document.getElementById("pw-f");
+    if (pf) pf.onsubmit = function(e){
+      e.preventDefault();
+      var cur = document.getElementById("pw-cur").value, n1 = document.getElementById("pw-new").value, n2 = document.getElementById("pw-new2").value;
+      var msg = document.getElementById("pw-msg"); msg.className = "pw-msg";
+      if (n1.length < 8) { msg.textContent = "새 비밀번호는 8자 이상이어야 해요."; msg.classList.add("bad"); return; }
+      if (n1 !== n2) { msg.textContent = "새 비밀번호가 서로 달라요."; msg.classList.add("bad"); return; }
+      if (n1 === cur) { msg.textContent = "지금 비밀번호와 다른 비밀번호로 정해 주세요."; msg.classList.add("bad"); return; }
+      var b = pf.querySelector("button"); b.disabled = true; b.textContent = "바꾸는 중…";
+      JIDB.call("password_change", { cur: cur, "new": n1 }).then(function(){
+        pf.reset(); msg.textContent = "비밀번호를 바꿨어요. 다음 로그인부터 새 비밀번호를 써 주세요."; msg.classList.add("ok");
+      }, function(err){ msg.textContent = err.message; msg.classList.add("bad"); })
+        .then(function(){ b.disabled = false; b.textContent = "비밀번호 바꾸기"; });
+    };
     paintBulk("mem");
   };
   /* 회원이 쓴 글·댓글 목록 */
