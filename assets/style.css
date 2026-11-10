@@ -2185,3 +2185,27 @@ a.act-item:hover{border-color:var(--sea-200)}
   .pg-mini b{flex:1;min-width:0;font-weight:700;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
   .pg-go{flex:none;font-size:12.5px;font-weight:800;color:var(--sea-700)}
 }
+
+/* 한달살기: 체크리스트·한 달 계획 (휴대폰은 접고, 옆으로 넘기기) */
+.chk-bar,.chk-ar{display:none}
+@media (max-width:680px){
+  .chk-top p,.plan-top p{display:none}
+  .chk-top .more,.plan-top .more{font-size:12.5px;padding:6px 10px}
+  .chk-wrap{gap:8px}
+  .chk-group{padding:0;box-shadow:var(--sh-1)}
+  .chk-group h3{margin:0;padding:15px 16px;cursor:pointer;gap:10px;justify-content:flex-start}
+  .chk-group h3 small{margin-left:auto}
+  .chk-bar{display:block;width:44px;height:5px;border-radius:3px;background:var(--bg-2);overflow:hidden;flex:none}
+  .chk-bar b{display:block;height:100%;background:var(--sea)}
+  .chk-ar{display:inline-block;font-size:20px;line-height:1;color:var(--ink-4);transition:transform .2s;flex:none}
+  .chk-group.open .chk-ar{transform:rotate(90deg)}
+  .chk-group.all h3 small{color:#16a34a}
+  .chk-group:not(.open) label{display:none}
+  .chk-group.open{padding-bottom:8px}
+  .chk-group.open label{margin:0 10px}
+  .week-plan{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin:0 calc(-1*var(--gutter));padding:2px var(--gutter) 6px}
+  .week-plan::-webkit-scrollbar{display:none}
+  .week{flex:0 0 74%;scroll-snap-align:start;padding:16px}
+  .week h4{font-size:15px;margin:4px 0 6px}
+  .week p{font-size:13px}
+}

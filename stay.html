@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261111r">
+<link rel="stylesheet" href="assets/style.css?v=20261111s">
 </head>
 <body data-active="stay">
 
@@ -70,14 +70,14 @@
     </div>
   </div>
 
-  <div class="sec-title">
+  <div class="sec-title chk-top">
     <div><div class="st-eb">CHECKLIST</div><h2>준비 체크리스트</h2>
       <p>체크한 내용은 이 브라우저에 저장돼요. 다음에 들어와도 이어서 볼 수 있습니다.</p></div>
     <button class="more" type="button" id="chk-reset">체크 초기화</button>
   </div>
   <div class="chk-wrap" id="chk"></div>
 
-  <div class="sec-title">
+  <div class="sec-title plan-top">
     <div><div class="st-eb">PLAN</div><h2>이주를 고민한다면, 한 달은 이렇게</h2>
       <p>관광지보다 '생활'을 경험하는 데 시간을 쓰세요.</p></div>
     <a class="more" href="guide/trial-stay.html">자세히 읽기 →</a>
@@ -96,11 +96,11 @@
   <div class="g-grid" id="stay-guides"></div>
 </main>
 
-<script src="assets/common.js?v=20261111r"></script>
-<script src="assets/db.js?v=20261111r"></script>
-<script src="assets/guide-data.js?v=20261111r"></script>
-<script src="assets/programs-data.js?v=20261111r"></script>
-<script src="assets/notify.js?v=20261111r"></script>
+<script src="assets/common.js?v=20261111s"></script>
+<script src="assets/db.js?v=20261111s"></script>
+<script src="assets/guide-data.js?v=20261111s"></script>
+<script src="assets/programs-data.js?v=20261111s"></script>
+<script src="assets/notify.js?v=20261111s"></script>
 <script>
 /* ── 새 공고 무료 알림 (모집 시작이 반영되면 자동 발송) ── */
 (function(){
@@ -250,15 +250,20 @@ var CHK = [
   ["생활해 보기", ["출퇴근·등하교 시간대에 실제로 이동해 보기", "후보 동네 2~3곳 걸어서 둘러보기", "동네 모임·도서관 프로그램 한 번 참여", "비 오는 날·바람 센 날 집 안팎 느낌 기록"]],
   ["돌아가기 전", ["이주한다면 살고 싶은 동네 순위 정하기", "한 달 실제 지출 정리 (계산기와 비교)", "다른 계절에 한 번 더 올지 결정", "커뮤니티에 후기 남기기 — 다음 사람에게 큰 도움"]]
 ];
-var done = JI.get("stay_chk", {});
+var done = JI.get("stay_chk", {}), chkOpen = {};
 function drawChk(){
   document.getElementById("chk").innerHTML = CHK.map(function(g, gi){
     var n = g[1].filter(function(_, i){ return done[gi + "-" + i]; }).length;
-    return '<div class="chk-group"><h3>' + g[0] + '<small>' + n + ' / ' + g[1].length + '</small></h3>' +
+    return '<div class="chk-group' + (chkOpen[gi] ? ' open' : '') + (n === g[1].length ? ' all' : '') + '"><h3 data-g="' + gi + '">' + g[0] +
+      '<small>' + n + ' / ' + g[1].length + '</small><i class="chk-bar"><b style="width:' + Math.round(n / g[1].length * 100) + '%"></b></i><span class="chk-ar" aria-hidden="true">›</span></h3>' +
       g[1].map(function(t, i){ var k = gi + "-" + i;
         return '<label><input type="checkbox" data-k="' + k + '"' + (done[k] ? " checked" : "") + '><span>' + esc(t) + '</span></label>'; }).join("") + '</div>';
   }).join("");
 }
+document.getElementById("chk").addEventListener("click", function(e){   // 휴대폰: 제목을 누르면 펼치고 접기
+  var h = e.target.closest("h3[data-g]"); if (!h || window.innerWidth > 680) return;
+  var g = h.dataset.g; chkOpen[g] = !chkOpen[g]; drawChk();
+});
 document.getElementById("chk").addEventListener("change", function(e){
   var k = e.target.dataset.k; if (!k) return;
   if (e.target.checked) done[k] = 1; else delete done[k];
