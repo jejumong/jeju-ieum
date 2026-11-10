@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261111p">
+<link rel="stylesheet" href="../assets/style.css?v=20261111q">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -279,6 +279,18 @@ table.mem-t td small{font-size:13px}
   /* 아이폰은 16px 보다 작은 입력칸을 누르면 화면을 확대해 좌우로 움직이게 되므로 16px 로 */
   input,select,textarea{font-size:16px!important}
 }
+.rc-list{display:flex;flex-direction:column}
+.rc-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid #f0f2f5;text-decoration:none;color:inherit;font-size:14px}
+.rc-row:last-child{border-bottom:0}
+.rc-row:hover .rc-t{color:var(--sea)}
+.rc-row .bd{flex:none}
+.rc-t{flex:1;min-width:0;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-m{flex:none;font-size:12.5px;color:var(--ink-4);white-space:nowrap}
+@media (max-width:760px){
+  .rc-row{flex-wrap:wrap;gap:4px 8px;padding:10px 2px}
+  .rc-t{flex:1 1 calc(100% - 90px)}
+  .rc-m{flex-basis:100%;padding-left:2px}
+}
 </style>
 </head>
 <body data-admin>
@@ -288,17 +300,17 @@ table.mem-t td small{font-size:13px}
 <div class="toast" id="toast"></div>
 
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261111p"></script>
-<script src="../assets/db.js?v=20261111p"></script>
-<script src="../assets/notify.js?v=20261111p"></script>
-<script src="../assets/seed-trade.js?v=20261111p"></script>
-<script src="../assets/seed-extra.js?v=20261111p"></script>
-<script src="../assets/seed-new.js?v=20261111p"></script>
-<script src="../assets/seed-comments.js?v=20261111p"></script>
-<script src="../assets/photos.js?v=20261111p"></script>
-<script src="../assets/admin-data.js?v=20261111p"></script>
-<script src="../assets/kmap.js?v=20261111p"></script>
-<script src="../assets/op-posts.js?v=20261111p"></script>
+<script src="../assets/common.js?v=20261111q"></script>
+<script src="../assets/db.js?v=20261111q"></script>
+<script src="../assets/notify.js?v=20261111q"></script>
+<script src="../assets/seed-trade.js?v=20261111q"></script>
+<script src="../assets/seed-extra.js?v=20261111q"></script>
+<script src="../assets/seed-new.js?v=20261111q"></script>
+<script src="../assets/seed-comments.js?v=20261111q"></script>
+<script src="../assets/photos.js?v=20261111q"></script>
+<script src="../assets/admin-data.js?v=20261111q"></script>
+<script src="../assets/kmap.js?v=20261111q"></script>
+<script src="../assets/op-posts.js?v=20261111q"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -459,9 +471,10 @@ function drawDash(){
       stat("가입 회원", members.toLocaleString()) + stat("승인 대기", pending) +
     '</div>' +
     '<div class="panel"><h2>게시판별 현황</h2><div class="tbl-wrap"><table class="adm-t"><thead><tr><th>게시판</th><th>글 수</th><th>회원 작성</th><th>프리미엄</th><th>조회수 합계</th><th></th></tr></thead><tbody>' + byBoard + '</tbody></table></div></div>' +
-    '<div class="panel"><h2>최근 회원 작성 글</h2>' + (recent.length ? '<table class="adm-t"><tbody>' + recent.map(function(p){
-      return '<tr><td><span class="bd user">' + esc(p.board) + '</span></td><td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank">' + esc(p.title) + '</a></td><td>' + esc(p.author) + '</td><td>' + esc(p.date) + '</td></tr>';
-    }).join("") + '</tbody></table>' : '<div class="empty">아직 회원이 쓴 글이 없습니다.</div>') + '</div>';
+    '<div class="panel"><h2>최근 회원 작성 글</h2>' + (recent.length ? '<div class="rc-list">' + recent.map(function(p){
+      return '<a class="rc-row" href="' + SITE + 'view.html?id=' + p.id + '" target="_blank"><span class="bd user">' + esc(p.board) + '</span>' +
+        '<span class="rc-t">' + esc(p.title) + '</span><span class="rc-m">' + esc(p.author) + ' · ' + esc(p.date) + '</span></a>';
+    }).join("") + '</div>' : '<div class="empty">아직 회원이 쓴 글이 없습니다.</div>') + '</div>';
 }
 function stat(k,v){ return '<div class="stat"><div class="k">' + k + '</div><div class="v">' + v + '</div></div>'; }
 
