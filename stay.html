@@ -12,11 +12,11 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=20261111k">
+<link rel="stylesheet" href="assets/style.css?v=20261111l">
 </head>
 <body data-active="stay">
 
-<div class="page-head"><div class="inner">
+<div class="page-head stay-head"><div class="inner">
   <div>
     <div class="crumb"><a href="index.html">홈</a> › 한달살기·이주</div>
     <h1>먼저 살아보고, 그다음에 결정해요</h1>
@@ -27,7 +27,7 @@
 
 <main class="wrap">
 
-  <div class="sec-title" style="margin-top:8px" id="programs-top">
+  <div class="sec-title pg-top" style="margin-top:8px" id="programs-top">
     <div><div class="st-eb">SUPPORT</div><h2>장기체류·정착 지원 프로그램 <span class="pg-count" id="pg-count"></span></h2>
       <p>제주도 공식 누리집과 기사에서 모아 정리했어요. 마지막 확인 <b id="pg-checked"></b> — 신청 전에는 꼭 원문 공고를 확인하세요.</p></div>
     <button class="more" type="button" id="pg-bell">🔔 새 공고 무료 알림</button>
@@ -96,11 +96,11 @@
   <div class="g-grid" id="stay-guides"></div>
 </main>
 
-<script src="assets/common.js?v=20261111k"></script>
-<script src="assets/db.js?v=20261111k"></script>
-<script src="assets/guide-data.js?v=20261111k"></script>
-<script src="assets/programs-data.js?v=20261111k"></script>
-<script src="assets/notify.js?v=20261111k"></script>
+<script src="assets/common.js?v=20261111l"></script>
+<script src="assets/db.js?v=20261111l"></script>
+<script src="assets/guide-data.js?v=20261111l"></script>
+<script src="assets/programs-data.js?v=20261111l"></script>
+<script src="assets/notify.js?v=20261111l"></script>
 <script>
 /* ── 새 공고 무료 알림 (모집 시작이 반영되면 자동 발송) ── */
 (function(){
@@ -140,10 +140,11 @@ function drawPrograms(){
   drawPager(pages);
   document.getElementById("programs").innerHTML = shown.map(function(p){
     var st = PROGRAM_STATUS[p.status];
-    return '<article class="pg s-' + p.status + '"' + (p.id ? ' id="prog-' + p.id + '"' : '') + '><div class="pg-head"><span class="chip region">' + esc(p.cat) + '</span>' +
+    return '<article class="pg s-' + p.status + '" data-i="' + PROGRAMS.indexOf(p) + '"' + (p.id ? ' id="prog-' + p.id + '"' : '') + '><div class="pg-head"><span class="chip region">' + esc(p.cat) + '</span>' +
       (p.tags||[]).map(function(t){ return '<span class="chip stage">' + esc(t) + '</span>'; }).join("") +
       '<span class="pst ' + st[1] + ' pg-st">' + st[0] + '</span></div>' +
       '<h3>' + (p.id ? '<a href="program/' + p.id + '.html">' + esc(p.name) + '</a>' : esc(p.name)) + '</h3><div class="pg-org">' + esc(p.org) + '</div>' +
+      '<div class="pg-mini"><b>' + esc(p.what) + '</b><span class="pg-go">자세히 ›</span></div>' +
       '<dl><dt>대상</dt><dd>' + esc(p.who) + '</dd><dt>지원</dt><dd><b>' + esc(p.what) + '</b></dd>' +
       (p.cond && p.cond !== "—" ? '<dt class="x">조건</dt><dd class="x">' + esc(p.cond) + '</dd>' : '') +
       (p.school ? '<dt class="x">학교</dt><dd class="x">' + esc(p.school) + '</dd>' : '') +
@@ -173,6 +174,25 @@ document.getElementById("pg-filter").addEventListener("click", function(e){
   drawCats(); drawPrograms();
 });
 drawCats(); drawPrograms();
+/* 휴대폰: 카드를 누르면 자세한 내용을 작은 창으로 */
+function progDetail(p){
+  var st = PROGRAM_STATUS[p.status];
+  var row = function(k, v, b){ return v && v !== "—" ? '<div class="pd-r"><span>' + k + '</span><p>' + (b ? '<b>' + esc(v) + '</b>' : esc(v)) + '</p></div>' : ''; };
+  return '<div class="pd"><div class="pd-chips"><span class="pst ' + st[1] + '">' + st[0] + '</span><span class="chip region">' + esc(p.cat) + '</span>' +
+    (p.tags||[]).map(function(t){ return '<span class="chip stage">' + esc(t) + '</span>'; }).join("") + '</div>' +
+    '<h3>' + esc(p.name) + '</h3><div class="pd-org">' + esc(p.org) + '</div>' +
+    row("대상", p.who) + row("지원", p.what, 1) + row("조건", p.cond) + row("학교", p.school) + row("시기", p.when) + row("문의", p.contact) +
+    '<div class="pd-btns"><a class="btn primary" href="' + p.url + '" target="_blank" rel="noopener">공고·안내 보기 ↗</a>' +
+    (p.id ? '<a class="btn ghost" href="program/' + p.id + '.html">상세 페이지</a>' : '') + '</div>' +
+    '<div class="pd-src">출처: ' + (p.src||[]).map(function(x){ return '<a href="' + x[1] + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a>'; }).join(", ") + '</div></div>';
+}
+document.getElementById("programs").addEventListener("click", function(e){
+  if (window.innerWidth > 680) return;
+  var c = e.target.closest(".pg[data-i]"); if (!c) return;
+  if (e.target.closest(".pg-foot a, .pg-more")) return;
+  e.preventDefault();
+  jiModal(progDetail(PROGRAMS[+c.dataset.i]));
+});
 /* stay.html#prog-p05 처럼 들어오면 그 프로그램이 있는 쪽으로 넘기고 그 자리로 스크롤 */
 function goProgram(){
   var m = (location.hash || "").match(/^#prog-(\w+)$/); if (!m) return;
