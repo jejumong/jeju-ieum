@@ -653,6 +653,14 @@ case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기
   elseif ($p === '7') { $from = date('Y-m-d', strtotime('-6 day')); $to = date('Y-m-d', strtotime('+1 day')); }
   elseif ($p === '30') { $from = date('Y-m-d', strtotime('-29 day')); $to = date('Y-m-d', strtotime('+1 day')); }
   else { $p = 't'; $from = $today; $to = date('Y-m-d', strtotime('+1 day')); }
+  // 날짜를 직접 고른 경우 (from~to, 둘 다 포함, 최대 1년)
+  $isD = function ($d) { return is_string($d) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $d) && strtotime($d); };
+  if ($isD($R['from'] ?? null)) {
+    $f = $R['from']; $t2 = $isD($R['to'] ?? null) ? $R['to'] : $f;
+    if ($t2 < $f) { $x = $f; $f = $t2; $t2 = $x; }
+    if ((strtotime($t2) - strtotime($f)) / 86400 > 366) $f = date('Y-m-d', strtotime($t2 . ' -366 day'));
+    $p = 'd'; $from = $f; $to = date('Y-m-d', strtotime($t2 . ' +1 day'));
+  }
   $W = "at >= ? AND at < ?"; $A = [$from, $to];
   $grp = function ($col, $lim = 12, $extra = '') use ($W, $A) {
     return array_map(function ($r) { return ['k' => $r['k'], 'n' => (int)$r['n']]; },

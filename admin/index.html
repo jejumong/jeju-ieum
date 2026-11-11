@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261111s">
+<link rel="stylesheet" href="../assets/style.css?v=20261111t">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -293,6 +293,15 @@ table.mem-t td small{font-size:13px}
 }
 /* 관리자 콘솔: 두 손가락 확대·두 번 탭 확대 막기 */
 html,body{touch-action:pan-x pan-y}
+.tm-date{display:inline-flex;align-items:center;gap:6px;background:#f1f3f6;border-radius:12px;padding:4px 6px}
+.tm-date input{border:1px solid #dfe4ea;border-radius:8px;padding:6px 8px;font:inherit;font-size:13.5px;background:#fff;color:var(--ink)}
+.tm-date span{color:var(--ink-4);font-weight:700}
+.tm-nav{border:0;background:#fff;border-radius:8px;width:32px;height:32px;cursor:pointer;color:var(--ink-2);font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.tm-nav:disabled{opacity:.35;cursor:default}
+.tm-quick{display:inline-flex;gap:4px}
+.tm-quick button{border:1px solid #e3e7ec;background:#fff;border-radius:999px;padding:5px 10px;font:inherit;font-size:12.5px;font-weight:700;color:var(--ink-3);cursor:pointer}
+.tm-quick button:hover{border-color:var(--sea);color:var(--sea)}
+@media (max-width:760px){ .tm-date{width:100%;justify-content:space-between} .tm-date input{flex:1;min-width:0;font-size:16px} }
 </style>
 </head>
 <body data-admin>
@@ -308,17 +317,17 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261111s"></script>
-<script src="../assets/db.js?v=20261111s"></script>
-<script src="../assets/notify.js?v=20261111s"></script>
-<script src="../assets/seed-trade.js?v=20261111s"></script>
-<script src="../assets/seed-extra.js?v=20261111s"></script>
-<script src="../assets/seed-new.js?v=20261111s"></script>
-<script src="../assets/seed-comments.js?v=20261111s"></script>
-<script src="../assets/photos.js?v=20261111s"></script>
-<script src="../assets/admin-data.js?v=20261111s"></script>
-<script src="../assets/kmap.js?v=20261111s"></script>
-<script src="../assets/op-posts.js?v=20261111s"></script>
+<script src="../assets/common.js?v=20261111t"></script>
+<script src="../assets/db.js?v=20261111t"></script>
+<script src="../assets/notify.js?v=20261111t"></script>
+<script src="../assets/seed-trade.js?v=20261111t"></script>
+<script src="../assets/seed-extra.js?v=20261111t"></script>
+<script src="../assets/seed-new.js?v=20261111t"></script>
+<script src="../assets/seed-comments.js?v=20261111t"></script>
+<script src="../assets/photos.js?v=20261111t"></script>
+<script src="../assets/admin-data.js?v=20261111t"></script>
+<script src="../assets/kmap.js?v=20261111t"></script>
+<script src="../assets/op-posts.js?v=20261111t"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1189,7 +1198,7 @@ if (SRV) {
 
 
   /* ── 방문 통계: 실시간(최근 5분)·오늘·어제 ── */
-  var TF = null, tfDay = "t", tfTimer = null, TM = null, tmP = "t", tmRank = "views";
+  var TF = null, tfDay = "t", tfTimer = null, TM = null, tmP = "t", tmRank = "views", tmFrom = "", tmTo = "";
   function tfNum(n){ return (n || 0).toLocaleString(); }
   function tfDiff(a, b, label){
     if (!b) return '<div class="d">' + label + ' 기록 없음</div>';
@@ -1208,17 +1217,35 @@ if (SRV) {
     }).join("");
   }
   window.loadTraffic = function(){
-    return Promise.all([JIDB.call("admin_traffic"), JIDB.call("admin_traffic_more", { p: tmP }).catch(function(){ return null; })])
+    return Promise.all([JIDB.call("admin_traffic"), JIDB.call("admin_traffic_more", tmArgs()).catch(function(){ return null; })])
       .then(function(a){ TF = a[0]; TM = a[1]; return TF; });
   };
+  function tmArgs(){ if (!tmFrom) { var t = ymd(new Date()); tmFrom = tmTo = t; } return { from: tmFrom, to: tmTo || tmFrom }; }
+  function tmLoad(){ JIDB.call("admin_traffic_more", tmArgs()).then(function(r){ TM = r; if (view === "traffic") paintTraffic(); }); }
   window.tmSet = function(k, v){
     if (k === "rank") { tmRank = v; paintTraffic(); return; }
-    tmP = v; JIDB.call("admin_traffic_more", { p: tmP }).then(function(r){ TM = r; if (view === "traffic") paintTraffic(); });
+    var today = ymd(new Date());
+    if (k === "from") { tmFrom = v || today; if (!tmTo || tmTo < tmFrom) tmTo = tmFrom; }
+    else if (k === "to") { tmTo = v || tmFrom; if (tmTo < tmFrom) tmFrom = tmTo; }
+    else if (k === "shift") {   // ◀ ▶ : 고른 기간 길이만큼 앞뒤로
+      var f = new Date(tmFrom + "T00:00:00"), t = new Date((tmTo || tmFrom) + "T00:00:00"), span = Math.round((t - f) / 864e5) + 1;
+      f.setDate(f.getDate() + v * span); t.setDate(t.getDate() + v * span);
+      if (ymd(t) > today) return;
+      tmFrom = ymd(f); tmTo = ymd(t);
+    } else if (k === "quick") {
+      var e = new Date(), b = new Date(); if (v === "y") { e.setDate(e.getDate() - 1); b = new Date(e); } else b.setDate(b.getDate() - (+v - 1));
+      tmFrom = ymd(b); tmTo = ymd(e);
+    }
+    tmLoad();
   };
   function tmPanels(){
     var m = TM; if (!m) return "";
-    var segP = '<span class="tf-seg">' + [["t","오늘"],["y","어제"],["7","최근 7일"],["30","최근 30일"]].map(function(x){
-      return '<button class="' + (tmP === x[0] ? "on" : "") + '" onclick="tmSet(\'p\',\'' + x[0] + '\')">' + x[1] + '</button>'; }).join("") + '</span>';
+    var today = ymd(new Date()), mx = ' max="' + today + '"';
+    var segP = '<span class="tm-date"><button class="tm-nav" onclick="tmSet(\'shift\',-1)" aria-label="이전 기간">◀</button>' +
+      '<input type="date" value="' + m.from + '"' + mx + ' onchange="tmSet(\'from\',this.value)" aria-label="시작 날짜"><span>~</span>' +
+      '<input type="date" value="' + m.to + '"' + mx + ' onchange="tmSet(\'to\',this.value)" aria-label="끝 날짜">' +
+      '<button class="tm-nav" onclick="tmSet(\'shift\',1)"' + (m.to >= today ? " disabled" : "") + ' aria-label="다음 기간">▶</button></span>' +
+      '<span class="tm-quick">' + [["1","오늘"],["y","어제"],["7","7일"],["30","30일"]].map(function(x){ return '<button onclick="tmSet(\'quick\',\'' + x[0] + '\')">' + x[1] + '</button>'; }).join("") + '</span>';
     var pct = function(n, t){ return t ? Math.round(n / t * 100) : 0; };
     var kv = function(rows, unit){ return tfList(rows, "n", function(x){ return esc(x.k); }, unit || "명"); };
     // 유입 경로
@@ -1236,7 +1263,8 @@ if (SRV) {
     var rank = (cur[1] && cur[1].length) ? '<ol class="tm-rank">' + cur[1].map(function(x, i){
       return '<li><span class="no' + (i < 3 ? " top" : "") + '">' + (i + 1) + '</span><span class="nm"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(x.id) + '" target="_blank">' + esc(x.title) + '</a><small>' + esc(x.board) + ' · ' + esc(x.nick || "") + '</small></span><span class="n">' + tfNum(x.n) + cur[2] + '</span></li>';
     }).join("") + '</ol>' : '<div class="empty">' + (tmRank === "total" ? "아직 글이 없어요." : "이 기간에는 기록이 없어요.") + '</div>';
-    var range = m.from === m.to ? m.from.replace(/-/g, ".") : m.from.slice(5).replace("-", ".") + " ~ " + m.to.slice(5).replace("-", ".");
+    var days = Math.round((new Date(m.to + "T00:00:00") - new Date(m.from + "T00:00:00")) / 864e5) + 1;
+    var range = (m.from === m.to ? m.from.replace(/-/g, ".") : m.from.replace(/-/g, ".") + " ~ " + m.to.slice(5).replace("-", ".") + " (" + days + "일)");
     return '<div class="tm-head"><h2>자세히 보기</h2>' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span></div>' +
       '<div class="panel"><h2>유입 경로</h2>' + stack + '<div style="margin-top:14px">' + kv(m.refs) + '</div></div>' +
       '<div class="tf-2">' +
