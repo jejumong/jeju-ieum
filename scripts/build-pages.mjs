@@ -59,7 +59,7 @@ function page({ file, title, desc, active, body, jsonld, extraScripts = "", ogTy
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1f74d0">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+<link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
 <link rel="stylesheet" href="assets/style.css?v=${VER}">
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld).replace(/</g, "\\u003c")}</script>` : ""}
 </head>
