@@ -20,7 +20,7 @@
 <meta name="theme-color" content="#1f74d0">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261112a">
+<link rel="stylesheet" href="assets/style.css?v=20261112b">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"마을과 잘 지내는 법 — 텃세가 아니라 '시간'입니다","description":"귀촌인이 꼽는 어려움 중 하나가 주민과의 관계입니다. 제주는 '괸당'이라 부르는 친족·이웃 연결망이 촘촘해서, 처음엔 벽처럼 느껴질 수 있어요.","dateModified":"2026-11-04","author":{"@type":"Organization","name":"제주이음"},"publisher":{"@type":"Organization","name":"제주이음"},"mainEntityOfPage":"https://jejuieum.com/guide/neighbors.html","inLanguage":"ko"}</script>
 </head>
 <body data-active="article">
@@ -38,10 +38,10 @@
   </div>
   <section class="related" id="related"></section>
 </main>
-<script src="assets/common.js?v=20261112a"></script>
-<script src="assets/db.js?v=20261112a"></script>
-<script src="assets/notify.js?v=20261112a"></script>
-<script src="assets/guide-data.js?v=20261112a"></script>
+<script src="assets/common.js?v=20261112b"></script>
+<script src="assets/db.js?v=20261112b"></script>
+<script src="assets/notify.js?v=20261112b"></script>
+<script src="assets/guide-data.js?v=20261112b"></script>
 <script>var FORCE_ID = "neighbors";</script>
 <script>
 (function(){
@@ -70,10 +70,13 @@
   // 처음 읽는 순서 안에 있는 글이면: 위에 단계 표시, 본문 끝에 '다음 순서' 버튼
   var pi = -1; GUIDE_PATH.forEach(function(x, i){ if (x.id === g.id) pi = i; });
   var pathTop = "", pathNext = "";
+  // 실제로 읽은 글만 ✓ 표시 (이 브라우저 기준)
+  var readMap = JI.get("guide_read", {}) || {}; readMap[g.id] = 1; JI.set("guide_read", readMap);
   if (pi > -1) {
     pathTop = '<nav class="ap-steps" aria-label="처음 읽는 순서"><span class="ap-l">처음 읽는 순서</span>' +
       GUIDE_PATH.map(function(x, i){
-        return '<a href="guide/' + x.id + '.html" class="' + (i === pi ? "on" : (i < pi ? "done" : "")) + '"><span>' + (i < pi ? "✓" : i + 1) + '</span>' + esc(x.q) + '</a>';
+        var rd = i !== pi && readMap[x.id];
+        return '<a href="guide/' + x.id + '.html" class="' + (i === pi ? "on" : (rd ? "done" : "")) + '"><span>' + (rd ? "✓" : i + 1) + '</span>' + esc(x.q) + '</a>';
       }).join("") + (GUIDE_PATH[pi + 1] ? '<a class="ap-skip" href="guide/' + GUIDE_PATH[pi + 1].id + '.html">다음: ' + esc(GUIDE_PATH[pi + 1].q) + ' →</a>' : '') + '</nav>';
     var nx = GUIDE_PATH[pi + 1] && guideById(GUIDE_PATH[pi + 1].id), pv = pi > 0 && guideById(GUIDE_PATH[pi - 1].id);
     pathNext = nx
