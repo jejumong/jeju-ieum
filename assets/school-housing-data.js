@@ -20,7 +20,7 @@
              사진이 없으면 상세 창에는 지도·로드뷰 버튼만 보입니다 (방문자 사진 제보는 받지 않음)
    ============================================================ */
 
-var SCHOOL_HOUSES_CHECKED = "2026-11-05";
+var SCHOOL_HOUSES_CHECKED = "2026-11-12";
 
 var SCHOOL_HOUSE_SOURCES = {
   jejusi:   { label: "제주시 공공데이터 (2026.8.7 기준)", url: "https://www.data.go.kr/data/15056196/fileData.do" },
