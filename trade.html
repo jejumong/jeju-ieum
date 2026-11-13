@@ -65,11 +65,13 @@
     return n.toLocaleString();
   }
   document.getElementById("hub").innerHTML = BOARDS.map(function(b){
-    var list = premiumFirst(posts.filter(function(p){ return p.board === b[0]; }).sort(byRecent));
+    var list = b[0] === "축제정보"
+      ? activeFestivals().sort(function(a, c){ var o = { "진행중":0, "예정":1, "마감":2 }; return ((o[a.head] ?? 3) - (o[c.head] ?? 3)) || ((a.start || "") < (c.start || "") ? -1 : 1); })   // 끝난 지 7일 지난 축제는 빼고, 진행중·예정 먼저
+      : premiumFirst(posts.filter(function(p){ return p.board === b[0]; }).sort(byRecent));
     var items = list.slice(0, 5).map(function(p){
       var pr = shortPrice(p);
       return '<li>' + (isPremium(p) ? '<span class="chip new">AD</span>' : (p.loc ? '<span class="chip region">' + esc(String(p.loc).split(" ")[0]) + '</span>' : '')) +
-        '<a href="view.html?id=' + p.id + '">' + esc(p.title) + '</a>' + (pr ? '<span class="price">' + pr + '</span>' : '<span class="meta">' + fmtDate(p.date) + '</span>') + '</li>';
+        '<a href="view.html?id=' + p.id + '">' + esc(p.title) + '</a>' + (pr ? '<span class="price">' + pr + '</span>' : '<span class="meta">' + (b[0] === "축제정보" && p.period ? esc(p.period) : fmtDate(p.date)) + '</span>') + '</li>';
     }).join("");
     return '<section class="card hub-box' + (b[4] ? " " + b[4] : "") + '" data-href="' + b[1] + '"><a class="card-head hub-go" href="' + b[1] + '"><h2><span class="ti">' + b[2] + '</span>' + b[0] + ' <span class="tc">' + list.length + '</span></h2>' +
       '<span class="hub-arrow" aria-hidden="true">›</span></a>' +

@@ -216,7 +216,7 @@
   var LABEL = { "자유게시판":"자유", "질문하기":"질문", "생활정보":"정보", "최신뉴스":"뉴스", "취미·여행":"취미", "중고사고팔기":"중고", "구인구직":"구인", "부동산":"부동산", "제주상점":"상점", "특가공구":"공구", "동호회":"동호회", "축제정보":"축제" };
   var pop = posts.filter(function(p){ return TRADE_BOARDS.indexOf(p.board) < 0 && p.board !== "공지"; }).sort(function(a,b){ return viewsOf(b) - viewsOf(a); })[0];
   if (pop && viewsOf(pop) < 30) pop = null;   // 실제로 많이 본 글이 생기기 전엔 '인기' 표시 안 함
-  var recent = posts.filter(function(p){ return p.board !== "공지" && (!pop || p.id !== pop.id); }).sort(byRecent).slice(0, pop ? 2 : 3);
+  var recent = posts.filter(function(p){ return p.board !== "공지" && (!pop || p.id !== pop.id) && !(p.board === "축제정보" && festStatus(p) === "만료"); }).sort(byRecent).slice(0, pop ? 2 : 3);
   $("hm-feed").innerHTML = [pop].concat(recent).filter(Boolean).map(function(p, i){
     var n = cc(p.id), lb = (pop && i === 0) ? "인기" : (LABEL[p.board] || p.board);
     return '<a href="view.html?id=' + p.id + '"><em>' + esc(lb) + '</em><span>' + esc(p.title) + '</span><small>' + (n ? "💬" + n : fmtDate(p.date)) + '</small></a>';
