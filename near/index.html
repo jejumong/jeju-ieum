@@ -443,7 +443,7 @@ async function routeTo(idx){
       const code = String(err.code);
       const msg = code === '-98' ? '가까워서 걸어가는 게 더 빨라요.'
                 : code === '-99' ? '버스 경로를 찾지 못했어요. 카카오맵으로 확인해 주세요.'
-                : '지금은 버스 경로를 불러오지 못했어요. 카카오맵으로 확인해 주세요.';
+                : '지금은 버스 경로를 불러오지 못했어요. 카카오맵으로 확인해 주세요. <small style="opacity:.6">(오류 ' + code + ')</small>';
       $('#routes').innerHTML = `<div class="notice">${msg} <a target="_blank" rel="noopener" href="${routeLink(d.place_name, d.y, d.x)}">카카오맵 열기</a></div>`; return;
     }
     const paths = (j.result && j.result.path) || [];
