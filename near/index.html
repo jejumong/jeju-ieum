@@ -396,29 +396,61 @@ async function lifeSearch(q, o){
   if (o.cat) return renderPlaces(sortPlaces(await catR(o.cat, o.label)), o.label);
   if (q) renderPlaces(sortPlaces(await kwR(q)), q);
 }
-/* 시골 마을은 1.5km 안에 정류장이 없을 수 있어서, 못 찾으면 3km → 5km → 10km 로 스스로 넓혀 찾아요 */
-const STOP_RADII = [1500, 3000, 5000, 10000];
+/* 가까운 버스정류장: 카카오 장소 검색에는 시골 정류장이 거의 없어서, 대중교통 자료(ODsay 주변 정류장 검색)로 찾아요.
+   500m 안에 없으면 1km → 2km → 3km → 5km 로 스스로 넓히고, 찾은 뒤에도 '더 넓게 찾기' 버튼으로 넓힐 수 있어요. */
+const STOP_RADII = [500, 1000, 2000, 3000, 5000];
+const odsay = (api, q) => fetch(`https://api.odsay.com/v1/api/${api}?lang=0&${q}&apiKey=${encodeURIComponent(CONFIG.ODSAY_API_KEY)}`).then(r => r.json());
+const distM = (la1, lo1, la2, lo2) => { const R = 6371000, r = Math.PI / 180, a = Math.sin((la2 - la1) * r / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin((lo2 - lo1) * r / 2) ** 2; return Math.round(2 * R * Math.asin(Math.sqrt(a))); };
 async function nearStops(start = 0){
+  let lastErr = '';
   for (let i = start; i < STOP_RADII.length; i++) {
     const R = STOP_RADII[i];
     loading(`가까운 정류장 찾는 중… (내 주변 ${fmtDist(R)})`);
-    let list = sortPlaces(await kwR('버스정류장', null, R));
-    if (!list.length && !S.authFail) list = sortPlaces(await kwR('정류장', null, R));
-    if (S.authFail) return renderPlaces([], '가까운 버스정류장', R);
-    if (list.length) {
-      renderPlaces(list, '가까운 버스정류장', R);
-      if (i < STOP_RADII.length - 1) {
-        const more = document.createElement('button');
-        more.className = 'more'; more.type = 'button';
-        more.textContent = `${fmtDist(STOP_RADII[i + 1])}까지 더 넓게 찾기`;
-        more.onclick = () => nearStops(i + 1);
-        $('#results').appendChild(more);
-      }
-      return;
-    }
+    let j;
+    try { j = await odsay('pointSearch', `x=${S.me.lng}&y=${S.me.lat}&radius=${R}&stationClass=1`); }
+    catch (e) { hideMap(); return empty('지금은 정류장 정보를 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.'); }
+    let err = j && j.error; if (Array.isArray(err)) err = err[0];
+    if (err) { lastErr = String(err.code || err.msg || ''); continue; }
+    const seen = new Set();
+    const list = ((j.result && j.result.station) || []).map(s => ({
+      id: s.stationID, name: s.stationName, ars: s.arsID && s.arsID !== '0' ? String(s.arsID) : '',
+      lat: +s.y, lng: +s.x, d: distM(S.me.lat, S.me.lng, +s.y, +s.x)
+    })).filter(s => s.name && s.d <= R && !seen.has(s.id) && seen.add(s.id)).sort((a, b) => a.d - b.d);
+    if (list.length) return renderStops(list, R, i);
   }
   hideMap();
-  empty(`내 주변 ${fmtDist(STOP_RADII[STOP_RADII.length - 1])} 안에서 버스정류장을 찾지 못했어요.<br>위 검색창에 가려는 곳을 넣으면 타야 할 버스를 알려드려요.`);
+  empty(lastErr
+    ? `지금은 정류장 정보를 불러오지 못했어요. <small style="opacity:.6">(오류 ${esc(lastErr)})</small>`
+    : `내 주변 ${fmtDist(STOP_RADII[STOP_RADII.length - 1])} 안에서 버스정류장을 찾지 못했어요.`);
+}
+function renderStops(list, R, i){
+  S.stops = list;
+  const next = STOP_RADII[i + 1];
+  $('#results').innerHTML = `<div class="rhead"><b>가까운 버스정류장</b><span>${fmtDist(R)} 안 · 가까운 순 ${list.length}곳</span></div>`
+    + list.slice(0, 30).map((s, k) => `<div class="card">
+      <div class="prow"><span class="num">${k + 1}</span><div class="pmain">
+        <div class="pname">${esc(s.name)}</div>
+        <div class="pmeta"><span class="dist">${fmtDist(s.d)}</span>${s.ars ? `<span class="dot"></span><span>정류장 번호 ${esc(s.ars)}</span>` : ''}</div>
+        <div class="paddr" id="sb${k}"></div></div></div>
+      <div class="pbtns">
+        <a class="main" target="_blank" rel="noopener" href="${routeLink(s.name + ' 정류장', s.lat, s.lng)}">${ic('nav')}걸어서 가기</a>
+        <a href="#" data-stop="${k}">${ic('bus')}지나는 버스</a>
+      </div></div>`).join('')
+    + (next ? `<button class="more" type="button" id="stopMore">${fmtDist(next)}까지 더 넓게 찾기</button>` : '');
+  if (next) $('#stopMore').onclick = () => nearStops(i + 1);
+  $('#results').querySelectorAll('[data-stop]').forEach(a => a.onclick = e => { e.preventDefault(); stopBuses(+a.dataset.stop); });
+  drawPoints(list.slice(0, 30).map((s, k) => ({ lat: s.lat, lng: s.lng, label: k + 1 })));
+}
+async function stopBuses(k){
+  const s = S.stops[k], box = $('#sb' + k);
+  if (!s || !box) return;
+  box.textContent = '지나는 버스 찾는 중…';
+  try {
+    const j = await odsay('busStationInfo', `stationID=${encodeURIComponent(s.id)}`);
+    const lanes = (j.result && j.result.lane) || [];
+    const nums = [...new Set(lanes.map(l => l.busNo).filter(Boolean))];
+    box.innerHTML = nums.length ? nums.map(n => `<span class="bus">${esc(n)}</span>`).join('') : '이 정류장을 지나는 버스 정보가 없어요.';
+  } catch (e) { box.textContent = '지금은 버스 정보를 불러오지 못했어요.'; }
 }
 
 /* ---------- 대중교통 ---------- */
