@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261113a">
+<link rel="stylesheet" href="assets/style.css?v=20261113b">
 <style>
 /* ── 축제 지도 (이미지 + 점 오버레이) ── */
 .map-wrap{position:relative;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px;line-height:0;box-shadow:var(--sh-3)}
@@ -89,18 +89,20 @@
   </div>
 
   <div class="grid-cards" id="fest-grid"></div>
+  <p id="fest-checked" style="color:var(--muted);font-size:13px;margin:14px 2px 0"></p>
   <div style="display:flex;justify-content:flex-end;margin:22px 0 8px"><a class="btn accent" href="write.html?board=축제정보">✏️ 축제 제보</a></div>
 </main>
 
-<script src="assets/common.js?v=20261113a"></script>
-<script src="assets/db.js?v=20261113a"></script>
-<script src="assets/notify.js?v=20261113a"></script>
-<script src="assets/seed-trade.js?v=20261113a"></script>
-<script src="assets/seed-extra.js?v=20261113a"></script>
-<script src="assets/seed-new.js?v=20261113a"></script>
-<script src="assets/seed-comments.js?v=20261113a"></script>
-<script src="assets/photos.js?v=20261113a"></script>
-<script src="assets/admin-data.js?v=20261113a"></script>
+<script src="assets/common.js?v=20261113b"></script>
+<script src="assets/db.js?v=20261113b"></script>
+<script src="assets/notify.js?v=20261113b"></script>
+<script src="assets/seed-trade.js?v=20261113b"></script>
+<script src="assets/seed-extra.js?v=20261113b"></script>
+<script src="assets/festivals-data.js?v=20261113b"></script>
+<script src="assets/seed-new.js?v=20261113b"></script>
+<script src="assets/seed-comments.js?v=20261113b"></script>
+<script src="assets/photos.js?v=20261113b"></script>
+<script src="assets/admin-data.js?v=20261113b"></script>
 <script>
 /* ── 축제별 지도 좌표(이미지 크기 대비 %)와 카드 이모지 ── */
 var FEST_META = {
@@ -219,6 +221,7 @@ function render(){
   }).join("") || '<p style="color:var(--muted);padding:24px">조건에 맞는 축제가 없습니다.</p>';
 }
 render();
+if (typeof FESTIVALS_CHECKED !== "undefined") { var _fc = FESTIVALS_CHECKED.split("-"); document.getElementById("fest-checked").textContent = "축제 정보는 매일 오후 새로 찾아 넣어요 · 최근 확인 " + (+_fc[1]) + "월 " + (+_fc[2]) + "일"; }
 window.onJIData = render;   // 서버에서 새 글을 받아오면 목록을 다시 그림
 </script>
 </body>
