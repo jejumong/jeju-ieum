@@ -122,7 +122,7 @@ var GUIDES = [
              "억새 철, 오름 오르기 가장 좋은 계절"] }
   ],
   tip: "관광객용 행사·축제 일정은 '제주 열두 달 달력'에서, 매일의 물때는 '물때 시간표'에서 확인하세요.",
-  sources: [["제주 열두 달 달력 (제주몽)", "https://jejumong.github.io/jeju-calendar/"], ["기상청 날씨누리", "https://www.weather.go.kr"]],
+  sources: [["제주 열두 달 달력 (제주몽)", "https://jejuieum.com/calendar/"], ["기상청 날씨누리", "https://www.weather.go.kr"]],
   service: "kit"
 },
 {

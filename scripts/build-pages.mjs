@@ -273,6 +273,7 @@ const urls = [
   ...SCHOOL_HOUSES.map((h) => [`house/${h.id}.html`, SCHOOL_HOUSES_CHECKED, "0.7"]),
   ...PROGRAMS.filter((p) => p.id).map((p) => [`program/${p.id}.html`, PROGRAMS_CHECKED, "0.7"]),
   ["festivals.html", today, "0.6"], ["info/index.html", today, "0.7"],
+  ["calendar/", today, "0.7"], ["tide/", today, "0.7"], ["near/", today, "0.6"],
   ...OPS.map((o) => [`info/${o.k}.html`, today, "0.6"])
 ];
 wr("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>

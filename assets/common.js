@@ -29,9 +29,9 @@ var SITE_CFG = {
   kakaoJsKey: "e8daa949540834b55af58b73b1a279ef",
   youtube: "https://www.youtube.com/@Jejumong",
   tools: {
-    tide: "https://jejumong.github.io/jeju-tide/",
-    calendar: "https://jejumong.github.io/jeju-calendar/",
-    near: "https://jejumong.github.io/jeju-near/",
+    tide: "/tide/",
+    calendar: "/calendar/",
+    near: "/near/",
     home: "https://jejumong.github.io/"
   }
 };

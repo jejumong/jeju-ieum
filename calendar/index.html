@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<link rel="canonical" href="https://jejuieum.com/calendar/">
+<meta property="og:site_name" content="제주이음">
+<meta property="og:url" content="https://jejuieum.com/calendar/">
+<meta property="og:image" content="https://jejuieum.com/assets/og-image.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>제주 열두 달 달력</title>
+<meta name="description" content="1월부터 12월까지 제주에서 열리는 축제, 명소별 가장 좋은 시기, 제철 풍경과 먹거리, 여행 시기 팁을 날짜별로 모은 달력">
+<meta property="og:type" content="website">
+<meta property="og:title" content="제주 열두 달 달력">
+<meta property="og:description" content="축제·명소 적기·제철 먹거리까지, 제주 여행 날짜 고를 때 보는 달력">
+<meta name="theme-color" content="#f6f5f1">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SN1ZYKZMMY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SN1ZYKZMMY');
+</script>
+</head>
+<body>
+<!-- 제주몽 메인으로 돌아가기 -->
+<style>
+.jjm-bar{position:relative;z-index:50;padding:calc(8px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-left,0px)) 8px;background:#0b4f6c}
+.jjm-home{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;text-decoration:none;font:700 14px/1 -apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;-webkit-tap-highlight-color:transparent}
+.jjm-home img{width:28px;height:28px;border-radius:50%;display:block}
+.jjm-home:active{opacity:.7}
+@media print{.jjm-bar{display:none}}
+html.jjm-embed .jjm-bar{display:none}
+html.jjm-embed,html.jjm-embed body{overflow:hidden!important;height:auto!important}
+html.jjm-embed .wrap{max-width:none;padding-left:24px;padding-right:24px}
+</style>
+<script>/* 제주이음 등 다른 사이트 안에 넣어 보여 줄 때는 제주몽 홈 버튼 숨김 */try{if(window.self!==window.top||/[?&]embed=1/.test(location.search))document.documentElement.classList.add("jjm-embed")}catch(e){document.documentElement.classList.add("jjm-embed")}</script>
+<script>/* 다른 사이트 안에 넣어 보여 줄 때: 내용 높이를 바깥 페이지에 알려 틀 높이를 맞춤 */
+(function(){try{if(window.self===window.top)return;}catch(e){}
+var last=0;function send(){var b=document.body,h=Math.max(document.documentElement.scrollHeight,b?b.scrollHeight:0,b?Math.ceil(b.getBoundingClientRect().bottom+window.scrollY):0)+2;if(Math.abs(h-last)>4){last=h;parent.postMessage({jjmHeight:h},"*");}}
+window.addEventListener("load",send);window.addEventListener("resize",send);
+document.addEventListener("DOMContentLoaded",function(){send();if(window.ResizeObserver)new ResizeObserver(send).observe(document.body);setInterval(send,1500);});})();</script>
+<div class="jjm-bar"><a class="jjm-home" href="https://jejumong.github.io/" aria-label="제주몽 메인 페이지로"><img src="https://jejumong.github.io/favicon.png" alt="">‹ 제주몽 홈</a></div>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 달 이동 띠 → 월 달력(7칸) → 그 달/그날 항목 목록. 현무암 바탕에 감귤·오름·바다 색으로 분류 */
+:root{
+  --bg:#f6f5f1; --surface:#ffffff; --fg:#23262a; --muted:#6b6f72; --line:#e3e1da;
+  --basalt:#3a3d40;
+  --fest:#e2702a; --fest-soft:#fbe6d8;
+  --view:#4f8a3c; --view-soft:#e2efd9;
+  --food:#1f7a99; --food-soft:#d8ebf2;
+  --tip:#7a5aa6; --tip-soft:#ebe3f5;
+  --spot:#b0405e; --spot-soft:#f6dfe5;
+  --village:#9a6a00; --village-soft:#f6ebcc;
+  --today:#e2702a;
+  --display:"Gowun Batang", "Nanum Myeongjo", serif;
+  --body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17191b; --surface:#202326; --fg:#ecebe6; --muted:#9a9ea1; --line:#33373b; --basalt:#c9c7c0;
+  --fest:#f08a45; --fest-soft:#3d2a1d; --view:#7cb866; --view-soft:#243321;
+  --food:#4fb0d0; --food-soft:#1b313a; --tip:#ad8fd8; --tip-soft:#2e2639; --spot:#e17b95; --spot-soft:#3a2229; --village:#e0b041; --village-soft:#3a3018; --today:#f08a45; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17191b; --surface:#202326; --fg:#ecebe6; --muted:#9a9ea1; --line:#33373b; --basalt:#c9c7c0;
+  --fest:#f08a45; --fest-soft:#3d2a1d; --view:#7cb866; --view-soft:#243321;
+  --food:#4fb0d0; --food-soft:#1b313a; --tip:#ad8fd8; --tip-soft:#2e2639; --spot:#e17b95; --spot-soft:#3a2229; --village:#e0b041; --village-soft:#3a3018; --today:#f08a45; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px;display:flex;flex-direction:column;gap:22px}
+header h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,5vw,40px);line-height:1.2;margin:0;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.months{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;min-width:0}
+.months button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:14px;padding:6px 11px;border-radius:999px;cursor:pointer}
+.months button[aria-pressed="true"]{background:var(--basalt);color:var(--bg);border-color:var(--basalt)}
+.year{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--muted)}
+select{font:inherit;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+button:focus-visible,select:focus-visible{outline:2px solid var(--fest);outline-offset:2px}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:13.5px;padding:5px 12px;border-radius:999px;cursor:pointer}
+.chip i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.chip[aria-pressed="false"]{opacity:.45}
+.monthhead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.monthhead h2{font-family:var(--display);font-size:clamp(24px,4vw,32px);margin:0}
+.monthhead span{color:var(--muted)}
+.navbtn{border:1px solid var(--line);background:var(--surface);color:var(--fg);width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer}
+.grid-scroll{overflow-x:auto}
+.calwrap{position:relative;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 10px)}
+
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface);min-width:340px}
+.dow{font-size:12px;letter-spacing:.06em;color:var(--muted);padding:6px 8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:left}
+.dow.sun,.cell.sun .num{color:#c8453b}
+.dow.sat,.cell.sat .num{color:var(--food)}
+.cell{min-height:96px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:5px 4px 6px;display:flex;flex-direction:column;gap:3px;cursor:pointer;background:none;border-top:0;border-left:0;font:inherit;color:inherit;text-align:left;min-width:0}
+.cell.blank{cursor:default;background:var(--bg)}
+.cell.sel{box-shadow:inset 0 0 0 2px var(--basalt)}
+.num{font-size:13px;font-variant-numeric:tabular-nums;padding-left:3px}
+.cell.today .num{background:var(--today);color:#fff;border-radius:999px;padding:0 7px;align-self:flex-start}
+.pill{font-size:11.5px;line-height:1.35;padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.more{font-size:11px;color:var(--muted);padding-left:4px}
+.dots{display:none;gap:3px;flex-wrap:wrap;padding-left:3px}
+.dots i{width:6px;height:6px;border-radius:50%}
+.c-fest{background:var(--fest-soft);color:var(--fest)} .d-fest{background:var(--fest)}
+.c-view{background:var(--view-soft);color:var(--view)} .d-view{background:var(--view)}
+.c-food{background:var(--food-soft);color:var(--food)} .d-food{background:var(--food)}
+.c-tip{background:var(--tip-soft);color:var(--tip)} .d-tip{background:var(--tip)}
+.c-spot{background:var(--spot-soft);color:var(--spot)} .d-spot{background:var(--spot)}
+.c-village{background:var(--village-soft);color:var(--village)} .d-village{background:var(--village);border-radius:2px!important}
+.more-link{font-size:14px;font-weight:600;color:var(--village);text-decoration:none;align-self:flex-start;padding:4px 0}
+.more-link:hover{text-decoration:underline}
+header .updated{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13.5px;color:var(--muted)}
+.updated i{flex:none;width:9px;height:9px;border-radius:2px;background:var(--village);display:inline-block}
+.updated span{min-width:0}
+.best{font-size:13.5px;background:var(--spot-soft);color:var(--fg);border-radius:6px;padding:7px 10px}
+.best b{color:var(--spot);font-weight:600;margin-right:4px}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{gap:18px;padding-block:20px 48px}
+  header p{font-size:15px}
+  .pill,.more{display:none}
+  .dots{display:flex;gap:4px;padding-left:2px}
+  .dots i{width:8px;height:8px}
+  .cell{min-height:56px;padding:6px 3px;align-items:center}
+  .num{font-size:16px;padding-left:0}
+  .cell.today .num{padding:0 8px}
+  .dow{font-size:13px;text-align:center;padding:8px 2px}
+  .grid{min-width:0}
+  .bar{flex-direction:column;align-items:stretch}
+  .months{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;overflow:visible}
+  .months button{font-size:15px;padding:10px 0;min-height:44px}
+  .year{justify-content:flex-end}
+  .chip{font-size:15px;padding:9px 15px}
+  .chip i{width:11px;height:11px}
+  .navbtn{width:44px;height:44px;font-size:20px}
+  .monthhead{gap:10px}
+  .monthhead span{flex-basis:100%;font-size:15px}
+  .listhead h3{font-size:18px}
+  .allbtn{font-size:16px;padding:0 16px;min-height:48px}
+  .list{grid-template-columns:1fr}
+  .item{padding:16px}
+  .item h4{font-size:18px}
+  .item p{font-size:15.5px}
+  .best{font-size:15px;padding:10px 12px}
+  .place,.when{font-size:14px}
+  .tag{font-size:13px;padding:3px 10px}
+  footer{font-size:14px}
+}
+.listhead{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.listhead h3{font-family:var(--display);font-size:21px;margin:0;min-width:0;line-height:1.3;word-break:keep-all}
+.listhead h3 small{font-family:var(--body);font-size:.72em;font-weight:500;color:var(--muted);margin-left:6px;white-space:nowrap}
+.allbtn{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 18px;border-radius:999px;border:2px solid var(--fest);background:var(--fest);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px color-mix(in srgb,var(--fest) 35%,transparent)}
+.allbtn:active{transform:scale(.97)}
+.allbtn[aria-pressed="true"]{background:var(--surface);color:var(--muted);border-color:var(--line);box-shadow:none;font-weight:500}
+.dayhint{font-size:13.5px;color:var(--muted);margin:0}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.item .top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.when{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.item h4{margin:0;font-size:16.5px;font-weight:600}
+.item p{margin:0;font-size:14px;color:var(--fg)}
+.place{font-size:13px;color:var(--muted)}
+.badge{font-size:11.5px;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:1px 6px;align-self:flex-start}
+.badge.ok{border-style:solid;color:var(--view);border-color:var(--view)}
+.empty{color:var(--muted);padding:12px 0}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;max-width:72ch}
+@media (prefers-reduced-motion:no-preference){.cell,.chip,.months button{transition:background .15s,opacity .15s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>제주 열두 달 달력</h1>
+    <p>달마다 제주에서 열리는 축제와 마을 행사, 제철 풍경과 먹거리, 여행 시기 팁을 한 장에 모았어요. 날짜를 누르면 그날 볼 수 있는 것만 추려 보여 줍니다.</p>
+    <p class="updated" id="updated"><i aria-hidden="true"></i><span id="updtext"></span></p>
+  </header>
+
+  <div class="bar">
+    <div class="months" id="months" role="group" aria-label="월 선택"></div>
+    <label class="year" for="year">달력 연도
+      <select id="year"><option value="2026">2026년</option><option value="2027">2027년</option></select>
+    </label>
+  </div>
+
+  <div class="filters" id="filters" role="group" aria-label="분류 보기"></div>
+
+  <section>
+    <div class="monthhead">
+      <button class="navbtn" id="prev" aria-label="이전 달">‹</button>
+      <h2 id="mtitle"></h2>
+      <button class="navbtn" id="next" aria-label="다음 달">›</button>
+      <span id="msub"></span>
+    </div>
+  </section>
+
+  <div class="calwrap" id="calwrap">
+    <div class="grid-scroll"><div class="grid" id="grid"></div></div>
+  </div>
+
+  <section id="listsec" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:env(safe-area-inset-top,0px)">
+    <div class="listhead"><h3 id="ltitle"></h3><button class="allbtn" id="clearday" aria-pressed="true"></button></div>
+    <p class="dayhint" id="dayhint">달력의 날짜를 누르면 그날 볼 수 있는 것만 골라 보여 드려요.</p>
+    <div class="list" id="list"></div>
+  </section>
+
+  <footer>
+    ‘마을 행사’는 지역 신문과 행사 안내에서 찾은 그해 일정이에요. 갑자기 바뀌거나 취소될 수 있으니 카드의 ‘행사 안내 보기’에서 한 번 더 확인하세요. 축제 날짜 중 ‘2026 확정’ 표시는 2026년 공식 발표 기준이고, 해마다 바뀝니다. ‘해마다 이맘때’ 표시는 평년 기준 대략적인 시기예요. 꽃 개화와 억새·단풍 절정은 날씨에 따라 1~2주 앞당겨지거나 늦어질 수 있고, 숙박 가격은 숙소마다 다르니 예약 전에 꼭 확인하세요.
+  </footer>
+</div>
+
+<script>
+const CATS={spot:"명소 적기",fest:"축제·행사",village:"마을 행사",view:"풍경·꽃",food:"제철 먹거리",tip:"여행 팁"};
+// [시작월,시작일,끝월,끝일,분류,제목,설명,장소,확정연도(없으면 해마다),즐기는 요령]
+const E=[
+ [11,15,12,31,"fest","휴애리 동백축제","분홍빛 애기동백이 정원 가득 피는 겨울 축제. 감귤 따기 체험도 함께 할 수 있어요.","서귀포 남원읍 신례동로 256 휴애리"],
+ [12,31,12,31,"fest","대정 동일 해넘이축제","노을 지는 포구에서 달집을 태우며 한 해를 보내는 마을 축제. 선셋 콘서트도 열려요. 날짜는 해마다 확인하세요.","서귀포 대정읍 동일리포구 일원"],
+ [1,1,1,1,"fest","서귀포 겨울바다 국제펭귄수영대회","새해 첫날 겨울 바다에 뛰어드는 이색 대회. 신청하지 않아도 구경과 공연 관람은 자유예요.","중문색달해수욕장"],
+ [5,20,6,20,"spot","비자림 숲 산책","천년 비자나무 숲이 연둣빛 새잎으로 가장 싱그러운 때. 숲 향기를 내뿜는 피톤치드는 기온이 오르는 초여름부터 여름에 많아지고, 장마 전이라 길도 보송해요.","구좌읍 평대리 비자림",null,"문 여는 아침에 들어가면 사람이 적고 숲 공기가 가장 맑아요. 비 그친 다음 날 아침은 흙과 나무 향이 훨씬 진합니다."],
+ [6,19,6,23,"spot","사려니숲 에코힐링 · 물찻오름 개방","평소 닫혀 있는 분화구 습지 물찻오름을 이 기간에만 해설사와 걸을 수 있어요. 출입이 막혀 있던 시험림 길도 함께 열려요.","제주시 교래리 사려니숲길 (붉은오름 입구)","2026","물찻오름 탐방은 하루 150명 선착순 예약제예요. 2026년에는 6월 10일부터 접수했으니, 매년 6월 초 공지를 챙겨 보세요."],
+ [1,5,2,10,"spot","사려니숲 설경","눈 내린 다음 날, 곧게 뻗은 삼나무 숲길이 하얗게 덮여 전혀 다른 숲이 돼요.","사려니숲길 (붉은오름·비자림로 입구)",null,"한라산 입산이 부담스러울 때 눈 숲을 걷기 좋은 대안이에요. 눈 온 날은 516도로·비자림로 통제 여부를 먼저 확인하세요."],
+ [4,25,5,15,"spot","한라산 털진달래","산철쭉보다 한 달쯤 먼저, 해발 1400~1600m 고원을 분홍빛으로 물들여요. 잎보다 꽃이 먼저 피는 게 특징.","한라산 진달래밭, 선작지왓, 윗세오름",null,"영실 코스로 윗세오름까지 오르면 가장 쉽게 볼 수 있어요. 개화가 늦은 해는 5월 중하순까지 밀려요."],
+ [4,24,4,25,"fest","우도 소라축제","우도 특산 뿔소라 요리와 해녀 공연, ‘우도의 밤’ 공연이 열려요.","우도 천진항 일원","2026"],
+ [4,28,5,10,"spot","귤꽃 향기 드라이브","하얀 귤꽃이 피면 서귀포 귤밭 마을 전체에 달콤한 향이 퍼져요. 사진보다 창문을 내리고 지나가야 아는 제주예요.","효돈·남원·위미 귤밭 마을길",null,"해 질 무렵 바람이 잦아들 때 향이 가장 짙게 남아요."],
+ [5,10,8,31,"spot","은하수 보기","5월에는 새벽, 한여름에는 밤 9~11시쯤 은하수 중심부가 남쪽 하늘에 떠요.","1100고지 습지, 수월봉, 동쪽 해안 마을",null,"달이 없는 그믐 전후, 맑은 날을 고르세요. 휴대폰은 야간 모드로 삼각대에 세워 30초 이상 찍으면 담겨요."],
+ [3,15,5,20,"spot","광치기해변 초록 이끼 바위","썰물 때 드러나는 현무암 바위에 초록 이끼가 덮여, 성산일출봉을 배경으로 이국적인 풍경이 펼쳐져요.","성산읍 광치기해변",null,"물이 가장 많이 빠지는 간조 시각에 맞춰 가야 해요. 물때표를 먼저 확인하세요. 바위가 미끄러우니 운동화 필수."],
+ [11,1,2,28,"spot","하도리 철새도래지","겨울이면 수천 마리 겨울 철새가 하도 바닷가 호수에 내려앉아요. 운이 좋으면 저어새도 만나요.","구좌읍 하도리 철새도래지",null,"아침 이른 시간이 가장 활발해요. 가까이 다가가지 말고 탐조대에서 쌍안경으로 보세요."],
+ [6,1,8,31,"tip","해산물 금어기 확인","여름에는 소라(6/1~8/31), 갈치(7월), 옥돔(7/21~8/20), 참문어(5/16~6/30) 등 금어기가 겹쳐요. 이 기간엔 바다에서 직접 잡지 말고 식당·시장에서 사 드세요.","제주 연안",null,"금어기 날짜는 해마다 고시가 바뀔 수 있어요."],
+ [12,31,1,1,"fest","성산일출축제","한 해의 마지막 해넘이와 새해 첫 해돋이를 성산일출봉에서 맞는 행사. 새벽 등반객이 많으니 일찍 출발하세요.","서귀포 성산읍 성산일출봉"],
+ [12,10,2,28,"view","한라산 눈꽃·상고대","눈 덮인 영실·윗세오름 길이 가장 아름다운 때. 아이젠은 필수이고, 성판악·관음사 코스는 탐방 예약이 필요해요.","한라산 영실·어리목·윗세오름"],
+ [12,1,2,28,"view","동백꽃","붉은 동백이 숲과 돌담을 덮는 계절. 떨어진 꽃잎이 길을 덮는 1월 중순 무렵이 특히 예뻐요.","위미 동백군락지, 카멜리아힐, 남원 동백포레스트"],
+ [12,20,2,10,"view","수선화","겨울 들판과 돌담 밑에 하얀 제주 수선화가 피어요. 향이 진해서 걷기만 해도 좋습니다.","대정 추사관 일대, 한림공원"],
+ [11,15,2,28,"food","대방어 제철","살이 오른 겨울 대방어 회를 맛볼 때. 모슬포 포구 식당에서 부위별로 즐길 수 있어요.","대정읍 모슬포항 일대"],
+ [12,1,3,31,"food","한라봉·천혜향","만감류가 차례로 나오는 시기. 오일장이나 농가 직판장에서 사면 저렴해요.","서귀포 일대 농가, 제주민속오일시장"],
+ [1,6,2,10,"tip","숙박 비수기(설 연휴 제외)","방학 성수기가 지나고 1월 중순부터 2월 초까지 펜션·호텔 요금이 내려가는 편이에요. 설 연휴는 예외.","제주 전역"],
+ [2,2,2,4,"fest","탐라국 입춘굿","탐라 시대부터 이어 온 봄맞이 굿. 나무 소 ‘낭쉐’를 끄는 낭쉐몰이와 거리굿이 볼거리예요.","제주시 관덕정·제주목 관아","2026"],
+ [2,1,3,10,"view","매화","제주의 첫 봄꽃. 흰 매화와 홍매화가 함께 피어요.","휴애리 자연생활공원, 한림공원"],
+ [2,10,3,20,"view","이른 유채꽃","제주는 2월부터 유채가 피기 시작해요. 산방산을 배경으로 한 유채밭이 대표 사진 명소.","산방산 일대, 중문 엉덩물계곡"],
+ [3,9,3,14,"fest","제주들불축제","옛 목축 문화 ‘방애’를 재현한 축제. 실제 불 대신 디지털 불놓기와 횃불대행진, 달집태우기로 진행해요.","애월읍 새별오름","2026"],
+ [3,28,3,29,"fest","서귀포 유채꽃 국제걷기대회","노란 유채꽃길을 따라 걷는 봄 걷기 행사.","서귀포 표선면 가시리 일대","2026"],
+ [3,22,4,8,"view","왕벚꽃","제주 자생 왕벚나무 꽃길. 밤 조명 아래 벚꽃 터널도 인기예요.","전농로, 제주대 입구, 애월 장전리"],
+ [3,20,4,15,"view","녹산로 유채·벚꽃길","노란 유채와 분홍 벚꽃이 10km 넘게 함께 이어지는 드라이브 길.","표선면 가시리 녹산로"],
+ [4,4,4,5,"fest","서귀포유채꽃축제","드넓은 유채꽃밭 산책과 야간 개장, 공연, 체험 프로그램.","표선면 가시리 조랑말체험공원","2026"],
+ [4,15,5,15,"fest","가파도 청보리축제","섬 전체가 초록 보리 물결로 덮여요. 모슬포 운진항에서 배로 15분 안팎.","가파도 (운진항 출발)","2026"],
+ [4,1,5,10,"food","고사리 철","4월 ‘고사리 장마’ 뒤에 새순이 올라와 가장 연해요. 고사리 육개장도 이때가 제맛.","남원 수망리 등 해발 200~500m 중산간 들판",null,"직접 꺾으러 간다면 혼자 가지 말고 밝은 옷, 보조배터리, 호루라기를 챙기세요. 제주 길잃음 사고의 상당수가 4~5월 고사리 채취 중에 일어나요."],
+ [4,20,5,20,"view","햇차 녹차밭","첫물차를 따는 계절의 연두빛 녹차밭.","서광 녹차밭(오설록), 도순 녹차밭"],
+ [5,1,5,6,"tip","5월 연휴 성수기","어린이날 연휴 전후로 항공·숙박·렌터카가 빨리 마감되고 비싸져요. 미리 예약하세요.","제주 전역"],
+ [5,20,6,15,"view","메밀꽃(봄 메밀)","하얀 메밀꽃밭이 펼쳐지는 늦봄. 제주는 국내 최대 메밀 산지예요.","표선 보롬왓 일대"],
+ [5,25,6,10,"view","한라산 산철쭉","분홍 산철쭉이 윗세오름 일대 고산 초원을 물들여요.","한라산 윗세오름·선작지왓"],
+ [5,15,7,10,"food","자리돔 제철","자리물회와 자리구이의 계절. 보목포구에서는 보통 5~6월에 자리돔축제가 열려요.","서귀포 보목포구, 모슬포"],
+ [6,1,6,30,"view","곶자왈 반딧불이","초여름 밤, 곶자왈 숲에 반딧불이가 날아요. 예약제 탐방이 있어요.","한경면 청수곶자왈"],
+ [6,10,7,10,"view","수국","돌담길과 길가를 수국이 가득 채우는 계절.","종달리 수국길, 혼인지, 카멜리아힐, 휴애리"],
+ [6,18,7,20,"tip","장마철","평년 기준 6월 중하순부터 7월 중순까지 비가 잦아요. 실내 일정과 우비를 챙기세요.","제주 전역"],
+ [6,1,8,31,"food","한치 제철","여름밤 바다의 한치잡이 배 불빛. 한치물회는 이때가 가장 맛있어요.","제주 해안 마을 식당"],
+ [7,1,8,31,"view","해수욕장 개장","에메랄드빛 물놀이 철. 해변마다 개장일이 조금씩 달라요.","협재·금능·함덕·월정·중문 해변"],
+ [7,15,8,20,"tip","여름 극성수기","휴가철로 숙박·렌터카 요금이 1년 중 가장 높아요. 일찍 예약할수록 유리합니다.","제주 전역"],
+ [7,24,7,26,"fest","이호테우축제","전통 뗏목 ‘테우’를 테마로 한 여름 해변 축제. 날짜는 해마다 달라요.","제주시 이호테우해변"],
+ [8,1,8,1,"fest","풋귤 페스티벌","덜 익은 풋귤로 풋귤청을 담그는 체험과 직거래 장터.","서귀포농업기술센터","2026"],
+ [8,1,8,31,"view","해바라기","한여름 들판을 채우는 해바라기밭.","한림 일대 해바라기 농장"],
+ [8,25,11,15,"fest","제주비엔날레","제주 동·서부 여러 전시장에서 열리는 현대미술 축제.","제주도립미술관 등 도내 전시장","2026"],
+ [9,19,9,20,"fest","제주해녀축제","해녀굿, 거리행진, 해녀 이야기를 듣는 불턱토크쇼와 물질 체험.","구좌읍 제주해녀박물관 일대","2026"],
+ [9,20,10,31,"view","핑크뮬리","분홍빛 핑크뮬리 들판. 휴애리에서는 9월 하순부터 핑크뮬리축제를 열어요.","남원 휴애리 자연생활공원"],
+ [9,15,10,19,"view","가을 메밀꽃","가을 하늘 아래 흰 메밀꽃밭.","오라동 메밀밭"],
+ [9,1,11,30,"food","은갈치 제철","살이 두툼한 가을 은갈치. 갈치조림·갈치국을 맛보세요.","서귀포항, 한림항 일대"],
+ [9,1,9,20,"tip","초가을 한산기(추석 연휴 제외)","여름 성수기가 끝나 숙박 요금이 내려가고 바다도 아직 따뜻해요.","제주 전역"],
+ [10,3,10,18,"fest","세계유산축전 제주 화산섬과 용암동굴","평소 닫혀 있는 용암동굴과 화산 지형을 걸어 볼 수 있는 기회. 프로그램은 예약 필수.","거문오름·만장굴 등 세계자연유산 일대","2026"],
+ [10,17,10,21,"fest","탐라문화제","제주 대표 역사문화 축제. 거리 퍼레이드와 민속 공연이 열려요.","제주시 시민복지타운광장 일대","2026"],
+ [10,23,10,25,"fest","서귀포칠십리축제","거리 퍼레이드와 공연, 먹거리 장터가 있는 서귀포 대표 축제.","서귀포 천지연폭포 주차장 일대","2026"],
+ [10,10,11,20,"view","억새 절정","오름 능선이 은빛 억새로 출렁여요. 해 질 녘 역광이 가장 아름답습니다.","새별오름, 따라비오름, 산굼부리, 아끈다랑쉬오름",null,"해 지기 1시간 전에 올라 역광으로 억새를 보세요. 백약이오름은 자연휴식년으로 출입이 제한돼 있으니 다른 오름을 고르세요."],
+ [10,20,11,10,"view","한라산 단풍","계곡을 따라 붉게 물드는 한라산 가을.","천아계곡, 1100고지, 영실"],
+ [11,5,11,7,"fest","제주올레걷기축제","사흘간 올레 코스를 함께 걷는 축제. 참가 신청은 미리 하세요.","제주올레 19·20코스 (조천·김녕·하도 일원)","2026","온라인 신청은 마감됐지만 당일 현장 접수로 걸을 수 있어요. 하루만 골라 걸어도 됩니다."],
+ [11,19,11,22,"fest","최남단방어축제","방어 맨손잡기와 방어 시식, 공연이 열리는 겨울 바다 축제.","대정읍 모슬포항 일원","2026"],
+ [11,19,11,23,"fest","제주감귤박람회","감귤 직거래와 가족 체험, 공연. 사전예약하면 입장료가 절반이에요.","서귀포농업기술센터 제주농업생태원","2026"],
+ [11,1,12,31,"food","노지감귤 따기 체험","주렁주렁 열린 귤을 직접 따 보는 시기. 농장마다 체험비와 가져갈 수 있는 양이 달라요.","서귀포·남원·효돈 일대 감귤농장"],
+ [11,20,12,18,"tip","늦가을 비수기","단풍철이 끝나고 연말 전까지 숙박 요금이 내려가는 편이에요.","제주 전역"],
+ [12,20,12,31,"tip","연말 성수기","크리스마스와 연말 해맞이 여행객이 몰려 숙박·렌터카가 오릅니다.","제주 전역"]
+];
+/*LOCAL_EVENTS_START*/
+// 마을·소규모 행사. 매일 갱신. s=시작일, e=끝일(YYYY-MM-DD), w=요일 한정(0일~6토, 없으면 매일), u=출처·안내 링크
+const LAST_UPDATED="2026-11-09";
+const LOCAL=[
+ {s:"2026-11-06",e:"2026-11-10",t:"대한민국 제주정원문화박람회",d:"제주에서 처음 열리는 정원 박람회예요. 작가정원과 시민 참여정원 10곳을 둘러보고, 정원 장터와 정원토크·음악회도 즐길 수 있어요.",p:"서귀포시 제주혁신도시 바람모루공원 일원",tip:"11월 10일(화)이 마지막 날이에요. 혁신도시 안이라 서귀포 시내에서 가깝습니다.",u:"https://www.headlinejeju.co.kr/news/articleView.html?idxno=600861"},
+ {s:"2026-11-13",e:"2026-11-15",t:"산책형 거리 전시 그렇게 가족이 된다",d:"책을 들고 표지판을 따라 공원을 걸으며 그림·설치작품·뮤직비디오를 만나는 무료 전시예요. 한 사람과 강아지의 이야기를 따라가며 약 50분 걸어요. 매일 낮 12시~오후 5시, 20분마다 출발.",p:"제주시 일도2동 신산공원 일대",tip:"온라인 사전 예약제(1~5명 한 팀)이고, 남은 자리가 있으면 현장에서도 참여할 수 있어요.",u:"https://www.ijejutoday.com/news/articleView.html?idxno=403558"},
+ {s:"2026-11-14",e:"2026-11-14",t:"서귀포 생태문화기행 (오조리)",d:"성산일출봉 옆 오조리 일대를 걸으며 자연과 마을을 만나는 서귀포시 생태문화기행의 올해 마지막 회차예요.",p:"서귀포시 성산읍 오조리 일원",tip:"사전 신청제예요. 서귀포시 누리집 알림마당에 올라오는 QR코드로 신청하세요.",u:"https://www.jejunews.com/news/articleView.html?idxno=2227052"},
+ {s:"2026-10-27",e:"2026-12-23",t:"감귤박물관 감귤따기 체험",d:"월라봉을 배경으로 한 감귤박물관 체험 농장에서 귤을 직접 따고 약 1kg을 담아 가요. 1인 5,000원, 입장 오전 9시 30분~11시 30분, 오후 1시~4시 30분.",p:"서귀포시 신효동 서귀포시 감귤박물관",tip:"비가 오거나 바람이 강한 날은 쉬어요. 출발 전 박물관에 운영 여부를 확인하세요.",u:"https://www.djournal.co.kr/news/article.html?no=131456"},
+ {s:"2026-04-01",e:"2026-12-09",w:[3],t:"계절이 들리는 원도심 버스킹",d:"매주 수요일 낮, 원도심 야외무대에서 열리는 무료 버스킹 공연. 오전 11시 30분과 낮 12시 30분 두 번 열려요.",p:"제주시 중앙로14길 18 제주아트플랫폼 1층 야외무대",tip:"공연 시간이 바뀔 수 있으니 064-800-9171로 확인하고 가세요.",u:"https://m.visitjeju.net/kr/festival/view?contentsid=CNTS_300000000014266"},
+ {s:"2026-04-01",e:"2026-11-30",w:[6],t:"원도심 도보투어 (성안올레·별별투어)",d:"매주 토요일, 해설사와 함께 옛 제주성 안 골목을 걸으며 이야기를 듣는 투어. 11월에는 오전 9시 30분~낮 12시에 걸어요.",p:"제주시 관덕로17길 27-1 고씨주택 출발",tip:"제주착한여행 누리집에서 미리 신청해야 해요. 예약금 5,000원은 투어가 끝나면 탐나는전으로 돌려줘요.",u:"http://www.ihalla.com/article.php?aid=1775970023784526079"}
+];
+/*LOCAL_EVENTS_END*/
+function ymd(str){const [y,m,d]=str.split("-").map(Number);return {y,m,d,n:y*10000+m*100+d}}
+LOCAL.forEach(o=>{const a=ymd(o.s),b=ymd(o.e);const row=[a.m,a.d,b.m,b.d,"village",o.t,o.d,o.p,String(a.y),o.tip||""];row.abs={s:a.n,e:b.n,w:o.w,u:o.u,sy:a.y,ey:b.y};E.push(row)});
+const MSUB=["눈 덮인 한라산과 붉은 동백","입춘굿과 첫 매화","들불축제, 유채와 벚꽃","유채·청보리·고사리의 봄","녹차밭과 산철쭉","수국과 반딧불이, 장마","해변과 한치의 여름","해바라기와 극성수기","해녀축제와 가을 메밀","억새와 축제의 달","감귤과 방어","동백과 연말 해돋이"];
+const DOW=["일","월","화","수","목","금","토"];
+const now=new Date();
+let year=now.getFullYear()===2026||now.getFullYear()===2027?now.getFullYear():2026;
+let month=now.getMonth()+1, selDay=null;
+let on={spot:true,fest:true,village:true,view:true,food:true,tip:true};
+try{const s=JSON.parse(localStorage.getItem("jeju-cal-filter")||"null");if(s)on=Object.assign(on,s)}catch(e){}
+const $=id=>document.getElementById(id);
+function track(name,params){try{if(typeof gtag==="function")gtag("event",name,params)}catch(e){}}
+
+function key(m,d){return m*100+d}
+function covers(e,m,d){
+  if(e.abs){const n=year*10000+m*100+d;if(n<e.abs.s||n>e.abs.e)return false;return !e.abs.w||e.abs.w.includes(new Date(year,m-1,d).getDay())}
+  const s=key(e[0],e[1]),t=key(e[2],e[3]),k=key(m,d);return s<=t?(k>=s&&k<=t):(k>=s||k<=t)}
+function inMonth(e,m){const last=new Date(year,m,0).getDate();for(let d=1;d<=last;d++)if(covers(e,m,d))return true;return false}
+function fmt(e){const a=`${e[0]}월 ${e[1]}일`,b=`${e[2]}월 ${e[3]}일`;let t=(e[0]===e[2]&&e[1]===e[3])?a:`${a} ~ ${b}`;if(e.abs&&e.abs.w)t=`매주 ${e.abs.w.map(i=>DOW[i]).join("·")}요일 · ~${b}`;return t}
+function visible(e){return on[e[4]]}
+/* 오늘 이전에 끝난 행사·시기는 숨김 (보고 있는 달 기준으로 그 회차의 끝날을 계산) */
+const TODAY=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
+function endOf(e,m){
+  if(e.abs)return e.abs.e;
+  const s=key(e[0],e[1]),t=key(e[2],e[3]);
+  if(s<=t)return year*10000+t;
+  return (m*100+31>=s && m>=e[0]) ? (year+1)*10000+t : year*10000+t;
+}
+function live(e,m){return endOf(e,m)>=TODAY}
+
+function renderMonths(){
+  $("months").innerHTML="";
+  for(let m=1;m<=12;m++){const b=document.createElement("button");b.textContent=m+"월";b.setAttribute("aria-pressed",m===month);b.onclick=()=>{month=m;selDay=null;render();track("view_month",{month:m})};$("months").appendChild(b)}
+}
+function renderFilters(){
+  $("filters").innerHTML="";
+  for(const c in CATS){const b=document.createElement("button");b.className="chip";b.setAttribute("aria-pressed",on[c]);b.innerHTML=`<i class="d-${c}"></i>${CATS[c]}`;
+    b.onclick=()=>{on[c]=!on[c];track("toggle_category",{category:CATS[c],on:on[c]});try{localStorage.setItem("jeju-cal-filter",JSON.stringify(on))}catch(e){}render()};$("filters").appendChild(b)}
+}
+function renderGrid(){
+  const g=$("grid");g.innerHTML="";
+  DOW.forEach((d,i)=>{const h=document.createElement("div");h.className="dow"+(i===0?" sun":i===6?" sat":"");h.textContent=d;g.appendChild(h)});
+  const first=new Date(year,month-1,1).getDay(),last=new Date(year,month,0).getDate();
+  for(let i=0;i<first;i++){const b=document.createElement("div");b.className="cell blank";g.appendChild(b)}
+  for(let d=1;d<=last;d++){
+    const wd=(first+d-1)%7;
+    const c=document.createElement("button");
+    const isToday=now.getFullYear()===year&&now.getMonth()+1===month&&now.getDate()===d;
+    c.dataset.day=d;
+    c.className="cell"+(wd===0?" sun":wd===6?" sat":"")+(isToday?" today":"")+(selDay===d?" sel":"");
+    const evs=E.filter(e=>visible(e)&&live(e,month)&&covers(e,month,d));
+    c.setAttribute("aria-label",`${month}월 ${d}일, ${evs.length}개 항목`);
+    let h=`<span class="num">${d}</span>`;
+    evs.slice(0,3).forEach(e=>h+=`<span class="pill c-${e[4]}">${e[5]}</span>`);
+    if(evs.length>3)h+=`<span class="more">+${evs.length-3}개</span>`;
+    h+=`<span class="dots">${evs.map(e=>`<i class="d-${e[4]}"></i>`).join("")}</span>`;
+    c.innerHTML=h;
+    c.onclick=()=>{selDay=selDay===d?null:d;render();if(selDay)track("view_day",{month:month,day:d});$("listsec").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})};
+    g.appendChild(c);
+  }
+}
+function renderList(){
+  const L=$("list");L.innerHTML="";
+  let evs=E.filter(e=>visible(e)&&live(e,month)&&(selDay?covers(e,month,selDay):inMonth(e,month)));
+  const span=e=>e.abs?(Date.UTC(Math.floor(e.abs.e/1e4),Math.floor(e.abs.e/100)%100-1,e.abs.e%100)-Date.UTC(Math.floor(e.abs.s/1e4),Math.floor(e.abs.s/100)%100-1,e.abs.s%100))/864e5+(e.abs.w?1000:0):0;
+  evs.sort((a,b)=>ORDER[a[4]]-ORDER[b[4]]||span(a)-span(b)||(a[0]===month?a[1]:0)-(b[0]===month?b[1]:0));
+  $("ltitle").innerHTML=(selDay?`${month}월 ${selDay}일 볼거리`:`${month}월 볼거리`)+`<small>${evs.length}개</small>`;
+  const cb=$("clearday");
+  cb.setAttribute("aria-pressed",!selDay);
+  cb.textContent=selDay?`${month}월 전체 보기`:`${month}월 전체 보는 중`;
+  $("dayhint").hidden=!!selDay;
+  if(!evs.length){
+    const past=year*10000+month*100+(selDay||new Date(year,month,0).getDate())<TODAY;
+    L.innerHTML=past?`<p class="empty">이 ${selDay?"날":"달"}의 행사와 볼거리는 모두 끝났어요. 위에서 달력 연도를 ${year+1}년으로 바꾸면 내년 같은 시기를 볼 수 있어요.</p>`:`<p class="empty">선택한 분류에 해당하는 항목이 없어요. 위에서 분류를 켜 보세요.</p>`;return}
+  L.innerHTML=evs.map(itemHTML).join("");
+}
+const ORDER={spot:0,fest:1,village:2,view:3,food:4,tip:5};
+function dayEvents(d){return E.filter(e=>visible(e)&&live(e,month)&&covers(e,month,d)).sort((a,b)=>ORDER[a[4]]-ORDER[b[4]])}
+function itemHTML(e){
+  const fixed=e[8];
+  if(e.abs){return `<article class="item"><div class="top"><span class="tag c-village">${CATS.village}</span><span class="when">${fmt(e)}</span></div><h4>${e[5]}</h4><p>${e[6]}</p>${e[9]?`<div class="best"><b>이렇게 즐기세요</b>${e[9]}</div>`:""}<span class="place">장소 · ${e[7]}</span>${e.abs.u?`<a class="more-link" href="${e.abs.u}" target="_blank" rel="noopener">행사 안내 보기 ↗</a>`:""}</article>`}
+  const badge=fixed?(String(year)===fixed?`<span class="badge ok">${fixed} 확정 일정</span>`:`<span class="badge">${fixed}년 일정 기준 · ${year}년 날짜는 발표 후 확인</span>`):`<span class="badge">해마다 이맘때</span>`;
+  return `<article class="item"><div class="top"><span class="tag c-${e[4]}">${CATS[e[4]]}</span><span class="when">${fmt(e)}</span></div><h4>${e[5]}</h4><p>${e[6]}</p>${e[9]?`<div class="best"><b>이렇게 즐기세요</b>${e[9]}</div>`:""}<span class="place">장소 · ${e[7]}</span>${badge}</article>`;
+}
+
+function render(){
+  {const u=ymd(LAST_UPDATED);$("updtext").textContent=`마을 행사는 매일 새로 찾아 넣어요 · 최근 갱신 ${u.m}월 ${u.d}일`}
+  $("year").value=year;
+  $("mtitle").textContent=`${year}년 ${month}월`;
+  $("msub").textContent=MSUB[month-1];
+  renderMonths();renderFilters();renderGrid();renderList();
+}
+$("prev").onclick=()=>{selDay=null;if(month===1){month=12;if(year>2026)year--}else month--;render()};
+$("next").onclick=()=>{selDay=null;if(month===12){month=1;if(year<2027)year++}else month++;render()};
+$("year").onchange=e=>{year=+e.target.value;selDay=null;render()};
+$("clearday").onclick=()=>{if(!selDay)return;selDay=null;render()};
+render();
+</script>
+
+</body>
+</html>
