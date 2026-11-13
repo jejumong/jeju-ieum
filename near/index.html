@@ -396,9 +396,29 @@ async function lifeSearch(q, o){
   if (o.cat) return renderPlaces(sortPlaces(await catR(o.cat, o.label)), o.label);
   if (q) renderPlaces(sortPlaces(await kwR(q)), q);
 }
-async function nearStops(){
-  loading('가까운 정류장 찾는 중…');
-  renderPlaces(sortPlaces(await kwR('버스정류장', null, 1500)), '가까운 버스정류장', 1500);
+/* 시골 마을은 1.5km 안에 정류장이 없을 수 있어서, 못 찾으면 3km → 5km → 10km 로 스스로 넓혀 찾아요 */
+const STOP_RADII = [1500, 3000, 5000, 10000];
+async function nearStops(start = 0){
+  for (let i = start; i < STOP_RADII.length; i++) {
+    const R = STOP_RADII[i];
+    loading(`가까운 정류장 찾는 중… (내 주변 ${fmtDist(R)})`);
+    let list = sortPlaces(await kwR('버스정류장', null, R));
+    if (!list.length && !S.authFail) list = sortPlaces(await kwR('정류장', null, R));
+    if (S.authFail) return renderPlaces([], '가까운 버스정류장', R);
+    if (list.length) {
+      renderPlaces(list, '가까운 버스정류장', R);
+      if (i < STOP_RADII.length - 1) {
+        const more = document.createElement('button');
+        more.className = 'more'; more.type = 'button';
+        more.textContent = `${fmtDist(STOP_RADII[i + 1])}까지 더 넓게 찾기`;
+        more.onclick = () => nearStops(i + 1);
+        $('#results').appendChild(more);
+      }
+      return;
+    }
+  }
+  hideMap();
+  empty(`내 주변 ${fmtDist(STOP_RADII[STOP_RADII.length - 1])} 안에서 버스정류장을 찾지 못했어요.<br>위 검색창에 가려는 곳을 넣으면 타야 할 버스를 알려드려요.`);
 }
 
 /* ---------- 대중교통 ---------- */
