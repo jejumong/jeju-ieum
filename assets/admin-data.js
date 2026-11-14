@@ -28,7 +28,12 @@ function adminOv() { return JI.get("admin_ov", {}); }
   if (typeof SEED_POSTS !== "undefined") apply(SEED_POSTS);
   if (typeof TRADE_SEEDS !== "undefined") apply(TRADE_SEEDS);
   if (typeof NOTICE !== "undefined" && ov.n1) {
-    EDIT_FIELDS.concat(["target", "pinned"]).forEach(function (k) { if (ov.n1[k] !== undefined) NOTICE[k] = ov.n1[k]; });
+    /* 공지 내용을 새로 바꾸면(rev 변경) 예전에 관리자 콘솔에서 고친 제목·본문은 쓰지 않음 */
+    var keepText = ov.n1.rev === NOTICE.rev;
+    EDIT_FIELDS.concat(["target", "pinned"]).forEach(function (k) {
+      if (!keepText && (k === "title" || k === "content" || k === "head" || k === "author")) return;
+      if (ov.n1[k] !== undefined) NOTICE[k] = ov.n1[k];
+    });
   }
 })();
 
