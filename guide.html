@@ -13,6 +13,16 @@
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
 <link rel="stylesheet" href="assets/style.css?v=20261114b">
+<style>
+.sr-posts{background:var(--card,#fff);border:1px solid var(--line,#e5e9f0);border-radius:var(--r,14px);padding:6px 4px;margin:0 0 18px}
+.sr-h{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px;font-size:15px}
+.sr-h a{font-size:13px;font-weight:700;color:var(--sea-700,#0b4f6c)}
+.sr-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line,#eef1f5);text-decoration:none;color:inherit;min-width:0}
+.sr-row:hover{background:var(--sea-50,#f2f7fb)}
+.sr-b{flex:none;font-size:12px;font-weight:700;color:var(--sea-700,#0b4f6c);background:var(--sea-50,#eaf3f8);border-radius:999px;padding:2px 9px}
+.sr-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.sr-d{flex:none;font-size:12px;color:var(--ink-3,#6b7280)}
+</style>
 </head>
 <body data-active="guide">
 
@@ -92,8 +102,27 @@
     $("g-title").textContent = "‘" + q + "’ 검색 결과";
     $("gq").value = q;
     $("list-h").textContent = "가이드 " + list.length + "편";
-    var cm = allPosts().filter(function(p){ return ((p.title||"") + " " + (p.content||"")).indexOf(q) > -1; }).length;
-    if (cm) $("search-note").innerHTML = '<div class="search-note">커뮤니티에도 관련 글이 ' + cm + '건 있어요 <a href="community.html?q=' + encodeURIComponent(q) + '">커뮤니티 결과 보기 →</a></div>';
+    // 커뮤니티·생활장터 글도 함께 검색 (서버 글이 늦게 도착하면 다시 그림)
+    var drawPosts = function(){
+      var ql = q.toLowerCase();
+      var hits = allPosts().filter(function(p){
+        if (p.board === "공지") return false;
+        return ((p.title||"") + " " + (p.content||"") + " " + (p.board||"")).toLowerCase().indexOf(ql) > -1;
+      }).sort(function(a, b){ return (a.date||"") < (b.date||"") ? 1 : -1; });
+      var ns = (typeof noticesFor === "function" ? noticesFor(null) : []).filter(function(n){ return ((n.title||"") + " " + (n.content||"")).toLowerCase().indexOf(ql) > -1; });
+      hits = ns.concat(hits);
+      $("search-note").innerHTML = hits.length
+        ? '<section class="sr-posts"><div class="sr-h"><b>커뮤니티·생활장터 글 ' + hits.length + '건</b>' +
+            (hits.length > 6 ? '<a href="community.html?q=' + encodeURIComponent(q) + '">전체 보기 →</a>' : '') + '</div>' +
+            hits.slice(0, 6).map(function(p){
+              return '<a class="sr-row" href="view.html?id=' + encodeURIComponent(p.id) + '"><span class="sr-b">' + esc(p.board || "공지") + '</span>' +
+                '<span class="sr-t">' + esc(p.title) + '</span><span class="sr-d">' + esc(typeof fmtDate === "function" ? fmtDate(p.date) : (p.date||"")) + '</span></a>';
+            }).join("") + '</section>'
+        : '<div class="search-note">커뮤니티·생활장터에는 ‘' + esc(q) + '’ 관련 글이 아직 없어요.</div>';
+    };
+    drawPosts();
+    var prevOnData = window.onJIData;
+    window.onJIData = function(){ if (typeof prevOnData === "function") prevOnData.apply(this, arguments); drawPosts(); };
   }
 
   $("gd-list").innerHTML = list.length ? list.map(function(g){
