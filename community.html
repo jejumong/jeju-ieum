@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261114b">
+<link rel="stylesheet" href="assets/style.css?v=20261114c">
 </head>
 <body data-active="community">
 
@@ -27,6 +27,8 @@
 <main class="wrap">
   <div class="layout">
     <aside class="side" id="side-nav">
+      <h3>안내</h3>
+      <a href="?board=공지">공지사항</a>
       <h3>주제 게시판</h3>
       <a href="?board=자유게시판">자유게시판</a>
       <a href="?board=질문하기">질문하기</a>
@@ -70,15 +72,15 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261114b"></script>
-<script src="assets/db.js?v=20261114b"></script>
-<script src="assets/notify.js?v=20261114b"></script>
-<script src="assets/seed-trade.js?v=20261114b"></script>
-<script src="assets/seed-extra.js?v=20261114b"></script>
-<script src="assets/festivals-data.js?v=20261114b"></script>
-<script src="assets/seed-new.js?v=20261114b"></script>
-<script src="assets/seed-comments.js?v=20261114b"></script>
-<script src="assets/admin-data.js?v=20261114b"></script>
+<script src="assets/common.js?v=20261114c"></script>
+<script src="assets/db.js?v=20261114c"></script>
+<script src="assets/notify.js?v=20261114c"></script>
+<script src="assets/seed-trade.js?v=20261114c"></script>
+<script src="assets/seed-extra.js?v=20261114c"></script>
+<script src="assets/festivals-data.js?v=20261114c"></script>
+<script src="assets/seed-new.js?v=20261114c"></script>
+<script src="assets/seed-comments.js?v=20261114c"></script>
+<script src="assets/admin-data.js?v=20261114c"></script>
 <script>
 var params = new URLSearchParams(location.search);
 var board = params.get("board");
@@ -100,12 +102,22 @@ if (board) {
   document.getElementById("write-link2").href = "write.html?board=" + encodeURIComponent(board);
   document.body.classList.add("board-on");   // 휴대폰에서도 게시판 안에서는 글쓰기 버튼 보이기
 }
+var IS_NOTICE = board === "공지";   // 공지사항: 지금 공지 + 지난 공지(공지 해제)를 모두 모아 보기
+if (IS_NOTICE) {
+  document.getElementById("board-title").textContent = "공지사항";
+  document.title = "공지사항 — 제주이음";
+  document.getElementById("board-desc").textContent = "제주이음의 지금 공지와 지난 공지를 모두 모아 두었어요";
+  ["write-link", "write-link2"].forEach(function(id){ var el = document.getElementById(id); if (el) el.style.display = "none"; });
+  document.body.classList.remove("board-on");
+  document.querySelectorAll("#side-nav a").forEach(function(a){ a.classList.toggle("on", a.getAttribute("href") === "?board=공지"); });
+}
 if (q) {
   document.getElementById("board-title").textContent = "‘" + q + "’ 검색 결과";
   document.getElementById("board-desc").textContent = "커뮤니티 전체 게시판에서 검색했습니다";
 }
 
 function getList() {
+  if (IS_NOTICE) return noticeArchive().filter(function(n){ return !q || (n.title + " " + (n.content||"")).toLowerCase().indexOf(q.toLowerCase()) > -1; });
   var list = allPosts();
   if (board) list = list.filter(function(p){ return p.board === board; });
   else if (!q) list = list.filter(function(p){ return TRADE_BOARDS.indexOf(p.board) === -1; });
@@ -133,7 +145,7 @@ function render() {
   var rows = "";
 
   // 공지 (첫 페이지, 검색 아닐 때)
-  if (page === 1 && !q) {
+  if (page === 1 && !q && !IS_NOTICE) {
     noticesFor(board).forEach(function(n){
       rows += '<tr class="notice-row"><td class="hide-m">공지</td><td><span class="chip hot">' + (n.pinned ? '📌 공지' : '공지') + '</span></td>' +
         '<td class="title"><a href="view.html?id=' + encodeURIComponent(n.id) + '"><b>' + esc(n.title) + '</b></a></td>' +
@@ -151,7 +163,7 @@ function render() {
       var isNew = isUserPost(p);
       rows += '<tr>' +
         '<td class="hide-m">' + no + '</td>' +
-        '<td><span class="chip ' + headCls(p.head) + '">' + esc(p.head || p.board) + '</span></td>' +
+        '<td><span class="chip ' + (IS_NOTICE ? (p.off ? '' : 'hot') : headCls(p.head)) + '">' + (IS_NOTICE ? (p.off ? '지난 공지' : (p.pinned ? '📌 공지' : '공지')) : esc(p.head || p.board)) + '</span></td>' +
         '<td class="title"><a href="view.html?id=' + p.id + '">' + esc(p.title) +
           (cmts.length ? ' <span class="cmt">[' + cmts.length + ']</span>' : '') + '</a></td>' +
         '<td class="hide-m">' + esc(p.author) + roleMark(p) + '</td>' +

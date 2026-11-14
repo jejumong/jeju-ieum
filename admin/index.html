@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261114b">
+<link rel="stylesheet" href="../assets/style.css?v=20261114c">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -317,18 +317,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261114b"></script>
-<script src="../assets/db.js?v=20261114b"></script>
-<script src="../assets/notify.js?v=20261114b"></script>
-<script src="../assets/seed-trade.js?v=20261114b"></script>
-<script src="../assets/seed-extra.js?v=20261114b"></script>
-<script src="../assets/festivals-data.js?v=20261114b"></script>
-<script src="../assets/seed-new.js?v=20261114b"></script>
-<script src="../assets/seed-comments.js?v=20261114b"></script>
-<script src="../assets/photos.js?v=20261114b"></script>
-<script src="../assets/admin-data.js?v=20261114b"></script>
-<script src="../assets/kmap.js?v=20261114b"></script>
-<script src="../assets/op-posts.js?v=20261114b"></script>
+<script src="../assets/common.js?v=20261114c"></script>
+<script src="../assets/db.js?v=20261114c"></script>
+<script src="../assets/notify.js?v=20261114c"></script>
+<script src="../assets/seed-trade.js?v=20261114c"></script>
+<script src="../assets/seed-extra.js?v=20261114c"></script>
+<script src="../assets/festivals-data.js?v=20261114c"></script>
+<script src="../assets/seed-new.js?v=20261114c"></script>
+<script src="../assets/seed-comments.js?v=20261114c"></script>
+<script src="../assets/photos.js?v=20261114c"></script>
+<script src="../assets/admin-data.js?v=20261114c"></script>
+<script src="../assets/kmap.js?v=20261114c"></script>
+<script src="../assets/op-posts.js?v=20261114c"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -665,23 +665,29 @@ function closeModal(){ document.getElementById("modal").classList.remove("on"); 
   m.addEventListener("click", function(e){ if (e.target === m && downOut) closeModal(); downOut = false; });
 })();
 
-/* ── 공지 관리 ── */
+/* ── 공지 관리 ──
+   지난 공지는 지우지 않고 '공지 해제'로 보관합니다 (사이트의 커뮤니티 › 공지사항 목록에 계속 남음) */
 function allNoticeItems(){
-  var list = adminNotices().slice();
-  if (!(adminOv().n1 && adminOv().n1.deleted)) { NOTICE.target = NOTICE.target || "커뮤니티"; list.push(NOTICE); }
-  return list.sort(function(a,b){ if (!!b.pinned !== !!a.pinned) return b.pinned ? 1 : -1; return a.date < b.date ? 1 : -1; });
+  return allNotices().slice().sort(function(a,b){
+    if (!!a.off !== !!b.off) return a.off ? 1 : -1;
+    if (!!b.pinned !== !!a.pinned) return b.pinned ? 1 : -1;
+    return a.date < b.date ? 1 : -1;
+  });
 }
 function drawNotices(){
-  var list = allNoticeItems();
-  M().innerHTML = '<h1>공지 관리</h1><p class="sub">공지는 선택한 게시판 맨 위에 표시됩니다. ‘전체’로 올리면 홈 화면과 모든 게시판에 나옵니다.</p>' +
+  var list = allNoticeItems(), on = list.filter(function(n){ return !n.off; }).length;
+  M().innerHTML = '<h1>공지 관리</h1><p class="sub">공지는 선택한 게시판 맨 위에 표시됩니다. ‘전체’로 올리면 홈 화면과 모든 게시판에 나옵니다. 내릴 때는 <b>공지 해제</b>를 누르세요 — 지워지지 않고 사이트의 <a href="' + SITE + 'community.html?board=%EA%B3%B5%EC%A7%80" target="_blank">공지사항</a> 목록에 계속 남아요.</p>' +
     '<div class="panel"><h2>새 공지 작성</h2>' + noticeForm(null) +
     '<div class="bt" style="display:flex;justify-content:flex-end"><button class="btn primary" onclick="saveNotice(null)">공지 올리기</button></div></div>' +
-    '<div class="panel"><h2>등록된 공지 (' + list.length + ')</h2>' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>대상</th><th>제목</th><th>조회수</th><th>관리</th></tr></thead><tbody>' +
+    '<div class="panel"><h2>등록된 공지 (표시 중 ' + on + ' · 지난 공지 ' + (list.length - on) + ')</h2>' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>상태</th><th>표시할 곳</th><th>제목</th><th>조회수</th><th>관리</th></tr></thead><tbody>' +
       list.map(function(n){
-        return '<tr><td><span class="bd">' + esc(n.target) + '</span>' + (n.pinned ? ' 📌' : '') + '</td>' +
+        return '<tr' + (n.off ? ' style="opacity:.62"' : '') + '><td>' + (n.off ? '<span class="bd">지난 공지</span>' : '<span class="bd" style="background:#e7f6ec;color:#16794a">표시 중</span>' + (n.pinned ? ' 📌' : '')) + '</td>' +
+          '<td><span class="bd">' + esc(n.target) + '</span></td>' +
           '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(n.id) + '" target="_blank">' + esc(n.title) + '</a><small>' + esc(n.date) + '</small></td>' +
           '<td><input class="num" type="number" min="0" value="' + viewsOf(n) + '" data-nid="' + n.id + '"></td>' +
-          '<td><div class="acts"><button class="mb" onclick="editNotice(\'' + n.id + '\')">수정</button><button class="mb del" onclick="delNotice(\'' + n.id + '\')">삭제</button></div></td></tr>';
+          '<td><div class="acts"><button class="mb" onclick="editNotice(\'' + n.id + '\')">수정</button>' +
+            '<button class="mb" onclick="toggleNotice(\'' + n.id + '\')">' + (n.off ? '다시 공지' : '공지 해제') + '</button>' +
+            '<button class="mb del" onclick="delNotice(\'' + n.id + '\')">삭제</button></div></td></tr>';
       }).join("") + '</tbody></table></div>' : '<div class="empty">등록된 공지가 없습니다.</div>') + '</div>';
   M().querySelectorAll("input[data-nid]").forEach(function(inp){
     function save(){ setNotice(inp.dataset.nid, { views: Math.max(0, parseInt(inp.value,10)||0) }, true); toast("조회수를 바꿨습니다"); }
@@ -690,9 +696,14 @@ function drawNotices(){
   });
 }
 function noticeForm(n){
+  var isNew = !n;
   n = n || { target:"전체", title:"", content:"", pinned:true };
   var targets = ["전체","커뮤니티"].concat(ALL_BOARDS);
-  return '<div class="row2"><div class="fld"><label>표시할 곳</label><select id="n-target">' +
+  return (isNew ? '' :
+      '<div class="fld"><label>공지 상태</label><select id="n-off">' +
+        '<option value="on"' + (n.off ? '' : ' selected') + '>공지로 표시 (게시판 맨 위)</option>' +
+        '<option value="off"' + (n.off ? ' selected' : '') + '>공지 해제 — 지난 공지로 보관 (공지사항 목록에만 남음)</option></select></div>') +
+    '<div class="row2"><div class="fld"><label>' + (isNew ? '표시할 곳' : '표시할 게시판 (다른 게시판으로 옮기기)') + '</label><select id="n-target">' +
       targets.map(function(t){ return '<option' + (n.target===t?' selected':'') + '>' + t + '</option>'; }).join("") + '</select></div>' +
     '<div class="fld"><label>상단 고정</label><label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding-top:8px"><input type="checkbox" id="n-pin"' + (n.pinned?' checked':'') + '> 다른 공지보다 위에 고정</label></div></div>' +
     '<div class="fld"><label>제목</label><input id="n-title" value="' + esc(n.title) + '" placeholder="공지 제목"></div>' +
@@ -700,16 +711,24 @@ function noticeForm(n){
 }
 function setNotice(id, obj, viewsReset){
   if (viewsReset) { var v = JI.get("views", {}); delete v[id]; JI.set("views", v); }
-  if (id === "n1") {
-    var ov = adminOv(); ov.n1 = ov.n1 || {}; if (ov.n1.rev !== NOTICE.rev) { ["title","content","head","author"].forEach(function(f){ delete ov.n1[f]; }); ov.n1.rev = NOTICE.rev; } for (var k in obj) { ov.n1[k] = obj[k]; NOTICE[k] = obj[k]; } JI.set("admin_ov", ov); return;
+  if (isBuiltinNotice(id)) {
+    var base = builtinNoticeBase().filter(function(x){ return x.id === id; })[0];
+    var ov = adminOv(); var o = ov[id] = ov[id] || {};
+    if (base.rev && o.rev !== base.rev) { ["title","content","head","author"].forEach(function(f){ delete o[f]; }); o.rev = base.rev; }
+    for (var k in obj) { o[k] = obj[k]; base[k] = obj[k]; }
+    JI.set("admin_ov", ov); return;
   }
   var ns = adminNotices(); ns.forEach(function(n){ if (n.id === id) for (var k in obj) n[k] = obj[k]; }); JI.set("notices", ns);
 }
 function saveNotice(id){
-  var obj = { target: document.getElementById("n-target").value, pinned: document.getElementById("n-pin").checked,
-    title: document.getElementById("n-title").value.trim(), content: document.getElementById("n-content").value.trim() };
+  /* 수정 창과 새 공지 칸의 입력 이름이 같아서, 수정할 때는 수정 창 안에서만 찾음 */
+  var box = id ? document.getElementById("modal") : M();
+  function F(x){ return box.querySelector("#" + x); }
+  var obj = { target: F("n-target").value, pinned: F("n-pin").checked,
+    title: F("n-title").value.trim(), content: F("n-content").value.trim() };
+  var offSel = F("n-off"); if (offSel) obj.off = offSel.value === "off";
   if (!obj.title) { alert("제목을 입력하세요."); return; }
-  if (id) { setNotice(id, obj); closeModal(); toast("공지를 수정했습니다"); }
+  if (id) { setNotice(id, obj); closeModal(); toast(obj.off ? "공지를 해제했습니다 (공지사항 목록에 보관)" : "공지를 수정했습니다"); }
   else {
     var ns = adminNotices();
     obj.id = "an" + Date.now(); obj.board = "공지"; obj.head = "공지"; obj.author = "제주이음"; obj.date = today(); obj.views = 0;
@@ -721,9 +740,14 @@ function editNotice(id){
   var n = allNoticeItems().filter(function(x){ return x.id === id; })[0]; if (!n) return;
   showModal('<h3>공지 수정</h3>' + noticeForm(n) + '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" onclick="saveNotice(\'' + id + '\')">저장</button></div>');
 }
+function toggleNotice(id){
+  var n = allNoticeItems().filter(function(x){ return x.id === id; })[0]; if (!n) return;
+  setNotice(id, { off: !n.off });
+  toast(n.off ? "다시 공지로 올렸습니다" : "공지를 해제했습니다 (공지사항 목록에 보관)"); drawNotices();
+}
 function delNotice(id){
-  if (!confirm("이 공지를 삭제할까요?")) return;
-  if (id === "n1") setNotice("n1", { deleted: true });
+  if (!confirm("이 공지를 완전히 삭제할까요?\n삭제하면 지난 공지 목록에서도 사라집니다.\n보관하려면 '공지 해제'를 누르세요.")) return;
+  if (isBuiltinNotice(id)) setNotice(id, { deleted: true });
   else JI.set("notices", adminNotices().filter(function(n){ return n.id !== id; }));
   toast("공지를 삭제했습니다"); drawNotices();
 }
@@ -867,7 +891,7 @@ if (SRV) {
     return _deletePost(p);
   });
   restorePost = pushOn(restorePost);
-  saveNotice = pushOn(saveNotice); delNotice = pushOn(delNotice); setNotice = pushOn(setNotice);
+  saveNotice = pushOn(saveNotice); delNotice = pushOn(delNotice); setNotice = pushOn(setNotice); toggleNotice = pushOn(toggleNotice);
   if (typeof togglePm === "function") togglePm = pushOn(togglePm);
 
   /* 서버 글 수정: 목록에는 본문 앞부분만 있으니 전문을 불러온 뒤 수정 창 열기 */

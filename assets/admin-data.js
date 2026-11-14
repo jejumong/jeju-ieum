@@ -13,6 +13,14 @@ var EDIT_FIELDS = ["title", "content", "head", "price", "loc", "author", "period
 var REMOVED_SEEDS = [];
 
 function adminOv() { return JI.get("admin_ov", {}); }
+/* 사이트 코드에 들어 있는 공지들 (지금 공지 n1 + 지난 공지 보관함) */
+function builtinNoticeBase() {
+  var a = [];
+  if (typeof NOTICE !== "undefined") a.push(NOTICE);
+  if (typeof NOTICE_ARCHIVE !== "undefined") a = a.concat(NOTICE_ARCHIVE);
+  return a;
+}
+function isBuiltinNotice(id) { return builtinNoticeBase().some(function (n) { return n.id === id; }); }
 
 (function applyAdminOverrides() {
   var ov = adminOv();
@@ -27,25 +35,36 @@ function adminOv() { return JI.get("admin_ov", {}); }
   }
   if (typeof SEED_POSTS !== "undefined") apply(SEED_POSTS);
   if (typeof TRADE_SEEDS !== "undefined") apply(TRADE_SEEDS);
-  if (typeof NOTICE !== "undefined" && ov.n1) {
-    /* 공지 내용을 새로 바꾸면(rev 변경) 예전에 관리자 콘솔에서 고친 제목·본문은 쓰지 않음 */
-    var keepText = ov.n1.rev === NOTICE.rev;
-    EDIT_FIELDS.concat(["target", "pinned"]).forEach(function (k) {
+  /* 사이트 코드에 넣은 공지(n1 · 지난 공지)에 관리자 콘솔 수정값 적용.
+     공지 내용을 새로 바꾸면(rev 변경) 예전에 콘솔에서 고친 제목·본문은 쓰지 않음 */
+  builtinNoticeBase().forEach(function (n) {
+    var o = ov[n.id]; if (!o) return;
+    var keepText = !n.rev || o.rev === n.rev;
+    EDIT_FIELDS.concat(["target", "pinned", "off"]).forEach(function (k) {
       if (!keepText && (k === "title" || k === "content" || k === "head" || k === "author")) return;
-      if (ov.n1[k] !== undefined) NOTICE[k] = ov.n1[k];
+      if (o[k] !== undefined) n[k] = o[k];
     });
-  }
+  });
 })();
 
 /* ── 공지 ── */
 function adminNotices() { return JI.get("notices", []); }
-/* board: 게시판 이름 (없으면 전체 공지만). 고정 공지 먼저, 그다음 최신순 */
+/* 모든 공지 — 공지 해제(off)된 지난 공지까지. 삭제한 것만 빠짐 */
+function allNotices() {
+  var ov = adminOv();
+  var b = builtinNoticeBase().filter(function (n) { return !(ov[n.id] && ov[n.id].deleted); });
+  b.forEach(function (n) { n.target = n.target || "커뮤니티"; });
+  return adminNotices().concat(b);
+}
+/* 공지사항 목록용: 최신순 */
+function noticeArchive() {
+  return allNotices().slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+}
+/* board: 게시판 이름 (없으면 전체 공지만). 공지 해제된 것은 빼고, 고정 공지 먼저, 그다음 최신순 */
 function noticesFor(board) {
   var isCommunity = !board || TRADE_BOARDS.indexOf(board) < 0;
-  var list = adminNotices().slice();
-  var ov = adminOv();
-  if (typeof NOTICE !== "undefined" && !(ov.n1 && ov.n1.deleted)) { NOTICE.target = NOTICE.target || "커뮤니티"; list.push(NOTICE); }
-  list = list.filter(function (n) {
+  var list = allNotices().filter(function (n) {
+    if (n.off) return false;
     return n.target === "전체" || (board && n.target === board) || (n.target === "커뮤니티" && isCommunity);
   });
   return list.sort(function (a, b) {
@@ -59,8 +78,8 @@ function noticesFor(board) {
   var base = findPost;
   findPost = function (id) {
     if (!id) return null;
-    if (id === "n1" && adminOv().n1 && adminOv().n1.deleted) return null;
-    var ns = adminNotices();
+    if (isBuiltinNotice(id) && adminOv()[id] && adminOv()[id].deleted) return null;
+    var ns = allNotices();
     for (var i = 0; i < ns.length; i++) if (ns[i].id === id) return ns[i];
     return base(id);
   };

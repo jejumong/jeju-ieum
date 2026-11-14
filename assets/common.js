@@ -192,6 +192,12 @@ var NOTICE = { id:"n1", rev:"2026-11-14", board:"공지", head:"공지", title:"
     "3. 내 근처 찾기에서 가까운 버스정류장을 볼 수 있어요\n내 위치에서 가까운 정류장과 거리, 그 정류장을 지나는 버스 번호를 확인할 수 있어요. 정류장이 멀면 범위를 넓혀 찾아 드려요.\n\n" +
     "일정이나 내용은 바뀔 수 있으니 중요한 일은 출처 안내를 한 번 더 확인해 주세요. 틀린 정보나 알리고 싶은 동네 소식은 문의·제보로 알려 주시면 확인 후 반영할게요." };
 
+/* 지난 공지 — 사이트 코드에 넣었던 공지는 바꿔 쓰지 않고 여기로 옮겨 보관합니다 (off:true = 공지 해제, 공지사항 목록에만 보임) */
+var NOTICE_ARCHIVE = [
+  { id:"n0", board:"공지", head:"공지", off:true, target:"커뮤니티", title:"태풍 접근 시 지역별 재난정보 확인 방법 안내", author:"제주이음", date:"2026-08-12",
+    content:"태풍 북상 시 기상청 특보와 제주도 재난안전대책본부 공지를 함께 확인해주세요. 게시판에 떠도는 미확인 정보보다 공식 발표를 우선해 주시고, 정전·침수 등 피해 상황 공유 글은 '최신뉴스' 게시판을 이용해 주시기 바랍니다." }
+];
+
 /* ── 내 글 · 내 댓글 권한과 수정·삭제 ── */
 
 /* 로그인한 사람이 쓴 글인지 (회원이 작성한 글만 수정·삭제 가능) */
@@ -352,6 +358,7 @@ function allPosts() {
 }
 function findPost(id) {
   if (id === "n1") return NOTICE;
+  for (var j = 0; j < NOTICE_ARCHIVE.length; j++) if (NOTICE_ARCHIVE[j].id === id) return NOTICE_ARCHIVE[j];
   var all = allPosts();
   for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
   return null;
