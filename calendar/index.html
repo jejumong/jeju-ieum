@@ -170,6 +170,35 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .empty{color:var(--muted);padding:12px 0}
 footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;max-width:72ch}
 @media (prefers-reduced-motion:no-preference){.cell,.chip,.months button{transition:background .15s,opacity .15s}}
+
+/* ── PC(1024px 이상): 왼쪽 달력 · 오른쪽 목록, 목록을 누르면 자세히 보기 창 ── */
+@media (min-width:1024px){
+  .wrap{max-width:1320px}
+  .split{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(340px,1fr);gap:24px;align-items:start}
+  .calcol{display:flex;flex-direction:column;gap:14px;min-width:0}
+  #listsec{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 14px 14px;gap:8px!important}
+  #listsec .listhead{background:var(--surface);margin:0 -14px;padding:12px 14px}
+  #listsec .list{grid-template-columns:1fr;gap:8px}
+  #listsec .item{cursor:pointer;padding:11px 13px;gap:3px;transition:border-color .15s,box-shadow .15s}
+  #listsec .item:hover{border-color:var(--basalt);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  #listsec .item:focus-visible{outline:2px solid var(--fest);outline-offset:2px}
+  #listsec .item h4{font-size:15.5px}
+  #listsec .item p,#listsec .item .best,#listsec .item .badge,#listsec .item .more-link{display:none}
+  #listsec .item .place{font-size:12.5px}
+  #listsec .item::after{content:"자세히 보기 ›";font-size:12px;color:var(--muted);align-self:flex-end;margin-top:-18px}
+  .cell{min-height:104px}
+  html.jjm-embed #listsec{position:static;max-height:none;overflow:visible}
+}
+.dlg{position:fixed;inset:0;z-index:100;background:rgba(20,22,25,.45);display:flex;align-items:center;justify-content:center;padding:24px}
+.dlg[hidden]{display:none}
+.dlg-box{position:relative;width:min(560px,100%);max-height:calc(100vh - 48px);overflow:auto;background:var(--surface);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.dlg-box .item{border:0;padding:26px 26px 22px;gap:10px}
+.dlg-box .item .top{padding-right:40px}
+.dlg-box .item h4{font-size:21px;font-family:var(--display)}
+.dlg-box .item p{font-size:15.5px;line-height:1.75}
+.dlg-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:16px;cursor:pointer;z-index:1}
+html.jjm-embed .dlg{position:absolute;align-items:flex-start;padding-top:80px}
+html.jjm-embed .dlg-box{max-height:none}
 </style>
 
 <div class="wrap">
@@ -188,6 +217,8 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
 
   <div class="filters" id="filters" role="group" aria-label="분류 보기"></div>
 
+  <div class="split">
+  <div class="calcol">
   <section>
     <div class="monthhead">
       <button class="navbtn" id="prev" aria-label="이전 달">‹</button>
@@ -200,16 +231,23 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   <div class="calwrap" id="calwrap">
     <div class="grid-scroll"><div class="grid" id="grid"></div></div>
   </div>
+  </div>
 
   <section id="listsec" style="display:flex;flex-direction:column;gap:12px;scroll-margin-top:env(safe-area-inset-top,0px)">
     <div class="listhead"><h3 id="ltitle"></h3><button class="allbtn" id="clearday" aria-pressed="true"></button></div>
     <p class="dayhint" id="dayhint">달력의 날짜를 누르면 그날 볼 수 있는 것만 골라 보여 드려요.</p>
     <div class="list" id="list"></div>
   </section>
+  </div>
 
   <footer>
     ‘마을 행사’는 지역 신문과 행사 안내에서 찾은 그해 일정이에요. 갑자기 바뀌거나 취소될 수 있으니 카드의 ‘행사 안내 보기’에서 한 번 더 확인하세요. 축제 날짜 중 ‘2026 확정’ 표시는 2026년 공식 발표 기준이고, 해마다 바뀝니다. ‘해마다 이맘때’ 표시는 평년 기준 대략적인 시기예요. 꽃 개화와 억새·단풍 절정은 날씨에 따라 1~2주 앞당겨지거나 늦어질 수 있고, 숙박 가격은 숙소마다 다르니 예약 전에 꼭 확인하세요.
   </footer>
+</div>
+
+<!-- PC: 오른쪽 목록을 누르면 열리는 자세히 보기 창 -->
+<div class="dlg" id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+  <div class="dlg-box"><button class="dlg-x" id="dlg-x" type="button" aria-label="닫기">✕</button><div id="dlg-body"></div></div>
 </div>
 
 <script>
@@ -347,7 +385,7 @@ function renderGrid(){
     if(evs.length>3)h+=`<span class="more">+${evs.length-3}개</span>`;
     h+=`<span class="dots">${evs.map(e=>`<i class="d-${e[4]}"></i>`).join("")}</span>`;
     c.innerHTML=h;
-    c.onclick=()=>{selDay=selDay===d?null:d;render();if(selDay)track("view_day",{month:month,day:d});$("listsec").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})};
+    c.onclick=()=>{selDay=selDay===d?null:d;render();if(selDay)track("view_day",{month:month,day:d});if(WIDE.matches){$("listsec").scrollTop=0;return}$("listsec").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})};
     g.appendChild(c);
   }
 }
@@ -370,9 +408,9 @@ const ORDER={spot:0,fest:1,village:2,view:3,food:4,tip:5};
 function dayEvents(d){return E.filter(e=>visible(e)&&live(e,month)&&covers(e,month,d)).sort((a,b)=>ORDER[a[4]]-ORDER[b[4]])}
 function itemHTML(e){
   const fixed=e[8];
-  if(e.abs){return `<article class="item"><div class="top"><span class="tag c-village">${CATS.village}</span><span class="when">${fmt(e)}</span></div><h4>${e[5]}</h4><p>${e[6]}</p>${e[9]?`<div class="best"><b>이렇게 즐기세요</b>${e[9]}</div>`:""}<span class="place">장소 · ${e[7]}</span>${e.abs.u?`<a class="more-link" href="${e.abs.u}" target="_blank" rel="noopener">행사 안내 보기 ↗</a>`:""}</article>`}
+  if(e.abs){return `<article class="item" tabindex="0"><div class="top"><span class="tag c-village">${CATS.village}</span><span class="when">${fmt(e)}</span></div><h4>${e[5]}</h4><p>${e[6]}</p>${e[9]?`<div class="best"><b>이렇게 즐기세요</b>${e[9]}</div>`:""}<span class="place">장소 · ${e[7]}</span>${e.abs.u?`<a class="more-link" href="${e.abs.u}" target="_blank" rel="noopener">행사 안내 보기 ↗</a>`:""}</article>`}
   const badge=fixed?(String(year)===fixed?`<span class="badge ok">${fixed} 확정 일정</span>`:`<span class="badge">${fixed}년 일정 기준 · ${year}년 날짜는 발표 후 확인</span>`):`<span class="badge">해마다 이맘때</span>`;
-  return `<article class="item"><div class="top"><span class="tag c-${e[4]}">${CATS[e[4]]}</span><span class="when">${fmt(e)}</span></div><h4>${e[5]}</h4><p>${e[6]}</p>${e[9]?`<div class="best"><b>이렇게 즐기세요</b>${e[9]}</div>`:""}<span class="place">장소 · ${e[7]}</span>${badge}</article>`;
+  return `<article class="item" tabindex="0"><div class="top"><span class="tag c-${e[4]}">${CATS[e[4]]}</span><span class="when">${fmt(e)}</span></div><h4>${e[5]}</h4><p>${e[6]}</p>${e[9]?`<div class="best"><b>이렇게 즐기세요</b>${e[9]}</div>`:""}<span class="place">장소 · ${e[7]}</span>${badge}</article>`;
 }
 
 function render(){
@@ -385,6 +423,25 @@ function render(){
 $("prev").onclick=()=>{selDay=null;if(month===1){month=12;if(year>2026)year--}else month--;render()};
 $("next").onclick=()=>{selDay=null;if(month===12){month=1;if(year<2027)year++}else month++;render()};
 $("year").onchange=e=>{year=+e.target.value;selDay=null;render()};
+
+/* PC: 오른쪽 목록 → 자세히 보기 창 */
+const WIDE=matchMedia("(min-width:1024px)");
+let lastFocus=null;
+function openDetail(art){
+  if(!WIDE.matches||!art)return;
+  lastFocus=art;
+  const box=$("dlg-body");box.innerHTML=art.outerHTML;
+  const h=box.querySelector("h4");if(h)h.id="dlg-title";
+  $("dlg").hidden=false;$("dlg-x").focus();
+  if(document.documentElement.classList.contains("jjm-embed")){const r=art.getBoundingClientRect();$("dlg").style.paddingTop=Math.max(20,r.top-120)+"px"}
+  track("view_detail",{title:h?h.textContent:""});
+}
+function closeDetail(){$("dlg").hidden=true;if(lastFocus)lastFocus.focus()}
+$("list").addEventListener("click",e=>{if(e.target.closest("a"))return;openDetail(e.target.closest(".item"))});
+$("list").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("item")){e.preventDefault();openDetail(e.target)}});
+$("dlg-x").onclick=closeDetail;
+$("dlg").addEventListener("click",e=>{if(e.target.id==="dlg")closeDetail()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("dlg").hidden)closeDetail()});
 $("clearday").onclick=()=>{if(!selDay)return;selDay=null;render()};
 render();
 </script>
