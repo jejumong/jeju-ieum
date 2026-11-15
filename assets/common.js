@@ -453,17 +453,21 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
     { id: "contact", label: "문의·제보", href: "contact.html" }
   ];
 
-  /* 휴대폰 전용 메뉴 5개: 부동산은 생활·장터로, 생활도구·문의제보는 커뮤니티로 묶음 */
+  /* 휴대폰 메뉴: PC와 같은 8개를 그림과 함께 4칸×2줄로 (스크롤하면 작게 접힘) */
+  function mi(d) { return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
   var M_MENU = [
-    ["가이드", "guide.html", ["guide", "article"]],
-    ["한달살기", "stay.html", ["stay"]],
-    ["학교 연계", "school.html", ["school"]],
-    ["생활·장터", "trade.html", ["trade", "realestate", "jobs", "market", "shops", "clubs", "deals", "festivals"]],
-    ["커뮤니티", "community.html", ["community", "tools", "contact"]]
+    ["제주살이<br>가이드", "guide.html", ["guide", "article"], mi('<path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7z"/>')],
+    ["한달살기<br>·이주", "stay.html", ["stay"], mi('<rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 7V4h6v3"/>')],
+    ["학교<br>연계 집", "school.html", ["school"], mi('<path d="M3 11l9-6 9 6M5 10v9h14v-9M10 19v-5h4v5"/>')],
+    ["부동산", "realestate.html", ["realestate"], mi('<path d="M4 20V9l8-5 8 5v11zM9 20v-6h6v6"/>')],
+    ["생활<br>·장터", "trade.html", ["trade", "jobs", "market", "shops", "clubs", "deals", "festivals"], mi('<path d="M4 9h16l-1 11H5zM8 9V6a4 4 0 0 1 8 0v3"/>')],
+    ["동네<br>커뮤니티", "community.html", ["community"], mi('<path d="M4 5h16v11H9l-5 4z"/>')],
+    ["생활도구", "tools.html", ["tools", "tool"], mi('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>')],
+    ["문의·제보", "contact.html", ["contact"], mi('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 8l9 6 9-6"/>')]
   ];
   var gnbMobile = '<nav class="gnb-m" aria-label="메뉴">' + M_MENU.map(function (m) {
     var on = m[2].indexOf(active) > -1;
-    return '<a href="' + m[1] + '"' + (on ? ' class="on" aria-current="page"' : '') + '>' + m[0] + '</a>';
+    return '<a href="' + m[1] + '"' + (on ? ' class="on" aria-current="page"' : '') + '>' + m[3] + '<span>' + m[0] + '</span></a>';
   }).join("") + '</nav>';
   var gnbItems = menus.map(function (m) {
     var on = active === m.id || (m.match && m.match.indexOf(active) > -1);
@@ -537,12 +541,12 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
   document.body.insertAdjacentHTML("beforeend", foot);
 
   /* 생활·장터 묶음 페이지: 헤더 아래 탭으로 서로 이동 */
-  var TRADE_TABS = [["trade", "전체", "trade.html", "🧺"], ["realestate", "부동산", "realestate.html", "🏡", "m-only"], ["jobs", "구인구직", "jobs.html", "💼"],
+  var TRADE_TABS = [["trade", "전체", "trade.html", "🧺"], ["jobs", "구인구직", "jobs.html", "💼"],
     ["market", "중고사고팔기", "market.html", "📦"], ["shops", "제주상점", "shops.html", "🏪"], ["clubs", "동호회", "clubs.html", "🏄"],
     ["deals", "특가공구", "deals.html", "🍊"], ["festivals", "축제정보", "festivals.html", "🎉"]];
   var isTrade = TRADE_TABS.some(function (t) { return t[0] === active; });
   if (isTrade) {
-    var sub = '<nav class="subnav' + (active === "realestate" ? " m-only-nav" : "") + '" aria-label="생활·장터 게시판"><div class="subnav-inner"><span class="subnav-l">생활·장터</span>' +
+    var sub = '<nav class="subnav" aria-label="생활·장터 게시판"><div class="subnav-inner"><span class="subnav-l">생활·장터</span>' +
       TRADE_TABS.map(function (t) {
         var cls = [t[0] === active ? "on" : "", t[4] || ""].join(" ").trim();
         return '<a href="' + t[2] + '"' + (cls ? ' class="' + cls + '"' : "") + (t[0] === active ? ' aria-current="page"' : "") + '><span class="sn-i">' + t[3] + "</span>" + t[1] + "</a>";
@@ -554,16 +558,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
       pn.scrollLeft = rel + on.offsetWidth > pn.clientWidth - 16 ? Math.max(0, rel - 40) : 0;
     }
     var cr = document.querySelector(".page-head .crumb");
-    if (cr && active !== "trade" && active !== "realestate") cr.innerHTML = cr.innerHTML.replace('</a> ›', '</a> › <a href="trade.html">생활·장터</a> ›');
-  }
-
-  /* 휴대폰: 커뮤니티 묶음(게시판·생활도구·문의제보) 탭 */
-  if (["community", "tools", "contact"].indexOf(active) > -1) {
-    var CT = [["community", "게시판", "community.html", "💬"], ["tools", "생활도구", "tools.html", "🧰"], ["contact", "문의·제보", "contact.html", "✉️"]];
-    document.querySelector("header.site").insertAdjacentHTML("afterend", '<nav class="subnav m-only-nav" aria-label="커뮤니티">' +
-      '<div class="subnav-inner">' + CT.map(function (t) {
-        return '<a href="' + t[2] + '"' + (t[0] === active ? ' class="on" aria-current="page"' : "") + '><span class="sn-i">' + t[3] + "</span>" + t[1] + "</a>";
-      }).join("") + "</div></nav>");
+    if (cr && active !== "trade") cr.innerHTML = cr.innerHTML.replace('</a> ›', '</a> › <a href="trade.html">생활·장터</a> ›');
   }
 
   var gs = document.getElementById("gsearch");
@@ -571,7 +566,8 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
 
   // 스크롤 시 헤더에 그림자
   var onScroll = function () {
-    document.body.classList.toggle("scrolled", window.scrollY > 4);
+    var y = window.scrollY, sc = document.body.classList.contains("scrolled");   // 메뉴가 접히며 높이가 바뀌어도 떨리지 않게 간격을 둠
+    if (!sc && y > 60) document.body.classList.add("scrolled"); else if (sc && y < 8) document.body.classList.remove("scrolled");
   };
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();

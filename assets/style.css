@@ -1698,14 +1698,23 @@ a.act-item:hover{border-color:var(--sea-200)}
 .m-only,.m-only-nav{display:none!important}
 @media (max-width:680px){
   nav.gnb{display:none!important}
-  .gnb-m{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:8px var(--gutter) 10px}
-  .gnb-m a{text-align:center;padding:9px 0;border-radius:10px;font-size:13.5px;font-weight:800;color:var(--ink-2);background:var(--bg-2);text-decoration:none;white-space:nowrap;letter-spacing:-.03em}
+  .gnb-m{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:4px var(--gutter) 12px}
+  .gnb-m a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;padding:8px 2px 7px;border-radius:12px;background:var(--bg-2);color:var(--ink-2);text-decoration:none;text-align:center;transition:min-height .2s var(--ease),padding .2s var(--ease)}
+  .gnb-m a svg{color:var(--sea-700,#1E6FD9);flex:none;transition:height .2s var(--ease),opacity .2s}
+  .gnb-m a span{font-size:12.5px;font-weight:800;line-height:1.25;letter-spacing:-.03em}
   .gnb-m a.on{background:var(--ink);color:#fff}
+  .gnb-m a.on svg{color:#F59A3C}
+  /* 아래로 스크롤하면 그림을 숨기고 작게 접기 */
+  body.scrolled .gnb-m{gap:5px;padding-bottom:8px}
+  body.scrolled .gnb-m a{min-height:34px;padding:6px 2px;gap:0}
+  body.scrolled .gnb-m a svg{height:0;opacity:0}
+  body.scrolled .gnb-m a span br{display:none}
+  body.scrolled .gnb-m a span{font-size:12px;white-space:nowrap}
   .subnav a.m-only{display:inline-flex!important}
   nav.subnav.m-only-nav{display:block!important}
   .trade-hub .card.m-only{display:block!important}
 }
-@media (max-width:350px){.gnb-m a{font-size:12px}}
+@media (max-width:350px){.gnb-m a span{font-size:11.5px}body.scrolled .gnb-m a span{font-size:10.5px}}
 @media (max-width:680px){.page-head .pg-write{display:none!important}}
 @media (max-width:680px){
   body[data-active="trade"] .hb-write,body[data-active="community"] .hb-write{display:none!important}
@@ -2047,7 +2056,11 @@ a.act-item:hover{border-color:var(--sea-200)}
 .trade-hub a.hub-go{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:inherit}
 .trade-hub .hub-arrow{font-size:26px;line-height:1;font-weight:700;color:var(--sea-700);padding:0 2px 0 10px}
 @media (max-width:680px){
-  body[data-active="trade"] nav.subnav{display:none!important}
+  /* 생활·장터 세부 메뉴 버튼: 휴대폰에서 조금 더 크고 눈에 띄게 */
+  nav.subnav .subnav-inner{padding:12px var(--gutter);gap:8px}
+  nav.subnav a{padding:11px 16px;font-size:15px;font-weight:800;box-shadow:0 2px 6px rgba(16,40,70,.08)}
+  nav.subnav a .sn-i{font-size:17px}
+  nav.subnav a.on{box-shadow:0 6px 16px rgba(43,140,230,.30)}
 }
 
 /* 학교 연계: 휴대폰은 목록부터 간단하게 */
