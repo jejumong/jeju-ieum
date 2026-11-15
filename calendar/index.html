@@ -188,8 +188,12 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   #listsec .item::after{content:"자세히 보기 ›";font-size:12px;color:var(--muted);align-self:flex-end;margin-top:-18px}
   .cell{min-height:104px}
   html.jjm-embed #listsec{position:static}
-  #listsec .morehint{position:sticky;bottom:-14px;margin:0 -14px -14px;padding:26px 14px 22px;border:0;background:linear-gradient(to bottom,transparent,var(--surface) 55%);color:var(--fest);font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:center}
-  #listsec .morehint:hover{text-decoration:underline}
+  #listsec .morehint{position:sticky;bottom:-14px;display:flex;justify-content:center;margin:0 -14px -14px;padding:34px 14px 16px;border:0;background:linear-gradient(to bottom,transparent,var(--surface) 45%);font:inherit;cursor:pointer}
+  #listsec .morehint span{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;background:var(--fest);color:#fff;font-size:15px;font-weight:700;box-shadow:0 4px 14px color-mix(in srgb,var(--fest) 45%,transparent)}
+  #listsec .morehint b{display:inline-block;font-size:16px;line-height:1}
+  #listsec .morehint:hover span{filter:brightness(1.06)}
+  @media (prefers-reduced-motion:no-preference){#listsec .morehint b{animation:mh 1.4s ease-in-out infinite}}
+  @keyframes mh{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
   #listsec{box-sizing:border-box}
 }
 .dlg{position:fixed;inset:0;z-index:100;background:rgba(20,22,25,.45);display:flex;align-items:center;justify-content:center;padding:24px}
@@ -466,7 +470,7 @@ function updHint(){
   if(left>8){
     const bottom=L.getBoundingClientRect().bottom;
     const hidden=[...$("list").children].filter(c=>c.getBoundingClientRect().top>bottom-40).length;
-    h.textContent=hidden?`아래로 ${hidden}개 더 있어요 ↓`:"아래로 더 보기 ↓";
+    h.innerHTML="<span>"+(hidden?`아래로 ${hidden}개 더 있어요`:"아래로 더 보기")+" <b>↓</b></span>";
     h.hidden=false;L.classList.add("has-more");
   } else {h.hidden=true;L.classList.remove("has-more")}
 }
