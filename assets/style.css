@@ -2056,11 +2056,21 @@ a.act-item:hover{border-color:var(--sea-200)}
 .trade-hub a.hub-go{display:flex;align-items:center;justify-content:space-between;text-decoration:none;color:inherit}
 .trade-hub .hub-arrow{font-size:26px;line-height:1;font-weight:700;color:var(--sea-700);padding:0 2px 0 10px}
 @media (max-width:680px){
-  /* 생활·장터 세부 메뉴 버튼: 휴대폰에서 조금 더 크고 눈에 띄게 */
-  nav.subnav .subnav-inner{padding:12px var(--gutter);gap:8px}
-  nav.subnav a{padding:11px 16px;font-size:15px;font-weight:800;box-shadow:0 2px 6px rgba(16,40,70,.08)}
-  nav.subnav a .sn-i{font-size:17px}
-  nav.subnav a.on{box-shadow:0 6px 16px rgba(43,140,230,.30)}
+  /* 생활·장터 세부 메뉴: 휴대폰에서 한 화면에 다 보이게 줄바꿈(옆으로 밀지 않음) */
+  nav.subnav .subnav-inner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible;padding:10px var(--gutter) 12px;gap:6px}
+  nav.subnav a{justify-content:center;padding:9px 2px;border-radius:10px;font-size:13px;font-weight:800;letter-spacing:-.03em;white-space:nowrap;box-shadow:none;transform:none}
+  nav.subnav a .sn-i{display:none}
+  nav.subnav a.on{box-shadow:0 4px 10px rgba(43,140,230,.28)}
+  /* 생활·장터 첫 화면은 아래 상자가 세부 메뉴 역할 → 위 버튼 줄은 숨김 */
+  body[data-active="trade"] nav.subnav{display:none!important}
+
+  /* 커뮤니티 게시판 버튼: 4칸 격자로 가지런히 */
+  body[data-active="community"] .side{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:12px}
+  body[data-active="community"] .side::before{content:"게시판";grid-column:1/-1;font-size:11.5px;font-weight:800;color:var(--ink-4);letter-spacing:.06em;margin:0 2px}
+  body[data-active="community"] .side h3{grid-column:1/-1;width:auto;margin:6px 2px 0;font-size:11.5px;letter-spacing:.06em}
+  body[data-active="community"] .side h3:nth-of-type(1),body[data-active="community"] .side h3:nth-of-type(2){display:none}
+  body[data-active="community"] .side a{justify-content:center;padding:9px 2px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;letter-spacing:-.03em;background:var(--bg-2)}
+  body[data-active="community"] .side a.on{background:var(--ink);color:#fff}
 }
 
 /* 학교 연계: 휴대폰은 목록부터 간단하게 */
