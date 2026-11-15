@@ -176,7 +176,7 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   .wrap{max-width:1320px}
   .split{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(340px,1fr);gap:24px;align-items:start}
   .calcol{display:flex;flex-direction:column;gap:14px;min-width:0}
-  #listsec{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 14px 14px;gap:8px!important}
+  #listsec{position:sticky;top:12px;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 14px 14px;gap:8px!important}
   #listsec .listhead{background:var(--surface);margin:0 -14px;padding:12px 14px}
   #listsec .list{grid-template-columns:1fr;gap:8px}
   #listsec .item{cursor:pointer;padding:11px 13px;gap:3px;transition:border-color .15s,box-shadow .15s}
@@ -188,6 +188,9 @@ footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);paddin
   #listsec .item::after{content:"자세히 보기 ›";font-size:12px;color:var(--muted);align-self:flex-end;margin-top:-18px}
   .cell{min-height:104px}
   html.jjm-embed #listsec{position:static}
+  #listsec .morehint{position:sticky;bottom:-14px;margin:0 -14px -14px;padding:26px 14px 22px;border:0;background:linear-gradient(to bottom,transparent,var(--surface) 55%);color:var(--fest);font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:center}
+  #listsec .morehint:hover{text-decoration:underline}
+  #listsec{box-sizing:border-box}
 }
 .dlg{position:fixed;inset:0;z-index:100;background:rgba(20,22,25,.45);display:flex;align-items:center;justify-content:center;padding:24px}
 .dlg[hidden]{display:none}
@@ -237,6 +240,7 @@ html.jjm-embed .dlg-box{max-height:none}
     <div class="listhead"><h3 id="ltitle"></h3><button class="allbtn" id="clearday" aria-pressed="true"></button></div>
     <p class="dayhint" id="dayhint">달력의 날짜를 누르면 그날 볼 수 있는 것만 골라 보여 드려요.</p>
     <div class="list" id="list"></div>
+    <button class="morehint" id="morehint" type="button" hidden></button>
   </section>
   </div>
 
@@ -419,7 +423,7 @@ function render(){
   $("mtitle").textContent=`${year}년 ${month}월`;
   $("msub").textContent=MSUB[month-1];
   renderMonths();renderFilters();renderGrid();renderList();
-  if(typeof fitList==="function")fitList();
+  if(typeof fitList==="function"){$("listsec").scrollTop=0;fitList();}
 }
 $("prev").onclick=()=>{selDay=null;if(month===1){month=12;if(year>2026)year--}else month--;render()};
 $("next").onclick=()=>{selDay=null;if(month===12){month=1;if(year<2027)year++}else month++;render()};
@@ -433,23 +437,41 @@ function openDetail(art){
   lastFocus=art;
   const box=$("dlg-body");box.innerHTML=art.outerHTML;
   const h=box.querySelector("h4");if(h)h.id="dlg-title";
-  $("dlg").hidden=false;$("dlg-x").focus();
+  $("dlg").hidden=false;$("dlg-x").focus({preventScroll:true});
   if(document.documentElement.classList.contains("jjm-embed")){const r=art.getBoundingClientRect();$("dlg").style.paddingTop=Math.max(20,r.top-120)+"px"}
   track("view_detail",{title:h?h.textContent:""});
 }
-function closeDetail(){$("dlg").hidden=true;if(lastFocus)lastFocus.focus()}
+function closeDetail(){$("dlg").hidden=true;if(lastFocus)lastFocus.focus({preventScroll:true})}
+$("list").addEventListener("mousedown",e=>{if(WIDE.matches&&e.target.closest(".item")&&!e.target.closest("a"))e.preventDefault()});
 $("list").addEventListener("click",e=>{if(e.target.closest("a"))return;openDetail(e.target.closest(".item"))});
 $("list").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("item")){e.preventDefault();openDetail(e.target)}});
 $("dlg-x").onclick=closeDetail;
 /* PC: 오른쪽 목록 높이를 왼쪽 달력 높이에 맞춤 (넘치면 목록 안에서만 스크롤) */
 function fitList(){
   const L=$("listsec");
-  if(!WIDE.matches){L.style.maxHeight="";return}
+  if(!WIDE.matches){L.style.maxHeight="";updHint();return}
   const calH=document.querySelector(".calcol").offsetHeight;
   const embed=document.documentElement.classList.contains("jjm-embed");
-  L.style.maxHeight=(embed?calH:Math.min(calH,innerHeight-24))+"px";
+  L.style.maxHeight=calH+"px";   // 왼쪽 달력과 같은 높이
+  updHint();
 }
 addEventListener("resize",fitList);
+if(window.ResizeObserver)new ResizeObserver(()=>fitList()).observe(document.querySelector(".calcol"));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitList);
+/* 목록이 넘치면 아래에 '아래로 N개 더' 안내 */
+function updHint(){
+  const L=$("listsec"),h=$("morehint");
+  if(!WIDE.matches){h.hidden=true;L.classList.remove("has-more");return}
+  const left=L.scrollHeight-L.clientHeight-L.scrollTop;
+  if(left>8){
+    const bottom=L.getBoundingClientRect().bottom;
+    const hidden=[...$("list").children].filter(c=>c.getBoundingClientRect().top>bottom-40).length;
+    h.textContent=hidden?`아래로 ${hidden}개 더 있어요 ↓`:"아래로 더 보기 ↓";
+    h.hidden=false;L.classList.add("has-more");
+  } else {h.hidden=true;L.classList.remove("has-more")}
+}
+$("listsec").addEventListener("scroll",updHint,{passive:true});
+$("morehint").onclick=()=>{const L=$("listsec");L.scrollBy({top:L.clientHeight*0.7,behavior:"smooth"})};
 if(WIDE.addEventListener)WIDE.addEventListener("change",fitList);
 $("dlg").addEventListener("click",e=>{if(e.target.id==="dlg")closeDetail()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("dlg").hidden)closeDetail()});
