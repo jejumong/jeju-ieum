@@ -2232,3 +2232,21 @@ a.act-item:hover{border-color:var(--sea-200)}
   .week h4{font-size:15px;margin:4px 0 6px}
   .week p{font-size:13px}
 }
+
+/* 휴대폰 생활·장터 첫 화면: 게시판 상자를 2칸 작은 타일로 (한 화면에 다 보이게) */
+@media (max-width:680px){
+  body[data-active="trade"] .page-head,body[data-active="trade"] .page-head .inner{padding-top:8px!important;padding-bottom:0!important;margin-bottom:0!important}
+  body[data-active="trade"] main.wrap{padding-top:4px!important}
+  body[data-active="trade"] .page-head .crumb,body[data-active="trade"] .page-head p{display:none!important}
+  body[data-active="trade"] .page-head h1{font-size:24px!important;margin:0!important}
+  .trade-hub{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+  .trade-hub .hub-box{padding:11px 12px!important;margin:0!important;border-radius:14px;min-width:0;min-height:0!important}
+  .trade-hub .hub-box .card-head{margin:0!important;padding:0!important;border:0!important;min-height:0}
+  .trade-hub .hub-box h2{font-size:15px!important;display:flex;align-items:center;gap:5px;flex-wrap:nowrap;white-space:nowrap;margin:0!important;letter-spacing:-.04em;min-width:0}
+  .trade-hub .card-head h2 .ti{font-size:17px}
+  .trade-hub .card-head h2 .tc{font-size:11px;padding:1px 7px;margin-left:auto}
+  .trade-hub .hub-arrow{display:none}
+  .trade-hub .hub-box p{font-size:12px!important;margin:3px 0 0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .trade-hub .hub-box ul{display:none}
+  .trade-hub .biz-strip{grid-column:1/-1}
+}
