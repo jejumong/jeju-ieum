@@ -6,7 +6,7 @@
    - cat: 체류 체험 / 워케이션 / 귀농·귀촌 / 정착 지원 / 청년
    ============================================================ */
 
-var PROGRAMS_CHECKED = "2026-11-15";
+var PROGRAMS_CHECKED = "2026-11-16";
 
 var PROGRAM_CATS = [
   { id: "체류 체험", ico: "🧳", desc: "먼저 살아보기 — 숙박비·체험비 지원" },
@@ -243,7 +243,16 @@ var PROGRAMS = [
     when: "2024년 발표 기준 연중 접수 — 올해 운영 여부는 도청 문의",
     contact: "도 주택토지과 주거복지팀 064-710-4251~4252",
     url: "https://www.jeju.go.kr/news/news/law/jeju2.htm",
-    src: [["헤드라인제주 2024.2", "https://www.headlinejeju.co.kr/news/articleView.html?idxno=535515"]] }
+    src: [["헤드라인제주 2024.2", "https://www.headlinejeju.co.kr/news/articleView.html?idxno=535515"]] },
+  { id: "p24", cat: "정착 지원", tags: ["주거비 지원"], status: "wait",
+    name: "제주 3만원 주택 (신혼·출산 가구 공공임대 임대료 지원)", org: "제주특별자치도",
+    who: "도내 공공임대주택에 사는 혼인 또는 자녀 출산 7년 이내 가구 (분양전환형 공공임대 거주자 제외, 주택 보유·주거급여·청년월세·신혼부부 전세자금 대출이자 지원 받는 가구는 신청 불가)",
+    what: "월 임대료 중 3만 원만 입주자가 내고 나머지는 도가 지원, 최대 10개월분 — 임차보증금·관리비는 본인 부담 (2026년 350가구 계획)",
+    cond: "전년도 도시근로자 가구원수별 월평균 소득 130% 이하 (맞벌이 200% 이하)",
+    when: "2026년 3차 9.16~10.9 접수 (마감) — 다음 공고 확인",
+    contact: "정부24에서 '제주 3만원 주택' 검색 — 문의처는 공고 확인",
+    url: "https://www.gov.kr",
+    src: [["SBS Biz 2026.9", "https://biz.sbs.co.kr/amp/article/20000334496"]] }
 ];
 
 /* [표시 이름, 색 클래스, 점 색] — 색은 style.css 의 .pst.* 에서 바꿀 수 있어요 */
