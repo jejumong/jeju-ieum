@@ -2250,3 +2250,22 @@ a.act-item:hover{border-color:var(--sea-200)}
   .trade-hub .hub-box ul{display:none}
   .trade-hub .biz-strip{grid-column:1/-1}
 }
+
+/* 휴대폰 학교 연계 집 목록: 이름 먼저, 한눈에 읽히게 */
+@media (max-width:680px){
+  .hr-list{gap:8px}
+  .hr,.hr.s-open,.hr.s-wait,.hr.s-check,.hr.s-plan{display:flex;flex-direction:column;padding:14px 15px 12px;border-left:1px solid var(--line);border-radius:14px}
+  .hr h3{order:1;font-size:17px;margin:0 0 6px;line-height:1.35}
+  .hr-top{order:2;gap:6px;row-gap:5px}
+  .hr-top .hst{font-size:11.5px;padding:3px 8px}
+  .hr-sc{font-size:13px}
+  .hr-top .chip{font-size:11px;padding:2px 7px}
+  .hr-city{margin-left:0;font-size:12px;background:var(--bg-2);border-radius:999px;padding:2px 8px}
+  .hr-dl{order:3;display:flex;flex-direction:column;gap:3px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+  .hr-dl>div{grid-template-columns:30px 1fr;gap:8px;font-size:13.5px;line-height:1.5}
+  .hr-dl dt{font-size:12.5px;padding-top:1px}
+  .hr-dl dd{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .hr-f{order:4;margin-top:8px;padding-top:0;border-top:0}
+  .hr-f .hc-more{font-size:12.5px;color:var(--sea-700)}
+  .hr-f .bell{padding:5px 10px;font-size:12px}
+}
