@@ -888,6 +888,10 @@ case 'push_reg': {   // 이 기기(dev)의 최근 푸시 구독 id 를 기억 �
   q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", ['ps:' . $u['id'], json_encode($m), now()]);
   out(count($m));
 }
+case 'noti_read_admin': {   // 관리자 콘솔을 열면: 운영 알림(새 문의·가입·댓글 등)은 확인한 것으로 — 앱 아이콘 숫자가 남지 않게
+  $u = me($R); if (!is_mod($u)) out(0);
+  q("UPDATE ji_notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0 AND kind LIKE 'admin\\_%'", [$u['id']]); out(true);
+}
 case 'noti_read_all': { $u = me($R); q("UPDATE ji_notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0", [$u['id']]); out(true); }
 
 default: fail('알 수 없는 요청이에요', 404);

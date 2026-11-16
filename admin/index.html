@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261116c">
+<link rel="stylesheet" href="../assets/style.css?v=20261117a">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -75,6 +75,7 @@ table.adm-t .ttl small{color:var(--ink-4);font-size:12px}
 .modal.on{display:flex}
 .modal .box{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:620px;max-height:90vh;overflow:auto}
 .modal{overscroll-behavior:contain;touch-action:none}
+html.m-lock,html.m-lock body{overflow:hidden}
 .modal .box{max-height:88svh;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 @media (max-width:760px){ .modal{align-items:flex-start;padding:max(14px,env(safe-area-inset-top)) 12px 14px} .modal .box{padding:18px 16px;max-height:calc(100svh - 28px)} }
 .modal h3{margin:0 0 16px;font-size:18px;font-weight:800}
@@ -297,27 +298,27 @@ table.mem-t td small{font-size:13px}
 /* 문의·제보: 휴대폰에서는 한 건씩 카드로 */
 .iq-nm{white-space:nowrap}.iq-mail{font-size:12.5px;color:var(--ink-3);margin-top:2px;overflow-wrap:anywhere}
 @media (max-width:760px){
-  .iq-t thead{display:none}
-  .iq-t,.iq-t tbody{display:block;width:100%}
-  .iq-t tr{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:8px 8px;padding:12px 12px 12px 14px;border:1px solid #e6e9ee;border-radius:14px;margin-bottom:10px;background:#fff}
-  .iq-t tr.iq-new{background:#fff6ea;border-color:#ffd9a8;box-shadow:inset 4px 0 0 #ff9a2e}
-  .iq-t td,.iq-t tr.iq-new td,.iq-t tr:hover td,.iq-t tr.iq-new td:first-child{display:block;padding:0;border:0;background:none;box-shadow:none;min-width:0;max-width:none;width:auto}
-  .iq-t td.ck{grid-column:1;padding:0}
-  .iq-t td.iq-d{grid-column:2;font-size:12.5px;color:var(--ink-3)}
-  .iq-t td.iq-tp{grid-column:3;justify-self:end}
-  .iq-t .iq-type{font-size:12.5px;padding:3px 9px}
-  .iq-t td.iq-who{grid-column:1 / -1;padding-top:8px;border-top:1px solid #f0f2f5;text-align:left}
-  .iq-t .iq-nm{white-space:normal;font-size:15px;line-height:1.4}
-  .iq-t .iq-mail{font-size:13px}
-  .iq-t td.iq-cell,.iq-t tr.iq-new td.iq-cell,.iq-t tr:hover td.iq-cell{grid-column:1 / -1;text-align:left;font-size:14px;line-height:1.6;background:#f6f8fb;border-radius:10px;padding:9px 11px}
-  .iq-t tr.iq-new td.iq-cell{background:#fff}
-  .iq-t td.iq-cell small{display:block;margin-bottom:2px}
-  .iq-t .iq-clamp{max-width:none;-webkit-line-clamp:3}
-  .iq-t td.iq-st{grid-column:1 / 3}
-  .iq-t td.iq-st select{width:100%;padding:7px 8px;border-radius:9px}
-  .iq-t td.iq-ac{grid-column:3}
-  .iq-t td.iq-ac .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:nowrap}
-  .iq-t td.iq-ac .mb{padding:7px 10px;white-space:nowrap}
+  table.adm-t.iq-t thead{display:none}
+  table.adm-t.iq-t,table.adm-t.iq-t tbody{display:block;width:100%}
+  table.adm-t.iq-t tr{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:8px 8px;padding:12px 12px 12px 14px;border:1px solid #e6e9ee;border-radius:14px;margin-bottom:10px;background:#fff}
+  table.adm-t.iq-t tr.iq-new{background:#fff6ea;border-color:#ffd9a8;box-shadow:inset 4px 0 0 #ff9a2e}
+  table.adm-t.iq-t td,table.adm-t.iq-t tr.iq-new td,table.adm-t.iq-t tr:hover td,table.adm-t.iq-t tr.iq-new td:first-child{display:block;padding:0;border:0;background:none;box-shadow:none;min-width:0;max-width:none;width:auto}
+  table.adm-t.iq-t td.ck{grid-column:1;padding:0}
+  table.adm-t.iq-t td.iq-d{grid-column:2;font-size:12.5px;color:var(--ink-3)}
+  table.adm-t.iq-t td.iq-tp{grid-column:3;justify-self:end}
+  table.adm-t.iq-t .iq-type{font-size:12.5px;padding:3px 9px}
+  table.adm-t.iq-t td.iq-who,table.adm-t.iq-t tr.iq-new td.iq-who,table.adm-t.iq-t tr:hover td.iq-who{grid-column:1 / -1;padding-top:8px;border-top:1px solid #f0f2f5;text-align:left}
+  table.adm-t.iq-t .iq-nm{white-space:normal;font-size:15px;line-height:1.4}
+  table.adm-t.iq-t .iq-mail{font-size:13px}
+  table.adm-t.iq-t td.iq-cell,table.adm-t.iq-t tr.iq-new td.iq-cell,table.adm-t.iq-t tr:hover td.iq-cell{grid-column:1 / -1;text-align:left;font-size:14px;line-height:1.6;background:#f6f8fb;border-radius:10px;padding:9px 11px}
+  table.adm-t.iq-t tr.iq-new td.iq-cell{background:#fff}
+  table.adm-t.iq-t td.iq-cell small{display:block;margin-bottom:2px}
+  table.adm-t.iq-t .iq-clamp{max-width:none;-webkit-line-clamp:3}
+  table.adm-t.iq-t td.iq-st{grid-column:1 / 3}
+  table.adm-t.iq-t td.iq-st select{width:100%;padding:7px 8px;border-radius:9px}
+  table.adm-t.iq-t td.iq-ac{grid-column:3}
+  table.adm-t.iq-t td.iq-ac .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:nowrap}
+  table.adm-t.iq-t td.iq-ac .mb{padding:7px 10px;white-space:nowrap}
 }
 /* 관리자 콘솔: 두 손가락 확대·두 번 탭 확대 막기 */
 html,body{touch-action:pan-x pan-y}
@@ -345,18 +346,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261116c"></script>
-<script src="../assets/db.js?v=20261116c"></script>
-<script src="../assets/notify.js?v=20261116c"></script>
-<script src="../assets/seed-trade.js?v=20261116c"></script>
-<script src="../assets/seed-extra.js?v=20261116c"></script>
-<script src="../assets/festivals-data.js?v=20261116c"></script>
-<script src="../assets/seed-new.js?v=20261116c"></script>
-<script src="../assets/seed-comments.js?v=20261116c"></script>
-<script src="../assets/photos.js?v=20261116c"></script>
-<script src="../assets/admin-data.js?v=20261116c"></script>
-<script src="../assets/kmap.js?v=20261116c"></script>
-<script src="../assets/op-posts.js?v=20261116c"></script>
+<script src="../assets/common.js?v=20261117a"></script>
+<script src="../assets/db.js?v=20261117a"></script>
+<script src="../assets/notify.js?v=20261117a"></script>
+<script src="../assets/seed-trade.js?v=20261117a"></script>
+<script src="../assets/seed-extra.js?v=20261117a"></script>
+<script src="../assets/festivals-data.js?v=20261117a"></script>
+<script src="../assets/seed-new.js?v=20261117a"></script>
+<script src="../assets/seed-comments.js?v=20261117a"></script>
+<script src="../assets/photos.js?v=20261117a"></script>
+<script src="../assets/admin-data.js?v=20261117a"></script>
+<script src="../assets/kmap.js?v=20261117a"></script>
+<script src="../assets/op-posts.js?v=20261117a"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -686,9 +687,11 @@ function askDelete(id){
 }
 function doDelete(id){ var p = findAny(id); if (p) deletePost(p); closeModal(); toast("삭제했습니다"); draw(); }
 /* 창이 열려 있는 동안 뒤 페이지를 고정 — 휴대폰에서 창 안을 밀 때 뒤 화면·주소창이 같이 움직여 창이 들썩이지 않게 */
-var _mLockY = null;
-function lockPage(){ if (_mLockY !== null) return; _mLockY = window.scrollY || 0; var b = document.body.style; b.position = "fixed"; b.top = -_mLockY + "px"; b.left = "0"; b.right = "0"; b.width = "100%"; }
-function unlockPage(){ if (_mLockY === null) return; var y = _mLockY, b = document.body.style; _mLockY = null; b.position = b.top = b.left = b.right = b.width = ""; window.scrollTo({ top: y, behavior: "instant" }); }
+var _mLocked = false;
+function lockPage(){ if (_mLocked) return; _mLocked = true; document.documentElement.classList.add("m-lock"); }
+function unlockPage(){ if (!_mLocked) return; _mLocked = false; document.documentElement.classList.remove("m-lock"); }
+/* 창 바깥(어두운 부분)을 밀어도 뒤 화면이 움직이지 않게 */
+document.addEventListener("touchmove", function(e){ if (!_mLocked) return; var box = document.getElementById("modal-box"); if (!box || !box.contains(e.target)) e.preventDefault(); }, { passive: false });
 function showModal(html){ var box = document.getElementById("modal-box"); box.innerHTML = html; box.scrollTop = 0; document.getElementById("modal").classList.add("on"); lockPage(); }
 function closeModal(){ document.getElementById("modal").classList.remove("on"); unlockPage(); }
 /* 바깥(어두운 곳)을 눌렀다 뗄 때만 닫기 — 창 안에서 글자를 끌어 선택하다 바깥에서 떼도 닫히지 않게 */
@@ -1472,7 +1475,7 @@ if (SRV) {
         }));
       }),
       JIDB.call("admin_users").then(function(l){ USERS = l; })
-    ]).then(function(){ boot(); });
+    ]).then(function(){ boot(); clearAdminBadge(); });
   };
 
   JIDB.ready.then(function(){
@@ -1482,6 +1485,11 @@ if (SRV) {
     document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>불러오는 중…</h2></div></div>';
     reloadAll().catch(function(e){ alert("관리자 데이터를 불러오지 못했어요: " + e.message); });
   });
+  /* 앱 아이콘의 숫자 — 콘솔을 열거나 다시 보면 운영 알림을 확인한 것으로 처리하고 숫자를 다시 맞춤 (새 문의는 콘솔 안 주황 표시로 계속 보임) */
+  function clearAdminBadge(){
+    return JIDB.call("noti_read_admin").catch(function(){}).then(function(){ if (JIDB.refreshUnread) JIDB.refreshUnread(); });
+  }
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && JIDB.me()) clearAdminBadge(); });
 } else {
   if (sessionStorage.getItem("ji_admin_ok") === "1") boot(); else gate();
 }
