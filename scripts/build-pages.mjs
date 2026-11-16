@@ -300,7 +300,9 @@ wr("robots.txt", `User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /write.html
-Disallow: /mypage.html
+Disallow: /profile.html
+Disallow: /messages.html
+Disallow: /activity.html
 Disallow: /api/
 
 Sitemap: ${SITE}sitemap.xml
