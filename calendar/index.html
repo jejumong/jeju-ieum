@@ -41,7 +41,7 @@ html.jjm-embed .wrap{max-width:none;padding-left:24px;padding-right:24px}
 var last=0;function send(){var b=document.body,h=Math.max(document.documentElement.scrollHeight,b?b.scrollHeight:0,b?Math.ceil(b.getBoundingClientRect().bottom+window.scrollY):0)+2;if(Math.abs(h-last)>4){last=h;parent.postMessage({jjmHeight:h},"*");}}
 window.addEventListener("load",send);window.addEventListener("resize",send);
 document.addEventListener("DOMContentLoaded",function(){send();if(window.ResizeObserver)new ResizeObserver(send).observe(document.body);setInterval(send,1500);});})();</script>
-<div class="jjm-bar"><a class="jjm-home" href="https://jejumong.github.io/" aria-label="제주몽 메인 페이지로"><img src="https://jejumong.github.io/favicon.png" alt="">‹ 제주몽 홈</a></div>
+<div class="jjm-bar"><a class="jjm-home" href="https://jejumong.github.io/" aria-label="제주몽 메인 페이지로"><img src="https://jejumong.github.io/favicon.png" alt="">‹ 제주몽 홈</a></div><script>/* 제주이음(jejuieum.com)에서 바로 열렸을 때는 홈 버튼이 제주이음 첫 화면으로 */(function(){try{if(!/(^|\.)jejuieum\.com$/.test(location.hostname))return;var a=document.querySelector(".jjm-bar .jjm-home");if(!a)return;a.href="/";a.setAttribute("aria-label","제주이음 첫 화면으로");var im=a.querySelector("img");if(im)im.src="/assets/icons/favicon-48.png";for(var i=a.childNodes.length-1;i>=0;i--){if(a.childNodes[i].nodeType===3)a.removeChild(a.childNodes[i]);}a.appendChild(document.createTextNode("‹ 제주이음 홈"));}catch(e){}})();</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
