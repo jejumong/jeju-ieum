@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261117d">
+<link rel="stylesheet" href="assets/style.css?v=20261117e">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -77,16 +77,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261117d"></script>
-<script src="assets/common.js?v=20261117d"></script>
-<script src="assets/db.js?v=20261117d"></script>
-<script src="assets/notify.js?v=20261117d"></script>
-<script src="assets/seed-trade.js?v=20261117d"></script>
-<script src="assets/seed-extra.js?v=20261117d"></script>
-<script src="assets/festivals-data.js?v=20261117d"></script>
-<script src="assets/seed-new.js?v=20261117d"></script>
-<script src="assets/seed-comments.js?v=20261117d"></script>
-<script src="assets/admin-data.js?v=20261117d"></script>
+<script src="assets/kmap.js?v=20261117e"></script>
+<script src="assets/common.js?v=20261117e"></script>
+<script src="assets/db.js?v=20261117e"></script>
+<script src="assets/notify.js?v=20261117e"></script>
+<script src="assets/seed-trade.js?v=20261117e"></script>
+<script src="assets/seed-extra.js?v=20261117e"></script>
+<script src="assets/festivals-data.js?v=20261117e"></script>
+<script src="assets/seed-new.js?v=20261117e"></script>
+<script src="assets/seed-comments.js?v=20261117e"></script>
+<script src="assets/admin-data.js?v=20261117e"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -339,7 +339,7 @@ function galleryHtml(p) {
   PV_PH = (p && p.extra && Array.isArray(p.extra.photos)) ? p.extra.photos : []; PV_I = 0;
   if (!PV_PH.length) return "";
   var many = PV_PH.length > 1;
-  return '<div class="pv-gallery"><div class="pv-main"><img id="pv-img" src="' + esc(PV_PH[0]) + '" alt="첨부 사진 1" onclick="window.open(this.src,\'_blank\')">' +
+  return '<div class="pv-gallery"><div class="pv-main"><img id="pv-img" src="' + esc(PV_PH[0]) + '" alt="첨부 사진 1" onclick="pvZoom()">' +
     (many ? '<button type="button" class="pv-nav l" onclick="pvGo(-1)" aria-label="이전 사진">‹</button><button type="button" class="pv-nav r" onclick="pvGo(1)" aria-label="다음 사진">›</button>' +
       '<span class="pv-count" id="pv-count">1 / ' + PV_PH.length + '</span>' : '') + '</div>' +
     (many ? '<div class="pv-thumbs" id="pv-thumbs">' + PV_PH.map(function (u, i) { return '<button type="button" class="' + (i ? '' : 'on') + '" onclick="pvShow(' + i + ')"><img src="' + esc(u) + '" alt="" loading="lazy"></button>'; }).join("") + '</div>' : '') + '</div>';
@@ -351,6 +351,42 @@ function pvShow(i) {
   document.querySelectorAll("#pv-thumbs button").forEach(function (b, j) { b.classList.toggle("on", j === PV_I); });
 }
 function pvGo(d) { pvShow(PV_I + d); }
+/* 사진 크게 보기: 누르면 화면 가득 팝업, 사진이나 바깥을 누르면(또는 Esc) 닫힘 */
+function pvZoom() {
+  if (!PV_PH.length) return;
+  var lb = document.getElementById("pv-lb");
+  if (!lb) {
+    lb = document.createElement("div"); lb.id = "pv-lb"; lb.className = "pv-lb"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", "사진 크게 보기");
+    lb.innerHTML = '<img id="pv-lb-img" alt="">' +
+      '<button type="button" class="pv-lb-x" aria-label="닫기">×</button>' +
+      '<button type="button" class="pv-lb-nav l" aria-label="이전 사진">‹</button><button type="button" class="pv-lb-nav r" aria-label="다음 사진">›</button>' +
+      '<span class="pv-lb-count" id="pv-lb-count"></span>';
+    lb.addEventListener("click", function (e) {
+      var n = e.target.closest(".pv-lb-nav");
+      if (n) { e.stopPropagation(); pvGo(n.classList.contains("l") ? -1 : 1); pvZoomPaint(); return; }
+      pvZoomClose();
+    });
+    document.body.appendChild(lb);
+    document.addEventListener("keydown", function (e) {
+      if (!lb.classList.contains("on")) return;
+      if (e.key === "Escape") pvZoomClose();
+      else if (PV_PH.length > 1 && (e.key === "ArrowLeft" || e.key === "ArrowRight")) { pvGo(e.key === "ArrowLeft" ? -1 : 1); pvZoomPaint(); }
+    });
+  }
+  pvZoomPaint();
+  lb.classList.add("on"); document.documentElement.classList.add("pv-lb-open");
+}
+function pvZoomPaint() {
+  var im = document.getElementById("pv-lb-img"); if (!im) return;
+  im.src = PV_PH[PV_I]; im.alt = "첨부 사진 " + (PV_I + 1) + " 크게 보기";
+  var many = PV_PH.length > 1, lb = document.getElementById("pv-lb");
+  lb.classList.toggle("many", many);
+  document.getElementById("pv-lb-count").textContent = many ? (PV_I + 1) + " / " + PV_PH.length : "";
+}
+function pvZoomClose() {
+  var lb = document.getElementById("pv-lb"); if (lb) lb.classList.remove("on");
+  document.documentElement.classList.remove("pv-lb-open");
+}
 
 /* 회원에게 쪽지 보내기 링크 (서버 회원 글·댓글에만) */
 function msgLink(uid, nick) {
