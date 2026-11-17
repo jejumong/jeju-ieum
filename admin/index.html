@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261117a">
+<link rel="stylesheet" href="../assets/style.css?v=20261117b">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -237,14 +237,25 @@ table.mem-t td small{font-size:13px}
 .tf-seg{display:inline-flex;background:#f1f3f6;border-radius:999px;padding:3px;margin-left:8px;vertical-align:middle}
 .tf-seg button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:700;padding:4px 12px;border-radius:999px;cursor:pointer;color:var(--ink-3)}
 .tf-seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.tf-act{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.tf-act{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.tf-act div.lv b{color:#c2410c}
+.tf-mem{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tf-mem div{background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--ink-3);font-weight:600}
+.tf-mem b{display:block;font-size:17px;color:var(--ink);margin-top:3px}
+.tf-mem small{display:block;font-size:11.5px;color:var(--ink-4);margin-top:2px}
+.tf-mh{font-size:13.5px;margin:16px 0 6px}
+.tf-lv{list-style:none;margin:0;padding:0}
+.tf-lv li{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #f0f2f5;font-size:13px}
+.tf-lv li span:first-child{color:var(--ink-3);min-width:118px}
+.tf-lv li span:nth-child(2){flex:1}
+.bd.warn{background:#fdecec;color:#b42318}
 .tf-act div{background:#f8fafc;border-radius:10px;padding:12px;text-align:center;font-size:12.5px;color:var(--ink-3);font-weight:600}
 .tf-act b{display:block;font-size:20px;color:var(--ink);margin-top:2px}
 .tf-act small{display:block;font-size:11.5px;color:var(--ink-4);font-weight:600;margin-top:2px}
 .dash-tf{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:14px;cursor:pointer}
 .dash-tf b{font-size:17px}
 .dash-tf .go{margin-left:auto;font-weight:800;color:var(--sea-700)}
-@media (max-width:900px){ .tf-2{grid-template-columns:1fr} .tf-act{grid-template-columns:repeat(3,1fr)} .tf-row .bar{display:none} }
+@media (max-width:900px){ .tf-2{grid-template-columns:1fr} .tf-act{grid-template-columns:repeat(4,1fr)} .tf-mem{grid-template-columns:repeat(2,1fr)} .tf-row .bar{display:none} }
 .tm-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:26px 0 12px}
 .tm-head h2{font-size:19px;font-weight:800;margin:0}
 .tm-head .tf-seg{margin:0}
@@ -346,18 +357,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261117a"></script>
-<script src="../assets/db.js?v=20261117a"></script>
-<script src="../assets/notify.js?v=20261117a"></script>
-<script src="../assets/seed-trade.js?v=20261117a"></script>
-<script src="../assets/seed-extra.js?v=20261117a"></script>
-<script src="../assets/festivals-data.js?v=20261117a"></script>
-<script src="../assets/seed-new.js?v=20261117a"></script>
-<script src="../assets/seed-comments.js?v=20261117a"></script>
-<script src="../assets/photos.js?v=20261117a"></script>
-<script src="../assets/admin-data.js?v=20261117a"></script>
-<script src="../assets/kmap.js?v=20261117a"></script>
-<script src="../assets/op-posts.js?v=20261117a"></script>
+<script src="../assets/common.js?v=20261117b"></script>
+<script src="../assets/db.js?v=20261117b"></script>
+<script src="../assets/notify.js?v=20261117b"></script>
+<script src="../assets/seed-trade.js?v=20261117b"></script>
+<script src="../assets/seed-extra.js?v=20261117b"></script>
+<script src="../assets/festivals-data.js?v=20261117b"></script>
+<script src="../assets/seed-new.js?v=20261117b"></script>
+<script src="../assets/seed-comments.js?v=20261117b"></script>
+<script src="../assets/photos.js?v=20261117b"></script>
+<script src="../assets/admin-data.js?v=20261117b"></script>
+<script src="../assets/kmap.js?v=20261117b"></script>
+<script src="../assets/op-posts.js?v=20261117b"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1365,7 +1376,7 @@ if (SRV) {
     }).join("") + '</div><div class="tf-ax">' + dk.map(function(k, i){ return '<span>' + (i % 5 === 4 || i === 29 ? k.slice(5).replace("-", ".") : "") + '</span>'; }).join("") + '</div>';
     var D = tfDay === "t" ? { pages: r.t_pages, refs: r.t_refs } : { pages: r.y_pages, refs: r.y_refs };
     var seg = '<span class="tf-seg"><button class="' + (tfDay === "t" ? "on" : "") + '" onclick="tfSetDay(\'t\')">오늘</button><button class="' + (tfDay === "y" ? "on" : "") + '" onclick="tfSetDay(\'y\')">어제</button></span>';
-    var A = [["users","새 회원"],["posts","새 글"],["comments","댓글"],["likes","좋아요"],["messages","쪽지"],["inquiries","문의·제보"]];
+    var A = [["users","새 회원"],["leaves","탈퇴"],["posts","새 글"],["comments","댓글"],["likes","좋아요"],["messages","쪽지"],["inquiries","문의·제보"]];
     var since = r.since ? r.since.slice(0, 10).replace(/-/g, ".") : "";
     M().innerHTML = '<h1>방문 통계</h1>' +
       '<div class="tf-live"><span class="tf-dot"></span>30초마다 자동으로 새로 고쳐요 · ' + esc((r.now || "").slice(11, 16)) + ' 기준' + (since ? ' · ' + since + '부터 기록' : '') +
@@ -1377,8 +1388,9 @@ if (SRV) {
         '<div class="stat"><div class="k">어제 하루</div><div class="v">' + tfNum(y.uv) + '명</div><div class="d">페이지뷰 ' + tfNum(y.pv) + '회 · 처음 온 사람 ' + tfNum(y.nv) + '명</div></div>' +
       '</div>' +
       '<div class="panel"><h2>오늘 활동 <small style="font-weight:600;color:var(--ink-4)">(아래 작은 글씨는 어제)</small></h2><div class="tf-act">' + A.map(function(a){
-        return '<div>' + a[1] + '<b>' + tfNum(r.t_act[a[0]]) + '</b><small>어제 ' + tfNum(r.y_act[a[0]]) + '</small></div>'; }).join("") + '</div>' +
+        return '<div' + (a[0] === "leaves" ? ' class="lv"' : '') + '>' + a[1] + '<b>' + tfNum(r.t_act[a[0]] || 0) + '</b><small>어제 ' + tfNum(r.y_act[a[0]] || 0) + '</small></div>'; }).join("") + '</div>' +
         '<p class="sub" style="margin:12px 0 0">오늘 방문자 중 처음 온 사람 <b>' + tfNum(t.nv) + '명</b> · 휴대폰 <b>' + (t.uv ? Math.round(t.mob / t.uv * 100) : 0) + '%</b> / PC ' + (t.uv ? 100 - Math.round(t.mob / t.uv * 100) : 0) + '%</p></div>' +
+      tfMembers(r.members) +
       '<div class="panel"><h2>시간대별 방문자</h2><div class="tf-lg"><span><b></b>오늘</span><span><b class="y"></b>어제</span></div>' + hours + '</div>' +
       '<div class="tf-2">' +
         '<div class="panel"><h2>지금 보고 있는 페이지 <small style="font-weight:600;color:var(--ink-4)">최근 5분</small></h2>' + tfList((r.live_pages || []).slice(0, 10), "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
@@ -1387,6 +1399,25 @@ if (SRV) {
       '<div class="panel"><h2>최근 30일 방문자</h2>' + days + '</div>' +
       '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
     window.scrollTo(0, sx);
+  }
+
+  /* 회원 현황: 지금 회원 수 · 최근 7일/30일 가입·탈퇴 · 최근 탈퇴 (이름은 남기지 않음) */
+  function tfMembers(m){
+    if (!m) return "";
+    var ago = function(a, b){ if (!a || !b) return ""; var d = Math.floor((new Date(b) - new Date(a)) / 86400000); return d < 1 ? "가입 당일 탈퇴" : "가입 " + d + "일 만에"; };
+    var dt = function(x){ return x ? x.slice(0, 10).replace(/-/g, ".") + " " + x.slice(11, 16) : ""; };
+    var box = function(k, v, d){ return '<div><span>' + k + '</span><b>' + v + '</b>' + (d ? '<small>' + d + '</small>' : '') + '</div>'; };
+    var net = function(x){ var n = x.join - x.leave; return (n > 0 ? "+" : "") + n; };
+    return '<div class="panel"><h2>회원 현황</h2><div class="tf-mem">' +
+        box("지금 회원", tfNum(m.now) + '명', "") +
+        box("최근 7일", '가입 ' + tfNum(m.d7.join) + ' · 탈퇴 ' + tfNum(m.d7.leave), "늘어난 수 " + net(m.d7)) +
+        box("최근 30일", '가입 ' + tfNum(m.d30.join) + ' · 탈퇴 ' + tfNum(m.d30.leave), "늘어난 수 " + net(m.d30)) +
+        box("지금까지 탈퇴", tfNum(m.left_total) + '명', "") +
+      '</div>' +
+      (m.recent && m.recent.length ? '<h3 class="tf-mh">최근 탈퇴</h3><ul class="tf-lv">' + m.recent.map(function(x){
+        return '<li><span>' + dt(x.left_at) + '</span><span>' + (ago(x.joined_at, x.left_at) || "가입일 기록 없음") + '</span><span class="bd' + (x.by_admin ? ' warn' : '') + '">' + (x.by_admin ? "관리자가 삭제" : "본인 탈퇴") + '</span></li>'; }).join("") + '</ul>'
+        : '<p class="sub" style="margin:10px 0 0">아직 탈퇴한 회원이 없어요.</p>') +
+      '<p class="sub" style="margin:10px 0 0">탈퇴하면 개인정보처리방침대로 이름·이메일은 바로 지워져서, 여기에는 탈퇴 시각과 가입 후 기간만 남아요.</p></div>';
   }
 
   /* 대시보드 맨 위: 실시간 한 줄 */

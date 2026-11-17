@@ -124,8 +124,10 @@ case 'account_delete': {
   q("DELETE FROM ji_sessions WHERE user_id = ?", [$u['id']]);
   q("DELETE FROM ji_notifications WHERE user_id = ?", [$u['id']]);
   q("DELETE FROM ji_club_joins WHERE applicant = ?", [$u['id']]);
+  $joined = one("SELECT created_at FROM ji_users WHERE id = ?", [$u['id']])['created_at'] ?? null;
   q("DELETE FROM ji_users WHERE id = ?", [$u['id']]);
   q("DELETE FROM ji_settings WHERE k = ?", ['al:' . $u['id']]);
+  log_leave($joined, false);
   alert_admins('leave', '🚪 회원 탈퇴', $u['nick'] . '님이 탈퇴했어요', 'admin/index.html#members', $u['id']);
   out(true);
 }
@@ -629,8 +631,20 @@ case 'admin_traffic': {   // 관리자: 실시간·오늘·어제 방문 통계
   };
   $act = function ($d) use ($cnt) {
     return ['users' => $cnt('ji_users', $d), 'posts' => $cnt('ji_posts', $d), 'comments' => $cnt('ji_comments', $d),
-      'inquiries' => $cnt('ji_inquiries', $d), 'messages' => $cnt('ji_messages', $d, "AND kind = 'dm'"), 'likes' => $cnt('ji_likes', $d)];
+      'inquiries' => $cnt('ji_inquiries', $d), 'messages' => $cnt('ji_messages', $d, "AND kind = 'dm'"), 'likes' => $cnt('ji_likes', $d),
+      'leaves' => (int)one("SELECT COUNT(*) n FROM ji_leaves WHERE left_at >= ? AND left_at < ? + INTERVAL 1 DAY", [$d, $d])['n']];
   };
+  // 회원 현황: 지금 회원 수 · 기간별 가입/탈퇴 · 최근 탈퇴 (이름 없이)
+  $jl = function ($days) {
+    return ['join' => (int)one("SELECT COUNT(*) n FROM ji_users WHERE created_at >= CURDATE() - INTERVAL ? DAY", [$days - 1])['n']
+                    + (int)one("SELECT COUNT(*) n FROM ji_leaves WHERE joined_at >= CURDATE() - INTERVAL ? DAY", [$days - 1])['n'],
+            'leave' => (int)one("SELECT COUNT(*) n FROM ji_leaves WHERE left_at >= CURDATE() - INTERVAL ? DAY", [$days - 1])['n']];
+  };
+  $members = ['now' => (int)one("SELECT COUNT(*) n FROM ji_users")['n'],
+    'left_total' => (int)one("SELECT COUNT(*) n FROM ji_leaves")['n'],
+    'd7' => $jl(7), 'd30' => $jl(30),
+    'recent' => array_map(function ($r) { return ['left_at' => iso($r['left_at']), 'joined_at' => iso($r['joined_at']), 'by_admin' => (bool)$r['by_admin']]; },
+      all("SELECT left_at, joined_at, by_admin FROM ji_leaves ORDER BY left_at DESC LIMIT 10"))];
   $days = [];
   foreach (all("SELECT DATE(at) d, COUNT(*) pv, COUNT(DISTINCT vid) uv FROM ji_hits WHERE at >= (CURDATE() - INTERVAL 29 DAY) GROUP BY DATE(at) ORDER BY d") as $r)
     $days[$r['d']] = ['pv' => (int)$r['pv'], 'uv' => (int)$r['uv']];
@@ -642,7 +656,7 @@ case 'admin_traffic': {   // 관리자: 실시간·오늘·어제 방문 통계
     't' => $day($today), 'y' => $day($yest), 'y_same' => ['pv' => (int)$yNow['pv'], 'uv' => (int)$yNow['uv']],
     't_hours' => $hours($today), 'y_hours' => $hours($yest),
     't_pages' => $pages($today), 'y_pages' => $pages($yest), 't_refs' => $refs($today), 'y_refs' => $refs($yest),
-    't_act' => $act($today), 'y_act' => $act($yest), 'days' => $days ?: new stdClass(),
+    't_act' => $act($today), 'y_act' => $act($yest), 'members' => $members, 'days' => $days ?: new stdClass(),
     'since' => one("SELECT MIN(at) m FROM ji_hits")['m']]);
 }
 case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기기·글 순위
@@ -782,7 +796,9 @@ case 'admin_user_delete': {   // 관리자만: 회원 탈퇴 처리 (관리자 �
   }
   q("DELETE FROM ji_sessions WHERE user_id = ?", [$id]); q("DELETE FROM ji_notifications WHERE user_id = ?", [$id]);
   q("DELETE FROM ji_club_joins WHERE applicant = ?", [$id]); q("DELETE FROM ji_settings WHERE k = ?", ['al:' . $id]);
+  $joined = one("SELECT created_at FROM ji_users WHERE id = ?", [$id])['created_at'] ?? null;
   q("DELETE FROM ji_users WHERE id = ?", [$id]);
+  if ($joined) log_leave($joined, true);
   out(true);
 }
 case 'admin_seller_until': {   // 판매자 입점 기간 정하기 (null = 기한 없음)

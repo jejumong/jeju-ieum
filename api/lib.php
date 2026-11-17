@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 12;
+const JI_SCHEMA = 13;
 
 /* ── 응답 ── */
 function cors() {
@@ -140,6 +140,17 @@ function migrate($pdo) {
       try { $pdo->exec("ALTER TABLE ji_hits ADD COLUMN $col"); } catch (Exception $e) {}
     }
   }
+  if ($v < 13) {   // 탈퇴 기록 (관리자 '방문 통계'의 탈퇴 수) — 개인정보는 남기지 않고 가입일·탈퇴 시각·방식만
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ji_leaves (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY, left_at DATETIME NOT NULL, joined_at DATETIME NULL, by_admin TINYINT(1) NOT NULL DEFAULT 0,
+      INDEX (left_at))$T");
+    // 이전 탈퇴: 관리자에게 갔던 '회원 탈퇴' 알림 시각으로 채움 (같은 분에 여러 관리자에게 간 알림은 1건으로)
+    try {
+      if (!(int)$pdo->query("SELECT COUNT(*) FROM ji_leaves")->fetchColumn())
+        $pdo->exec("INSERT INTO ji_leaves (left_at) SELECT MIN(created_at) FROM ji_notifications WHERE kind = 'admin_leave'
+          GROUP BY body, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i')");
+    } catch (Throwable $e) {}
+  }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }
 
@@ -230,6 +241,9 @@ function alert_admins($ev, $title, $body, $link, $except = null, $pushTitle = nu
     if (!(admin_alert_prefs($ad['id'])[$ev] ?? false)) continue;
     notify($ad['id'], 'admin_' . $ev, $title, $body, $link, $pushTitle ?? ('제주이음 · ' . $title), $pushBody ?? $body);
   }
+}
+function log_leave($joined, $byAdmin) {
+  try { q("INSERT INTO ji_leaves (left_at, joined_at, by_admin) VALUES (?,?,?)", [now(), $joined ?: null, $byAdmin ? 1 : 0]); } catch (Throwable $e) {}
 }
 function setting($k, $def) { $r = one("SELECT v FROM ji_settings WHERE k = ?", [$k]); return $r ? json_decode($r['v'], true) : $def; }
 /* ── 사진 ── */
