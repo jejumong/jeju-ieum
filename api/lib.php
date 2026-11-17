@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 14;
+const JI_SCHEMA = 15;
 
 /* ── 응답 ── */
 function cors() {
@@ -153,6 +153,9 @@ function migrate($pdo) {
   }
   if ($v < 14) {   // 활동정지 (이 시각까지 글·댓글·쪽지 등을 못 씀, 영구 = 9999년)
     try { $pdo->exec("ALTER TABLE ji_users ADD COLUMN suspended_until DATETIME NULL"); } catch (Throwable $e) {}
+  }
+  if ($v < 15) {   // 조회수 정직하게 다시 시작 (새로고침·본인 조회·중복으로 부풀려진 숫자 정리)
+    $pdo->exec("UPDATE ji_posts SET views = 0");
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }

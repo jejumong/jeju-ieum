@@ -390,6 +390,14 @@ function findPost(id) {
   for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
   return null;
 }
+/* 서버 글 조회수를 올릴지: 같은 브라우저에서 24시간 안에 이미 셌으면 안 셈, 내 글이면 안 셈 */
+function shouldCountView(id, p) {
+  var u = currentUser(); if (u && p && p.authorId === u.id) return false;
+  var seen = JI.get("viewed", {}), now = Date.now();
+  if (seen[id] && now - seen[id] < 86400000) return false;
+  for (var k in seen) if (now - seen[k] > 86400000) delete seen[k];
+  seen[id] = now; JI.set("viewed", seen); return true;
+}
 function addViews(id) {
   var v = JI.get("views", {});
   v[id] = (v[id] || 0) + 1;
@@ -437,6 +445,7 @@ function emptyInvite(board, noun) {
     '<a class="btn primary" href="' + href + '">✏️ 첫 ' + noun + ' 올리기</a></div>';
 }
 function viewsOf(p) {
+  if (p && p.db) return p.views || 0;   // 회원 글(서버): 서버가 센 숫자 그대로
   var v = JI.get("views", {});
   return (p.views || 0) + (v[p.id] || 0);
 }

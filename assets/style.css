@@ -2316,3 +2316,5 @@ main.wrap > section > ul.dots a:hover{background:var(--sea-50);color:var(--sea-7
 .susp-bar a{font-weight:700;color:#b42318;text-decoration:underline;white-space:nowrap}
 @media (max-width:1232px){.susp-bar{margin:10px 16px 0}}
 .cmt-login.susp{background:#fdecec;color:#8a1c12}
+
+.hx-pk-ico{margin-right:7px}

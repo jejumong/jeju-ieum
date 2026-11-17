@@ -316,7 +316,10 @@ case 'post_get': {
   $id = $R['id'] ?? ''; if (!is_uuid($id)) out(null);
   $r = one("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id]); if (!$r) out(null);
   if (!post_live($r)) { $gv = me($R, false); if (!$gv || ($gv['id'] !== $r['author'] && !is_mod($gv))) out(null); }
-  if (!empty($R['view'])) { q("UPDATE ji_posts SET views = views + 1 WHERE id = ?", [$id]); $r['views']++; }
+  if (!empty($R['view'])) {   // 조회수: 글쓴이 본인은 세지 않음 (같은 브라우저 24시간 1번은 화면에서 거름)
+    $vu = me($R, false);
+    if (!$vu || $vu['id'] !== $r['author']) { q("UPDATE ji_posts SET views = views + 1 WHERE id = ?", [$id]); $r['views']++; }
+  }
   out(post_out($r));
 }
 case 'post_create': {

@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261117f">
+<link rel="stylesheet" href="assets/style.css?v=20261117g">
 </head>
 <body data-active="home">
 
@@ -66,6 +66,7 @@
     <div class="hm-hd"><h2>동네 소식</h2><a href="community.html">더 보기 →</a></div>
     <div class="hm-feed" id="hm-feed"></div>
   </section>
+  <section class="hm-news" id="hm-pick"></section>
 
   <!-- 2. 처음이라면 이 순서로 -->
   <section class="hx-sec">
@@ -117,19 +118,19 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261117f"></script>
-<script src="assets/db.js?v=20261117f"></script>
-<script src="assets/notify.js?v=20261117f"></script>
-<script src="assets/seed-trade.js?v=20261117f"></script>
-<script src="assets/seed-extra.js?v=20261117f"></script>
-<script src="assets/festivals-data.js?v=20261117f"></script>
-<script src="assets/seed-new.js?v=20261117f"></script>
-<script src="assets/seed-comments.js?v=20261117f"></script>
-<script src="assets/admin-data.js?v=20261117f"></script>
-<script src="assets/guide-data.js?v=20261117f"></script>
-<script src="assets/programs-data.js?v=20261117f"></script>
-<script src="assets/school-housing-data.js?v=20261117f"></script>
-<script src="assets/jangnal-data.js?v=20261117f"></script>
+<script src="assets/common.js?v=20261117g"></script>
+<script src="assets/db.js?v=20261117g"></script>
+<script src="assets/notify.js?v=20261117g"></script>
+<script src="assets/seed-trade.js?v=20261117g"></script>
+<script src="assets/seed-extra.js?v=20261117g"></script>
+<script src="assets/festivals-data.js?v=20261117g"></script>
+<script src="assets/seed-new.js?v=20261117g"></script>
+<script src="assets/seed-comments.js?v=20261117g"></script>
+<script src="assets/admin-data.js?v=20261117g"></script>
+<script src="assets/guide-data.js?v=20261117g"></script>
+<script src="assets/programs-data.js?v=20261117g"></script>
+<script src="assets/school-housing-data.js?v=20261117g"></script>
+<script src="assets/jangnal-data.js?v=20261117g"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -160,12 +161,49 @@
     return '<li><a href="stay.html#programs-top"><span class="pst ' + st[1] + '">' + st[0] + '</span><span class="l-t">' + esc(p.name) + '</span></a></li>';
   }).join("");
 
-  // 이번 달
-  var m = new Date().getMonth() + 1, note = MONTH_NOTES[m];
-  $("hx-month").innerHTML =
-    '<div class="hx-head"><h2>' + m + '월의 제주 생활</h2><a href="guide/seasons.html">열두 달 보기 →</a></div>' +
-    '<p class="hx-mt">' + esc(note.t) + '</p>' +
-    '<ul class="hx-dots">' + note.items.slice(0, 4).map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul>';
+  // 오른쪽 칸: 새로고침할 때마다 다른 게시판을 골라 최근 글 4개 (글이 있는 게시판만, 바로 전에 본 것은 피함)
+  (function(){
+    var all = allPosts();
+    var notEnded = function(p){ return !(p.board === "축제정보" && typeof festStatus === "function" && festStatus(p) === "만료"); };
+    var SRC = [
+      { ico:"🏄", k:"동호회", board:"동호회", more:"clubs.html" },
+      { ico:"🏠", k:"부동산", board:"부동산", more:"realestate.html" },
+      { ico:"💼", k:"구인구직", board:"구인구직", more:"jobs.html" },
+      { ico:"📦", k:"중고거래", board:"중고사고팔기", more:"market.html" },
+      { ico:"🏪", k:"제주상점", board:"제주상점", more:"shops.html" },
+      { ico:"🍊", k:"특가공구", board:"특가공구", more:"deals.html" },
+      { ico:"🎉", k:"축제정보", board:"축제정보", more:"festivals.html" },
+      { ico:"💬", k:"자유게시판", board:"자유게시판", more:"community.html?board=" + encodeURIComponent("자유게시판") },
+      { ico:"🙋", k:"질문하기", board:"질문하기", more:"community.html?board=" + encodeURIComponent("질문하기") },
+      { ico:"🧰", k:"생활도구", more:"tools.html", items:[
+        ["stay.html#calc", "🧮 한 달 예산 계산기", "계산"], ["stay.html#chk", "✅ 이주·한달살기 준비 체크리스트", "점검"],
+        ["guide/region.html", "🧭 제주 동네 비교표", "비교"], ["festivals.html", "🎉 축제 지도", "지도"]] }
+    ];
+    SRC.forEach(function(x){
+      if (x.items) return;
+      x.list = all.filter(function(p){ return p.board === x.board && notEnded(p); }).sort(byRecent).slice(0, 4);
+    });
+    var ok = SRC.filter(function(x){ return x.items || x.list.length; });
+    var last = ""; try { last = sessionStorage.getItem("hx-pick") || ""; } catch (e) {}
+    var pool = ok.length > 1 ? ok.filter(function(x){ return x.k !== last; }) : ok;
+    var pk = pool[Math.floor(Math.random() * pool.length)];
+    try { sessionStorage.setItem("hx-pick", pk.k); } catch (e) {}
+    var rows = pk.items
+      ? pk.items.map(function(t){ return '<li><a href="' + t[0] + '"><span class="l-t">' + esc(t[1]) + '</span><span class="l-m">' + t[2] + '</span></a></li>'; })
+      : pk.list.map(function(p){
+          var pr = shortPrice(p);
+          return '<li><a href="view.html?id=' + encodeURIComponent(p.id) + '"><span class="l-t">' + esc(p.title) + '</span>' +
+            (pr ? '<span class="l-p">' + pr + '</span>' : '<span class="l-m">' + fmtDate(p.date) + '</span>') + '</a></li>';
+        });
+    $("hx-month").innerHTML =
+      '<div class="hx-head"><h2><span class="hx-pk-ico">' + pk.ico + '</span>' + pk.k + '</h2><a href="' + pk.more + '">더 보기 →</a></div>' +
+      '<ul class="hx-list">' + rows.join("") + '</ul>';
+    // 휴대폰: 같은 게시판을 '동네 소식' 아래에 3줄로
+    var mrows = pk.items
+      ? pk.items.slice(0, 3).map(function(t){ return '<a href="' + t[0] + '"><span>' + esc(t[1]) + '</span></a>'; })
+      : pk.list.slice(0, 3).map(function(p){ var pr = shortPrice(p); return '<a href="view.html?id=' + encodeURIComponent(p.id) + '"><span>' + esc(p.title) + '</span><small>' + (pr || fmtDate(p.date)) + '</small></a>'; });
+    $("hm-pick").innerHTML = '<div class="hm-hd"><h2>' + pk.ico + ' ' + pk.k + '</h2><a href="' + pk.more + '">더 보기 →</a></div><div class="hm-feed">' + mrows.join("") + '</div>';
+  })();
 
   // 생활도구 주소
 
