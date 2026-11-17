@@ -154,8 +154,35 @@ function requireLogin(msg) {
     }
     return null;
   }
+  if (!canWrite()) return null;
   return u;
 }
+
+/* ── 활동정지: 정지 중이면 끝나는 시각 글자, 아니면 "" ── */
+function suspendedText(u) {
+  u = u || currentUser(); var t = u && u.suspended_until; if (!t || new Date(t) <= new Date()) return "";
+  if (String(t).slice(0, 4) === "9999") return "영구 정지";
+  var d = new Date(t); return d.getFullYear() + "년 " + (d.getMonth() + 1) + "월 " + d.getDate() + "일 " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + "까지";
+}
+/* 글·댓글 등 쓰기 전에: 정지 중이면 안내하고 false */
+function canWrite() {
+  var s = suspendedText(); if (!s) return true;
+  alert("활동이 정지된 계정이에요 (" + s + ").\n정지 기간에는 글·댓글·쪽지·좋아요를 쓸 수 없어요.\n궁금한 점은 문의·제보로 보내 주세요.");
+  return false;
+}
+/* 모든 화면 머리글 아래: 정지 안내 띠 */
+function paintSuspend() {
+  if (window.JI_AUTH_NS === "admin") return;
+  var old = document.getElementById("susp-bar"), s = suspendedText();
+  if (!s) { if (old) old.remove(); return; }
+  var html = '<div id="susp-bar" class="susp-bar" role="status">⛔ <b>활동이 정지된 계정이에요 (' + s + ')</b><span>정지 기간에는 글·댓글·쪽지·좋아요를 쓸 수 없어요.</span><a href="contact.html">문의하기</a></div>';
+  if (old) { old.outerHTML = html; return; }
+  var h = document.querySelector("header.site"); if (h) h.insertAdjacentHTML("afterend", html);
+}
+window.addEventListener("DOMContentLoaded", function () {
+  paintSuspend();
+  if (window.JIDB && JIDB.ready) JIDB.ready.then(paintSuspend);
+});
 
 /* ── 기본 게시글 (커뮤니티) ── */
 var SEED_POSTS = [

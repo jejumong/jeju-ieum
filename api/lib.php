@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 13;
+const JI_SCHEMA = 14;
 
 /* ── 응답 ── */
 function cors() {
@@ -151,6 +151,9 @@ function migrate($pdo) {
           GROUP BY body, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i')");
     } catch (Throwable $e) {}
   }
+  if ($v < 14) {   // 활동정지 (이 시각까지 글·댓글·쪽지 등을 못 씀, 영구 = 9999년)
+    try { $pdo->exec("ALTER TABLE ji_users ADD COLUMN suspended_until DATETIME NULL"); } catch (Throwable $e) {}
+  }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }
 
@@ -177,7 +180,7 @@ function me($req, $need = true) {
   if ($u !== false) { if (!$u && $need) fail('로그인이 필요해요', 401); return $u; }
   $u = null; $t = $req['_t'] ?? '';
   if (is_string($t) && strlen($t) === 64) {
-    $s = one("SELECT s.token, s.seen_at, u.id, u.email, u.nick, u.region, u.role, u.seller_until FROM ji_sessions s JOIN ji_users u ON u.id = s.user_id
+    $s = one("SELECT s.token, s.seen_at, u.id, u.email, u.nick, u.region, u.role, u.seller_until, u.suspended_until FROM ji_sessions s JOIN ji_users u ON u.id = s.user_id
               WHERE s.token = ? AND s.seen_at > (NOW() - INTERVAL 60 DAY)", [token_hash($t)]);
     if ($s) {
       if (strtotime($s['seen_at']) < time() - 86400) q("UPDATE ji_sessions SET seen_at = ? WHERE token = ?", [now(), $s['token']]);
@@ -206,6 +209,15 @@ function push_tag($tag, $title, $body, $link) {
 const YUHAK_BASES = ['귀덕', '송당', '평대', '하도', '성읍', '신례', '창천', '흥산', '구좌중앙', '종달', '한동', '대정서', '무릉', '수산'];
 /* 운영자처럼 보이는 닉네임은 일반 회원이 못 씀 */
 function reserved_nick($n) { $k = preg_replace('/\s+/u', '', mb_strtolower($n)); return (bool)preg_match('/제주이음|운영자|관리자|운영진|admin/u', $k); }
+/* 활동정지: 지금 정지 중이면 끝나는 시각, 아니면 null */
+function suspended($u) { $t = $u['suspended_until'] ?? null; return ($t && strtotime($t) > time()) ? $t : null; }
+function suspend_text($t) { return substr($t, 0, 4) === '9999' ? '영구 정지' : date('Y년 n월 j일 H:i', strtotime($t)) . '까지'; }
+/* 글·댓글·쪽지·좋아요 등 '쓰기'는 이걸로 — 정지된 회원은 막음 */
+function active($req) {
+  $u = me($req);
+  if ($t = suspended($u)) fail('활동이 정지된 계정이에요 (' . suspend_text($t) . '). 글·댓글·쪽지 등을 쓸 수 없어요. 문의는 문의·제보로 보내 주세요.', 403);
+  return $u;
+}
 function is_mod($u) { return in_array($u['role'] ?? '', ['admin', 'staff'], true); }   // 글·댓글 관리 가능
 /* 관리자 페이지: 스텝도 들어올 수 있음. $strict 이면 관리자만 (역할 바꾸기 등) */
 function admin($req, $strict = false) {
@@ -277,7 +289,7 @@ function remove_upload($path) {
   @unlink(upload_dir() . '/' . $path);
   q("DELETE FROM ji_uploads WHERE path = ?", [$path]);
 }
-function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user', 'seller_until' => $u['seller_until'] ?? null]; }
+function user_out($u) { return ['id' => $u['id'], 'email' => $u['email'], 'nick' => $u['nick'], 'region' => $u['region'], 'role' => $u['role'] ?? 'user', 'seller_until' => $u['seller_until'] ?? null, 'suspended_until' => suspended($u) ? iso($u['suspended_until']) : null]; }
 /* 판매 게시판: 제주상점은 상점판매자, 특가공구는 공구판매자 — 입점 기간(seller_until)이 지났으면 '쉬는 중' */
 const SELLER_BOARDS = ['제주상점' => 'shop', '특가공구' => 'dealer'];
 function seller_live($role, $until) { return in_array($role, ['admin', 'staff'], true) ? true : ($until === null || $until === '' || $until >= date('Y-m-d')); }

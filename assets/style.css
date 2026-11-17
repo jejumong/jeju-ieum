@@ -2288,3 +2288,11 @@ main.wrap > section > ul.dots a:hover{background:var(--sea-50);color:var(--sea-7
 /* 첫 화면 동네 소식: 글이 없을 때 안내 */
 .hx-list .l-empty a{color:var(--sea-700);font-weight:700}
 .hx-list .l-tag{flex-shrink:0;font-size:11.5px;font-weight:800;color:var(--sea-700);background:var(--sea-50);border-radius:var(--r-pill);padding:3px 9px;margin-right:10px}
+
+/* 활동정지 안내 띠 */
+.susp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;max-width:1200px;margin:10px auto 0;padding:11px 16px;background:#fdecec;border:1px solid #f3c6c2;border-radius:12px;color:#8a1c12;font-size:14px;line-height:1.5}
+.susp-bar b{color:#b42318}
+.susp-bar span{flex:1;min-width:200px}
+.susp-bar a{font-weight:700;color:#b42318;text-decoration:underline;white-space:nowrap}
+@media (max-width:1232px){.susp-bar{margin:10px 16px 0}}
+.cmt-login.susp{background:#fdecec;color:#8a1c12}

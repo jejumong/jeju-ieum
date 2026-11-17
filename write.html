@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261117b">
+<link rel="stylesheet" href="assets/style.css?v=20261117c">
 </head>
 <body data-active="">
 
@@ -181,16 +181,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261117b"></script>
-<script src="assets/common.js?v=20261117b"></script>
-<script src="assets/db.js?v=20261117b"></script>
-<script src="assets/notify.js?v=20261117b"></script>
-<script src="assets/seed-trade.js?v=20261117b"></script>
-<script src="assets/seed-extra.js?v=20261117b"></script>
-<script src="assets/festivals-data.js?v=20261117b"></script>
-<script src="assets/seed-new.js?v=20261117b"></script>
-<script src="assets/seed-comments.js?v=20261117b"></script>
-<script src="assets/admin-data.js?v=20261117b"></script>
+<script src="assets/kmap.js?v=20261117c"></script>
+<script src="assets/common.js?v=20261117c"></script>
+<script src="assets/db.js?v=20261117c"></script>
+<script src="assets/notify.js?v=20261117c"></script>
+<script src="assets/seed-trade.js?v=20261117c"></script>
+<script src="assets/seed-extra.js?v=20261117c"></script>
+<script src="assets/festivals-data.js?v=20261117c"></script>
+<script src="assets/seed-new.js?v=20261117c"></script>
+<script src="assets/seed-comments.js?v=20261117c"></script>
+<script src="assets/admin-data.js?v=20261117c"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -214,6 +214,12 @@ if (!user) {
     if (document.referrer && document.referrer.indexOf(location.origin) === 0 && history.length > 1) history.back();
     else location.replace(_b && COMMUNITY_MOVE.indexOf(_b) > -1 ? "community.html?board=" + encodeURIComponent(_b) : "index.html");
   }
+}
+
+/* 활동정지 중이면 글쓰기 대신 안내하고 돌아가기 */
+if (user && !canWrite()) {
+  if (document.referrer && document.referrer.indexOf(location.origin) === 0 && history.length > 1) history.back(); else location.replace("index.html");
+  user = null;
 }
 
 /* 제한 게시판: 승인된 판매자만 고를 수 있음 (일반 회원은 선택 자체가 안 됨) */

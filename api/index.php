@@ -273,7 +273,7 @@ case 'my_comments': {
 
 /* ───────── 사진 올리기 ───────── */
 case 'upload': {
-  $u = me($R);
+  $u = active($R);
   $n = one("SELECT COUNT(*) n FROM ji_uploads WHERE user_id = ? AND created_at > (NOW() - INTERVAL 10 MINUTE)", [$u['id']])['n'];
   if ($n >= 40 && !is_mod($u)) fail('사진을 너무 많이 올리고 있어요. 잠시 후 다시 해 주세요.', 429);
   $f = $_FILES['file'] ?? null;
@@ -320,7 +320,7 @@ case 'post_get': {
   out(post_out($r));
 }
 case 'post_create': {
-  $u = me($R); $b = str($R['board'] ?? '', 30);
+  $u = active($R); $b = str($R['board'] ?? '', 30);
   if (!in_array($b, $BOARDS, true)) fail('게시판 이름이 올바르지 않아요');
   if (isset(SELLER_BOARDS[$b]) && ($u['role'] ?? '') === SELLER_BOARDS[$b] && !seller_live($u['role'], $u['seller_until'] ?? null)) fail('입점 기간이 끝나 새 글을 올릴 수 없어요. 운영자에게 문의해 주세요.', 403);
   if (!can_write_board($u, $b)) fail($b === '축제정보' ? '축제 정보는 운영자가 확인한 뒤 올려요. 축제 제보로 보내 주세요.' : '승인된 ' . ($b === '제주상점' ? '상점판매자' : '공구판매자') . '만 올릴 수 있어요', 403);
@@ -359,7 +359,7 @@ case 'post_create': {
   out(post_out(one("SELECT p.*, u.role author_role, u.seller_until author_until FROM ji_posts p LEFT JOIN ji_users u ON u.id = p.author WHERE p.id = ?", [$id])));
 }
 case 'post_update': {
-  $u = me($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT * FROM ji_posts WHERE id = ?", [$id]) : null;
+  $u = active($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT * FROM ji_posts WHERE id = ?", [$id]) : null;
   if (!$r) fail('글을 찾을 수 없어요', 404);
   if ($r['author'] !== $u['id'] && !is_mod($u)) fail('내가 쓴 글만 고칠 수 있어요', 403);
   $title = str($R['title'] ?? $r['title'], 120); if ($title === '') fail('제목을 입력해 주세요.');
@@ -422,7 +422,7 @@ case 'comments': {
   out(array_map(function ($c) use ($cnt, $mine) { $o = cmt_out($c); $o['likes'] = $cnt['c:' . $c['id']] ?? 0; $o['liked'] = !empty($mine['c:' . $c['id']]); return $o; }, $rows));
 }
 case 'comment_add': {
-  $u = me($R); $pid = str($R['post_id'] ?? '', 40); $text = str($R['text'] ?? '', 1000);
+  $u = active($R); $pid = str($R['post_id'] ?? '', 40); $text = str($R['text'] ?? '', 1000);
   if ($pid === '' || $text === '') fail('댓글 내용을 입력해 주세요.');
   $recent = one("SELECT COUNT(*) n FROM ji_comments WHERE author = ? AND created_at > (NOW() - INTERVAL 1 MINUTE)", [$u['id']])['n'];
   if ($recent >= 6) fail('댓글을 너무 빨리 달고 있어요. 잠시 후 다시 해 주세요.', 429);
@@ -434,7 +434,7 @@ case 'comment_add': {
   out(cmt_out(one("SELECT * FROM ji_comments WHERE id = ?", [$id])));
 }
 case 'comment_update': {
-  $u = me($R); $text = str($R['text'] ?? '', 1000); if ($text === '') fail('댓글 내용을 입력해 주세요.');
+  $u = active($R); $text = str($R['text'] ?? '', 1000); if ($text === '') fail('댓글 내용을 입력해 주세요.');
   $c = one("SELECT * FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
   if ($c['author'] !== $u['id']) fail('내가 쓴 댓글만 고칠 수 있어요', 403);
   q("UPDATE ji_comments SET text = ?, edited = 1 WHERE id = ?", [$text, $c['id']]);
@@ -453,7 +453,7 @@ case 'join_my': {
   out($j ? join_out($j) : null);
 }
 case 'join_request': {
-  $u = me($R); $c = club_of($R['club_id'] ?? '');
+  $u = active($R); $c = club_of($R['club_id'] ?? '');
   if ($c['author'] === $u['id']) fail('내가 만든 모임이에요');
   if (one("SELECT id FROM ji_club_joins WHERE club_id = ? AND applicant = ?", [$c['id'], $u['id']])) fail('이미 신청한 모임이에요');
   $id = uuid(); $msg = str($R['message'] ?? '', 300);
@@ -496,7 +496,7 @@ case 'notices': {
     all("SELECT * FROM ji_club_notices WHERE club_id = ? ORDER BY created_at DESC LIMIT 50", [$R['club_id']])));
 }
 case 'notice_add': {
-  $u = me($R); $c = club_of($R['club_id'] ?? '');
+  $u = active($R); $c = club_of($R['club_id'] ?? '');
   if ($c['author'] !== $u['id']) fail('모임장만 공지를 남길 수 있어요', 403);
   $body = str($R['body'] ?? '', 1000); if ($body === '') fail('공지 내용을 입력해 주세요.');
   $id = uuid(); q("INSERT INTO ji_club_notices (id, club_id, club_title, owner, body, created_at) VALUES (?,?,?,?,?,?)", [$id, $c['id'], $c['title'], $u['id'], $body, now()]);
@@ -521,7 +521,7 @@ case 'seller_my': {   // 내가 이 게시판에 보낸 가장 최근 승인 요
   out($r ? ['status' => $r['status'], 'date' => substr($r['created_at'], 0, 10)] : null);
 }
 case 'seller_request': {
-  $u = me($R); $b = $R['board'] ?? '';
+  $u = active($R); $b = $R['board'] ?? '';
   if (!in_array($b, ['제주상점', '특가공구'], true)) fail('게시판 이름이 올바르지 않아요');
   $rid = uuid(); $det = is_array($R['details'] ?? null) ? $R['details'] : [];
   q("INSERT INTO ji_seller_requests (id, board, applicant, applicant_nick, details, message, created_at) VALUES (?,?,?,?,?,?,?)",
@@ -537,7 +537,7 @@ case 'seller_request': {
 
 /* ───────── 좋아요 (예시 글에도 누를 수 있게 post_id 는 아무 글 id) ───────── */
 case 'like_toggle': {
-  $u = me($R); $pid = str($R['post_id'] ?? '', 40); if ($pid === '') fail('글을 찾을 수 없어요');
+  $u = active($R); $pid = str($R['post_id'] ?? '', 40); if ($pid === '') fail('글을 찾을 수 없어요');
   $row = one("SELECT active FROM ji_likes WHERE post_id = ? AND user_id = ?", [$pid, $u['id']]);
   if (!$row) {
     q("INSERT INTO ji_likes (post_id, user_id, active, created_at) VALUES (?,?,1,?)", [$pid, $u['id'], now()]);
@@ -725,10 +725,10 @@ case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기
 }
 case 'admin_users': {
   admin($R);
-  out(array_map(function ($u) { $u['created_at'] = iso($u['created_at']); $u['last_login'] = iso($u['last_login']);
+  out(array_map(function ($u) { $u['created_at'] = iso($u['created_at']); $u['last_login'] = iso($u['last_login']); $u['suspended_until'] = iso($u['suspended_until']);
     if (in_array($u['role'], ['shop', 'dealer'], true)) $u['periods'] = (array)setting('sp:' . $u['id'], []);
     return $u; },
-    all("SELECT u.id, u.email, u.nick, u.region, u.role, u.seller_until, u.created_at, u.last_login,
+    all("SELECT u.id, u.email, u.nick, u.region, u.role, u.seller_until, IF(u.suspended_until > NOW(), u.suspended_until, NULL) suspended_until, u.created_at, u.last_login,
          (SELECT COUNT(*) FROM ji_posts p WHERE p.author = u.id) posts,
          (SELECT COUNT(*) FROM ji_comments c WHERE c.author = u.id) comments FROM ji_users u ORDER BY u.created_at DESC LIMIT 1000")));
 }
@@ -801,6 +801,25 @@ case 'admin_user_delete': {   // 관리자만: 회원 탈퇴 처리 (관리자 �
   if ($joined) log_leave($joined, true);
   out(true);
 }
+case 'admin_suspend': {   // 활동정지: p = 7(일주일) · 30(한 달) · perm(영구) · off(해제)
+  $me = admin($R); $id = $R['id'] ?? '';
+  $t = is_uuid($id) ? one("SELECT id, nick, role, suspended_until FROM ji_users WHERE id = ?", [$id]) : null;
+  if (!$t) fail('회원을 찾을 수 없어요', 404);
+  if ($t['id'] === $me['id']) fail('내 계정은 정지할 수 없어요');
+  if (is_mod($t)) fail('관리자·스텝 계정은 정지할 수 없어요', 403);
+  $p = (string)($R['p'] ?? ''); $why = str($R['reason'] ?? '', 200);
+  if ($p === 'off') {
+    q("UPDATE ji_users SET suspended_until = NULL WHERE id = ?", [$id]);
+    notify($id, 'suspend', '활동정지가 풀렸어요', '이제 다시 글·댓글·쪽지를 쓸 수 있어요.', 'profile.html');
+    out(['suspended_until' => null]);
+  }
+  $until = $p === '7' ? date('Y-m-d H:i:s', strtotime('+7 day')) : ($p === '30' ? date('Y-m-d H:i:s', strtotime('+1 month')) : ($p === 'perm' ? '9999-12-31 23:59:59' : null));
+  if (!$until) fail('정지 기간을 골라 주세요');
+  q("UPDATE ji_users SET suspended_until = ? WHERE id = ?", [$until, $id]);
+  notify($id, 'suspend', '활동이 정지됐어요 (' . suspend_text($until) . ')',
+    ($why !== '' ? '사유: ' . $why . ' · ' : '') . '정지 기간에는 글·댓글·쪽지·좋아요를 쓸 수 없어요. 문의는 문의·제보로 보내 주세요.', 'contact.html');
+  out(['suspended_until' => iso($until)]);
+}
 case 'admin_seller_until': {   // 판매자 입점 기간 정하기 (null = 기한 없음)
   admin($R, true); $u = one("SELECT id FROM ji_users WHERE id = ?", [$R['id'] ?? '']); if (!$u) fail('회원을 찾을 수 없어요', 404);
   $d = $R['until'] ?? null; if ($d !== null && $d !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) fail('날짜 형식이 올바르지 않아요');
@@ -845,6 +864,8 @@ case 'msg_send': {
       : one("SELECT id, nick FROM ji_users WHERE nick = ?", [str($R['to_nick'] ?? '', 20)]);
   if (!$to) fail('받는 사람을 찾을 수 없어요. 닉네임을 확인해 주세요.', 404);
   if ($to['id'] === $u['id']) fail('나에게는 보낼 수 없어요');
+  if (($t = suspended($u)) && !is_mod(one("SELECT role FROM ji_users WHERE id = ?", [$to['id']]) ?: []))
+    fail('활동이 정지된 계정이에요 (' . suspend_text($t) . '). 관리자에게만 쪽지를 보낼 수 있어요.', 403);
   $n = one("SELECT COUNT(*) n FROM ji_messages WHERE sender = ? AND created_at > (NOW() - INTERVAL 10 MINUTE)", [$u['id']])['n'];
   if ($n >= 20 && !is_mod($u)) fail('쪽지를 너무 많이 보내고 있어요. 잠시 후 다시 해 주세요.', 429);
   $id = send_msg($u['id'], $u['nick'], $to, $body);

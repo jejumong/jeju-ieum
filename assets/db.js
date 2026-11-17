@@ -35,8 +35,8 @@ var JIDB = (function () {
   function setUser(u) {
     var cur = JI.get(SK, null);
     if (!u) { JI.set(AK, ""); if (cur) { JI.set(SK, null); return true; } return false; }
-    var next = { id: u.id, email: u.email, nick: u.nick, region: u.region || "", role: u.role || "user", seller_until: u.seller_until || null };
-    var changed = !cur || cur.id !== next.id || cur.nick !== next.nick || cur.region !== next.region || cur.role !== next.role || (cur.seller_until || null) !== next.seller_until;
+    var next = { id: u.id, email: u.email, nick: u.nick, region: u.region || "", role: u.role || "user", seller_until: u.seller_until || null, suspended_until: u.suspended_until || null };
+    var changed = !cur || cur.id !== next.id || cur.nick !== next.nick || cur.region !== next.region || cur.role !== next.role || (cur.seller_until || null) !== next.seller_until || (cur.suspended_until || null) !== next.suspended_until;
     if (changed) JI.set(SK, next);
     return changed;
   }

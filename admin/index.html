@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261117b">
+<link rel="stylesheet" href="../assets/style.css?v=20261117c">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -165,6 +165,22 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 table.mem-t td,table.mem-t th{white-space:nowrap;overflow-wrap:normal;word-break:keep-all}
 table.mem-t td small{font-size:13px}
 .mem-cards{display:none}
+.bd.susp{background:#fdecec;color:#b42318}
+.mb.danger-o{color:#b42318;border-color:#f3c6c2}
+.mb.susp-on{background:#fdecec;color:#b42318;border-color:#f3c6c2}
+.mem-t .acts{display:flex;flex-direction:column;gap:4px;align-items:stretch}
+.mem-t .acts .mb{padding:5px 9px;font-size:12.5px;white-space:nowrap;text-align:center}
+.mem-t .bd.susp{display:block;width:max-content;margin-top:4px;font-size:11px}
+.sus-l{display:block;font-weight:700;font-size:13.5px;margin:14px 0 6px}
+.sus-l small{font-weight:600;color:var(--ink-4)}
+#sus-r{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #dfe3ea;border-radius:10px;font:inherit}
+.sus-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sus-o{display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 6px;border:1px solid #f3c6c2;border-radius:12px;background:#fff;cursor:pointer;font:inherit;color:#b42318}
+.sus-o b{font-size:16px}.sus-o small{font-size:11.5px;color:var(--ink-4);text-align:center}
+.sus-o:hover{background:#fdecec}.sus-o.perm{background:#fff5f4}
+.mem-card.susp{border-color:#f3c6c2;background:#fffafa}
+.mc-susp{margin-top:6px}.mc-susp .bd{margin:0}
+.mc-btns{display:flex;gap:6px;flex:none}
 @media (max-width:760px){
   .mem-wrap{display:none}
   .mem-cards{display:flex;flex-direction:column;gap:10px}
@@ -357,18 +373,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261117b"></script>
-<script src="../assets/db.js?v=20261117b"></script>
-<script src="../assets/notify.js?v=20261117b"></script>
-<script src="../assets/seed-trade.js?v=20261117b"></script>
-<script src="../assets/seed-extra.js?v=20261117b"></script>
-<script src="../assets/festivals-data.js?v=20261117b"></script>
-<script src="../assets/seed-new.js?v=20261117b"></script>
-<script src="../assets/seed-comments.js?v=20261117b"></script>
-<script src="../assets/photos.js?v=20261117b"></script>
-<script src="../assets/admin-data.js?v=20261117b"></script>
-<script src="../assets/kmap.js?v=20261117b"></script>
-<script src="../assets/op-posts.js?v=20261117b"></script>
+<script src="../assets/common.js?v=20261117c"></script>
+<script src="../assets/db.js?v=20261117c"></script>
+<script src="../assets/notify.js?v=20261117c"></script>
+<script src="../assets/seed-trade.js?v=20261117c"></script>
+<script src="../assets/seed-extra.js?v=20261117c"></script>
+<script src="../assets/festivals-data.js?v=20261117c"></script>
+<script src="../assets/seed-new.js?v=20261117c"></script>
+<script src="../assets/seed-comments.js?v=20261117c"></script>
+<script src="../assets/photos.js?v=20261117c"></script>
+<script src="../assets/admin-data.js?v=20261117c"></script>
+<script src="../assets/kmap.js?v=20261117c"></script>
+<script src="../assets/op-posts.js?v=20261117c"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1205,12 +1221,12 @@ if (SRV) {
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
             : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>'
           if ((u.role === "shop" || u.role === "dealer") && boss) roleCell += sellerPeriod(u);
-          return '<tr>' + (boss ? bkBox("mem", u.id, u.role === "admin" || (me && u.id === me.id)) : '') + '<td><b>' + esc(u.nick) + '</b></td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td>' +
+          return '<tr>' + (boss ? bkBox("mem", u.id, u.role === "admin" || (me && u.id === me.id)) : '') + '<td><b>' + esc(u.nick) + '</b>' + suspBadge(u) + '</td><td><small>' + esc(u.email) + '</small></td><td>' + esc(u.region) + '</td>' +
             '<td>' + (u.posts ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'posts\')">' + u.posts + '</button>' : '0') + '</td>' +
             '<td>' + (u.comments ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'comments\')">' + u.comments + '</button>' : '0') + '</td>' +
             '<td style="white-space:nowrap">' + esc((u.created_at||"").slice(0,10)) + '</td><td style="white-space:nowrap">' + esc((u.last_login||"").slice(0,10)) + '</td>' +
             '<td>' + roleCell + '</td>' +
-            '<td>' + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</td></tr>';
+            '<td><div class="acts">' + suspBtn(u, me) + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</div></td></tr>';
         }).join("") + '</tbody></table></div>' +
         /* 휴대폰: 회원마다 카드 한 장 */
         '<div class="mem-cards">' + LIST.map(function(u){
@@ -1219,17 +1235,50 @@ if (SRV) {
             : '<select onchange="setRole(\'' + u.id + '\',this.value)">' + Object.keys(R).map(function(k){ return '<option value="' + k + '"' + (u.role===k?" selected":"") + '>' + R[k] + '</option>'; }).join("") + '</select>'
           if ((u.role === "shop" || u.role === "dealer") && boss) roleCell += sellerPeriod(u);
           var ckm = boss && u.role !== "admin" && !(me && u.id === me.id) ? '<input type="checkbox" class="bk mc-ck" data-k="mem" data-id="' + u.id + '"' + (BSEL.mem[u.id] ? ' checked' : '') + '>' : '';
-          return '<div class="mem-card"><div class="mc-top">' + ckm + '<b>' + esc(u.nick) + '</b>' + roleCell + '</div>' +
+          return '<div class="mem-card' + (u.suspended_until ? ' susp' : '') + '"><div class="mc-top">' + ckm + '<b>' + esc(u.nick) + '</b>' + roleCell + '</div>' + (u.suspended_until ? '<div class="mc-susp">' + suspBadge(u) + '</div>' : '') +
             '<div class="mc-mail">' + esc(u.email) + '</div>' +
             '<div class="mc-meta"><span>📍 ' + esc(u.region || "-") + '</span>' +
               '<span>글 ' + (u.posts ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'posts\')">' + u.posts + '</button>' : '0') + '</span>' +
               '<span>댓글 ' + (u.comments ? '<button class="cnt-link" onclick="showActivity(\'' + u.id + '\',\'comments\')">' + u.comments + '</button>' : '0') + '</span></div>' +
             '<div class="mc-foot"><small>가입 ' + esc((u.created_at||"").slice(0,10)) + ' · 최근 ' + esc((u.last_login||"").slice(0,10) || "-") + '</small>' +
-              (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</div></div>';
+              '<span class="mc-btns">' + suspBtn(u, me) + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</span></div></div>';
         }).join("") + '</div>'
         : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>';
 
     paintBulk("mem");
+  };
+  /* ── 활동정지: 일주일 · 한 달 · 영구 ── */
+  function suspTxt(t){ if (!t) return ""; if (t.slice(0, 4) === "9999") return "영구 정지"; var d = new Date(t); return (d.getMonth() + 1) + "." + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + "까지 정지"; }
+  function suspBadge(u){ return u.suspended_until ? ' <span class="bd susp">⛔ ' + suspTxt(u.suspended_until) + '</span>' : ''; }
+  function suspBtn(u, me){
+    if (u.role === "admin" || u.role === "staff" || (me && u.id === me.id)) return "";
+    return '<button class="mb' + (u.suspended_until ? ' susp-on' : ' danger-o') + '" onclick="suspendUser(\'' + u.id + '\')">' + (u.suspended_until ? '정지 해제' : '활동정지') + '</button>';
+  }
+  window.suspendUser = function(id){
+    var u = USERS.filter(function(x){ return x.id === id; })[0]; if (!u) return;
+    var go = function(p){
+      var why = (document.getElementById("sus-r") || {}).value || "";
+      JIDB.call("admin_suspend", { id: id, p: p, reason: why.trim() }).then(function(r){
+        u.suspended_until = r.suspended_until; closeModal();
+        toast(p === "off" ? u.nick + "님의 활동정지를 풀었어요" : u.nick + "님을 " + suspTxt(r.suspended_until).replace(" 정지", "") + " 활동정지했어요"); drawMembers();
+      }, function(e){ alert(e.message); });
+    };
+    window._susGo = go;
+    if (u.suspended_until) {
+      showModal('<h3>' + esc(u.nick) + '님 활동정지 풀기</h3><p class="sub">지금 <b>' + suspTxt(u.suspended_until) + '</b> 상태예요. 풀면 바로 글·댓글·쪽지를 다시 쓸 수 있어요.</p>' +
+        '<div class="sus-opts"><button class="sus-o" onclick="_susGo(\'7\')"><b>일주일</b><small>지금부터 다시 7일</small></button><button class="sus-o" onclick="_susGo(\'30\')"><b>한 달</b><small>지금부터 다시 한 달</small></button><button class="sus-o" onclick="_susGo(\'perm\')"><b>영구</b><small>풀 때까지</small></button></div>' +
+        '<p class="sub" style="margin:4px 0 0">기간을 누르면 지금부터 새로 정해요.</p>' +
+        '<div class="bt"><button class="mb" onclick="closeModal()">닫기</button><button class="mb pri" onclick="_susGo(\'off\')">정지 해제</button></div>');
+      return;
+    }
+    showModal('<h3>' + esc(u.nick) + '님 활동정지</h3>' +
+      '<p class="sub">정지하면 로그인은 되지만 <b>글쓰기·글 수정·댓글·좋아요·쪽지·사진 올리기·동호회 가입 신청</b>을 할 수 없어요. 관리자에게 보내는 쪽지와 문의·제보는 보낼 수 있어요. 회원에게는 정지 알림이 가요.</p>' +
+      '<label class="sus-l">사유 <small>(선택 · 회원에게 알림으로 보여요)</small></label><input id="sus-r" maxlength="200" placeholder="예: 광고 글 반복 게시">' +
+      '<label class="sus-l">기간</label><div class="sus-opts">' +
+        '<button class="sus-o" onclick="_susGo(\'7\')"><b>일주일</b><small>7일 뒤 자동으로 풀려요</small></button>' +
+        '<button class="sus-o" onclick="_susGo(\'30\')"><b>한 달</b><small>한 달 뒤 자동으로 풀려요</small></button>' +
+        '<button class="sus-o perm" onclick="_susGo(\'perm\')"><b>영구</b><small>직접 풀 때까지</small></button></div>' +
+      '<div class="bt"><button class="mb" onclick="closeModal()">취소</button></div>');
   };
   /* 회원이 쓴 글·댓글 목록 */
   window.showActivity = function(uid, kind){
