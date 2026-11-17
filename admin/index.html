@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261117g">
+<link rel="stylesheet" href="../assets/style.css?v=20261117h">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -373,18 +373,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261117g"></script>
-<script src="../assets/db.js?v=20261117g"></script>
-<script src="../assets/notify.js?v=20261117g"></script>
-<script src="../assets/seed-trade.js?v=20261117g"></script>
-<script src="../assets/seed-extra.js?v=20261117g"></script>
-<script src="../assets/festivals-data.js?v=20261117g"></script>
-<script src="../assets/seed-new.js?v=20261117g"></script>
-<script src="../assets/seed-comments.js?v=20261117g"></script>
-<script src="../assets/photos.js?v=20261117g"></script>
-<script src="../assets/admin-data.js?v=20261117g"></script>
-<script src="../assets/kmap.js?v=20261117g"></script>
-<script src="../assets/op-posts.js?v=20261117g"></script>
+<script src="../assets/common.js?v=20261117h"></script>
+<script src="../assets/db.js?v=20261117h"></script>
+<script src="../assets/notify.js?v=20261117h"></script>
+<script src="../assets/seed-trade.js?v=20261117h"></script>
+<script src="../assets/seed-extra.js?v=20261117h"></script>
+<script src="../assets/festivals-data.js?v=20261117h"></script>
+<script src="../assets/seed-new.js?v=20261117h"></script>
+<script src="../assets/seed-comments.js?v=20261117h"></script>
+<script src="../assets/photos.js?v=20261117h"></script>
+<script src="../assets/admin-data.js?v=20261117h"></script>
+<script src="../assets/kmap.js?v=20261117h"></script>
+<script src="../assets/op-posts.js?v=20261117h"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -662,9 +662,22 @@ function bindRowControls(root){
       if (!p) return;
       var cur = inp.dataset.f === "views" ? viewsOf(p) : likesOf(p);
       if (n === cur) return;
-      if (inp.dataset.f === "views") setViews(p, n); else setFields(p, { likes: n });
-      inp.value = n; inp.classList.add("saved"); setTimeout(function(){ inp.classList.remove("saved"); }, 900);
-      toast((inp.dataset.f === "views" ? "조회수" : "좋아요") + "를 " + n.toLocaleString() + "(으)로 바꿨습니다");
+      var f = inp.dataset.f, done = function(){
+        inp.value = n; inp.classList.add("saved"); setTimeout(function(){ inp.classList.remove("saved"); }, 900);
+        toast((f === "views" ? "조회수" : "좋아요") + "를 " + n.toLocaleString() + "(으)로 바꿨습니다");
+      };
+      // 회원 글(서버): 서버에 저장해야 새로고침해도 남음
+      if (p.db && window.JIDB && JIDB.enabled) {
+        var body = { id: p.id }; body[f] = n;
+        JIDB.call("admin_post_counts", body).then(function(r){
+          p.views = r.views; setFields(p, { views: r.views });
+          var lc = _likeCache(); lc.n[p.id] = r.likes; JI.set("dblikes", lc.n);
+          done();
+        }, function(e){ alert("저장하지 못했어요: " + e.message); inp.value = cur; });
+        return;
+      }
+      if (f === "views") setViews(p, n); else setFields(p, { likes: n });
+      done();
     }
     inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { save(); inp.blur(); } });
     inp.addEventListener("change", save);

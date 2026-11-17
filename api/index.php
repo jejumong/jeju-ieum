@@ -28,6 +28,7 @@ function post_out($r) {
 function likes_map() {
   $m = [];
   foreach (all("SELECT post_id, COUNT(*) n FROM ji_likes WHERE active = 1 GROUP BY post_id") as $r) $m[$r['post_id']] = (int)$r['n'];
+  foreach (all("SELECT id, likes_adj FROM ji_posts WHERE likes_adj <> 0") as $r) $m[$r['id']] = max(0, ($m[$r['id']] ?? 0) + (int)$r['likes_adj']);   // 관리자가 정한 수
   return $m ?: new stdClass();
 }
 function cmt_out($c) {
@@ -560,7 +561,8 @@ case 'like_toggle': {
     $liked = !$row['active'];
     q("UPDATE ji_likes SET active = ? WHERE post_id = ? AND user_id = ?", [$liked ? 1 : 0, $pid, $u['id']]);
   }
-  out(['liked' => $liked, 'count' => (int)one("SELECT COUNT(*) n FROM ji_likes WHERE post_id = ? AND active = 1", [$pid])['n']]);
+  $adj = is_uuid($pid) ? (int)(one("SELECT likes_adj FROM ji_posts WHERE id = ?", [$pid])['likes_adj'] ?? 0) : 0;
+  out(['liked' => $liked, 'count' => max(0, (int)one("SELECT COUNT(*) n FROM ji_likes WHERE post_id = ? AND active = 1", [$pid])['n'] + $adj)]);
 }
 
 /* ───────── 문의·신청 (로그인 없이 보낼 수 있음) ───────── */
@@ -764,6 +766,17 @@ case 'admin_alerts_set': {
   foreach (ADMIN_ALERTS as $k => $v) $save[$k] = !empty($in[$k]);
   q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", ['al:' . $u['id'], json_encode($save), now()]);
   out(['prefs' => $save]);
+}
+case 'admin_post_counts': {   // 관리자: 회원 글 조회수·좋아요 수 정하기
+  admin($R); $id = $R['id'] ?? '';
+  $r = is_uuid($id) ? one("SELECT id FROM ji_posts WHERE id = ?", [$id]) : null; if (!$r) fail('글을 찾을 수 없어요', 404);
+  if (isset($R['views'])) q("UPDATE ji_posts SET views = ? WHERE id = ?", [max(0, min(100000000, (int)$R['views'])), $id]);
+  if (isset($R['likes'])) {
+    $real = (int)one("SELECT COUNT(*) n FROM ji_likes WHERE post_id = ? AND active = 1", [$id])['n'];
+    q("UPDATE ji_posts SET likes_adj = ? WHERE id = ?", [max(0, min(100000000, (int)$R['likes'])) - $real, $id]);
+  }
+  $x = one("SELECT views, likes_adj FROM ji_posts WHERE id = ?", [$id]);
+  out(['views' => (int)$x['views'], 'likes' => max(0, (int)one("SELECT COUNT(*) n FROM ji_likes WHERE post_id = ? AND active = 1", [$id])['n'] + (int)$x['likes_adj'])]);
 }
 case 'admin_set': {
   admin($R); $k = $R['k'] ?? '';
