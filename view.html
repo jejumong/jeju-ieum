@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261117e">
+<link rel="stylesheet" href="assets/style.css?v=20261117f">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -77,16 +77,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261117e"></script>
-<script src="assets/common.js?v=20261117e"></script>
-<script src="assets/db.js?v=20261117e"></script>
-<script src="assets/notify.js?v=20261117e"></script>
-<script src="assets/seed-trade.js?v=20261117e"></script>
-<script src="assets/seed-extra.js?v=20261117e"></script>
-<script src="assets/festivals-data.js?v=20261117e"></script>
-<script src="assets/seed-new.js?v=20261117e"></script>
-<script src="assets/seed-comments.js?v=20261117e"></script>
-<script src="assets/admin-data.js?v=20261117e"></script>
+<script src="assets/kmap.js?v=20261117f"></script>
+<script src="assets/common.js?v=20261117f"></script>
+<script src="assets/db.js?v=20261117f"></script>
+<script src="assets/notify.js?v=20261117f"></script>
+<script src="assets/seed-trade.js?v=20261117f"></script>
+<script src="assets/seed-extra.js?v=20261117f"></script>
+<script src="assets/festivals-data.js?v=20261117f"></script>
+<script src="assets/seed-new.js?v=20261117f"></script>
+<script src="assets/seed-comments.js?v=20261117f"></script>
+<script src="assets/admin-data.js?v=20261117f"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -360,8 +360,24 @@ function pvZoom() {
     lb.innerHTML = '<img id="pv-lb-img" alt="">' +
       '<button type="button" class="pv-lb-x" aria-label="닫기">×</button>' +
       '<button type="button" class="pv-lb-nav l" aria-label="이전 사진">‹</button><button type="button" class="pv-lb-nav r" aria-label="다음 사진">›</button>' +
-      '<span class="pv-lb-count" id="pv-lb-count"></span>';
+      '<span class="pv-lb-count" id="pv-lb-count"></span>' +
+      '<button type="button" class="pv-lb-zoom" id="pv-lb-zoom">🔍 원본 크기로 보기</button>';
+    /* 원본 크기에서는 마우스로 끌어서 둘러보기 — 끈 뒤에는 닫히지 않게 */
+    var drag = null, dragged = false;
+    lb.addEventListener("mousedown", function (e) {
+      if (!lb.classList.contains("full") || e.button !== 0 || e.target.closest("button")) return;
+      drag = { x: e.clientX, y: e.clientY, l: lb.scrollLeft, t: lb.scrollTop }; dragged = false; e.preventDefault();
+    });
+    window.addEventListener("mousemove", function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 5) { dragged = true; lb.classList.add("dragging"); }
+      lb.scrollLeft = drag.l - dx; lb.scrollTop = drag.t - dy;
+    });
+    window.addEventListener("mouseup", function () { drag = null; lb.classList.remove("dragging"); });
     lb.addEventListener("click", function (e) {
+      if (dragged) { dragged = false; return; }
+      if (e.target.closest(".pv-lb-zoom")) { e.stopPropagation(); pvZoomFull(!lb.classList.contains("full")); return; }
       var n = e.target.closest(".pv-lb-nav");
       if (n) { e.stopPropagation(); pvGo(n.classList.contains("l") ? -1 : 1); pvZoomPaint(); return; }
       pvZoomClose();
@@ -375,16 +391,31 @@ function pvZoom() {
   }
   pvZoomPaint();
   lb.classList.add("on"); document.documentElement.classList.add("pv-lb-open");
+  setTimeout(pvZoomCheck, 30);
+}
+function pvZoomFull(on) {
+  var lb = document.getElementById("pv-lb"), im = document.getElementById("pv-lb-img"); if (!lb) return;
+  lb.classList.toggle("full", on);
+  document.getElementById("pv-lb-zoom").textContent = on ? "↙ 화면에 맞추기" : "🔍 원본 크기로 보기";
+  if (on) { lb.scrollLeft = (lb.scrollWidth - lb.clientWidth) / 2; lb.scrollTop = 0; } else { lb.scrollLeft = lb.scrollTop = 0; }
+}
+/* 원본이 화면보다 클 때만 '원본 크기' 버튼을 보여 줌 */
+function pvZoomCheck() {
+  var lb = document.getElementById("pv-lb"), im = document.getElementById("pv-lb-img"), z = document.getElementById("pv-lb-zoom"); if (!lb || !im.naturalWidth) return;
+  var r = im.getBoundingClientRect(), big = lb.classList.contains("full") || im.naturalWidth > r.width + 40 || im.naturalHeight > r.height + 40;
+  z.style.display = big ? "" : "none";
 }
 function pvZoomPaint() {
   var im = document.getElementById("pv-lb-img"); if (!im) return;
+  pvZoomFull(false);
+  im.onload = pvZoomCheck;
   im.src = PV_PH[PV_I]; im.alt = "첨부 사진 " + (PV_I + 1) + " 크게 보기";
   var many = PV_PH.length > 1, lb = document.getElementById("pv-lb");
   lb.classList.toggle("many", many);
   document.getElementById("pv-lb-count").textContent = many ? (PV_I + 1) + " / " + PV_PH.length : "";
 }
 function pvZoomClose() {
-  var lb = document.getElementById("pv-lb"); if (lb) lb.classList.remove("on");
+  var lb = document.getElementById("pv-lb"); if (lb) { lb.classList.remove("on"); pvZoomFull(false); }
   document.documentElement.classList.remove("pv-lb-open");
 }
 
