@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 16;
+const JI_SCHEMA = 17;
 
 /* ── 응답 ── */
 function cors() {
@@ -159,6 +159,24 @@ function migrate($pdo) {
   }
   if ($v < 16) {   // 관리자가 정한 좋아요 수 (= 실제 좋아요 + 이 값)
     try { $pdo->exec("ALTER TABLE ji_posts ADD COLUMN likes_adj INT NOT NULL DEFAULT 0"); } catch (Throwable $e) {}
+  }
+  if ($v < 17) {   // 2026-11-17 운영자 요청: 축제정보·커뮤니티 글 조회수 +5~30, 좋아요 +0~3 (한 번만)
+    $pdo->exec("UPDATE ji_posts SET views = views + FLOOR(5 + RAND() * 26), likes_adj = likes_adj + FLOOR(RAND() * 4)
+      WHERE board IN ('축제정보','자유게시판','질문하기','최신뉴스','생활정보','취미·여행','교육','건강웰빙','제주북쪽','제주동쪽','제주서쪽','제주남쪽')");
+    // 사이트 파일에 든 축제정보 글(rf1~rf19)은 관리자 숫자 설정(admin_ov)으로
+    try {
+      $row = $pdo->query("SELECT v FROM ji_settings WHERE k = 'admin_ov'")->fetchColumn();
+      $ov = $row ? (json_decode($row, true) ?: []) : [];
+      $lk = $pdo->prepare("SELECT COUNT(*) FROM ji_likes WHERE post_id = ? AND active = 1");
+      for ($i = 1; $i <= 19; $i++) {
+        $id = 'rf' . $i; $o = isset($ov[$id]) && is_array($ov[$id]) ? $ov[$id] : [];
+        $o['views'] = (int)($o['views'] ?? 0) + random_int(5, 30);
+        if (!isset($o['likes']) || $o['likes'] === '' || $o['likes'] === null) { $lk->execute([$id]); $o['likes'] = (int)$lk->fetchColumn(); }
+        $o['likes'] = (int)$o['likes'] + random_int(0, 3);
+        $ov[$id] = $o;
+      }
+      $pdo->prepare("REPLACE INTO ji_settings (k, v, updated_at) VALUES ('admin_ov', ?, NOW())")->execute([json_encode($ov, JSON_UNESCAPED_UNICODE)]);
+    } catch (Throwable $e) {}
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }
