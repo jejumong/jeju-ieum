@@ -34,7 +34,11 @@ var JINotify = (function () {
           appId: cfg.onesignalAppId,
           serviceWorkerPath: path.replace(/^\//, "") + "OneSignalSDKWorker.js",
           serviceWorkerParam: { scope: path },
-          allowLocalhostAsSecureOrigin: true
+          allowLocalhostAsSecureOrigin: true,
+          // 원시그널 기본 영어 안내창(Subscribe/Later)은 자동으로 띄우지 않음 — 사이트의 한국어 '알림 켜기' 띠로만 물어봄
+          promptOptions: { slidedown: { prompts: [{ type: "push", autoPrompt: false,
+            text: { actionMessage: "쪽지·댓글·좋아요 알림을 이 기기로 받아 보세요. 언제든 끌 수 있어요.", acceptButton: "알림 받기", cancelButton: "나중에" } }] } },
+          notifyButton: { enable: false }
         }).then(function () { resolve(OneSignal); }, function () { resolve(null); });
       });
     });
