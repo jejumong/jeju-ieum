@@ -686,20 +686,38 @@ case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기
       all("SELECT $col k, COUNT(DISTINCT vid) n FROM ji_hits WHERE $W $extra GROUP BY $col ORDER BY n DESC LIMIT $lim", $A));
   };
   $refs = $grp('ref', 30, "AND ref <> ''");
-  $SE = ['네이버', '구글', '다음', '빙', '줌'];
+  // 검색 사이트: 이름으로 기록된 것 + 예전에 사이트 주소 그대로 기록된 것(chatgpt.com 등)을 같은 이름으로 묶음
+  $seName = function ($k) {
+    static $M = [['/^네이버$|naver/u', '네이버'], ['/^구글$/u', '구글'], ['/^다음$|daum/u', '다음'], ['/^빙$|bing\./u', '빙'], ['/^줌$|zum\./u', '줌'],
+      ['/^네이트$|nate\.com/u', '네이트'], ['/^야후$|yahoo\./u', '야후'], ['/^덕덕고$|duckduckgo/u', '덕덕고'], ['/^바이두$|baidu\./u', '바이두'],
+      ['/^에코시아$|ecosia\./u', '에코시아'], ['/^얀덱스$|yandex\./u', '얀덱스'], ['/^ChatGPT$|chatgpt\.com|openai\.com/u', 'ChatGPT'],
+      ['/^퍼플렉시티$|perplexity\./u', '퍼플렉시티'], ['/^제미나이$|gemini\.google/u', '제미나이'], ['/^코파일럿$|copilot\./u', '코파일럿'],
+      ['/(^|\.)google\./u', '구글']];
+    foreach ($M as $m) if (preg_match($m[0], $k)) return $m[1];
+    return null;
+  };
   $SNS = ['카카오', '카카오톡', '인스타그램', '페이스북', '유튜브', '밴드', '스레드', 'X'];
   $groups = ['검색' => 0, 'SNS·메신저' => 0, '직접 방문' => 0, '다른 사이트' => 0];
   foreach ($refs as $r) {
-    $g = in_array($r['k'], $SE) ? '검색' : (in_array($r['k'], $SNS) ? 'SNS·메신저' : ($r['k'] === '직접 방문' ? '직접 방문' : '다른 사이트'));
+    $g = $seName($r['k']) ? '검색' : (in_array($r['k'], $SNS) ? 'SNS·메신저' : ($r['k'] === '직접 방문' ? '직접 방문' : '다른 사이트'));
     $groups[$g] += $r['n'];
   }
-  $in = implode(',', array_fill(0, count($SE), '?'));
-  $search = array_map(function ($r) { return ['k' => $r['k'], 'n' => (int)$r['n'], 'pv' => (int)$r['pv']]; },
-    all("SELECT ref k, COUNT(DISTINCT vid) n, COUNT(*) pv FROM ji_hits WHERE $W AND ref IN ($in) GROUP BY ref ORDER BY n DESC", array_merge($A, $SE)));
+  $S = []; $seRefs = [];
+  foreach (all("SELECT ref k, COUNT(DISTINCT vid) n, COUNT(*) pv FROM ji_hits WHERE $W AND ref <> '' GROUP BY ref", $A) as $r) {
+    $nm = $seName($r['k']); if (!$nm) continue;
+    $seRefs[] = $r['k'];
+    if (!isset($S[$nm])) $S[$nm] = ['k' => $nm, 'n' => 0, 'pv' => 0];
+    $S[$nm]['n'] += (int)$r['n']; $S[$nm]['pv'] += (int)$r['pv'];
+  }
+  $search = array_values($S); usort($search, function ($a, $b) { return $b['n'] - $a['n']; }); $search = array_slice($search, 0, 10);
   $kws = array_map(function ($r) { return ['k' => $r['k'], 'ref' => $r['ref'], 'n' => (int)$r['n']]; },
     all("SELECT kw k, MAX(ref) ref, COUNT(DISTINCT vid) n FROM ji_hits WHERE $W AND kw <> '' GROUP BY kw ORDER BY n DESC LIMIT 20", $A));
-  $land = array_map(function ($r) { return ['path' => $r['path'], 'title' => $r['title'], 'n' => (int)$r['n']]; },
-    all("SELECT path, MAX(title) title, COUNT(DISTINCT vid) n FROM ji_hits WHERE $W AND ref IN ($in) GROUP BY path ORDER BY n DESC LIMIT 10", array_merge($A, $SE)));
+  $land = [];
+  if ($seRefs) {
+    $in = implode(',', array_fill(0, count($seRefs), '?'));
+    $land = array_map(function ($r) { return ['path' => $r['path'], 'title' => $r['title'], 'n' => (int)$r['n']]; },
+      all("SELECT path, MAX(title) title, COUNT(DISTINCT vid) n FROM ji_hits WHERE $W AND ref IN ($in) GROUP BY path ORDER BY n DESC LIMIT 10", array_merge($A, $seRefs)));
+  }
   // 글 순위: 조회(기간 안 방문 기록) · 댓글 · 좋아요
   $title = function ($ids) {
     if (!$ids) return [];

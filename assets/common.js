@@ -719,11 +719,13 @@ document.addEventListener("click", function (e) {
     if (first) {
       var h = "", RQ = null; try { if (document.referrer) { var RU = new URL(document.referrer); h = RU.hostname.replace(/^www\.|^m\./, ""); RQ = RU.searchParams; } } catch (e) {}
       var P = new URLSearchParams(location.search);
-      if (RQ && /naver|google|daum|bing|zum|yahoo/.test(h)) kw = RQ.get("query") || RQ.get("q") || RQ.get("p") || "";
+      if (RQ && /naver|google|daum|bing|zum|yahoo|nate|duckduckgo|ecosia|baidu|yandex/.test(h)) kw = RQ.get("query") || RQ.get("q") || RQ.get("p") || RQ.get("wd") || RQ.get("text") || "";
       kw = P.get("utm_term") || kw;
       if (!h && /카카오톡|인스타그램|페이스북/.test(br)) h = br;
       ref = P.get("utm_source") || (!h ? "직접 방문" : /^(카카오톡|인스타그램|페이스북)$/.test(h) ? h : h.indexOf("jejuieum") > -1 || h === location.hostname ? "" :
-        /naver/.test(h) ? "네이버" : /google/.test(h) ? "구글" : /daum/.test(h) ? "다음" : /kakao/.test(h) ? "카카오" : /zum/.test(h) ? "줌" :
+        /naver/.test(h) ? "네이버" : /gemini\.google/.test(h) ? "제미나이" : /google/.test(h) ? "구글" :
+        /chatgpt|openai/.test(h) ? "ChatGPT" : /perplexity/.test(h) ? "퍼플렉시티" : /copilot/.test(h) ? "코파일럿" : /nate\.com/.test(h) ? "네이트" :
+        /yahoo/.test(h) ? "야후" : /duckduckgo/.test(h) ? "덕덕고" : /ecosia/.test(h) ? "에코시아" : /baidu/.test(h) ? "바이두" : /yandex/.test(h) ? "얀덱스" : /daum/.test(h) ? "다음" : /kakao/.test(h) ? "카카오" : /zum/.test(h) ? "줌" :
         /instagram/.test(h) ? "인스타그램" : /facebook|fb\./.test(h) ? "페이스북" : /youtube|youtu\.be/.test(h) ? "유튜브" :
         /band\.us/.test(h) ? "밴드" : /bing/.test(h) ? "빙" : /threads/.test(h) ? "스레드" : h);
     }
