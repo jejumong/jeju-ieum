@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261119b">
+<link rel="stylesheet" href="assets/style.css?v=20261119c">
 <style>
 .sr-posts{background:var(--card,#fff);border:1px solid var(--line,#e5e9f0);border-radius:var(--r,14px);padding:6px 4px;margin:0 0 18px}
 .sr-h{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px;font-size:15px}
@@ -52,15 +52,15 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261119b"></script>
-<script src="assets/db.js?v=20261119b"></script>
-<script src="assets/notify.js?v=20261119b"></script>
-<script src="assets/seed-trade.js?v=20261119b"></script>
-<script src="assets/seed-extra.js?v=20261119b"></script>
-<script src="assets/festivals-data.js?v=20261119b"></script>
-<script src="assets/seed-new.js?v=20261119b"></script>
-<script src="assets/admin-data.js?v=20261119b"></script>
-<script src="assets/guide-data.js?v=20261119b"></script>
+<script src="assets/common.js?v=20261119c"></script>
+<script src="assets/db.js?v=20261119c"></script>
+<script src="assets/notify.js?v=20261119c"></script>
+<script src="assets/seed-trade.js?v=20261119c"></script>
+<script src="assets/seed-extra.js?v=20261119c"></script>
+<script src="assets/festivals-data.js?v=20261119c"></script>
+<script src="assets/seed-new.js?v=20261119c"></script>
+<script src="assets/admin-data.js?v=20261119c"></script>
+<script src="assets/guide-data.js?v=20261119c"></script>
 <script>
 (function(){
   var P = new URLSearchParams(location.search);
@@ -110,7 +110,7 @@
         return ((p.title||"") + " " + (p.content||"") + " " + (p.board||"")).toLowerCase().indexOf(ql) > -1;
       }).sort(function(a, b){ return (a.date||"") < (b.date||"") ? 1 : -1; });
       var ns = (typeof noticesFor === "function" ? noticesFor(null) : []).filter(function(n){ return ((n.title||"") + " " + (n.content||"")).toLowerCase().indexOf(ql) > -1; });
-      hits = ns.concat(hits);
+      hits = ns.concat(hits); postHits = hits.length;
       $("search-note").innerHTML = hits.length
         ? '<section class="sr-posts"><div class="sr-h"><b>커뮤니티·생활장터 글 ' + hits.length + '건</b>' +
             (hits.length > 6 ? '<a href="community.html?q=' + encodeURIComponent(q) + '">전체 보기 →</a>' : '') + '</div>' +
@@ -120,7 +120,10 @@
             }).join("") + '</section>'
         : '<div class="search-note">커뮤니티·생활장터에는 ‘' + esc(q) + '’ 관련 글이 아직 없어요.</div>';
     };
+    var postHits = 0;
     drawPosts();
+    // 관리자 방문 통계의 '사이트 안 검색어'에 남김 (서버 글이 도착할 시간을 조금 기다린 뒤, 결과 수와 함께)
+    setTimeout(function(){ if (window.logSiteSearch) logSiteSearch(q, list.length + postHits); }, 2500);
     var prevOnData = window.onJIData;
     window.onJIData = function(){ if (typeof prevOnData === "function") prevOnData.apply(this, arguments); drawPosts(); };
   }

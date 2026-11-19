@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261119b">
+<link rel="stylesheet" href="assets/style.css?v=20261119c">
 </head>
 <body data-active="home">
 
@@ -118,19 +118,19 @@
   </section>
 </main>
 
-<script src="assets/common.js?v=20261119b"></script>
-<script src="assets/db.js?v=20261119b"></script>
-<script src="assets/notify.js?v=20261119b"></script>
-<script src="assets/seed-trade.js?v=20261119b"></script>
-<script src="assets/seed-extra.js?v=20261119b"></script>
-<script src="assets/festivals-data.js?v=20261119b"></script>
-<script src="assets/seed-new.js?v=20261119b"></script>
-<script src="assets/seed-comments.js?v=20261119b"></script>
-<script src="assets/admin-data.js?v=20261119b"></script>
-<script src="assets/guide-data.js?v=20261119b"></script>
-<script src="assets/programs-data.js?v=20261119b"></script>
-<script src="assets/school-housing-data.js?v=20261119b"></script>
-<script src="assets/jangnal-data.js?v=20261119b"></script>
+<script src="assets/common.js?v=20261119c"></script>
+<script src="assets/db.js?v=20261119c"></script>
+<script src="assets/notify.js?v=20261119c"></script>
+<script src="assets/seed-trade.js?v=20261119c"></script>
+<script src="assets/seed-extra.js?v=20261119c"></script>
+<script src="assets/festivals-data.js?v=20261119c"></script>
+<script src="assets/seed-new.js?v=20261119c"></script>
+<script src="assets/seed-comments.js?v=20261119c"></script>
+<script src="assets/admin-data.js?v=20261119c"></script>
+<script src="assets/guide-data.js?v=20261119c"></script>
+<script src="assets/programs-data.js?v=20261119c"></script>
+<script src="assets/school-housing-data.js?v=20261119c"></script>
+<script src="assets/jangnal-data.js?v=20261119c"></script>
 <script>
 (function(){ var n = noticesFor(null)[0]; if (n) document.getElementById("home-notice").innerHTML = noticeStripHtml(n); })();
 
@@ -161,6 +161,7 @@
     return '<li><a href="stay.html#programs-top"><span class="pst ' + st[1] + '">' + st[0] + '</span><span class="l-t">' + esc(p.name) + '</span></a></li>';
   }).join("");
 
+  var m = new Date().getMonth() + 1, note = MONTH_NOTES[m] || { t: "", items: [] };   // 휴대폰 첫 화면 '이번 달의 제주' 줄에서 씀
   // 오른쪽 칸: 새로고침할 때마다 다른 게시판을 골라 최근 글 5개 (글이 있는 게시판만, 바로 전에 본 것은 피함)
   (function(){
     var all = allPosts();

@@ -736,6 +736,23 @@ document.addEventListener("click", function (e) {
     setTimeout(function () {
       fetch(api.replace(/\/?$/, "/") + "?a=hit", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: body, keepalive: true }).catch(function () {});
     }, 600);
+    // 머문 시간: 화면이 보이는 동안만 세고, 페이지를 떠나거나 다른 앱으로 갈 때 서버에 알림 (최대 30분)
+    var shown = 0, since = document.visibilityState === "visible" ? Date.now() : 0, lastSent = 0;
+    var apiBase = api.replace(/\/?$/, "/");
+    var sendDur = function () {
+      if (since) { shown += Date.now() - since; since = 0; }
+      var sec = Math.round(shown / 1000); if (sec < 1 || sec === lastSent) return; lastSent = sec;
+      var b = JSON.stringify({ vid: vid, path: path.slice(0, 120), sec: sec });
+      try { if (!(navigator.sendBeacon && navigator.sendBeacon(apiBase + "?a=hit_dur", new Blob([b], { type: "text/plain;charset=UTF-8" }))))
+        fetch(apiBase + "?a=hit_dur", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: b, keepalive: true }).catch(function () {}); } catch (e) {}
+    };
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") sendDur(); else if (!since) since = Date.now(); });
+    window.addEventListener("pagehide", sendDur);
+    // 사이트 안 검색어 기록 (검색 화면에서 부름)
+    window.logSiteSearch = function (q, n) {
+      q = String(q || "").trim(); if (!q) return;
+      fetch(apiBase + "?a=search_log", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify({ vid: vid, q: q.slice(0, 60), n: n || 0 }), keepalive: true }).catch(function () {});
+    };
   } catch (e) {}
 })();
 

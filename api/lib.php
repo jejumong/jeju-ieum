@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 17;
+const JI_SCHEMA = 18;
 
 /* ── 응답 ── */
 function cors() {
@@ -178,6 +178,24 @@ function migrate($pdo) {
       $pdo->prepare("REPLACE INTO ji_settings (k, v, updated_at) VALUES ('admin_ov', ?, NOW())")->execute([json_encode($ov, JSON_UNESCAPED_UNICODE)]);
     } catch (Throwable $e) {}
   }
+  if ($v < 18) {   // 신고 · 활동정지 기록 · 사이트 안 검색어 · 머문 시간 · 예약 게시
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ji_reports (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY, kind VARCHAR(10) NOT NULL, target_id VARCHAR(64) NOT NULL, post_id VARCHAR(64) NOT NULL DEFAULT '',
+      reason VARCHAR(30) NOT NULL, detail VARCHAR(300) NOT NULL DEFAULT '', reporter VARCHAR(36) NOT NULL, reporter_nick VARCHAR(40) NOT NULL DEFAULT '',
+      target_author VARCHAR(36) NOT NULL DEFAULT '', target_nick VARCHAR(40) NOT NULL DEFAULT '', snippet VARCHAR(200) NOT NULL DEFAULT '',
+      status VARCHAR(10) NOT NULL DEFAULT 'new', created_at DATETIME NOT NULL, handled_at DATETIME NULL, handled_by VARCHAR(40) NULL,
+      UNIQUE KEY one_per (kind, target_id, reporter), INDEX (status), INDEX (target_id))$T");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ji_suspend_log (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id VARCHAR(36) NOT NULL, nick VARCHAR(40) NOT NULL DEFAULT '', action VARCHAR(10) NOT NULL,
+      until_at DATETIME NULL, reason VARCHAR(200) NOT NULL DEFAULT '', by_nick VARCHAR(40) NOT NULL DEFAULT '', at DATETIME NOT NULL, INDEX (user_id), INDEX (at))$T");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ji_searches (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY, at DATETIME NOT NULL, q VARCHAR(60) NOT NULL, n INT NOT NULL DEFAULT 0, vid CHAR(16) NOT NULL DEFAULT '', INDEX (at))$T");
+    try { $pdo->exec("ALTER TABLE ji_hits ADD COLUMN dur INT NULL"); } catch (Throwable $e) {}
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ji_scheduled (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY, op_k VARCHAR(60) NOT NULL DEFAULT '', board VARCHAR(30) NOT NULL, head VARCHAR(30) NOT NULL DEFAULT '',
+      title VARCHAR(120) NOT NULL, content MEDIUMTEXT, at DATETIME NOT NULL, by_id VARCHAR(36) NOT NULL, status VARCHAR(10) NOT NULL DEFAULT 'wait',
+      post_id VARCHAR(36) NULL, created_at DATETIME NOT NULL, INDEX (status, at))$T");
+  }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }
 
@@ -265,6 +283,7 @@ const ADMIN_ALERTS = [
   'comment' => ['💬 새 댓글', false],
   'inquiry' => ['📮 새 문의·제보', true],
   'seller'  => ['🏪 입점·공구 승인 요청', true],
+  'report'  => ['🚨 게시글·댓글 신고', true],
 ];
 function admin_alert_prefs($uid) {
   $saved = setting('al:' . $uid, []); $out = [];
@@ -277,6 +296,24 @@ function alert_admins($ev, $title, $body, $link, $except = null, $pushTitle = nu
     if (!(admin_alert_prefs($ad['id'])[$ev] ?? false)) continue;
     notify($ad['id'], 'admin_' . $ev, $title, $body, $link, $pushTitle ?? ('제주이음 · ' . $title), $pushBody ?? $body);
   }
+}
+/* 예약 게시: 때가 된 운영자 글을 예약한 관리자 이름으로 올림 (요청이 들어올 때마다 가볍게 확인) */
+function publish_due() {
+  try {
+    $rows = all("SELECT * FROM ji_scheduled WHERE status = 'wait' AND at <= NOW() ORDER BY at LIMIT 3");
+    foreach ($rows as $r) {
+      q("UPDATE ji_scheduled SET status = 'busy' WHERE id = ? AND status = 'wait'", [$r['id']]);   // 동시에 두 번 올리지 않게
+      $u = one("SELECT id, nick FROM ji_users WHERE id = ?", [$r['by_id']]);
+      if (!$u) { q("UPDATE ji_scheduled SET status = 'fail' WHERE id = ?", [$r['id']]); continue; }
+      $id = uuid(); $t = now();
+      q("INSERT INTO ji_posts (id, board, head, title, content, loc, meta, price, extra, author, author_nick, created_at, updated_at) VALUES (?,?,?,?,?,'','','',?,?,?,?,?)",
+        [$id, $r['board'], $r['head'], $r['title'], $r['content'], json_encode($r['op_k'] !== '' ? ['op' => $r['op_k']] : new stdClass(), JSON_UNESCAPED_UNICODE), $u['id'], $u['nick'], $t, $t]);
+      q("UPDATE ji_scheduled SET status = 'done', post_id = ? WHERE id = ?", [$id, $r['id']]);
+    }
+  } catch (Throwable $e) {}
+}
+function log_suspend($uid, $nick, $action, $until, $reason, $by) {
+  try { q("INSERT INTO ji_suspend_log (user_id, nick, action, until_at, reason, by_nick, at) VALUES (?,?,?,?,?,?,?)", [$uid, $nick, $action, $until, $reason, $by, now()]); } catch (Throwable $e) {}
 }
 function log_leave($joined, $byAdmin) {
   try { q("INSERT INTO ji_leaves (left_at, joined_at, by_admin) VALUES (?,?,?)", [now(), $joined ?: null, $byAdmin ? 1 : 0]); } catch (Throwable $e) {}

@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261119b">
+<link rel="stylesheet" href="../assets/style.css?v=20261119c">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -202,6 +202,25 @@ table.mem-t td small{font-size:13px}
 .op-bar label{font-size:14px;font-weight:600;display:flex;gap:6px;align-items:center}
 .op-row{display:flex;gap:12px;align-items:center;padding:12px 4px;border-top:1px solid var(--line-2,#eef1f4)}
 .op-tabs{display:flex;gap:6px;margin:4px 0 12px}
+.rep-card{border:1px solid #eef1f5;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.tm-cmp{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.tm-cmp div{background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--ink-3);font-weight:600}
+.tm-cmp b{display:block;font-size:19px;color:var(--ink);margin:3px 0 2px}
+.tm-cmp small{font-size:12px;color:var(--ink-4)}.tm-cmp small.up{color:#1a7f37}.tm-cmp small.down{color:#b42318}
+.tm-dl{margin-left:auto}
+small.zero{color:#b42318;font-weight:700}
+.eng-t td:nth-child(n+2),.eng-t th:nth-child(n+2){text-align:right;white-space:nowrap}.eng-t span.hi{color:#b42318;font-weight:700}
+@media (max-width:760px){.tm-cmp{grid-template-columns:repeat(2,1fr)}.tm-dl{margin-left:0}}
+.rep-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.rep-top .bd{margin:0}
+.rep-n{margin-left:auto;font-size:12.5px;color:var(--ink-4)}
+.rep-snip{margin:10px 0 6px;padding:10px 12px;background:#f8fafc;border-radius:10px;font-size:14px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.rep-meta{font-size:13px;color:var(--ink-3);margin:4px 0}
+.rep-who{font-size:13px;margin:6px 0}.rep-who summary{cursor:pointer;color:#1e6fd9;font-weight:700}.rep-who ul{margin:6px 0 0;padding-left:18px}.rep-who li{margin:4px 0}.rep-who li span{color:var(--ink-3)}
+.rep-card .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.mem-tools{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 8px}
+.sl-h{margin:18px 0 6px;font-size:14px}
+.sl-list{list-style:none;margin:0;padding:0;font-size:13.5px}.sl-list li{padding:8px 2px;border-bottom:1px solid #f0f2f5;line-height:1.6}
+.sl-at{color:var(--ink-4);margin-right:8px;font-size:12.5px}.sl-r{color:var(--ink-2)}
 button.op-main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:none;border:0;padding:2px 0;font:inherit;color:inherit;cursor:pointer}
 button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .op-peek{font-size:12px;font-weight:700;color:#1e6fd9;margin-top:2px}
@@ -212,6 +231,10 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .op-tabs button{padding:9px 16px;border:1px solid #dfe3ea;border-radius:999px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer}
 .op-tabs button b{margin-left:4px;color:var(--ink-4);font-weight:700}
 .op-tabs button.on{background:#0e2440;border-color:#0e2440;color:#fff}.op-tabs button.on b{color:#ffc27a}
+.op-bar-b{display:flex;gap:6px;flex-wrap:wrap}
+.op-ok.sch{background:#fff4e5;color:#c2410c}.sch-at{color:#c2410c}
+.sch-in{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #dfe3ea;border-radius:10px;font:inherit}
+.sch-prev{margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:10px;font-size:13px;line-height:1.8;color:var(--ink-2);max-height:180px;overflow:auto}
 .op-ok{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#e6f4ea;color:#1a7f37;font-size:12px;font-weight:800}
 .op-chk{flex:none}.op-chk input{width:18px;height:18px}
 .op-main{flex:1;min-width:0}.op-main small{display:block;color:var(--ink-4,#8a96a3);font-size:12px;font-weight:700}
@@ -384,18 +407,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261119b"></script>
-<script src="../assets/db.js?v=20261119b"></script>
-<script src="../assets/notify.js?v=20261119b"></script>
-<script src="../assets/seed-trade.js?v=20261119b"></script>
-<script src="../assets/seed-extra.js?v=20261119b"></script>
-<script src="../assets/festivals-data.js?v=20261119b"></script>
-<script src="../assets/seed-new.js?v=20261119b"></script>
-<script src="../assets/seed-comments.js?v=20261119b"></script>
-<script src="../assets/photos.js?v=20261119b"></script>
-<script src="../assets/admin-data.js?v=20261119b"></script>
-<script src="../assets/kmap.js?v=20261119b"></script>
-<script src="../assets/op-posts.js?v=20261119b"></script>
+<script src="../assets/common.js?v=20261119c"></script>
+<script src="../assets/db.js?v=20261119c"></script>
+<script src="../assets/notify.js?v=20261119c"></script>
+<script src="../assets/seed-trade.js?v=20261119c"></script>
+<script src="../assets/seed-extra.js?v=20261119c"></script>
+<script src="../assets/festivals-data.js?v=20261119c"></script>
+<script src="../assets/seed-new.js?v=20261119c"></script>
+<script src="../assets/seed-comments.js?v=20261119c"></script>
+<script src="../assets/photos.js?v=20261119c"></script>
+<script src="../assets/admin-data.js?v=20261119c"></script>
+<script src="../assets/kmap.js?v=20261119c"></script>
+<script src="../assets/op-posts.js?v=20261119c"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -492,7 +515,7 @@ function boot(){
       '<a class="brand" href="index.html#dash" onclick="return goHome()" title="대시보드로 (새로고침)">' + LOGOMARK + '<div>제주이음<small>ADMIN CONSOLE</small></div></a>' +
       '<nav>' + MENU.map(function(m){
         return '<button data-v="' + m[0] + '" class="' + (view===m[0]?"on":"") + '" onclick="go(\'' + m[0] + '\')">' + m[1] +
-          (m[0]==="sellers" && pending ? '<span class="cnt">' + pending + '</span>' : '') + (m[0]==="inquiries" && newIq() ? '<span class="cnt">' + newIq() + '</span>' : '') + '</button>';
+          (m[0]==="sellers" && pending ? '<span class="cnt">' + pending + '</span>' : '') + (m[0]==="inquiries" && newIq() ? '<span class="cnt">' + newIq() + '</span>' : '') + (m[0]==="reports" && newRep() ? '<span class="cnt">' + newRep() + '</span>' : '') + '</button>';
       }).join("") + '</nav>' +
       '<div class="foot"><a href="' + SITE + 'index.html" target="_blank">사이트 열기 ↗</a><button onclick="logoutAdmin()">로그아웃</button></div>' +
     '</aside><main class="main" id="main"></main></div>';
@@ -517,6 +540,7 @@ var AL_HELP = { signup: "누군가 회원가입하면", leave: "회원이 탈퇴
      실제 운영 전에 Formspree·구글 폼 같은 수신 주소를 assets/common.js 의 SITE_CFG 에 넣어 주세요. */
 var IQ_ST = { "new": "새 신청", "seen": "확인함", "contacted": "연락함", "done": "완료" };
 function newIq(){ return JI.get("inquiries", []).filter(function(q){ return q.status === "new"; }).length; }
+function newRep(){ return (typeof STATS !== "undefined" && STATS && STATS.reports_new) || 0; }
 function drawInquiries(){
   var list = JI.get("inquiries", []).slice().reverse();
   var warn = (SRV || (typeof SITE_CFG !== "undefined" && SITE_CFG.inquiryEndpoint)) ? "" :
@@ -1111,35 +1135,46 @@ if (SRV) {
   /* 회원 관리 (서버 모드에서만) */
   MENU.splice(MENU.length - 1, 1, ["opposts", "운영자 글"], ["members", "회원 관리"], ["alerts", "알림 설정"], ["account", "관리자 정보 수정"]);
   MENU.splice(1, 0, ["traffic", "방문 통계"]);
+  MENU.splice(MENU.findIndex(function(m){ return m[0] === "inquiries"; }) + 1, 0, ["reports", "신고"]);
   var _draw = draw;
-  draw = function(){ if (view === "account") return drawAccount(); if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "settings") view = "members"; return _draw(); };
+  draw = function(){ if (view === "account") return drawAccount(); if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "reports") return drawReports(); if (view === "settings") view = "members"; return _draw(); };
 
   /* 운영자 글: assets/op-posts.js 초안을 골라 내 계정으로 올림 (이미 올린 글은 표시) */
   window.drawOpPosts = function(){
     var L = window.OP_POSTS || [];
     var TAB = window.OP_TAB || "todo";   // todo = 안 올린 글, done = 올린 글
     M().innerHTML = '<h1>운영자 글</h1><p class="sub">미리 준비한 정보 글 ' + L.length + '개예요. 올릴 글을 고르면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 게시판에 올라가요. 올린 뒤에도 글 화면에서 고치거나 지울 수 있어요.</p>' +
-      '<div class="op-tabs" id="op-tabs"><button data-t="todo">안 올린 글</button><button data-t="done">올린 글</button></div>' +
-      '<div class="panel"><div class="op-bar" id="op-bar"><label><input type="checkbox" id="op-all"> 안 올린 글 모두 고르기</label><button class="btn accent" id="op-go" disabled>고른 글 올리기</button></div><div id="op-list">확인하는 중…</div></div>';
+      '<div class="op-tabs" id="op-tabs"><button data-t="todo">안 올린 글</button><button data-t="sched">예약</button><button data-t="done">올린 글</button></div>' +
+      '<div class="panel"><div class="op-bar" id="op-bar"><label><input type="checkbox" id="op-all"> 안 올린 글 모두 고르기</label><span class="op-bar-b"><button class="btn" id="op-sch" disabled>⏰ 예약해서 올리기</button><button class="btn accent" id="op-go" disabled>고른 글 지금 올리기</button></span></div><div id="op-list">확인하는 중…</div></div>';
     var boards = [].concat.apply([], MOVE_BOARDS.map(function(g){ return g[1]; }));   // 게시판을 옮긴 글도 '올림'으로 잡히게 전체 게시판 확인
-    Promise.all(boards.map(function(b){ return JIDB.call("post_list", { board: b }).catch(function(){ return []; }); })).then(function(rs){
+    Promise.all(boards.map(function(b){ return JIDB.call("post_list", { board: b }).catch(function(){ return []; }); })
+      .concat([JIDB.call("admin_sched_list").catch(function(){ return []; })])).then(function(rs){
+      var SCH = {}, schRows = rs.pop() || [];
+      schRows.forEach(function(x){ if (x.op_k && x.status !== "done") SCH[x.op_k] = x; });
       var done = {};
       rs.forEach(function(arr){ (arr || []).forEach(function(p){ if (p.extra && p.extra.op) done[p.extra.op] = p.id; }); });
-      var IDX = { todo: [], done: [] };
-      L.forEach(function(p, i){ IDX[done[p.k] ? "done" : "todo"].push(i); });
+      schRows.forEach(function(x){ if (x.op_k && x.status === "done" && x.post_id && !done[x.op_k]) done[x.op_k] = x.post_id; });
+      var IDX = { todo: [], sched: [], done: [] };
+      L.forEach(function(p, i){ IDX[done[p.k] ? "done" : SCH[p.k] ? "sched" : "todo"].push(i); });
+      IDX.sched.sort(function(a, b){ return SCH[L[a].k].at < SCH[L[b].k].at ? -1 : 1; });
       var box = document.getElementById("op-list"), PER = 15, pg = 0, SEL = {};
       var go = document.getElementById("op-go"), all = document.getElementById("op-all"), tabs = document.getElementById("op-tabs");
-      function sync(){ var n = Object.keys(SEL).length; go.disabled = !n; go.textContent = n ? "고른 글 " + n + "개 올리기" : "고른 글 올리기"; }
+      var sch = document.getElementById("op-sch");
+      function sync(){ var n = Object.keys(SEL).length; go.disabled = sch.disabled = !n; go.textContent = n ? "고른 글 " + n + "개 지금 올리기" : "고른 글 지금 올리기"; sch.textContent = n ? "⏰ " + n + "개 예약해서 올리기" : "⏰ 예약해서 올리기"; }
+      var schTxt = function(at){ var d = new Date(at); return (d.getMonth() + 1) + "." + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); };
       function paintTabs(){
-        tabs.querySelectorAll("button").forEach(function(b){ var t = b.dataset.t; b.classList.toggle("on", t === TAB); b.innerHTML = (t === "todo" ? "안 올린 글" : "올린 글") + ' <b>' + IDX[t].length + '</b>'; });
+        tabs.querySelectorAll("button").forEach(function(b){ var t = b.dataset.t; b.classList.toggle("on", t === TAB); b.innerHTML = ({ todo: "안 올린 글", sched: "예약", done: "올린 글" })[t] + ' <b>' + IDX[t].length + '</b>'; });
         document.getElementById("op-bar").style.display = TAB === "todo" && IDX.todo.length ? "" : "none";
       }
       function paint(){
         paintTabs();
         var list = IDX[TAB], pages = Math.ceil(list.length / PER) || 1; pg = Math.min(pg, pages - 1);
-        if (!list.length) { box.innerHTML = '<div class="empty">' + (TAB === "todo" ? "준비한 글을 모두 올렸어요." : "아직 올린 글이 없어요.") + '</div>'; return; }
+        if (!list.length) { box.innerHTML = '<div class="empty">' + ({ todo: "준비한 글을 모두 올렸거나 예약했어요.", sched: "예약한 글이 없어요. '안 올린 글'에서 골라 예약할 수 있어요.", done: "아직 올린 글이 없어요." })[TAB] + '</div>'; return; }
         box.innerHTML = list.slice(pg * PER, pg * PER + PER).map(function(i){
-          var p = L[i], d = done[p.k];
+          var p = L[i], d = done[p.k], sc = SCH[p.k];
+          if (sc) return '<div class="op-row"><label class="op-chk"><span class="op-ok sch">⏰</span></label>' +
+            '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(p.board) + ' · <b class="sch-at">' + schTxt(sc.at) + (sc.status === "fail" ? ' 실패' : ' 예약') + '</b>' + (sc.by_nick ? ' · ' + esc(sc.by_nick) : '') + '</small><b>' + esc(p.title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
+            '<button class="mb danger-o" onclick="opSchCancel(' + sc.id + ')">예약 취소</button></div>';
           return '<div class="op-row"><label class="op-chk">' + (d ? '<span class="op-ok">✓</span>' : '<input type="checkbox" class="op-c" data-i="' + i + '"' + (SEL[i] ? ' checked' : '') + '>') + '</label>' +
             '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + '</small><b>' + esc(p.title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
             (d ? '<a class="mb" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '') + '</div>';
@@ -1166,6 +1201,32 @@ if (SRV) {
       tabs.onclick = function(e){ var b = e.target.closest("button"); if (!b || b.dataset.t === TAB) return; TAB = window.OP_TAB = b.dataset.t; pg = 0; paint(); };
       box.onchange = function(e){ var c = e.target; if (!c.classList.contains("op-c")) return; if (c.checked) SEL[c.dataset.i] = 1; else delete SEL[c.dataset.i]; sync(); };
       all.onchange = function(){ SEL = {}; if (all.checked) IDX.todo.forEach(function(i){ SEL[i] = 1; }); paint(); sync(); };   // 모든 페이지의 안 올린 글
+      window.opSchCancel = function(sid){ if (!confirm("이 예약을 취소할까요? 글은 '안 올린 글'로 돌아가요.")) return; JIDB.call("admin_sched_cancel", { id: sid }).then(function(){ toast("예약을 취소했어요"); drawOpPosts(); }, function(e){ alert(e.message); }); };
+      sch.onclick = function(){
+        var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return L[i]; });   // 목록 위쪽 글부터 먼저
+        if (!pick.length) return;
+        var t = new Date(); t.setDate(t.getDate() + 1); t.setHours(9, 0, 0, 0);
+        var loc = function(d){ return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); };
+        showModal('<h3>운영자 글 ' + pick.length + '개 예약</h3><p class="sub">정한 시간이 되면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 차례로 올라가요. 목록 위쪽 글부터 먼저 올라가요.</p>' +
+          '<label class="sus-l">첫 글 올릴 때</label><input type="datetime-local" id="sch-at" class="sch-in" value="' + loc(t) + '">' +
+          '<label class="sus-l">간격</label><select id="sch-gap" class="sch-in"><option value="1">하루에 1개씩</option><option value="2">이틀에 1개씩</option><option value="3">사흘에 1개씩</option><option value="7">일주일에 1개씩</option><option value="0">모두 같은 시간에</option></select>' +
+          '<div id="sch-prev" class="sch-prev"></div>' +
+          '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" id="sch-ok">예약하기</button></div>');
+        var plan = function(){
+          var st = new Date(document.getElementById("sch-at").value), gap = +document.getElementById("sch-gap").value;
+          return pick.map(function(p, k){ var d = new Date(st.getTime() + k * gap * 864e5); return { p: p, d: d }; });
+        };
+        var prev = function(){ var pl = plan(), bad = isNaN(pl[0].d.getTime()) || pl[0].d < new Date();
+          document.getElementById("sch-prev").innerHTML = bad ? '<span style="color:#b42318">지금보다 나중 시간을 골라 주세요.</span>' :
+            pl.slice(0, 6).map(function(x){ return '<div>' + schTxt(x.d) + ' · ' + esc(x.p.title) + '</div>'; }).join("") + (pl.length > 6 ? '<div>… 마지막 ' + schTxt(pl[pl.length - 1].d) + '</div>' : ''); return !bad; };
+        document.getElementById("sch-at").oninput = document.getElementById("sch-gap").onchange = prev; prev();
+        document.getElementById("sch-ok").onclick = function(){
+          if (!prev()) return; var b = this; b.disabled = true;
+          var items = plan().map(function(x){ var d = x.d; return { op_k: x.p.k, board: x.p.board, head: x.p.head || "", title: x.p.title, content: x.p.content,
+            at: d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":00" }; });
+          JIDB.call("admin_sched_add", { items: items }).then(function(r){ closeModal(); toast(r.added + "개 글을 예약했어요"); TAB = window.OP_TAB = "sched"; drawOpPosts(); }, function(e){ b.disabled = false; alert(e.message); });
+        };
+      };
       go.onclick = function(){
         var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return L[i]; }).reverse();   // 목록 위쪽 글이 가장 최근 글로 보이게 거꾸로 올림
         if (!pick.length || !confirm(pick.length + "개 글을 지금 게시판에 올릴까요?")) return;
@@ -1178,6 +1239,85 @@ if (SRV) {
         })(0);
       };
     });
+  };
+
+  /* ── 엑셀(CSV)로 내려받기: 엑셀에서 한글이 깨지지 않게 BOM 포함 ── */
+  window.dlCSV = function(name, rows){
+    var q = function(v){ v = v === null || v === undefined ? "" : String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var txt = "﻿" + rows.map(function(r){ return r.map(q).join(","); }).join("\r\n");
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/csv;charset=utf-8" }));
+    a.download = name + ".csv"; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  };
+  var ymdNow = function(){ var d = new Date(); return d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2); };
+  var dt16 = function(x){ return x ? String(x).slice(0, 16).replace("T", " ") : ""; };
+  window.dlMembers = function(){
+    var R = { admin: "관리자", user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝" };
+    dlCSV("제주이음_회원목록_" + ymdNow(), [["닉네임", "이메일", "지역", "역할", "가입일", "마지막 로그인", "글", "댓글", "활동정지"]].concat(USERS.map(function(u){
+      return [u.nick, u.email, u.region, R[u.role] || u.role, dt16(u.created_at), dt16(u.last_login), u.posts || 0, u.comments || 0, u.suspended_until ? (u.suspended_until.slice(0, 4) === "9999" ? "영구" : dt16(u.suspended_until) + "까지") : ""];
+    })));
+  };
+
+  /* ── 신고: 같은 글·댓글에 들어온 신고를 한 줄로 묶어서 ── */
+  var REP = [], REP_TAB = "new";
+  window.drawReports = function(){
+    M().innerHTML = '<h1>신고</h1><p class="sub">회원이 신고한 글·댓글이에요. 같은 대상에 들어온 신고는 한 줄로 묶어서 보여 줘요. 처리하면 신고한 사람에게 따로 알림은 가지 않아요.</p><div class="panel" id="rep-box">불러오는 중…</div>';
+    JIDB.call("admin_reports").then(function(l){ REP = l || []; paintReports(); }, function(e){ document.getElementById("rep-box").textContent = "불러오지 못했어요: " + e.message; });
+  };
+  function paintReports(){
+    var G = {}, order = [];
+    REP.forEach(function(r){ var k = r.kind + ":" + r.target_id; if (!G[k]) { G[k] = { kind: r.kind, tid: r.target_id, post: r.post_id, nick: r.target_nick, author: r.target_author, snip: r.snippet, list: [], status: r.status, last: r.created_at }; order.push(k); } G[k].list.push(r); if (r.status === "new") G[k].status = "new"; });
+    var groups = order.map(function(k){ return G[k]; });
+    var cnt = { new: groups.filter(function(g){ return g.status === "new"; }).length }; cnt.done = groups.length - cnt.new;
+    var list = groups.filter(function(g){ return REP_TAB === "new" ? g.status === "new" : g.status !== "new"; });
+    var box = document.getElementById("rep-box"); if (!box) return;
+    box.innerHTML = '<div class="op-tabs"><button class="' + (REP_TAB === "new" ? "on" : "") + '" onclick="repTab(\'new\')">처리 전 <b>' + cnt.new + '</b></button><button class="' + (REP_TAB === "done" ? "on" : "") + '" onclick="repTab(\'done\')">처리 끝 <b>' + cnt.done + '</b></button></div>' +
+      (list.length ? list.map(function(g, i){
+        var reasons = {}; g.list.forEach(function(r){ reasons[r.reason] = (reasons[r.reason] || 0) + 1; });
+        var u = USERS.filter(function(x){ return x.id === g.author; })[0];
+        var st = g.list[0].status;
+        return '<div class="rep-card"><div class="rep-top"><span class="bd ' + (g.kind === "post" ? "user" : "") + '">' + (g.kind === "post" ? "게시글" : "댓글") + '</span>' +
+            Object.keys(reasons).map(function(k){ return '<span class="bd susp">' + esc(k) + (reasons[k] > 1 ? ' ×' + reasons[k] : '') + '</span>'; }).join("") +
+            '<span class="rep-n">신고 ' + g.list.length + '건 · ' + dt16(g.last) + '</span></div>' +
+          '<div class="rep-snip">' + esc(g.snip || "(내용 없음)") + '</div>' +
+          '<div class="rep-meta">쓴 사람 <b>' + esc(g.nick || "?") + '</b>' + (u && u.suspended_until ? suspBadge(u) : '') + '</div>' +
+          '<details class="rep-who"><summary>신고한 사람·내용 보기</summary><ul>' + g.list.map(function(r){ return '<li><b>' + esc(r.reporter_nick) + '</b> · ' + esc(r.reason) + ' · ' + dt16(r.created_at) + (r.detail ? '<br><span>' + esc(r.detail) + '</span>' : '') + '</li>'; }).join("") + '</ul></details>' +
+          (st !== "new" ? '<div class="rep-meta">' + (st === "done" ? "✅ 처리함" : "👌 문제 없음") + (g.list[0].handled_by ? ' · ' + esc(g.list[0].handled_by) : '') + ' · ' + dt16(g.list[0].handled_at) + '</div>' : '') +
+          '<div class="acts">' + (g.post ? '<a class="mb" href="' + SITE + 'view.html?id=' + encodeURIComponent(g.post) + '" target="_blank">글 보기</a>' : '') +
+            (st === "new" ? '<button class="mb danger-o" onclick="repDel(' + i + ')">' + (g.kind === "post" ? "글 지우기" : "댓글 지우기") + '</button>' +
+              (u && u.role !== "admin" && u.role !== "staff" ? '<button class="mb danger-o" onclick="suspendUser(\'' + u.id + '\')">' + (u.suspended_until ? "정지 바꾸기" : "쓴 사람 활동정지") + '</button>' : '') +
+              '<button class="mb pri" onclick="repSet(' + i + ',\'done\')">처리 완료</button><button class="mb" onclick="repSet(' + i + ',\'ignored\')">문제 없음</button>'
+              : '<button class="mb" onclick="repSet(' + i + ',\'new\')">처리 전으로 되돌리기</button>') + '</div></div>';
+      }).join("") : '<div class="empty">' + (REP_TAB === "new" ? "처리할 신고가 없어요." : "아직 처리한 신고가 없어요.") + '</div>');
+    window._repList = list;
+  }
+  window.repTab = function(t){ REP_TAB = t; paintReports(); };
+  window.repSet = function(i, st){
+    var g = window._repList[i]; if (!g) return;
+    JIDB.call("admin_report_set", { kind: g.kind, target_id: g.tid, status: st }).then(function(){
+      REP.forEach(function(r){ if (r.kind === g.kind && r.target_id === g.tid) { r.status = st; r.handled_at = st === "new" ? null : new Date().toISOString(); r.handled_by = st === "new" ? null : (JIDB.me() || {}).nick; } });
+      if (STATS) STATS.reports_new = Math.max(0, (STATS.reports_new || 0) + (st === "new" ? 1 : -1));
+      toast(st === "done" ? "처리 완료로 바꿨어요" : st === "ignored" ? "문제 없음으로 처리했어요" : "처리 전으로 되돌렸어요"); boot();
+    }, function(e){ alert(e.message); });
+  };
+  window.repDel = function(i){
+    var g = window._repList[i]; if (!g || !confirm((g.kind === "post" ? "이 글을" : "이 댓글을") + " 지울까요? 지우면 되돌릴 수 없어요.")) return;
+    JIDB.call(g.kind === "post" ? "post_delete" : "comment_delete", { id: g.tid }).then(function(){ repSet(i, "done"); }, function(e){
+      if (/찾을 수 없/.test(e.message)) repSet(i, "done"); else alert(e.message); });
+  };
+
+  /* ── 활동정지 기록 ── */
+  function suspLogHtml(rows, withNick){
+    if (!rows.length) return '<div class="empty" style="padding:12px">아직 기록이 없어요.</div>';
+    return '<ul class="sl-list">' + rows.map(function(r){
+      var u = r.until_at ? (String(r.until_at).slice(0, 4) === "9999" ? "영구" : dt16(r.until_at) + "까지") : "";
+      return '<li><span class="sl-at">' + dt16(r.at) + '</span>' + (withNick ? '<b>' + esc(r.nick) + '</b> ' : '') +
+        (r.action === "suspend" ? '<span class="bd susp">정지 ' + u + '</span>' : '<span class="bd">정지 해제</span>') +
+        (r.reason ? ' <span class="sl-r">사유: ' + esc(r.reason) + '</span>' : '') + ' <small>· ' + esc(r.by_nick) + '</small></li>';
+    }).join("") + '</ul>';
+  }
+  window.showSuspLog = function(){
+    showModal('<h3>활동정지 기록</h3><p class="sub">최근 100건 · 탈퇴한 회원의 기록은 지워져요.</p><div id="sl-all">불러오는 중…</div><div class="bt"><button class="mb" onclick="closeModal()">닫기</button></div>');
+    JIDB.call("admin_suspend_log").then(function(l){ var b = document.getElementById("sl-all"); if (b) b.innerHTML = suspLogHtml(l || [], true); });
   };
 
   /* 알림 설정: 관리자·스텝이 각자 받을 알림 종류를 켜고 끔 */
@@ -1259,7 +1399,7 @@ if (SRV) {
       return byNew * -dir;
     });
     var TH = function(l, k){ return thSort(l, k, srt, dir, "sortMembers"); };
-    M().innerHTML = '<h1>회원 관리</h1><p class="sub">가입한 회원 ' + USERS.length + '명 · ' + Object.keys(ROLE_LABEL).filter(function(k){ return cnt[k]; }).map(function(k){ return ROLE_LABEL[k] + ' ' + cnt[k]; }).join(" · ") + '</p>' +
+    M().innerHTML = '<h1>회원 관리</h1><div class="mem-tools"><button class="mb" onclick="dlMembers()">⬇ 엑셀로 받기</button><button class="mb" onclick="showSuspLog()">⛔ 활동정지 기록</button></div><p class="sub">가입한 회원 ' + USERS.length + '명 · ' + Object.keys(ROLE_LABEL).filter(function(k){ return cnt[k]; }).map(function(k){ return ROLE_LABEL[k] + ' ' + cnt[k]; }).join(" · ") + '</p>' +
       '<div class="panel role-help"><b>역할별 권한</b><ul>' +
         '<li><b>일반</b> — 커뮤니티·거래 글쓰기, 댓글, 쪽지</li>' +
         '<li><b>부동산 중개인</b> — 일반 권한 + 중개인으로 구분 (부동산 글은 누구나 쓸 수 있어요)</li>' +
@@ -1319,7 +1459,8 @@ if (SRV) {
       showModal('<h3>' + esc(u.nick) + '님 활동정지 풀기</h3><p class="sub">지금 <b>' + suspTxt(u.suspended_until) + '</b> 상태예요. 풀면 바로 글·댓글·쪽지를 다시 쓸 수 있어요.</p>' +
         '<div class="sus-opts"><button class="sus-o" onclick="_susGo(\'7\')"><b>일주일</b><small>지금부터 다시 7일</small></button><button class="sus-o" onclick="_susGo(\'30\')"><b>한 달</b><small>지금부터 다시 한 달</small></button><button class="sus-o" onclick="_susGo(\'perm\')"><b>영구</b><small>풀 때까지</small></button></div>' +
         '<p class="sub" style="margin:4px 0 0">기간을 누르면 지금부터 새로 정해요.</p>' +
-        '<div class="bt"><button class="mb" onclick="closeModal()">닫기</button><button class="mb pri" onclick="_susGo(\'off\')">정지 해제</button></div>');
+        '<div class="bt"><button class="mb" onclick="closeModal()">닫기</button><button class="mb pri" onclick="_susGo(\'off\')">정지 해제</button></div>' + '<h4 class="sl-h">지난 정지 기록</h4><div id="sl-one">불러오는 중…</div>');
+      JIDB.call("admin_suspend_log", { id: id }).then(function(l){ var b = document.getElementById("sl-one"); if (b) b.innerHTML = suspLogHtml(l || [], false); });
       return;
     }
     showModal('<h3>' + esc(u.nick) + '님 활동정지</h3>' +
@@ -1329,7 +1470,8 @@ if (SRV) {
         '<button class="sus-o" onclick="_susGo(\'7\')"><b>일주일</b><small>7일 뒤 자동으로 풀려요</small></button>' +
         '<button class="sus-o" onclick="_susGo(\'30\')"><b>한 달</b><small>한 달 뒤 자동으로 풀려요</small></button>' +
         '<button class="sus-o perm" onclick="_susGo(\'perm\')"><b>영구</b><small>직접 풀 때까지</small></button></div>' +
-      '<div class="bt"><button class="mb" onclick="closeModal()">취소</button></div>');
+      '<div class="bt"><button class="mb" onclick="closeModal()">취소</button></div>' + '<h4 class="sl-h">지난 정지 기록</h4><div id="sl-one">불러오는 중…</div>');
+    JIDB.call("admin_suspend_log", { id: id }).then(function(l){ var b = document.getElementById("sl-one"); if (b) b.innerHTML = suspLogHtml(l || [], false); });
   };
   /* 회원이 쓴 글·댓글 목록 */
   window.showActivity = function(uid, kind){
@@ -1436,20 +1578,59 @@ if (SRV) {
     }).join("") + '</ol>' : '<div class="empty">' + (tmRank === "total" ? "아직 글이 없어요." : "이 기간에는 기록이 없어요.") + '</div>';
     var days = Math.round((new Date(m.to + "T00:00:00") - new Date(m.from + "T00:00:00")) / 864e5) + 1;
     var range = (m.from === m.to ? m.from.replace(/-/g, ".") : m.from.replace(/-/g, ".") + " ~ " + m.to.slice(5).replace("-", ".") + " (" + days + "일)");
-    return '<div class="tm-head"><h2>자세히 보기</h2>' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span></div>' +
+    window._tmData = m;
+    // 이전 같은 길이 기간과 비교
+    var C = m.cmp || null, cmpBox = "";
+    if (C) {
+      var cell = function(lb, k){ var a = C.cur[k] || 0, b = C.prev[k] || 0, d = a - b, pc = b ? Math.round(d / b * 100) : null;
+        return '<div><span>' + lb + '</span><b>' + tfNum(a) + '</b><small class="' + (d > 0 ? "up" : d < 0 ? "down" : "") + '">' + (d > 0 ? "▲ " : d < 0 ? "▼ " : "") + (d ? tfNum(Math.abs(d)) : "변화 없음") + (pc !== null && d ? ' (' + (d > 0 ? "+" : "") + pc + '%)' : '') + '</small></div>'; };
+      cmpBox = '<div class="panel"><h2>지난 기간과 비교 <small style="font-weight:600;color:var(--ink-4)">' + C.prev_from.slice(5).replace("-", ".") + (C.prev_from !== C.prev_to ? " ~ " + C.prev_to.slice(5).replace("-", ".") : "") + '와 비교</small></h2><div class="tm-cmp">' +
+        cell("방문자", "uv") + cell("페이지뷰", "pv") + cell("검색으로 온 사람", "search") + cell("새 회원", "join") + cell("새 글", "posts") + '</div></div>';
+    }
+    var fmtDur = function(sec){ if (sec === null || sec === undefined) return "-"; return sec < 60 ? sec + "초" : Math.floor(sec / 60) + "분 " + (sec % 60) + "초"; };
+    var siteBox = '<div class="panel"><h2>사이트 안 검색어 <small style="font-weight:600;color:var(--ink-4)">첫 화면·가이드 검색창에서 찾은 말</small></h2>' +
+      ((m.site_kws || []).length ? tfList(m.site_kws, "n", function(x){ return esc(x.k) + (x.res ? ' <small>결과 ' + x.res + '건</small>' : ' <small class="zero">결과 없음</small>'); }, "명")
+        : '<div class="empty" style="padding:14px">이 기간에 사이트 안에서 검색한 기록이 없어요.</div>') +
+      ((m.site_zero || []).length ? '<h3 class="tm-h3">찾았는데 결과가 없던 말 <small style="font-weight:600;color:var(--ink-4)">— 새 글 주제 후보</small></h3>' + tfList(m.site_zero, "n", function(x){ return esc(x.k); }, "명") : '') + '</div>';
+    var engBox = '<div class="panel"><h2>페이지별 머문 시간·이탈 <small style="font-weight:600;color:var(--ink-4)">평균 머문 시간 ' + fmtDur(m.avg_dur) + ' · 전체 이탈률 ' + (m.bounce === null || m.bounce === undefined ? "-" : m.bounce + "%") + '</small></h2>' +
+      ((m.eng || []).length ? '<div class="tbl-wrap"><table class="adm-t eng-t"><thead><tr><th>페이지</th><th>조회</th><th>평균 머문 시간</th><th>이 페이지로 들어온 방문</th><th>이탈률</th></tr></thead><tbody>' +
+        m.eng.map(function(x){ return '<tr><td>' + tfName(x.path, x.title) + '</td><td>' + tfNum(x.pv) + '</td><td>' + fmtDur(x.dur) + '</td><td>' + tfNum(x.land) + '</td><td>' + (x.bounce === null ? "-" : '<span class="' + (x.bounce >= 70 ? "hi" : "") + '">' + x.bounce + '%</span>') + '</td></tr>'; }).join("") + '</tbody></table></div>'
+        : '<div class="empty">이 기간에는 기록이 없어요.</div>') +
+      '<p class="sub" style="margin:10px 0 0">머문 시간은 화면을 보고 있던 시간만 세요 (오늘부터 기록). 이탈률은 그 페이지로 들어와 다른 페이지를 하나도 보지 않고 나간 비율이에요. 하루 한 사람의 방문을 한 번으로 셉니다.</p></div>';
+    return '<div class="tm-head"><h2>자세히 보기</h2>' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div>' +
+      cmpBox +
       '<div class="panel"><h2>유입 경로</h2>' + stack + '<div style="margin-top:14px">' + kv(m.refs) + '</div></div>' +
       '<div class="tf-2">' +
         '<div class="panel"><h2>검색 유입 <small style="font-weight:600;color:var(--ink-4)">검색 사이트별 방문자</small></h2>' + kv(m.search) +
           '<h3 class="tm-h3">검색어</h3>' + (m.kws.length ? tfList(m.kws, "n", function(x){ return esc(x.k) + ' <small>' + esc(x.ref) + '</small>'; }, "명") :
             '<div class="empty" style="padding:14px">아직 잡힌 검색어가 없어요. 구글은 검색어를 알려 주지 않고, 네이버도 일부만 알려 줘요.</div>') + '</div>' +
         '<div class="panel"><h2>검색으로 처음 들어온 페이지</h2>' + tfList(m.landing, "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
-      '</div>' +
+      '</div>' + siteBox + engBox +
       '<div class="panel"><h2>기기별 분포</h2>' + dev +
         '<div class="tf-2" style="margin-top:16px"><div><h3 class="tm-h3">운영체제</h3>' + kv(m.os) + '</div><div><h3 class="tm-h3">브라우저·앱</h3>' + kv(m.br) + '</div></div></div>' +
       '<div class="panel"><h2>글 순위 ' + segR + '</h2>' + rank +
         '<p class="sub" style="margin:10px 0 0">조회수·댓글·좋아요는 위에서 고른 기간 기준이고, 누적 조회수는 글이 올라온 뒤 전체 합계예요.</p></div>';
   }
   window.tfSetDay = function(d){ tfDay = d; drawTraffic(true); };
+  /* 방문 통계 엑셀: 최근 30일 일별 + 지금 고른 기간의 자세히 보기 */
+  window.dlTraffic = function(){
+    var m = window._tmData, r = TF, rows = [];
+    var tit = function(x){ return (x.title || x.path || "").replace(/<[^>]+>/g, ""); };
+    if (r && r.days) { rows.push(["■ 최근 30일 날짜별"]); rows.push(["날짜", "방문자", "페이지뷰"]); Object.keys(r.days).sort().forEach(function(d){ rows.push([d, r.days[d].uv, r.days[d].pv]); }); rows.push([]); }
+    if (m) {
+      rows.push(["■ 기간 " + m.from + " ~ " + m.to, "방문자 " + m.uv]);
+      if (m.cmp) { rows.push([]); rows.push(["지난 기간과 비교", "이번", "지난"]); [["방문자", "uv"], ["페이지뷰", "pv"], ["검색으로 온 사람", "search"], ["새 회원", "join"], ["새 글", "posts"]].forEach(function(x){ rows.push([x[0], m.cmp.cur[x[1]], m.cmp.prev[x[1]]]); }); }
+      var sec = function(title, head, list, f){ rows.push([]); rows.push([title]); rows.push(head); (list || []).forEach(function(x){ rows.push(f(x)); }); };
+      sec("유입 경로", ["경로", "방문자"], m.refs, function(x){ return [x.k, x.n]; });
+      sec("검색 유입", ["검색 사이트", "방문자", "페이지뷰"], m.search, function(x){ return [x.k, x.n, x.pv]; });
+      sec("검색어", ["검색어", "검색 사이트", "방문자"], m.kws, function(x){ return [x.k, x.ref, x.n]; });
+      sec("검색으로 처음 들어온 페이지", ["페이지", "주소", "방문자"], m.landing, function(x){ return [tit(x), x.path, x.n]; });
+      sec("사이트 안 검색어", ["검색어", "검색한 사람", "결과 수"], m.site_kws, function(x){ return [x.k, x.n, x.res]; });
+      sec("페이지별 머문 시간·이탈", ["페이지", "주소", "조회", "평균 머문 시간(초)", "들어온 방문", "이탈률(%)"], m.eng, function(x){ return [tit(x), x.path, x.pv, x.dur === null ? "" : x.dur, x.land, x.bounce === null ? "" : x.bounce]; });
+      sec("기기", ["기기", "방문자"], m.dev, function(x){ return [x.k === "m" ? "휴대폰" : "PC", x.n]; });
+    }
+    dlCSV("제주이음_방문통계_" + (m ? m.from + "_" + m.to : ymdNow()), rows);
+  };
   window.drawTraffic = function(noFetch){
     clearInterval(tfTimer);
     tfTimer = setInterval(function(){ if (view !== "traffic") { clearInterval(tfTimer); return; } loadTraffic().then(function(){ if (view === "traffic") paintTraffic(); }); }, 30000);

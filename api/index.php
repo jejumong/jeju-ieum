@@ -58,6 +58,8 @@ function send_msg($from, $fromNick, $to, $body, $kind = 'dm', $ref = '') {
 }
 $BOARDS = ['동호회', '구인구직', '중고사고팔기', '부동산', '제주상점', '특가공구', '축제정보', '자유게시판', '질문하기', '최신뉴스', '생활정보', '취미·여행', '교육', '건강웰빙', '제주북쪽', '제주동쪽', '제주서쪽', '제주남쪽'];
 
+if ($a !== 'hit' && $a !== 'hit_dur') { try { if (one("SELECT id FROM ji_scheduled WHERE status = 'wait' AND at <= NOW() LIMIT 1")) publish_due(); } catch (Throwable $e) {} }
+
 try {
 switch ($a) {
 
@@ -129,6 +131,9 @@ case 'account_delete': {
   q("DELETE FROM ji_users WHERE id = ?", [$u['id']]);
   q("DELETE FROM ji_settings WHERE k = ?", ['al:' . $u['id']]);
   log_leave($joined, false);
+  q("DELETE FROM ji_suspend_log WHERE user_id = ?", [$u['id']]);   // 탈퇴하면 이름이 남는 기록은 지움
+  q("UPDATE ji_reports SET reporter_nick = '(탈퇴한 회원)' WHERE reporter = ?", [$u['id']]);
+  q("UPDATE ji_reports SET target_nick = '(탈퇴한 회원)' WHERE target_author = ?", [$u['id']]);
   alert_admins('leave', '🚪 회원 탈퇴', $u['nick'] . '님이 탈퇴했어요', 'admin/index.html#members', $u['id']);
   out(true);
 }
@@ -593,7 +598,8 @@ case 'admin_overview': {
        'posts' => (int)one("SELECT COUNT(*) n FROM ji_posts")['n'],
        'comments' => (int)one("SELECT COUNT(*) n FROM ji_comments")['n'],
        'inquiries_new' => (int)one("SELECT COUNT(*) n FROM ji_inquiries WHERE status = 'new'")['n'],
-       'sellers_pending' => (int)one("SELECT COUNT(*) n FROM ji_seller_requests WHERE status = 'pending'")['n']]);
+       'sellers_pending' => (int)one("SELECT COUNT(*) n FROM ji_seller_requests WHERE status = 'pending'")['n'],
+       'reports_new' => (int)one("SELECT COUNT(DISTINCT kind, target_id) n FROM ji_reports WHERE status = 'new'")['n']]);
 }
 case 'hit': {   // 방문 기록 한 줄 (로그인 필요 없음, 개인정보 없음)
   $vid = $R['vid'] ?? ''; $path = (string)($R['path'] ?? '');
@@ -741,7 +747,37 @@ case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기
   $allViews = array_map(function ($r) { return ['id' => $r['id'], 'title' => $r['title'], 'board' => $r['board'], 'nick' => $r['author_nick'], 'n' => (int)$r['views']]; },
     all("SELECT id, title, board, author_nick, views FROM ji_posts ORDER BY views DESC LIMIT 10"));
   $tot = (int)one("SELECT COUNT(DISTINCT vid) n FROM ji_hits WHERE $W", $A)['n'];
+  // 사이트 안 검색어 (첫 화면·가이드 검색창)
+  $site = array_map(function ($r) { return ['k' => $r['k'], 'n' => (int)$r['n'], 'res' => (int)$r['res']]; },
+    all("SELECT q k, COUNT(DISTINCT vid) n, MAX(n) res FROM ji_searches WHERE $W GROUP BY q ORDER BY n DESC, MAX(at) DESC LIMIT 20", $A));
+  $siteZero = array_map(function ($r) { return ['k' => $r['k'], 'n' => (int)$r['n']]; },
+    all("SELECT q k, COUNT(DISTINCT vid) n FROM ji_searches WHERE $W GROUP BY q HAVING MAX(n) = 0 ORDER BY n DESC LIMIT 15", $A));
+  // 머문 시간·이탈: 하루 한 사람의 방문을 한 번의 방문으로 보고, 그날 한 페이지만 보고 나가면 '이탈'
+  $sess = all("SELECT COUNT(*) c, SUBSTRING_INDEX(GROUP_CONCAT(path ORDER BY id SEPARATOR '\n'), '\n', 1) first FROM ji_hits WHERE $W GROUP BY vid, DATE(at)", $A);
+  $land2 = []; $sN = 0; $sOne = 0;
+  foreach ($sess as $x) { $sN++; $one = (int)$x['c'] === 1; if ($one) $sOne++;
+    $f = $x['first']; if (!isset($land2[$f])) $land2[$f] = [0, 0]; $land2[$f][0]++; if ($one) $land2[$f][1]++; }
+  $eng = array_map(function ($r) use ($land2) {
+    $l = $land2[$r['path']] ?? [0, 0];
+    return ['path' => $r['path'], 'title' => $r['title'], 'pv' => (int)$r['pv'], 'dur' => $r['nd'] ? (int)round($r['ad']) : null,
+            'land' => $l[0], 'bounce' => $l[0] ? (int)round($l[1] / $l[0] * 100) : null];
+  }, all("SELECT path, MAX(title) title, COUNT(*) pv, AVG(dur) ad, SUM(dur IS NOT NULL) nd FROM ji_hits WHERE $W GROUP BY path ORDER BY pv DESC LIMIT 15", $A));
+  $avgDur = one("SELECT AVG(dur) a FROM ji_hits WHERE $W AND dur IS NOT NULL", $A)['a'];
+  // 이전 같은 길이 기간과 비교
+  $sum = function ($f, $t) use ($seName) {
+    $B = [$f, $t];
+    $r = one("SELECT COUNT(DISTINCT vid) uv, COUNT(*) pv FROM ji_hits WHERE at >= ? AND at < ?", $B);
+    $se = 0; foreach (all("SELECT ref, COUNT(DISTINCT vid) n FROM ji_hits WHERE at >= ? AND at < ? AND ref <> '' GROUP BY ref", $B) as $x) if ($seName($x['ref'])) $se += (int)$x['n'];
+    $join = (int)one("SELECT COUNT(*) n FROM ji_users WHERE created_at >= ? AND created_at < ?", $B)['n'] + (int)one("SELECT COUNT(*) n FROM ji_leaves WHERE joined_at >= ? AND joined_at < ?", $B)['n'];
+    $posts = (int)one("SELECT COUNT(*) n FROM ji_posts WHERE created_at >= ? AND created_at < ?", $B)['n'];
+    return ['uv' => (int)$r['uv'], 'pv' => (int)$r['pv'], 'search' => $se, 'join' => $join, 'posts' => $posts];
+  };
+  $len = (strtotime($to) - strtotime($from));
+  $cmp = ['cur' => $sum($from, $to), 'prev' => $sum(date('Y-m-d', strtotime($from) - $len), $from),
+          'prev_from' => date('Y-m-d', strtotime($from) - $len), 'prev_to' => date('Y-m-d', strtotime($from) - 86400)];
   out(['p' => $p, 'from' => $from, 'to' => date('Y-m-d', strtotime($to . ' -1 day')), 'uv' => $tot,
+    'site_kws' => $site, 'site_zero' => $siteZero, 'eng' => $eng, 'bounce' => $sN ? (int)round($sOne / $sN * 100) : null,
+    'avg_dur' => $avgDur !== null ? (int)round($avgDur) : null, 'cmp' => $cmp,
     'groups' => $groups, 'refs' => $refs, 'search' => $search, 'kws' => $kws, 'landing' => $land,
     'dev' => $grp('dev', 2), 'os' => $grp('os', 6, "AND os <> ''"), 'br' => $grp('br', 10, "AND br <> ''"),
     'rank_views' => $views, 'rank_comments' => $cmts, 'rank_likes' => $likes, 'rank_total' => $allViews]);
@@ -796,6 +832,86 @@ case 'admin_post_counts': {   // 관리자: 회원 글 조회수·좋아요 수 
   $x = one("SELECT views, likes_adj FROM ji_posts WHERE id = ?", [$id]);
   out(['views' => (int)$x['views'], 'likes' => max(0, (int)one("SELECT COUNT(*) n FROM ji_likes WHERE post_id = ? AND active = 1", [$id])['n'] + (int)$x['likes_adj'])]);
 }
+/* ───────── 신고 ───────── */
+case 'report_add': {
+  $u = me($R); $kind = $R['kind'] ?? ''; $tid = (string)($R['id'] ?? '');
+  $REASONS = ['광고·홍보', '욕설·비방', '음란·불쾌한 내용', '사기 의심', '개인정보 노출', '기타'];
+  $reason = in_array($R['reason'] ?? '', $REASONS, true) ? $R['reason'] : '';
+  if ($reason === '') fail('신고 이유를 골라 주세요.');
+  if ($kind === 'post') { $t = is_uuid($tid) ? one("SELECT id, author, author_nick nick, title snip, id post FROM ji_posts WHERE id = ?", [$tid]) : null; }
+  elseif ($kind === 'comment') { $t = one("SELECT id, author, author_nick nick, text snip, post_id post FROM ji_comments WHERE id = ?", [$tid]); }
+  else fail('신고할 수 없는 대상이에요');
+  if (!$t) fail('이미 지워졌거나 찾을 수 없는 글이에요', 404);
+  if ($t['author'] === $u['id']) fail('내가 쓴 글은 신고할 수 없어요');
+  if (one("SELECT id FROM ji_reports WHERE kind = ? AND target_id = ? AND reporter = ?", [$kind, $tid, $u['id']])) out(['already' => true]);
+  $n = one("SELECT COUNT(*) n FROM ji_reports WHERE reporter = ? AND created_at > (NOW() - INTERVAL 1 HOUR)", [$u['id']])['n'];
+  if ($n >= 10) fail('신고를 너무 많이 했어요. 잠시 후 다시 해 주세요.', 429);
+  q("INSERT INTO ji_reports (kind, target_id, post_id, reason, detail, reporter, reporter_nick, target_author, target_nick, snippet, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+    [$kind, $tid, (string)$t['post'], $reason, str($R['detail'] ?? '', 300), $u['id'], $u['nick'], $t['author'] ?? '', $t['nick'] ?? '', mb_substr((string)$t['snip'], 0, 190), now()]);
+  alert_admins('report', '🚨 ' . ($kind === 'post' ? '게시글' : '댓글') . ' 신고 · ' . $reason, mb_substr((string)$t['snip'], 0, 60), 'admin/index.html#reports');
+  out(['already' => false]);
+}
+case 'admin_reports': {
+  admin($R);
+  out(array_map(function ($r) { $r['created_at'] = iso($r['created_at']); $r['handled_at'] = iso($r['handled_at']); return $r; },
+    all("SELECT id, kind, target_id, post_id, reason, detail, reporter_nick, target_author, target_nick, snippet, status, created_at, handled_at, handled_by FROM ji_reports ORDER BY created_at DESC LIMIT 300")));
+}
+case 'admin_report_set': {   // 같은 글·댓글에 들어온 신고를 한꺼번에 처리
+  $me = admin($R); $st = $R['status'] ?? '';
+  if (!in_array($st, ['new', 'done', 'ignored'], true)) fail('상태가 올바르지 않아요');
+  q("UPDATE ji_reports SET status = ?, handled_at = ?, handled_by = ? WHERE kind = ? AND target_id = ?",
+    [$st, $st === 'new' ? null : now(), $st === 'new' ? null : $me['nick'], (string)($R['kind'] ?? ''), (string)($R['target_id'] ?? '')]);
+  out(true);
+}
+case 'admin_suspend_log': {
+  admin($R); $id = $R['id'] ?? '';
+  $rows = is_uuid($id) ? all("SELECT nick, action, until_at, reason, by_nick, at FROM ji_suspend_log WHERE user_id = ? ORDER BY at DESC LIMIT 50", [$id])
+                       : all("SELECT user_id, nick, action, until_at, reason, by_nick, at FROM ji_suspend_log ORDER BY at DESC LIMIT 100");
+  out(array_map(function ($r) { $r['at'] = iso($r['at']); $r['until_at'] = iso($r['until_at']); return $r; }, $rows));
+}
+/* ───────── 사이트 안 검색어 · 머문 시간 ───────── */
+case 'search_log': {
+  $vid = $R['vid'] ?? ''; $qq = trim(preg_replace('/\s+/u', ' ', (string)($R['q'] ?? '')));
+  $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+  if (!preg_match('/^[a-z0-9]{16}$/', $vid) || mb_strlen($qq) < 1 || preg_match('/bot|crawl|spider|slurp|headless/i', $ua)) out(true);
+  $qq = mb_substr($qq, 0, 60);
+  if (one("SELECT id FROM ji_searches WHERE vid = ? AND q = ? AND at > (NOW() - INTERVAL 10 MINUTE) LIMIT 1", [$vid, $qq])) out(true);
+  q("INSERT INTO ji_searches (at, q, n, vid) VALUES (?,?,?,?)", [now(), $qq, max(0, min(9999, (int)($R['n'] ?? 0))), $vid]);
+  if (mt_rand(1, 500) === 1) q("DELETE FROM ji_searches WHERE at < (NOW() - INTERVAL 400 DAY)");
+  out(true);
+}
+case 'hit_dur': {   // 페이지를 떠날 때 머문 시간(초)
+  $vid = $R['vid'] ?? ''; $path = (string)($R['path'] ?? ''); $sec = (int)($R['sec'] ?? 0);
+  if (!preg_match('/^[a-z0-9]{16}$/', $vid) || $path === '' || $sec < 1) out(true);
+  $sec = min($sec, 1800);
+  $h = one("SELECT id, dur FROM ji_hits WHERE vid = ? AND path = ? AND at > (NOW() - INTERVAL 3 HOUR) ORDER BY id DESC LIMIT 1", [$vid, mb_substr($path, 0, 120)]);
+  if ($h && (int)$h['dur'] < $sec) q("UPDATE ji_hits SET dur = ? WHERE id = ?", [$sec, $h['id']]);
+  out(true);
+}
+/* ───────── 운영자 글 예약 게시 ───────── */
+case 'admin_sched_add': {   // items: [{op_k, board, head, title, content, at}]
+  $me = admin($R); $items = is_array($R['items'] ?? null) ? array_slice($R['items'], 0, 100) : [];
+  $n = 0;
+  foreach ($items as $it) {
+    $b = str($it['board'] ?? '', 30); $at = strtotime((string)($it['at'] ?? ''));
+    if (!in_array($b, $BOARDS, true) || !$at || $at < time() - 60) continue;
+    $k = str($it['op_k'] ?? '', 60);
+    if ($k !== '' && one("SELECT id FROM ji_scheduled WHERE op_k = ? AND status = 'wait'", [$k])) continue;
+    q("INSERT INTO ji_scheduled (op_k, board, head, title, content, at, by_id, created_at) VALUES (?,?,?,?,?,?,?,?)",
+      [$k, $b, str($it['head'] ?? '', 30), str($it['title'] ?? '', 120), str($it['content'] ?? '', 20000), date('Y-m-d H:i:s', $at), $me['id'], now()]);
+    $n++;
+  }
+  out(['added' => $n]);
+}
+case 'admin_sched_list': {
+  admin($R);
+  out(array_map(function ($r) { $r['at'] = iso($r['at']); return $r; },
+    all("SELECT s.id, s.op_k, s.board, s.title, s.at, s.status, s.post_id, u.nick by_nick FROM ji_scheduled s LEFT JOIN ji_users u ON u.id = s.by_id
+         WHERE s.status IN ('wait','busy','fail') OR s.at > (NOW() - INTERVAL 7 DAY) ORDER BY s.at")));
+}
+case 'admin_sched_cancel': {
+  admin($R); q("DELETE FROM ji_scheduled WHERE id = ? AND status IN ('wait','fail')", [(int)($R['id'] ?? 0)]); out(true);
+}
 case 'admin_set': {
   admin($R); $k = $R['k'] ?? '';
   if (!in_array($k, ['admin_ov', 'notices'], true)) fail('저장할 수 없는 항목이에요');
@@ -844,12 +960,14 @@ case 'admin_suspend': {   // 활동정지: p = 7(일주일) · 30(한 달) · pe
   $p = (string)($R['p'] ?? ''); $why = str($R['reason'] ?? '', 200);
   if ($p === 'off') {
     q("UPDATE ji_users SET suspended_until = NULL WHERE id = ?", [$id]);
+    log_suspend($id, $t['nick'], 'lift', null, $why, $me['nick']);
     notify($id, 'suspend', '활동정지가 풀렸어요', '이제 다시 글·댓글·쪽지를 쓸 수 있어요.', 'profile.html');
     out(['suspended_until' => null]);
   }
   $until = $p === '7' ? date('Y-m-d H:i:s', strtotime('+7 day')) : ($p === '30' ? date('Y-m-d H:i:s', strtotime('+1 month')) : ($p === 'perm' ? '9999-12-31 23:59:59' : null));
   if (!$until) fail('정지 기간을 골라 주세요');
   q("UPDATE ji_users SET suspended_until = ? WHERE id = ?", [$until, $id]);
+  log_suspend($id, $t['nick'], 'suspend', $until, $why, $me['nick']);
   notify($id, 'suspend', '활동이 정지됐어요 (' . suspend_text($until) . ')',
     ($why !== '' ? '사유: ' . $why . ' · ' : '') . '정지 기간에는 글·댓글·쪽지·좋아요를 쓸 수 없어요. 문의는 문의·제보로 보내 주세요.', 'contact.html');
   out(['suspended_until' => iso($until)]);
