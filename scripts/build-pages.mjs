@@ -81,7 +81,7 @@ function guideStatic(g) {
     let h = `<h2 id="sec${i}">${esc(s.h)}</h2>`;
     const eb = (t) => esc(t).replace(/&lt;(\/?)b&gt;/g, '<$1b>');   // 운영자 글이라 굵은 글씨(<b>)만 허용
     (s.p || []).forEach((t) => { h += `<p>${eb(t)}</p>`; });
-    if (s.table) h += `<div class="tbl-scroll"><table class="cmp${s.table.head.length <= 2 ? " two" : ""}"><thead><tr>${s.table.head.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>` +
+    if (s.table) h += `<div class="tbl-scroll"><table class="cmp${s.table.head.length <= 3 ? " two" : ""}"><thead><tr>${s.table.head.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>` +
       s.table.rows.map((r) => `<tr>${r.map((c, j) => (j === 0 ? `<th>${eb(c)}</th>` : `<td>${eb(c)}</td>`)).join("")}</tr>`).join("") + `</tbody></table></div>`;
     if (s.list) h += `<ul class="dots">${s.list.map((t) => `<li>${t}</li>`).join("")}</ul>`;
     return h;
