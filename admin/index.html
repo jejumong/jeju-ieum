@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261119g">
+<link rel="stylesheet" href="../assets/style.css?v=20261119h">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -224,19 +224,23 @@ table.mem-t td small{font-size:13px}
 .tm-cmp small{font-size:12px;color:var(--ink-4)}.tm-cmp small.up{color:#1a7f37}.tm-cmp small.down{color:#b42318}
 .tm-dl{margin-left:auto}
 small.zero{color:#b42318;font-weight:700}
-.eng-list{display:grid;grid-template-columns:1fr 1fr;column-gap:22px}
-.eng-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #f0f2f5;min-width:0}
+.eng-list{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(7,auto);grid-auto-flow:column;column-gap:26px}
+.eng-row,.eng-head{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid #f0f2f5;min-width:0}
+.eng-head{padding:4px 2px 6px;border-bottom:1px solid #e5e9f0;font-size:11.5px;font-weight:700;color:var(--ink-4)}
+.eng-head .eng-nm{font-size:11.5px}
 .eng-no{flex:none;width:20px;font-size:12px;font-weight:800;color:var(--ink-4);text-align:right}
 .eng-nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .eng-nm b{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .eng-nm small{font-size:11px;color:var(--ink-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.eng-bar{display:block;height:3px;border-radius:2px;background:#eef1f5;margin-top:4px}.eng-bar i{display:block;height:100%;border-radius:2px;background:#1e88e5}
+.eng-bar{display:block;height:3px;border-radius:2px;background:#eef1f5;margin-top:3px}.eng-bar i{display:block;height:100%;border-radius:2px;background:#1e88e5}
 .eng-v{flex:none;width:44px;display:flex;flex-direction:column;align-items:flex-end;font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+.eng-head .eng-v{font-size:11.5px;font-weight:700;color:var(--ink-4)}
 .eng-v.w{width:66px}
-.eng-v em{font-style:normal;font-size:10.5px;font-weight:600;color:var(--ink-4)}
+.eng-v em{display:none;font-style:normal;font-size:10.5px;font-weight:600;color:var(--ink-4)}
 .eng-v span.hi{color:#b42318}
-@media (max-width:1100px){.eng-list{grid-template-columns:1fr}}
-@media (max-width:600px){.eng-row:nth-child(n+11){display:none}   /* 휴대폰은 10개까지 */
+.eng-row.pc-hide{display:none}
+@media (max-width:1100px){.eng-list{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}.eng-head.h2{display:none}}
+@media (max-width:600px){.eng-row.m-hide{display:none}.eng-row.pc-hide:not(.m-hide){display:flex}.eng-head{display:none}.eng-v em{display:block}   /* 휴대폰은 10개까지, 숫자 이름은 줄마다 */
 .eng-row{flex-wrap:wrap;row-gap:6px}.eng-nm{flex-basis:calc(100% - 30px)}.eng-v,.eng-v.w{width:auto;flex:1;align-items:flex-start}.eng-nm + .eng-v{margin-left:30px}}
 @media (max-width:760px){.tm-cmp{grid-template-columns:repeat(2,1fr)}.tm-dl{margin-left:0}}
 .rep-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.rep-top .bd{margin:0}
@@ -435,18 +439,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261119g"></script>
-<script src="../assets/db.js?v=20261119g"></script>
-<script src="../assets/notify.js?v=20261119g"></script>
-<script src="../assets/seed-trade.js?v=20261119g"></script>
-<script src="../assets/seed-extra.js?v=20261119g"></script>
-<script src="../assets/festivals-data.js?v=20261119g"></script>
-<script src="../assets/seed-new.js?v=20261119g"></script>
-<script src="../assets/seed-comments.js?v=20261119g"></script>
-<script src="../assets/photos.js?v=20261119g"></script>
-<script src="../assets/admin-data.js?v=20261119g"></script>
-<script src="../assets/kmap.js?v=20261119g"></script>
-<script src="../assets/op-posts.js?v=20261119g"></script>
+<script src="../assets/common.js?v=20261119h"></script>
+<script src="../assets/db.js?v=20261119h"></script>
+<script src="../assets/notify.js?v=20261119h"></script>
+<script src="../assets/seed-trade.js?v=20261119h"></script>
+<script src="../assets/seed-extra.js?v=20261119h"></script>
+<script src="../assets/festivals-data.js?v=20261119h"></script>
+<script src="../assets/seed-new.js?v=20261119h"></script>
+<script src="../assets/seed-comments.js?v=20261119h"></script>
+<script src="../assets/photos.js?v=20261119h"></script>
+<script src="../assets/admin-data.js?v=20261119h"></script>
+<script src="../assets/kmap.js?v=20261119h"></script>
+<script src="../assets/op-posts.js?v=20261119h"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1625,14 +1629,17 @@ if (SRV) {
       ((m.eng || []).length ? (function(){
         var maxD = Math.max.apply(null, m.eng.map(function(x){ return x.dur || 0; })) || 1;
         var nm = function(x){ var t = (x.title || "").trim(), pth = (x.path || "").replace(/^\//, "").replace(/\.html/, "") || "홈"; return '<b>' + esc(t || pth) + '</b><small>' + esc(pth) + '</small>'; };
-        return '<div class="eng-list">' + m.eng.map(function(x, i){
-          return '<div class="eng-row"><span class="eng-no">' + (i + 1) + '</span><span class="eng-nm">' + nm(x) +
+        var head = '<div class="eng-head"><span class="eng-no"></span><span class="eng-nm">페이지</span><span class="eng-v">조회</span><span class="eng-v w">머문 시간</span><span class="eng-v">들어옴</span><span class="eng-v">이탈</span></div>';
+        var rows = m.eng.map(function(x, i){
+          return '<div class="eng-row' + (i >= 10 ? ' m-hide' : '') + (i >= 12 ? ' pc-hide' : '') + '"><span class="eng-no">' + (i + 1) + '</span><span class="eng-nm">' + nm(x) +
             '<i class="eng-bar"><i style="width:' + Math.round((x.dur || 0) / maxD * 100) + '%"></i></i></span>' +
             '<span class="eng-v"><em>조회</em>' + tfNum(x.pv) + '</span>' +
             '<span class="eng-v w"><em>머문 시간</em>' + fmtDur(x.dur) + '</span>' +
             '<span class="eng-v" title="이 페이지로 처음 들어온 방문"><em>들어옴</em>' + tfNum(x.land) + '</span>' +
             '<span class="eng-v"><em>이탈</em>' + (x.bounce === null ? "-" : '<span class="' + (x.bounce >= 70 ? "hi" : "") + '">' + x.bounce + '%</span>') + '</span></div>';
-        }).join("") + '</div>';
+        });
+        // PC: 왼쪽 1~6위, 오른쪽 7~12위 (각 칸 위에 머리글 한 줄)
+        return '<div class="eng-list">' + head + rows.slice(0, 6).join("") + (rows.length > 6 ? head.replace('class="eng-head"', 'class="eng-head h2"') : '') + rows.slice(6).join("") + '</div>';
       })() : '<div class="empty">이 기간에는 기록이 없어요.</div>') +
       '<p class="sub" style="margin:10px 0 0">머문 시간은 화면을 보고 있던 시간만 세요 (오늘부터 기록). 이탈률은 그 페이지로 들어와 다른 페이지를 하나도 보지 않고 나간 비율이에요. 하루 한 사람의 방문을 한 번으로 셉니다.</p></div>';
     return '<div class="tm-head"><h2>자세히 보기</h2>' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div>' +
