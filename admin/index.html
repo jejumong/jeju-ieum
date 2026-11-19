@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261119i">
+<link rel="stylesheet" href="../assets/style.css?v=20261119j">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -211,6 +211,7 @@ table.mem-t td small{font-size:13px}
 .dv-ring span{width:78px;height:78px;border-radius:50%;background:#f8fafc;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:var(--ink-4);line-height:1.2}
 .dv-ring b{font-size:20px;color:var(--ink)}
 .dv-leg{display:flex;flex-direction:column;gap:12px;min-width:0}
+.rf-leg{gap:7px}.rf-leg b{font-size:16px}.rf-leg small{display:none}
 .dv-leg div{display:grid;grid-template-columns:12px auto;column-gap:7px;align-items:center;font-size:13.5px;color:var(--ink-2)}
 .dv-leg i{width:12px;height:12px;border-radius:4px;grid-row:1 / 4;align-self:start;margin-top:4px}
 .dv-leg b{grid-column:2;font-size:20px;color:var(--ink);line-height:1.2}
@@ -439,18 +440,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261119i"></script>
-<script src="../assets/db.js?v=20261119i"></script>
-<script src="../assets/notify.js?v=20261119i"></script>
-<script src="../assets/seed-trade.js?v=20261119i"></script>
-<script src="../assets/seed-extra.js?v=20261119i"></script>
-<script src="../assets/festivals-data.js?v=20261119i"></script>
-<script src="../assets/seed-new.js?v=20261119i"></script>
-<script src="../assets/seed-comments.js?v=20261119i"></script>
-<script src="../assets/photos.js?v=20261119i"></script>
-<script src="../assets/admin-data.js?v=20261119i"></script>
-<script src="../assets/kmap.js?v=20261119i"></script>
-<script src="../assets/op-posts.js?v=20261119i"></script>
+<script src="../assets/common.js?v=20261119j"></script>
+<script src="../assets/db.js?v=20261119j"></script>
+<script src="../assets/notify.js?v=20261119j"></script>
+<script src="../assets/seed-trade.js?v=20261119j"></script>
+<script src="../assets/seed-extra.js?v=20261119j"></script>
+<script src="../assets/festivals-data.js?v=20261119j"></script>
+<script src="../assets/seed-new.js?v=20261119j"></script>
+<script src="../assets/seed-comments.js?v=20261119j"></script>
+<script src="../assets/photos.js?v=20261119j"></script>
+<script src="../assets/admin-data.js?v=20261119j"></script>
+<script src="../assets/kmap.js?v=20261119j"></script>
+<script src="../assets/op-posts.js?v=20261119j"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1596,6 +1597,12 @@ if (SRV) {
     var G = m.groups, gt = Object.keys(G).reduce(function(a, k){ return a + G[k]; }, 0), GC = { "검색": "#1e88e5", "SNS·메신저": "#f59e0b", "직접 방문": "#64748b", "다른 사이트": "#a855f7" };
     var stack = '<div class="tm-stack">' + Object.keys(G).filter(function(k){ return G[k]; }).map(function(k){ return '<i style="width:' + pct(G[k], gt) + '%;background:' + GC[k] + '" title="' + k + ' ' + G[k] + '명"></i>'; }).join("") + '</div>' +
       '<div class="tm-leg">' + Object.keys(G).map(function(k){ return '<span><b style="background:' + GC[k] + '"></b>' + k + ' <em>' + pct(G[k], gt) + '%</em> <small>' + tfNum(G[k]) + '명</small></span>'; }).join("") + '</div>';
+    // 유입 경로 도넛 (기기별 분포와 같은 모양)
+    var acc = 0, segs = Object.keys(G).filter(function(k){ return G[k]; }).map(function(k){ var a = acc; acc += G[k] / (gt || 1) * 100; return GC[k] + ' ' + a.toFixed(2) + '% ' + acc.toFixed(2) + '%'; });
+    var refRing = '<div class="dv-sum"><div class="dv-ring" style="background:' + (gt ? 'conic-gradient(' + segs.join(",") + ')' : '#eef1f5') + '"><span><b>' + tfNum(gt) + '</b>명</span></div>' +
+      '<div class="dv-leg rf-leg">' + Object.keys(G).map(function(k){ return '<div><i style="background:' + GC[k] + '"></i><span>' + k + '</span><b>' + pct(G[k], gt) + '%</b><small>' + tfNum(G[k]) + '명</small></div>'; }).join("") + '</div></div>';
+    var SE_N = ["네이버","구글","다음","빙","줌","네이트","야후","덕덕고","바이두","에코시아","얀덱스","ChatGPT","퍼플렉시티","제미나이","코파일럿"];
+    var otherRefs = (m.refs || []).filter(function(x){ return SE_N.indexOf(x.k) < 0 && x.k !== "직접 방문" && !/naver|google|daum|bing|zum|yahoo|chatgpt|perplexity/.test(x.k); });
     // 기기
     var dv = { m: 0, p: 0 }; (m.dev || []).forEach(function(x){ dv[x.k] = x.n; }); var dt = dv.m + dv.p;
     var mp = pct(dv.m, dt);
@@ -1644,7 +1651,11 @@ if (SRV) {
       '<p class="sub" style="margin:10px 0 0">머문 시간은 화면을 보고 있던 시간만 세요 (오늘부터 기록). 이탈률은 그 페이지로 들어와 다른 페이지를 하나도 보지 않고 나간 비율이에요. 하루 한 사람의 방문을 한 번으로 셉니다.</p></div>';
     return '<div class="tm-head"><h2>자세히 보기</h2>' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div>' +
       cmpBox +
-      '<div class="panel"><h2>유입 경로</h2>' + stack + '<div style="margin-top:14px">' + kv(m.refs) + '</div></div>' +
+      '<div class="panel"><h2>유입 경로</h2><div class="dv-grid">' +
+        '<div class="dv-col"><h3 class="tm-h3">어디서 왔나</h3>' + refRing + '</div>' +
+        '<div class="dv-col"><h3 class="tm-h3">자세한 경로</h3>' + kv((m.refs || []).slice(0, 8)) + '</div>' +
+        '<div class="dv-col"><h3 class="tm-h3">SNS · 다른 사이트</h3>' + (otherRefs.length ? kv(otherRefs.slice(0, 8)) : '<div class="empty" style="padding:14px 0">이 기간에는 없어요. 카카오톡·인스타그램 등에 링크를 공유하면 여기에 나타나요.</div>') + '</div>' +
+      '</div></div>' +
       '<div class="tf-2">' +
         '<div class="panel"><h2>검색 유입 <small style="font-weight:600;color:var(--ink-4)">검색 사이트별 방문자</small></h2>' + kv(m.search) +
           '<h3 class="tm-h3">검색어</h3>' + (m.kws.length ? tfList(m.kws, "n", function(x){ return esc(x.k) + ' <small>' + esc(x.ref) + '</small>'; }, "명") :
