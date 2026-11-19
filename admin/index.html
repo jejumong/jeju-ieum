@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261119j">
+<link rel="stylesheet" href="../assets/style.css?v=20261119k">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -218,7 +218,18 @@ table.mem-t td small{font-size:13px}
 .dv-leg span{grid-column:2}
 .dv-leg small{grid-column:2;font-size:12px;color:var(--ink-4)}
 @media (max-width:1000px){.dv-grid{grid-template-columns:1fr 1fr}.dv-grid .dv-col:first-child{grid-column:1 / -1}}
-@media (max-width:600px){.dv-grid{grid-template-columns:1fr}}
+@media (max-width:600px){   /* 휴대폰: 세로로 길어지지 않게 — 도넛은 작게, 목록 두 칸은 나란히 3줄까지 */
+  .dv-grid{grid-template-columns:1fr 1fr;gap:8px}.dv-grid .dv-col:first-child{grid-column:1 / -1}
+  .dv-col{padding:10px 11px;border-radius:10px}.dv-col .tm-h3{font-size:12.5px;margin-bottom:4px}
+  .dv-sum{gap:14px;padding:2px 0}
+  .dv-ring{width:84px;height:84px}.dv-ring span{width:56px;height:56px;font-size:10.5px}.dv-ring b{font-size:15px}
+  .dv-leg{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;flex:1}
+  .dv-leg div{grid-template-columns:10px 1fr;font-size:12px}.dv-leg i{width:10px;height:10px;grid-row:1 / 3}
+  .dv-leg b,.rf-leg b{font-size:15px}.dv-leg small{display:none}
+  .dv-col .tf-row{padding:5px 0;font-size:12.5px;gap:6px}.dv-col .tf-row .bar{display:none}
+  .dv-col .tf-row:nth-child(n+5){display:none}
+  .dv-col .empty{font-size:12px;padding:6px 0!important}
+}
 .tm-cmp{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .tm-cmp div{background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--ink-3);font-weight:600}
 .tm-cmp b{display:block;font-size:19px;color:var(--ink);margin:3px 0 2px}
@@ -440,18 +451,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261119j"></script>
-<script src="../assets/db.js?v=20261119j"></script>
-<script src="../assets/notify.js?v=20261119j"></script>
-<script src="../assets/seed-trade.js?v=20261119j"></script>
-<script src="../assets/seed-extra.js?v=20261119j"></script>
-<script src="../assets/festivals-data.js?v=20261119j"></script>
-<script src="../assets/seed-new.js?v=20261119j"></script>
-<script src="../assets/seed-comments.js?v=20261119j"></script>
-<script src="../assets/photos.js?v=20261119j"></script>
-<script src="../assets/admin-data.js?v=20261119j"></script>
-<script src="../assets/kmap.js?v=20261119j"></script>
-<script src="../assets/op-posts.js?v=20261119j"></script>
+<script src="../assets/common.js?v=20261119k"></script>
+<script src="../assets/db.js?v=20261119k"></script>
+<script src="../assets/notify.js?v=20261119k"></script>
+<script src="../assets/seed-trade.js?v=20261119k"></script>
+<script src="../assets/seed-extra.js?v=20261119k"></script>
+<script src="../assets/festivals-data.js?v=20261119k"></script>
+<script src="../assets/seed-new.js?v=20261119k"></script>
+<script src="../assets/seed-comments.js?v=20261119k"></script>
+<script src="../assets/photos.js?v=20261119k"></script>
+<script src="../assets/admin-data.js?v=20261119k"></script>
+<script src="../assets/kmap.js?v=20261119k"></script>
+<script src="../assets/op-posts.js?v=20261119k"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
