@@ -761,7 +761,7 @@ case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기
     $l = $land2[$r['path']] ?? [0, 0];
     return ['path' => $r['path'], 'title' => $r['title'], 'pv' => (int)$r['pv'], 'dur' => $r['nd'] ? (int)round($r['ad']) : null,
             'land' => $l[0], 'bounce' => $l[0] ? (int)round($l[1] / $l[0] * 100) : null];
-  }, all("SELECT path, MAX(title) title, COUNT(*) pv, AVG(dur) ad, SUM(dur IS NOT NULL) nd FROM ji_hits WHERE $W GROUP BY path ORDER BY pv DESC LIMIT 15", $A));
+  }, all("SELECT path, MAX(title) title, COUNT(*) pv, AVG(dur) ad, SUM(dur IS NOT NULL) nd FROM ji_hits WHERE $W GROUP BY path ORDER BY pv DESC LIMIT 20", $A));
   $avgDur = one("SELECT AVG(dur) a FROM ji_hits WHERE $W AND dur IS NOT NULL", $A)['a'];
   // 이전 같은 길이 기간과 비교
   $sum = function ($f, $t) use ($seName) {
