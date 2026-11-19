@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261119d">
+<link rel="stylesheet" href="../assets/style.css?v=20261119e">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -422,18 +422,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261119d"></script>
-<script src="../assets/db.js?v=20261119d"></script>
-<script src="../assets/notify.js?v=20261119d"></script>
-<script src="../assets/seed-trade.js?v=20261119d"></script>
-<script src="../assets/seed-extra.js?v=20261119d"></script>
-<script src="../assets/festivals-data.js?v=20261119d"></script>
-<script src="../assets/seed-new.js?v=20261119d"></script>
-<script src="../assets/seed-comments.js?v=20261119d"></script>
-<script src="../assets/photos.js?v=20261119d"></script>
-<script src="../assets/admin-data.js?v=20261119d"></script>
-<script src="../assets/kmap.js?v=20261119d"></script>
-<script src="../assets/op-posts.js?v=20261119d"></script>
+<script src="../assets/common.js?v=20261119e"></script>
+<script src="../assets/db.js?v=20261119e"></script>
+<script src="../assets/notify.js?v=20261119e"></script>
+<script src="../assets/seed-trade.js?v=20261119e"></script>
+<script src="../assets/seed-extra.js?v=20261119e"></script>
+<script src="../assets/festivals-data.js?v=20261119e"></script>
+<script src="../assets/seed-new.js?v=20261119e"></script>
+<script src="../assets/seed-comments.js?v=20261119e"></script>
+<script src="../assets/photos.js?v=20261119e"></script>
+<script src="../assets/admin-data.js?v=20261119e"></script>
+<script src="../assets/kmap.js?v=20261119e"></script>
+<script src="../assets/op-posts.js?v=20261119e"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1222,19 +1222,18 @@ if (SRV) {
         if (!pick.length) return;
         var t = new Date(); t.setDate(t.getDate() + 1); t.setHours(9, 0, 0, 0);
         var loc = function(d){ return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); };
-        showModal('<h3>운영자 글 ' + pick.length + '개 예약</h3><p class="sub">정한 시간이 되면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 차례로 올라가요. 목록 위쪽 글부터 먼저 올라가요.</p>' +
-          '<label class="sus-l">첫 글 올릴 때</label><input type="datetime-local" id="sch-at" class="sch-in" value="' + loc(t) + '">' +
-          '<label class="sus-l">간격</label><select id="sch-gap" class="sch-in"><option value="1">하루에 1개씩</option><option value="2">이틀에 1개씩</option><option value="3">사흘에 1개씩</option><option value="7">일주일에 1개씩</option><option value="0">모두 같은 시간에</option></select>' +
+        showModal('<h3>운영자 글 ' + pick.length + '개 예약</h3><p class="sub">고른 날짜와 시간이 되면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 올라가요.</p>' +
+          '<label class="sus-l">올릴 날짜와 시간</label><input type="datetime-local" id="sch-at" class="sch-in" value="' + loc(t) + '">' +
           '<div id="sch-prev" class="sch-prev"></div>' +
           '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" id="sch-ok">예약하기</button></div>');
         var plan = function(){
-          var st = new Date(document.getElementById("sch-at").value), gap = +document.getElementById("sch-gap").value;
-          return pick.map(function(p, k){ var d = new Date(st.getTime() + k * gap * 864e5); return { p: p, d: d }; });
+          var st = new Date(document.getElementById("sch-at").value);
+          return pick.map(function(p){ return { p: p, d: st }; });
         };
         var prev = function(){ var pl = plan(), bad = isNaN(pl[0].d.getTime()) || pl[0].d < new Date();
           document.getElementById("sch-prev").innerHTML = bad ? '<span style="color:#b42318">지금보다 나중 시간을 골라 주세요.</span>' :
-            pl.slice(0, 6).map(function(x){ return '<div>' + schTxt(x.d) + ' · ' + esc(x.p.title) + '</div>'; }).join("") + (pl.length > 6 ? '<div>… 마지막 ' + schTxt(pl[pl.length - 1].d) + '</div>' : ''); return !bad; };
-        document.getElementById("sch-at").oninput = document.getElementById("sch-gap").onchange = prev; prev();
+            '<b>' + schTxt(pl[0].d) + '</b>에 올라갈 글' + pl.slice(0, 6).map(function(x){ return '<div>· ' + esc(x.p.title) + '</div>'; }).join("") + (pl.length > 6 ? '<div>… 외 ' + (pl.length - 6) + '개</div>' : ''); return !bad; };
+        document.getElementById("sch-at").oninput = prev; prev();
         document.getElementById("sch-ok").onclick = function(){
           if (!prev()) return; var b = this; b.disabled = true;
           var items = plan().map(function(x){ var d = x.d; return { op_k: x.p.k, board: x.p.board, head: x.p.head || "", title: x.p.title, content: x.p.content,
