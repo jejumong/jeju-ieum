@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261120b">
+<link rel="stylesheet" href="../assets/style.css?v=20261120c">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -451,18 +451,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261120b"></script>
-<script src="../assets/db.js?v=20261120b"></script>
-<script src="../assets/notify.js?v=20261120b"></script>
-<script src="../assets/seed-trade.js?v=20261120b"></script>
-<script src="../assets/seed-extra.js?v=20261120b"></script>
-<script src="../assets/festivals-data.js?v=20261120b"></script>
-<script src="../assets/seed-new.js?v=20261120b"></script>
-<script src="../assets/seed-comments.js?v=20261120b"></script>
-<script src="../assets/photos.js?v=20261120b"></script>
-<script src="../assets/admin-data.js?v=20261120b"></script>
-<script src="../assets/kmap.js?v=20261120b"></script>
-<script src="../assets/op-posts.js?v=20261120b"></script>
+<script src="../assets/common.js?v=20261120c"></script>
+<script src="../assets/db.js?v=20261120c"></script>
+<script src="../assets/notify.js?v=20261120c"></script>
+<script src="../assets/seed-trade.js?v=20261120c"></script>
+<script src="../assets/seed-extra.js?v=20261120c"></script>
+<script src="../assets/festivals-data.js?v=20261120c"></script>
+<script src="../assets/seed-new.js?v=20261120c"></script>
+<script src="../assets/seed-comments.js?v=20261120c"></script>
+<script src="../assets/photos.js?v=20261120c"></script>
+<script src="../assets/admin-data.js?v=20261120c"></script>
+<script src="../assets/kmap.js?v=20261120c"></script>
+<script src="../assets/op-posts.js?v=20261120c"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1236,13 +1236,20 @@ if (SRV) {
           .then(function(){ closeModal(); toast("올렸어요"); drawOpPosts(); }, function(e){ alert("올리기 실패: " + e.message); });
       }
       window._opPost = postOne;
+      /* 이미 올린 글을 지금 운영자 글 내용으로 바꾸기 (제목·말머리·본문만, 조회수·댓글은 그대로) */
+      window._opRefresh = function(i){
+        var p = L[i], d = done[p.k]; if (!d) return;
+        if (!confirm("게시판에 올라가 있는 '" + p.title + "' 글을 지금 보이는 최신 내용으로 바꿀까요?\n조회수·좋아요·댓글은 그대로 남아요.")) return;
+        JIDB.call("post_update", { id: d, title: p.title, head: p.head || "", content: p.content })
+          .then(function(){ closeModal(); toast("최신 내용으로 바꿨어요"); }, function(e){ alert("바꾸지 못했어요: " + e.message); });
+      };
       box.addEventListener("click", function(e){
         var b = e.target.closest(".op-main"); if (!b) return;
         var i = +b.dataset.pv, p = L[i], d = done[p.k];
         showModal('<div class="op-pv"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + (d ? ' · <b style="color:#1a7f37">올린 글</b>' : ' · 아직 안 올림') + '</small>' +
           '<h3>' + esc(p.title) + '</h3><div class="op-pv-body">' + linkify(p.content || "") + '</div></div>' +
           '<div class="bt"><button class="mb" onclick="closeModal()">닫기</button>' +
-          (d ? '<a class="mb pri" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '<button class="mb pri" onclick="_opPost(' + i + ')">이 글 올리기</button>') + '</div>');
+          (d ? '<button class="mb" onclick="_opRefresh(' + i + ')">최신 내용으로 바꾸기</button><a class="mb pri" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '<button class="mb pri" onclick="_opPost(' + i + ')">이 글 올리기</button>') + '</div>');
       });
       tabs.onclick = function(e){ var b = e.target.closest("button"); if (!b || b.dataset.t === TAB) return; TAB = window.OP_TAB = b.dataset.t; pg = 0; paint(); };
       box.onchange = function(e){ var c = e.target; if (!c.classList.contains("op-c")) return; if (c.checked) SEL[c.dataset.i] = 1; else delete SEL[c.dataset.i]; sync(); };
