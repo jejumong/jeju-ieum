@@ -1149,8 +1149,9 @@ a.src-tag:hover{color:var(--sea-700);border-color:var(--sea-200)}
 .hx-head a:hover{color:var(--sea-700)}
 
 .hx-path{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:0;margin:0;counter-reset:none}
-.hx-path a{display:flex;flex-direction:column;gap:4px;height:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 16px;text-decoration:none;color:var(--ink-2);position:relative;transition:border-color .2s}
+.hx-path a{display:flex;flex-direction:column;gap:4px;height:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 16px;text-decoration:none;color:var(--ink-2);position:relative;transition:border-color .2s var(--ease),background .2s var(--ease),transform .2s var(--ease),box-shadow .2s var(--ease)}
 .hx-path a:hover{border-color:var(--sea-200)}
+@media (hover:hover){ .hx-path a:hover{background:#f3f8fc;border-color:var(--line);transform:translateY(-3px);box-shadow:0 10px 22px rgba(20,60,100,.08)} }
 .hx-path .p-n{width:28px;height:28px;border-radius:50%;background:var(--sea);color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;margin-bottom:8px}
 .hx-path .p-q{font-size:13px;font-weight:700;color:var(--sea-700)}
 .hx-path b{font-size:16px;color:var(--ink);line-height:1.4;letter-spacing:-.01em}
