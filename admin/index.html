@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261119k">
+<link rel="stylesheet" href="../assets/style.css?v=20261120a">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -451,18 +451,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261119k"></script>
-<script src="../assets/db.js?v=20261119k"></script>
-<script src="../assets/notify.js?v=20261119k"></script>
-<script src="../assets/seed-trade.js?v=20261119k"></script>
-<script src="../assets/seed-extra.js?v=20261119k"></script>
-<script src="../assets/festivals-data.js?v=20261119k"></script>
-<script src="../assets/seed-new.js?v=20261119k"></script>
-<script src="../assets/seed-comments.js?v=20261119k"></script>
-<script src="../assets/photos.js?v=20261119k"></script>
-<script src="../assets/admin-data.js?v=20261119k"></script>
-<script src="../assets/kmap.js?v=20261119k"></script>
-<script src="../assets/op-posts.js?v=20261119k"></script>
+<script src="../assets/common.js?v=20261120a"></script>
+<script src="../assets/db.js?v=20261120a"></script>
+<script src="../assets/notify.js?v=20261120a"></script>
+<script src="../assets/seed-trade.js?v=20261120a"></script>
+<script src="../assets/seed-extra.js?v=20261120a"></script>
+<script src="../assets/festivals-data.js?v=20261120a"></script>
+<script src="../assets/seed-new.js?v=20261120a"></script>
+<script src="../assets/seed-comments.js?v=20261120a"></script>
+<script src="../assets/photos.js?v=20261120a"></script>
+<script src="../assets/admin-data.js?v=20261120a"></script>
+<script src="../assets/kmap.js?v=20261120a"></script>
+<script src="../assets/op-posts.js?v=20261120a"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1196,11 +1196,13 @@ if (SRV) {
       var SCH = {}, schRows = rs.pop() || [];
       schRows.forEach(function(x){ if (x.op_k && x.status !== "done") SCH[x.op_k] = x; });
       var done = {};
-      rs.forEach(function(arr){ (arr || []).forEach(function(p){ if (p.extra && p.extra.op) done[p.extra.op] = p.id; }); });
+      var doneAt = {};
+      rs.forEach(function(arr){ (arr || []).forEach(function(p){ if (p.extra && p.extra.op) { done[p.extra.op] = p.id; doneAt[p.extra.op] = p.created_at || ""; } }); });
       schRows.forEach(function(x){ if (x.op_k && x.status === "done" && x.post_id && !done[x.op_k]) done[x.op_k] = x.post_id; });
       var IDX = { todo: [], sched: [], done: [] };
       L.forEach(function(p, i){ IDX[done[p.k] ? "done" : SCH[p.k] ? "sched" : "todo"].push(i); });
       IDX.sched.sort(function(a, b){ return SCH[L[a].k].at < SCH[L[b].k].at ? -1 : 1; });
+      IDX.done.sort(function(a, b){ var x = doneAt[L[a].k] || "", y = doneAt[L[b].k] || ""; return x < y ? 1 : x > y ? -1 : b - a; });   // 올린 글: 마지막에 올린 글이 맨 위
       var box = document.getElementById("op-list"), PER = 15, pg = 0, SEL = {};
       var go = document.getElementById("op-go"), all = document.getElementById("op-all"), tabs = document.getElementById("op-tabs");
       var sch = document.getElementById("op-sch");
