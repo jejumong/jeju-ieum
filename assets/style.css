@@ -1861,6 +1861,11 @@ html.pv-lb-open,html.pv-lb-open body{overflow:hidden}
 .pv-like:hover{border-color:#f3b4c0;color:#d94a6b}
 .pv-like.on{border-color:#f3b4c0;background:#fff1f4;color:#d94a6b}
 .pv-like.pop .hz{animation:likepop .35s ease}
+.pv-like-end{display:flex;justify-content:center;margin:28px 0 8px}
+.pv-like.big{padding:11px 26px;font-size:15px;gap:7px;border:1.5px solid #f3b4c0;color:#d94a6b;background:#fff;box-shadow:0 2px 8px rgba(217,74,107,.10)}
+.pv-like.big .hz{font-size:20px}
+.pv-like.big .lb{font-weight:700}
+.pv-like.big.on{background:#fff1f4}
 @keyframes likepop{0%{transform:scale(1)}50%{transform:scale(1.45)}100%{transform:scale(1)}}
 
 /* 좋아요: PC 에서 살짝 더 눈에 띄게 */

@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261120d">
+<link rel="stylesheet" href="assets/style.css?v=20261120e">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -87,16 +87,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261120d"></script>
-<script src="assets/common.js?v=20261120d"></script>
-<script src="assets/db.js?v=20261120d"></script>
-<script src="assets/notify.js?v=20261120d"></script>
-<script src="assets/seed-trade.js?v=20261120d"></script>
-<script src="assets/seed-extra.js?v=20261120d"></script>
-<script src="assets/festivals-data.js?v=20261120d"></script>
-<script src="assets/seed-new.js?v=20261120d"></script>
-<script src="assets/seed-comments.js?v=20261120d"></script>
-<script src="assets/admin-data.js?v=20261120d"></script>
+<script src="assets/kmap.js?v=20261120e"></script>
+<script src="assets/common.js?v=20261120e"></script>
+<script src="assets/db.js?v=20261120e"></script>
+<script src="assets/notify.js?v=20261120e"></script>
+<script src="assets/seed-trade.js?v=20261120e"></script>
+<script src="assets/seed-extra.js?v=20261120e"></script>
+<script src="assets/festivals-data.js?v=20261120e"></script>
+<script src="assets/seed-new.js?v=20261120e"></script>
+<script src="assets/seed-comments.js?v=20261120e"></script>
+<script src="assets/admin-data.js?v=20261120e"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -180,6 +180,7 @@ if (!post) {
     reInfoHtml(post) +
     galleryHtml(post) +
     '<div class="pv-content">' + esc(post.content || "(내용 없음)").replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener nofollow" style="color:var(--sea-700);text-decoration:underline;word-break:break-all">$1</a>') + '</div>' +
+    (post.db ? likeBtnHtml(post, true) : '') +
     (post.board === "구인구직" && isMyPost(post)
       ? '<div class="job-status' + (post.head === "채용완료" ? " done" : "") + '"><div><b>' + (post.head === "채용완료" ? "✅ 채용이 끝난 공고예요" : "📢 지금 모집 중인 공고예요") + '</b>' +
         '<span>' + (post.head === "채용완료" ? "목록에 '채용완료'로 흐리게 표시되고 있어요." : "사람을 구했으면 채용완료로 바꿔 주세요. 목록에 바로 표시돼요.") + '</span></div>' +
@@ -311,21 +312,25 @@ function goBackList(a) {
 }
 
 /* 좋아요 버튼 */
-function likeBtnHtml(p) {
-  var on = typeof likedByMe === "function" && likedByMe(p.id);
+function likeBtnHtml(p, big) {
+  var on = typeof likedByMe === "function" && likedByMe(p.id), n = likesOf(p).toLocaleString();
+  if (big) return '<div class="pv-like-end"><button type="button" class="pv-like big' + (on ? ' on' : '') + '" onclick="toggleLikeBtn()" aria-pressed="' + on + '">' +
+    '<span class="hz">' + (on ? '♥' : '♡') + '</span> <span class="lb">' + (on ? '좋아요 했어요' : '이 글이 좋아요') + '</span> <b>' + n + '</b></button></div>';
   return '<button type="button" class="pv-like' + (on ? ' on' : '') + '" id="pv-like" onclick="toggleLikeBtn()" aria-pressed="' + on + '" title="' + (on ? '좋아요 취소' : '좋아요') + '">' +
-    '<span class="hz">' + (on ? '♥' : '♡') + '</span> <b id="pv-like-n">' + likesOf(p).toLocaleString() + '</b></button>';
+    '<span class="hz">' + (on ? '♥' : '♡') + '</span> <b id="pv-like-n">' + n + '</b></button>';
 }
 function toggleLikeBtn() {
   if (!(window.JIDB && JIDB.enabled)) return;
   var u = currentUser();
   if (!u || !u.id) { if (confirm("로그인하면 좋아요를 누를 수 있어요. 로그인할까요?")) location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); return; }
   if (!canWrite()) return;
-  var b = document.getElementById("pv-like"); b.disabled = true;
+  var bs = document.querySelectorAll(".pv-like"); bs.forEach(function (b) { b.disabled = true; });
   JIDB.toggleLike(post.id).then(function (r) {
-    b.outerHTML = likeBtnHtml(post);
-    if (r.liked) { var nb = document.getElementById("pv-like"); nb.classList.add("pop"); }
-  }, function (e) { b.disabled = false; alert(e.message || e); });
+    /* 위(제목 아래)와 아래(글 끝) 버튼을 함께 바꿈 */
+    var t = document.getElementById("pv-like"); if (t) t.outerHTML = likeBtnHtml(post);
+    var e = document.querySelector(".pv-like-end"); if (e) e.outerHTML = likeBtnHtml(post, true);
+    if (r.liked) document.querySelectorAll(".pv-like").forEach(function (b) { b.classList.add("pop"); });
+  }, function (e) { bs.forEach(function (b) { b.disabled = false; }); alert(e.message || e); });
 }
 
 /* 부동산: 중개사무소 정보 또는 직거래 표시 */
