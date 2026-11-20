@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261120c">
+<link rel="stylesheet" href="assets/style.css?v=20261120d">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -87,16 +87,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261120c"></script>
-<script src="assets/common.js?v=20261120c"></script>
-<script src="assets/db.js?v=20261120c"></script>
-<script src="assets/notify.js?v=20261120c"></script>
-<script src="assets/seed-trade.js?v=20261120c"></script>
-<script src="assets/seed-extra.js?v=20261120c"></script>
-<script src="assets/festivals-data.js?v=20261120c"></script>
-<script src="assets/seed-new.js?v=20261120c"></script>
-<script src="assets/seed-comments.js?v=20261120c"></script>
-<script src="assets/admin-data.js?v=20261120c"></script>
+<script src="assets/kmap.js?v=20261120d"></script>
+<script src="assets/common.js?v=20261120d"></script>
+<script src="assets/db.js?v=20261120d"></script>
+<script src="assets/notify.js?v=20261120d"></script>
+<script src="assets/seed-trade.js?v=20261120d"></script>
+<script src="assets/seed-extra.js?v=20261120d"></script>
+<script src="assets/festivals-data.js?v=20261120d"></script>
+<script src="assets/seed-new.js?v=20261120d"></script>
+<script src="assets/seed-comments.js?v=20261120d"></script>
+<script src="assets/admin-data.js?v=20261120d"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -348,15 +348,26 @@ var PV_PH, PV_I;   // 값은 galleryHtml 에서 (글 그리기가 이 줄보다 
 function galleryHtml(p) {
   PV_PH = (p && p.extra && Array.isArray(p.extra.photos)) ? p.extra.photos : []; PV_I = 0;
   if (!PV_PH.length) return "";
-  var many = PV_PH.length > 1;
-  return '<div class="pv-gallery"><div class="pv-main"><img id="pv-img" src="' + esc(PV_PH[0]) + '" alt="첨부 사진 1" onclick="pvZoom()">' +
-    (many ? '<button type="button" class="pv-nav l" onclick="pvGo(-1)" aria-label="이전 사진">‹</button><button type="button" class="pv-nav r" onclick="pvGo(1)" aria-label="다음 사진">›</button>' +
-      '<span class="pv-count" id="pv-count">1 / ' + PV_PH.length + '</span>' : '') + '</div>' +
-    (many ? '<div class="pv-thumbs" id="pv-thumbs">' + PV_PH.map(function (u, i) { return '<button type="button" class="' + (i ? '' : 'on') + '" onclick="pvShow(' + i + ')"><img src="' + esc(u) + '" alt="" loading="lazy"></button>'; }).join("") + '</div>' : '') + '</div>';
+  if (PV_PH.length === 1) return '<div class="pv-gallery"><div class="pv-main"><img id="pv-img" src="' + esc(PV_PH[0]) + '" alt="첨부 사진 1" onclick="pvZoom()"></div></div>';
+  /* 여러 장이면 콜라주: 한 줄에 두 장씩, 같은 줄의 사진은 높이를 맞춤 (홀수면 마지막 한 장은 혼자 한 줄) */
+  var rows = [];
+  for (var i = 0; i < PV_PH.length; i += 2) rows.push(PV_PH.slice(i, i + 2).map(function (u, j) { return { u: u, i: i + j }; }));
+  return '<div class="pv-gallery pv-collage">' + rows.map(function (r) {
+    return '<div class="pc-row' + (r.length === 1 ? ' solo' : '') + '">' + r.map(function (c) {
+      return '<button type="button" class="pc-cell" onclick="pvOpen(' + c.i + ')" aria-label="사진 ' + (c.i + 1) + ' 크게 보기"><img src="' + esc(c.u) + '" alt="첨부 사진 ' + (c.i + 1) + '" loading="lazy" onload="pcFit(this)"></button>';
+    }).join("") + '</div>';
+  }).join("") + '</div>';
 }
+/* 사진 비율을 알게 되면 칸 너비를 비율대로 — 같은 줄 두 장의 높이가 같아짐 */
+function pcFit(im) {
+  var w = im.naturalWidth, h = im.naturalHeight; if (!w || !h) return;
+  var c = im.parentNode; c.style.aspectRatio = w + " / " + h;
+  if (c.parentNode.classList.contains("solo")) c.style.setProperty("--ar", w / h); else c.style.flex = (w / h) + " 1 0";
+}
+function pvOpen(i) { PV_I = i; pvZoom(); }
 function pvShow(i) {
   PV_I = (i + PV_PH.length) % PV_PH.length;
-  var im = document.getElementById("pv-img"); im.src = PV_PH[PV_I]; im.alt = "첨부 사진 " + (PV_I + 1);
+  var im = document.getElementById("pv-img"); if (im) { im.src = PV_PH[PV_I]; im.alt = "첨부 사진 " + (PV_I + 1); }
   var c = document.getElementById("pv-count"); if (c) c.textContent = (PV_I + 1) + " / " + PV_PH.length;
   document.querySelectorAll("#pv-thumbs button").forEach(function (b, j) { b.classList.toggle("on", j === PV_I); });
 }
