@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261120g">
+<link rel="stylesheet" href="../assets/style.css?v=20261121a">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -202,6 +202,12 @@ table.mem-t td small{font-size:13px}
 .op-bar label{font-size:14px;font-weight:600;display:flex;gap:6px;align-items:center}
 .op-row{display:flex;gap:12px;align-items:center;padding:12px 4px;border-top:1px solid var(--line-2,#eef1f4)}
 .op-tabs{display:flex;gap:6px;margin:4px 0 12px}
+.op-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0 12px}.op-top .op-tabs{margin:0}
+.op-q{display:flex;align-items:center;gap:8px;flex:1 1 240px;max-width:380px}
+.op-q input{flex:1;min-width:0;padding:9px 14px;border:1px solid #dfe3ea;border-radius:999px;font:inherit;font-size:14px;background:#fff}
+.op-q input:focus{outline:none;border-color:#1f6fb2;box-shadow:0 0 0 3px rgba(31,111,178,.12)}
+.op-q span{font-size:13px;color:var(--ink-3);white-space:nowrap}
+@media (max-width:680px){ .op-q{max-width:none;flex-basis:100%} }
 .rep-card{border:1px solid #eef1f5;border-radius:12px;padding:14px 16px;margin-bottom:10px}
 .dv-grid{display:grid;grid-template-columns:minmax(220px,0.8fr) 1fr 1fr;gap:14px}
 .dv-col{background:#f8fafc;border-radius:12px;padding:14px 16px;min-width:0}
@@ -451,18 +457,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261120g"></script>
-<script src="../assets/db.js?v=20261120g"></script>
-<script src="../assets/notify.js?v=20261120g"></script>
-<script src="../assets/seed-trade.js?v=20261120g"></script>
-<script src="../assets/seed-extra.js?v=20261120g"></script>
-<script src="../assets/festivals-data.js?v=20261120g"></script>
-<script src="../assets/seed-new.js?v=20261120g"></script>
-<script src="../assets/seed-comments.js?v=20261120g"></script>
-<script src="../assets/photos.js?v=20261120g"></script>
-<script src="../assets/admin-data.js?v=20261120g"></script>
-<script src="../assets/kmap.js?v=20261120g"></script>
-<script src="../assets/op-posts.js?v=20261120g"></script>
+<script src="../assets/common.js?v=20261121a"></script>
+<script src="../assets/db.js?v=20261121a"></script>
+<script src="../assets/notify.js?v=20261121a"></script>
+<script src="../assets/seed-trade.js?v=20261121a"></script>
+<script src="../assets/seed-extra.js?v=20261121a"></script>
+<script src="../assets/festivals-data.js?v=20261121a"></script>
+<script src="../assets/seed-new.js?v=20261121a"></script>
+<script src="../assets/seed-comments.js?v=20261121a"></script>
+<script src="../assets/photos.js?v=20261121a"></script>
+<script src="../assets/admin-data.js?v=20261121a"></script>
+<script src="../assets/kmap.js?v=20261121a"></script>
+<script src="../assets/op-posts.js?v=20261121a"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1188,7 +1194,8 @@ if (SRV) {
     var L = window.OP_POSTS || [];
     var TAB = window.OP_TAB || "todo";   // todo = 안 올린 글, done = 올린 글
     M().innerHTML = '<h1>운영자 글</h1><p class="sub">미리 준비한 정보 글 ' + L.length + '개예요. 올릴 글을 고르면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 게시판에 올라가요. 올린 뒤에도 글 화면에서 고치거나 지울 수 있어요.</p>' +
-      '<div class="op-tabs" id="op-tabs"><button data-t="todo">안 올린 글</button><button data-t="sched">예약</button><button data-t="done">올린 글</button></div>' +
+      '<div class="op-top"><div class="op-tabs" id="op-tabs"><button data-t="todo">안 올린 글</button><button data-t="sched">예약</button><button data-t="done">올린 글</button></div>' +
+      '<div class="op-q"><input type="search" id="op-q" placeholder="제목·내용·게시판 검색" value="' + esc(window.OP_Q || "") + '" autocomplete="off"><span id="op-q-n"></span></div></div>' +
       '<div class="panel"><div class="op-bar" id="op-bar"><label><input type="checkbox" id="op-all"> 안 올린 글 모두 고르기</label><span class="op-bar-b"><button class="btn" id="op-sch" disabled>⏰ 예약해서 올리기</button><button class="btn accent" id="op-go" disabled>고른 글 지금 올리기</button></span></div><div id="op-list">확인하는 중…</div></div>';
     var boards = [].concat.apply([], MOVE_BOARDS.map(function(g){ return g[1]; }));   // 게시판을 옮긴 글도 '올림'으로 잡히게 전체 게시판 확인
     Promise.all(boards.map(function(b){ return JIDB.call("post_list", { board: b }).catch(function(){ return []; }); })
@@ -1208,13 +1215,20 @@ if (SRV) {
       var sch = document.getElementById("op-sch");
       function sync(){ var n = Object.keys(SEL).length; go.disabled = sch.disabled = !n; go.textContent = n ? "고른 글 " + n + "개 지금 올리기" : "고른 글 지금 올리기"; sch.textContent = n ? "⏰ " + n + "개 예약해서 올리기" : "⏰ 예약해서 올리기"; }
       var schTxt = function(at){ var d = new Date(at); return (d.getMonth() + 1) + "." + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); };
+      /* 검색: 띄어쓰기로 나눈 낱말이 제목·말머리·게시판·본문에 모두 들어 있는 글만 */
+      var Q = window.OP_Q || "", qIn = document.getElementById("op-q"), qN = document.getElementById("op-q-n");
+      var HAY = L.map(function(p){ return (p.title + " " + (p.head || "") + " " + p.board + " " + (p.content || "")).toLowerCase(); });
+      function hit(i){ var w = Q.trim().toLowerCase().split(/\s+/).filter(Boolean); return w.every(function(x){ return HAY[i].indexOf(x) >= 0; }); }
+      function F(t){ return Q.trim() ? IDX[t].filter(hit) : IDX[t]; }
       function paintTabs(){
-        tabs.querySelectorAll("button").forEach(function(b){ var t = b.dataset.t; b.classList.toggle("on", t === TAB); b.innerHTML = ({ todo: "안 올린 글", sched: "예약", done: "올린 글" })[t] + ' <b>' + IDX[t].length + '</b>'; });
-        document.getElementById("op-bar").style.display = TAB === "todo" && IDX.todo.length ? "" : "none";
+        tabs.querySelectorAll("button").forEach(function(b){ var t = b.dataset.t; b.classList.toggle("on", t === TAB); b.innerHTML = ({ todo: "안 올린 글", sched: "예약", done: "올린 글" })[t] + ' <b>' + F(t).length + '</b>'; });
+        document.getElementById("op-bar").style.display = TAB === "todo" && F("todo").length ? "" : "none";
+        qN.textContent = Q.trim() ? "전체 " + (F("todo").length + F("sched").length + F("done").length) + "개 찾음" : "";
       }
       function paint(){
         paintTabs();
-        var list = IDX[TAB], pages = Math.ceil(list.length / PER) || 1; pg = Math.min(pg, pages - 1);
+        var list = F(TAB), pages = Math.ceil(list.length / PER) || 1; pg = Math.min(pg, pages - 1);
+        if (!list.length && Q.trim()) { box.innerHTML = '<div class="empty">\'' + esc(Q.trim()) + '\'(으)로 찾은 글이 이 탭에는 없어요.' + (F("todo").length + F("sched").length + F("done").length ? ' 다른 탭의 숫자를 확인해 보세요.' : '') + '</div>'; return; }
         if (!list.length) { box.innerHTML = '<div class="empty">' + ({ todo: "준비한 글을 모두 올렸거나 예약했어요.", sched: "예약한 글이 없어요. '안 올린 글'에서 골라 예약할 수 있어요.", done: "아직 올린 글이 없어요." })[TAB] + '</div>'; return; }
         box.innerHTML = list.slice(pg * PER, pg * PER + PER).map(function(i){
           var p = L[i], d = done[p.k], sc = SCH[p.k];
@@ -1253,7 +1267,10 @@ if (SRV) {
       });
       tabs.onclick = function(e){ var b = e.target.closest("button"); if (!b || b.dataset.t === TAB) return; TAB = window.OP_TAB = b.dataset.t; pg = 0; paint(); };
       box.onchange = function(e){ var c = e.target; if (!c.classList.contains("op-c")) return; if (c.checked) SEL[c.dataset.i] = 1; else delete SEL[c.dataset.i]; sync(); };
-      all.onchange = function(){ SEL = {}; if (all.checked) IDX.todo.forEach(function(i){ SEL[i] = 1; }); paint(); sync(); };   // 모든 페이지의 안 올린 글
+      var qt; qIn.oninput = function(){ clearTimeout(qt); qt = setTimeout(function(){ Q = window.OP_Q = qIn.value; pg = 0;
+        if (Q.trim() && !F(TAB).length) { var t = ["todo", "sched", "done"].filter(function(x){ return F(x).length; })[0]; if (t) TAB = window.OP_TAB = t; }   // 찾은 글이 있는 탭으로
+        paint(); }, 150); };
+      all.onchange = function(){ SEL = {}; if (all.checked) F("todo").forEach(function(i){ SEL[i] = 1; }); paint(); sync(); };   // 모든 페이지의 안 올린 글
       window.opSchCancel = function(sid){ if (!confirm("이 예약을 취소할까요? 글은 '안 올린 글'로 돌아가요.")) return; JIDB.call("admin_sched_cancel", { id: sid }).then(function(){ toast("예약을 취소했어요"); drawOpPosts(); }, function(e){ alert(e.message); }); };
       sch.onclick = function(){
         var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return L[i]; });   // 목록 위쪽 글부터 먼저
