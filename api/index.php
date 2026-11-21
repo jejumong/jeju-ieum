@@ -211,7 +211,8 @@ case 'maint': {
       if ($k === '' || !in_array($b, $BOARDS, true)) continue;
       if (isset($done[$k])) { $skip++; continue; }
       $t = date('Y-m-d H:i:s', $base + $i);
-      q("INSERT INTO ji_posts (id, board, head, title, content, loc, meta, price, extra, author, author_nick, created_at, updated_at) VALUES (?,?,?,?,?,'','','',?,?,?,?,?)",
+      if (isset($R['extra']['op']) && ($u['role'] ?? '') !== 'admin') unset($R['extra']['op']);   // 운영자 글 표시는 관리자만
+  q("INSERT INTO ji_posts (id, board, head, title, content, loc, meta, price, extra, author, author_nick, created_at, updated_at) VALUES (?,?,?,?,?,'','','',?,?,?,?,?)",
         [uuid(), $b, str($p['head'] ?? '', 30), str($p['title'] ?? '', 120), str($p['content'] ?? '', 20000), json_encode(['op' => $k], JSON_UNESCAPED_UNICODE), $a['id'], $a['nick'], $t, $t]);
       $n++;
     }
@@ -822,7 +823,7 @@ case 'admin_alerts_set': {
   out(['prefs' => $save]);
 }
 case 'admin_post_counts': {   // 관리자: 회원 글 조회수·좋아요 수 정하기
-  admin($R); $id = $R['id'] ?? '';
+  admin($R, true); $id = $R['id'] ?? '';
   $r = is_uuid($id) ? one("SELECT id FROM ji_posts WHERE id = ?", [$id]) : null; if (!$r) fail('글을 찾을 수 없어요', 404);
   if (isset($R['views'])) q("UPDATE ji_posts SET views = ? WHERE id = ?", [max(0, min(100000000, (int)$R['views'])), $id]);
   if (isset($R['likes'])) {
@@ -890,7 +891,7 @@ case 'hit_dur': {   // 페이지를 떠날 때 머문 시간(초)
 }
 /* ───────── 운영자 글 예약 게시 ───────── */
 case 'admin_sched_add': {   // items: [{op_k, board, head, title, content, at}]
-  $me = admin($R); $items = is_array($R['items'] ?? null) ? array_slice($R['items'], 0, 100) : [];
+  $me = admin($R, true); $items = is_array($R['items'] ?? null) ? array_slice($R['items'], 0, 100) : [];
   $n = 0;
   foreach ($items as $it) {
     $b = str($it['board'] ?? '', 30); $at = strtotime((string)($it['at'] ?? ''));
@@ -904,17 +905,28 @@ case 'admin_sched_add': {   // items: [{op_k, board, head, title, content, at}]
   out(['added' => $n]);
 }
 case 'admin_sched_list': {
-  admin($R);
+  admin($R, true);
   out(array_map(function ($r) { $r['at'] = iso($r['at']); return $r; },
     all("SELECT s.id, s.op_k, s.board, s.title, s.at, s.status, s.post_id, u.nick by_nick FROM ji_scheduled s LEFT JOIN ji_users u ON u.id = s.by_id
          WHERE s.status IN ('wait','busy','fail') OR s.at > (NOW() - INTERVAL 7 DAY) ORDER BY s.at")));
 }
 case 'admin_sched_cancel': {
-  admin($R); q("DELETE FROM ji_scheduled WHERE id = ? AND status IN ('wait','fail')", [(int)($R['id'] ?? 0)]); out(true);
+  admin($R, true); q("DELETE FROM ji_scheduled WHERE id = ? AND status IN ('wait','fail')", [(int)($R['id'] ?? 0)]); out(true);
 }
 case 'admin_set': {
-  admin($R); $k = $R['k'] ?? '';
+  $me = admin($R); $k = $R['k'] ?? '';
   if (!in_array($k, ['admin_ov', 'notices'], true)) fail('저장할 수 없는 항목이에요');
+  if ($k === 'admin_ov' && ($me['role'] ?? '') !== 'admin' && is_array($R['v'] ?? null)) {
+    // 스텝: 프리미엄·조회수·좋아요는 바꿀 수 없음 → 저장된 값을 그대로 둠
+    $old = setting('admin_ov', []); $old = is_array($old) ? $old : []; $nv = $R['v'];
+    foreach (array_unique(array_merge(array_keys($old), array_keys($nv))) as $pid) {
+      foreach (['premium', 'views', 'likes'] as $f) {
+        if (isset($old[$pid]) && is_array($old[$pid]) && array_key_exists($f, $old[$pid])) { if (!isset($nv[$pid]) || !is_array($nv[$pid])) $nv[$pid] = []; $nv[$pid][$f] = $old[$pid][$f]; }
+        elseif (isset($nv[$pid]) && is_array($nv[$pid])) unset($nv[$pid][$f]);
+      }
+    }
+    $R['v'] = $nv;
+  }
   $v = json_encode($R['v'] ?? null, JSON_UNESCAPED_UNICODE); if (strlen($v) > 2000000) fail('너무 커요');
   q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", [$k, $v, now()]); out(true);
 }
@@ -990,13 +1002,13 @@ case 'admin_inquiry_set': {
 }
 case 'admin_inquiry_delete': { admin($R); $iq = $R['id'] ?? ''; if (is_uuid($iq)) foreach (all("SELECT path FROM ji_uploads WHERE post_id = ?", [$iq]) as $o) remove_upload($o['path']); q("DELETE FROM ji_inquiries WHERE id = ?", [$iq]); out(true); }
 case 'admin_sellers': {
-  admin($R);
+  admin($R, true);
   out(array_map(function ($r) { $r['details'] = json_decode($r['details'], true); $r['created_at'] = iso($r['created_at']);
     $u = one("SELECT email, region FROM ji_users WHERE id = ?", [$r['applicant']]); $r['email'] = $u['email'] ?? ''; $r['region'] = $u['region'] ?? ''; return $r; },
     all("SELECT * FROM ji_seller_requests ORDER BY created_at DESC LIMIT 300")));
 }
 case 'admin_seller_decide': {
-  admin($R); $st = $R['status'] ?? ''; if (!in_array($st, ['approved', 'rejected'], true)) fail('처리 방법이 올바르지 않아요');
+  admin($R, true); $st = $R['status'] ?? ''; if (!in_array($st, ['approved', 'rejected'], true)) fail('처리 방법이 올바르지 않아요');
   $r = one("SELECT * FROM ji_seller_requests WHERE id = ?", [$R['id'] ?? '']); if (!$r) fail('요청을 찾을 수 없어요', 404);
   $was = $r['status'];
   q("UPDATE ji_seller_requests SET status = ? WHERE id = ?", [$st, $r['id']]);

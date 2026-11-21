@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261121a">
+<link rel="stylesheet" href="../assets/style.css?v=20261121b">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -202,6 +202,7 @@ table.mem-t td small{font-size:13px}
 .op-bar label{font-size:14px;font-weight:600;display:flex;gap:6px;align-items:center}
 .op-row{display:flex;gap:12px;align-items:center;padding:12px 4px;border-top:1px solid var(--line-2,#eef1f4)}
 .op-tabs{display:flex;gap:6px;margin:4px 0 12px}
+.adm-t td.num-ro{color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .op-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0 12px}.op-top .op-tabs{margin:0}
 .op-q{display:flex;align-items:center;gap:8px;flex:1 1 240px;max-width:380px}
 .op-q input{flex:1;min-width:0;padding:9px 14px;border:1px solid #dfe3ea;border-radius:999px;font:inherit;font-size:14px;background:#fff}
@@ -457,18 +458,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261121a"></script>
-<script src="../assets/db.js?v=20261121a"></script>
-<script src="../assets/notify.js?v=20261121a"></script>
-<script src="../assets/seed-trade.js?v=20261121a"></script>
-<script src="../assets/seed-extra.js?v=20261121a"></script>
-<script src="../assets/festivals-data.js?v=20261121a"></script>
-<script src="../assets/seed-new.js?v=20261121a"></script>
-<script src="../assets/seed-comments.js?v=20261121a"></script>
-<script src="../assets/photos.js?v=20261121a"></script>
-<script src="../assets/admin-data.js?v=20261121a"></script>
-<script src="../assets/kmap.js?v=20261121a"></script>
-<script src="../assets/op-posts.js?v=20261121a"></script>
+<script src="../assets/common.js?v=20261121b"></script>
+<script src="../assets/db.js?v=20261121b"></script>
+<script src="../assets/notify.js?v=20261121b"></script>
+<script src="../assets/seed-trade.js?v=20261121b"></script>
+<script src="../assets/seed-extra.js?v=20261121b"></script>
+<script src="../assets/festivals-data.js?v=20261121b"></script>
+<script src="../assets/seed-new.js?v=20261121b"></script>
+<script src="../assets/seed-comments.js?v=20261121b"></script>
+<script src="../assets/photos.js?v=20261121b"></script>
+<script src="../assets/admin-data.js?v=20261121b"></script>
+<script src="../assets/kmap.js?v=20261121b"></script>
+<script src="../assets/op-posts.js?v=20261121b"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -563,7 +564,7 @@ function boot(){
   document.getElementById("root").innerHTML =
     '<div class="adm"><aside class="side">' +
       '<a class="brand" href="index.html#dash" onclick="return goHome()" title="대시보드로 (새로고침)">' + LOGOMARK + '<div>제주이음<small>ADMIN CONSOLE</small></div></a>' +
-      '<nav>' + MENU.map(function(m){
+      '<nav>' + MENU.filter(menuOk).map(function(m){
         return '<button data-v="' + m[0] + '" class="' + (view===m[0]?"on":"") + '" onclick="go(\'' + m[0] + '\')">' + m[1] +
           (m[0]==="sellers" && pending ? '<span class="cnt">' + pending + '</span>' : '') + (m[0]==="inquiries" && newIq() ? '<span class="cnt">' + newIq() + '</span>' : '') + (m[0]==="reports" && newRep() ? '<span class="cnt">' + newRep() + '</span>' : '') + '</button>';
       }).join("") + '</nav>' +
@@ -577,6 +578,10 @@ function boot(){
   }
   draw();
 }
+/* 스텝(관리자가 아닌 운영진)에게 안 보이는 메뉴 */
+var STAFF_HIDE = ["premium", "sellers", "opposts", "account"];
+function isBoss(){ var u = window.JIDB && JIDB.me && JIDB.me(); return !!(u && u.role === "admin"); }
+function menuOk(m){ return isBoss() || STAFF_HIDE.indexOf(m[0]) < 0; }
 function goHome(){ try { history.replaceState(null, "", "#dash"); } catch (e) { location.hash = "dash"; } location.reload(); return false; }
 function go(v){ view = v; try { history.replaceState(null, "", "#" + v); } catch (e) {} boot(); window.scrollTo(0,0); }
 function draw(){ ({inquiries:drawInquiries,dash:drawDash,posts:drawPosts,notices:drawNotices,premium:drawPremium,sellers:drawSellers,trash:drawTrash,settings:drawSettings})[view](); }
@@ -615,6 +620,7 @@ function drawDash(){
   var views = all.reduce(function(s,p){ return s + viewsOf(p); }, 0);
   var members = JI.get("users", []).length;
   var pending = JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length;
+  if (!isBoss() && typeof STATS === "object" && STATS && STATS.sellers_pending != null) pending = STATS.sellers_pending;   // 스텝: 숫자만 서버 요약에서
   var byBoard = ALL_BOARDS.map(function(b){
     var ps = all.filter(function(p){ return p.board === b; });
     return '<tr><td><span class="bd">' + esc(b) + '</span></td><td>' + ps.length + '</td><td>' +
@@ -702,7 +708,7 @@ function boardOptions(sel, withAll){
     ALL_BOARDS.map(function(b){ return '<option' + (sel===b?' selected':'') + '>' + b + '</option>'; }).join("");
 }
 function drawPosts(){
-  M().innerHTML = '<h1>게시글 관리</h1><p class="sub">모든 게시판의 글을 열람하고 수정·삭제할 수 있습니다. 조회수·좋아요 칸은 숫자를 바꾸고 Enter를 누르면 바로 저장됩니다.</p>' +
+  M().innerHTML = '<h1>게시글 관리</h1><p class="sub">모든 게시판의 글을 열람하고 수정·삭제할 수 있습니다.' + (isBoss() ? ' 조회수·좋아요 칸은 숫자를 바꾸고 Enter를 누르면 바로 저장됩니다.' : '') + '</p>' +
     '<div class="panel"><div class="toolbar">' +
       '<select id="f-board">' + boardOptions(postBoard, true) + '</select>' +
       '<input type="search" id="f-q" placeholder="제목·작성자·내용 검색" value="' + esc(postQ) + '">' +
@@ -717,6 +723,7 @@ function drawPostTable(){
   var list = filteredPosts();
   var pages = Math.max(1, Math.ceil(list.length / PER));
   if (postPage > pages) postPage = pages;
+  var boss = isBoss();
   var rows = list.slice((postPage-1)*PER, postPage*PER).map(function(p){
     var canPm = PREMIUM_BOARDS.indexOf(p.board) > -1;
     return '<tr>' + bkBox("posts", p.id) +
@@ -724,9 +731,11 @@ function drawPostTable(){
       '<td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank" title="새 탭에서 보기">' + esc(p.title) + '</a>' +
         '<small>' + esc(p.author) + ' · 댓글 ' + cmtCount(p) + (p.hidden ? ' · <b style="color:#b4372d">🔒 비공개(판매 기간 끝남)</b>' : '') + '</small></td>' +
       '<td class="dt">' + esc(String(p.date || "").replace(/-/g, ".")) + (p.time ? '<small>' + esc(p.time) + '</small>' : '') + '</td>' +
-      '<td><input class="num" type="number" min="0" value="' + viewsOf(p) + '" data-id="' + p.id + '" data-f="views"></td>' +
-      '<td><input class="num" type="number" min="0" value="' + likesOf(p) + '" data-id="' + p.id + '" data-f="likes"></td>' +
-      '<td><label class="sw' + (canPm?'':' na') + '" title="' + (canPm?'프리미엄 상단 노출':'커뮤니티 게시판은 프리미엄이 없습니다') + '"><input type="checkbox" data-pm="' + p.id + '"' + (isPremium(p)?' checked':'') + '><i></i></label></td>' +
+      (boss ? '<td><input class="num" type="number" min="0" value="' + viewsOf(p) + '" data-id="' + p.id + '" data-f="views"></td>' +
+      '<td><input class="num" type="number" min="0" value="' + likesOf(p) + '" data-id="' + p.id + '" data-f="likes"></td>'
+      : '<td class="num-ro">' + viewsOf(p).toLocaleString() + '</td><td class="num-ro">' + likesOf(p).toLocaleString() + '</td>') +
+      (boss ? '<td><label class="sw' + (canPm?'':' na') + '" title="' + (canPm?'프리미엄 상단 노출':'커뮤니티 게시판은 프리미엄이 없습니다') + '"><input type="checkbox" data-pm="' + p.id + '"' + (isPremium(p)?' checked':'') + '><i></i></label></td>'
+      : '<td class="num-ro">' + (isPremium(p) ? '<span class="bd">PREMIUM</span>' : '-') + '</td>') +
       '<td><div class="acts"><button class="mb" onclick="openEdit(\'' + p.id + '\')">수정</button>' +
         '<button class="mb del" onclick="askDelete(\'' + p.id + '\')">삭제</button></div></td></tr>';
   }).join("");
@@ -1187,7 +1196,7 @@ if (SRV) {
   MENU.splice(1, 0, ["traffic", "방문 통계"]);
   MENU.splice(MENU.findIndex(function(m){ return m[0] === "inquiries"; }) + 1, 0, ["reports", "신고"]);
   var _draw = draw;
-  draw = function(){ if (view === "account") return drawAccount(); if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "reports") return drawReports(); if (view === "settings") view = "members"; return _draw(); };
+  draw = function(){ if (!isBoss() && STAFF_HIDE.indexOf(view) > -1) { view = "dash"; try { history.replaceState(null, "", "#dash"); } catch (e) {} boot(); return; } if (view === "account") return drawAccount(); if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "reports") return drawReports(); if (view === "settings") view = "members"; return _draw(); };
 
   /* 운영자 글: assets/op-posts.js 초안을 골라 내 계정으로 올림 (이미 올린 글은 표시) */
   window.drawOpPosts = function(){
@@ -1873,7 +1882,7 @@ if (SRV) {
       }),
       JIDB.call("admin_overview").then(function(r){ STATS = r; }),
       JIDB.call("admin_inquiries").then(function(l){ _set.call(JI, "inquiries", l.reverse()); }),
-      JIDB.call("admin_sellers").then(function(l){
+      (isBoss() ? JIDB.call("admin_sellers") : Promise.resolve([])).then(function(l){   // 판매자 승인은 관리자만
         _set.call(JI, "seller_requests", l.reverse().map(function(r){
           var det = r.details && typeof r.details === "object" ? Object.keys(r.details).filter(function(k){ return k.charAt(0) !== "_" && r.details[k] !== ""; }).map(function(k){ return k + ": " + r.details[k]; }).join("\n") : "";
           return { id: r.id, board: r.board, nick: r.applicant_nick, email: r.email, region: r.region, status: r.status, uid: r.applicant,
