@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261121b">
+<link rel="stylesheet" href="../assets/style.css?v=20261121c">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -202,6 +202,11 @@ table.mem-t td small{font-size:13px}
 .op-bar label{font-size:14px;font-weight:600;display:flex;gap:6px;align-items:center}
 .op-row{display:flex;gap:12px;align-items:center;padding:12px 4px;border-top:1px solid var(--line-2,#eef1f4)}
 .op-tabs{display:flex;gap:6px;margin:4px 0 12px}
+.n-per{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.n-per button{padding:8px 16px;border:1px solid #dfe3ea;border-radius:999px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer}
+.n-per button.on{background:#0e2440;border-color:#0e2440;color:#fff}
+.n-per-t{font-size:13px;color:var(--ink-3);margin-left:4px}
+small.n-until{display:block;margin-top:4px;font-size:12px;color:var(--ink-4)}
 .adm-t td.num-ro{color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .op-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0 12px}.op-top .op-tabs{margin:0}
 .op-q{display:flex;align-items:center;gap:8px;flex:1 1 240px;max-width:380px}
@@ -458,18 +463,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261121b"></script>
-<script src="../assets/db.js?v=20261121b"></script>
-<script src="../assets/notify.js?v=20261121b"></script>
-<script src="../assets/seed-trade.js?v=20261121b"></script>
-<script src="../assets/seed-extra.js?v=20261121b"></script>
-<script src="../assets/festivals-data.js?v=20261121b"></script>
-<script src="../assets/seed-new.js?v=20261121b"></script>
-<script src="../assets/seed-comments.js?v=20261121b"></script>
-<script src="../assets/photos.js?v=20261121b"></script>
-<script src="../assets/admin-data.js?v=20261121b"></script>
-<script src="../assets/kmap.js?v=20261121b"></script>
-<script src="../assets/op-posts.js?v=20261121b"></script>
+<script src="../assets/common.js?v=20261121c"></script>
+<script src="../assets/db.js?v=20261121c"></script>
+<script src="../assets/notify.js?v=20261121c"></script>
+<script src="../assets/seed-trade.js?v=20261121c"></script>
+<script src="../assets/seed-extra.js?v=20261121c"></script>
+<script src="../assets/festivals-data.js?v=20261121c"></script>
+<script src="../assets/seed-new.js?v=20261121c"></script>
+<script src="../assets/seed-comments.js?v=20261121c"></script>
+<script src="../assets/photos.js?v=20261121c"></script>
+<script src="../assets/admin-data.js?v=20261121c"></script>
+<script src="../assets/kmap.js?v=20261121c"></script>
+<script src="../assets/op-posts.js?v=20261121c"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -844,20 +849,23 @@ function allNoticeItems(){
   });
 }
 function drawNotices(){
-  var list = allNoticeItems(), on = list.filter(function(n){ return !n.off; }).length;
+  var list = allNoticeItems(), on = list.filter(function(n){ return !noticeOff(n); }).length;
   M().innerHTML = '<h1>공지 관리</h1><p class="sub">공지는 선택한 게시판 맨 위에 표시됩니다. ‘전체’로 올리면 홈 화면과 모든 게시판에 나옵니다. 내릴 때는 <b>공지 해제</b>를 누르세요 — 지워지지 않고 사이트의 <a href="' + SITE + 'community.html?board=%EA%B3%B5%EC%A7%80" target="_blank">공지사항</a> 목록에 계속 남아요.</p>' +
     '<div class="panel"><h2>새 공지 작성</h2>' + noticeForm(null) +
     '<div class="bt" style="display:flex;justify-content:flex-end"><button class="btn primary" onclick="saveNotice(null)">공지 올리기</button></div></div>' +
     '<div class="panel"><h2>등록된 공지 (표시 중 ' + on + ' · 지난 공지 ' + (list.length - on) + ')</h2>' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>상태</th><th>표시할 곳</th><th>제목</th><th>조회수</th><th>관리</th></tr></thead><tbody>' +
       list.map(function(n){
-        return '<tr' + (n.off ? ' style="opacity:.62"' : '') + '><td>' + (n.off ? '<span class="bd">지난 공지</span>' : '<span class="bd" style="background:#e7f6ec;color:#16794a">표시 중</span>' + (n.pinned ? ' 📌' : '')) + '</td>' +
+        var ex = !n.off && noticeExpired(n), off = n.off || ex;
+        return '<tr' + (off ? ' style="opacity:.62"' : '') + '><td>' + (off ? '<span class="bd">' + (ex ? '기간 끝남' : '지난 공지') + '</span>' : '<span class="bd" style="background:#e7f6ec;color:#16794a">표시 중</span>' + (n.pinned ? ' 📌' : '')) +
+          '<small class="n-until">' + (n.until ? '~' + esc(n.until.slice(5).replace("-", ".")) + '까지' : '영구') + '</small></td>' +
           '<td><span class="bd">' + esc(n.target) + '</span></td>' +
           '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(n.id) + '" target="_blank">' + esc(n.title) + '</a><small>' + esc(n.date) + '</small></td>' +
           '<td><input class="num" type="number" min="0" value="' + viewsOf(n) + '" data-nid="' + n.id + '"></td>' +
           '<td><div class="acts"><button class="mb" onclick="editNotice(\'' + n.id + '\')">수정</button>' +
-            '<button class="mb" onclick="toggleNotice(\'' + n.id + '\')">' + (n.off ? '다시 공지' : '공지 해제') + '</button>' +
+            '<button class="mb" onclick="toggleNotice(\'' + n.id + '\')">' + (off ? '다시 공지' : '공지 해제') + '</button>' +
             '<button class="mb del" onclick="delNotice(\'' + n.id + '\')">삭제</button></div></td></tr>';
       }).join("") + '</tbody></table></div>' : '<div class="empty">등록된 공지가 없습니다.</div>') + '</div>';
+  bindNoticePer(M());
   M().querySelectorAll("input[data-nid]").forEach(function(inp){
     function save(){ setNotice(inp.dataset.nid, { views: Math.max(0, parseInt(inp.value,10)||0) }, true); toast("조회수를 바꿨습니다"); }
     inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { save(); inp.blur(); } });
@@ -875,6 +883,10 @@ function noticeForm(n){
     '<div class="row2"><div class="fld"><label>' + (isNew ? '표시할 곳' : '표시할 게시판 (다른 게시판으로 옮기기)') + '</label><select id="n-target">' +
       targets.map(function(t){ return '<option' + (n.target===t?' selected':'') + '>' + t + '</option>'; }).join("") + '</select></div>' +
     '<div class="fld"><label>상단 고정</label><label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding-top:8px"><input type="checkbox" id="n-pin"' + (n.pinned?' checked':'') + '> 다른 공지보다 위에 고정</label></div></div>' +
+    '<div class="fld"><label>공지 기간</label><div class="n-per" id="n-per">' +
+      (isNew ? '' : '<button type="button" data-d="keep" class="on">그대로' + (n.until ? ' (~' + esc(n.until.slice(5).replace("-", ".")) + ')' : ' (영구)') + '</button>') +
+      [["7", "7일"], ["14", "14일"], ["30", "30일"], ["0", "영구"]].map(function(o){ return '<button type="button" data-d="' + o[0] + '"' + (isNew && o[0] === "0" ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("") +
+      '<span class="n-per-t"></span></div></div>' +
     '<div class="fld"><label>제목</label><input id="n-title" value="' + esc(n.title) + '" placeholder="공지 제목"></div>' +
     '<div class="fld"><label>내용</label><textarea id="n-content" placeholder="회원들에게 알릴 내용을 적어주세요">' + esc(n.content) + '</textarea></div>';
 }
@@ -896,6 +908,8 @@ function saveNotice(id){
   var obj = { target: F("n-target").value, pinned: F("n-pin").checked,
     title: F("n-title").value.trim(), content: F("n-content").value.trim() };
   var offSel = F("n-off"); if (offSel) obj.off = offSel.value === "off";
+  var per = box.querySelector("#n-per button.on"), dd = per ? per.dataset.d : "0";
+  if (dd !== "keep") obj.until = dd === "0" ? null : noticeUntil(+dd);
   if (!obj.title) { alert("제목을 입력하세요."); return; }
   if (id) { setNotice(id, obj); closeModal(); toast(obj.off ? "공지를 해제했습니다 (공지사항 목록에 보관)" : "공지를 수정했습니다"); }
   else {
@@ -905,14 +919,26 @@ function saveNotice(id){
   }
   drawNotices();
 }
+/* 오늘부터 d일 동안 (오늘 포함) → 마지막 날 */
+function noticeUntil(d){ var t = new Date(); t.setDate(t.getDate() + d - 1); return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2); }
+function bindNoticePer(root){
+  var box = root.querySelector("#n-per"); if (!box) return;
+  var txt = box.querySelector(".n-per-t");
+  function show(){ var b = box.querySelector("button.on"), d = b ? b.dataset.d : "0";
+    txt.textContent = d === "keep" ? "" : d === "0" ? "직접 해제할 때까지 표시돼요" : noticeUntil(+d).slice(5).replace("-", ".") + "까지 표시되고, 그다음 날 '지난 공지'로 넘어가요"; }
+  box.onclick = function(e){ var b = e.target.closest("button"); if (!b) return; box.querySelectorAll("button").forEach(function(x){ x.classList.toggle("on", x === b); }); show(); };
+  show();
+}
 function editNotice(id){
   var n = allNoticeItems().filter(function(x){ return x.id === id; })[0]; if (!n) return;
   showModal('<h3>공지 수정</h3>' + noticeForm(n) + '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" onclick="saveNotice(\'' + id + '\')">저장</button></div>');
+  bindNoticePer(document.getElementById("modal"));
 }
 function toggleNotice(id){
   var n = allNoticeItems().filter(function(x){ return x.id === id; })[0]; if (!n) return;
-  setNotice(id, { off: !n.off });
-  toast(n.off ? "다시 공지로 올렸습니다" : "공지를 해제했습니다 (공지사항 목록에 보관)"); drawNotices();
+  var wasOff = noticeOff(n);
+  if (wasOff) setNotice(id, noticeExpired(n) ? { off: false, until: null } : { off: false }); else setNotice(id, { off: true });
+  toast(wasOff ? (noticeExpired(n) ? "다시 공지로 올렸습니다 (기간: 영구 — 수정에서 바꿀 수 있어요)" : "다시 공지로 올렸습니다") : "공지를 해제했습니다 (공지사항 목록에 보관)"); drawNotices();
 }
 function delNotice(id){
   if (!confirm("이 공지를 완전히 삭제할까요?\n삭제하면 지난 공지 목록에서도 사라집니다.\n보관하려면 '공지 해제'를 누르세요.")) return;

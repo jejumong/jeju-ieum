@@ -56,6 +56,10 @@ function allNotices() {
   b.forEach(function (n) { n.target = n.target || "커뮤니티"; });
   return adminNotices().concat(b);
 }
+/* 공지 기간: until(YYYY-MM-DD, 그날까지 표시)이 지나면 '지난 공지'로 */
+function noticeToday() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+function noticeExpired(n) { return !!(n && n.until && n.until < noticeToday()); }
+function noticeOff(n) { return !!(n && (n.off || noticeExpired(n))); }
 /* 공지사항 목록용: 최신순 */
 function noticeArchive() {
   return allNotices().slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
@@ -64,7 +68,7 @@ function noticeArchive() {
 function noticesFor(board) {
   var isCommunity = !board || TRADE_BOARDS.indexOf(board) < 0;
   var list = allNotices().filter(function (n) {
-    if (n.off) return false;
+    if (noticeOff(n)) return false;
     return n.target === "전체" || (board && n.target === board) || (n.target === "커뮤니티" && isCommunity);
   });
   return list.sort(function (a, b) {
