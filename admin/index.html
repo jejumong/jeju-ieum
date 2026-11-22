@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261122a">
+<link rel="stylesheet" href="../assets/style.css?v=20261122b">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -485,18 +485,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261122a"></script>
-<script src="../assets/db.js?v=20261122a"></script>
-<script src="../assets/notify.js?v=20261122a"></script>
-<script src="../assets/seed-trade.js?v=20261122a"></script>
-<script src="../assets/seed-extra.js?v=20261122a"></script>
-<script src="../assets/festivals-data.js?v=20261122a"></script>
-<script src="../assets/seed-new.js?v=20261122a"></script>
-<script src="../assets/seed-comments.js?v=20261122a"></script>
-<script src="../assets/photos.js?v=20261122a"></script>
-<script src="../assets/admin-data.js?v=20261122a"></script>
-<script src="../assets/kmap.js?v=20261122a"></script>
-<script src="../assets/op-posts.js?v=20261122a"></script>
+<script src="../assets/common.js?v=20261122b"></script>
+<script src="../assets/db.js?v=20261122b"></script>
+<script src="../assets/notify.js?v=20261122b"></script>
+<script src="../assets/seed-trade.js?v=20261122b"></script>
+<script src="../assets/seed-extra.js?v=20261122b"></script>
+<script src="../assets/festivals-data.js?v=20261122b"></script>
+<script src="../assets/seed-new.js?v=20261122b"></script>
+<script src="../assets/seed-comments.js?v=20261122b"></script>
+<script src="../assets/photos.js?v=20261122b"></script>
+<script src="../assets/admin-data.js?v=20261122b"></script>
+<script src="../assets/kmap.js?v=20261122b"></script>
+<script src="../assets/op-posts.js?v=20261122b"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1810,9 +1810,9 @@ if (SRV) {
     // 차트
     var W = 24, line = Y.map(function(v, i){ return ((i + 0.5) / W * 100).toFixed(2) + ',' + (100 - v / top * 100).toFixed(2); }).join(" ");
     h += '<div class="hr-wrap"><div class="hr-y">' + [top, top / 2, 0].map(function(v){ return '<span>' + (v % 1 ? v.toFixed(1) : v) + '</span>'; }).join("") + '</div><div class="hr-plot">' +
-      parts.map(function(p, k){ return '<div class="hr-band' + (k % 2 ? ' alt' : '') + '" style="left:' + (p[1] / 24 * 100) + '%;width:' + ((p[2] - p[1]) / 24 * 100) + '%"><span>' + p[0] + ' <b>' + sum(T, p[1], Math.min(p[2], hr + 1)) + '</b></span></div>'; }).join("") +
+      parts.map(function(p, k){ return '<div class="hr-band' + (k % 2 ? ' alt' : '') + '" style="left:' + (p[1] / 24 * 100) + '%;width:' + ((p[2] - p[1]) / 24 * 100) + '%"><span>' + p[0] + ' <b>' + (p[1] > hr ? '-' : sum(T, p[1], Math.min(p[2], hr + 1))) + '</b></span></div>'; }).join("") +
       '<div class="hr-grid"><i style="top:0"></i><i style="top:50%"></i><i style="top:100%"></i></div>' +
-      '<div class="hr-bars">' + T.map(function(v, i){ var fut = i > hr; return '<div class="hrc' + (i === hr ? ' now' : '') + (HR_SEL === i ? ' sel' : '') + '" data-i="' + i + '"><i style="height:' + (fut ? 0 : v / top * 100) + '%">' + (!fut && v && i === pk ? '<em>' + v + '</em>' : '') + '</i></div>'; }).join("") + '</div>' +
+      '<div class="hr-bars">' + T.map(function(v, i){ var fut = i > hr; return '<div class="hrc' + (i === hr ? ' now' : '') + (HR_SEL === i ? ' sel' : '') + '" data-i="' + i + '"><i style="height:' + (fut ? 0 : v / top * 100) + '%' + (fut ? ';display:none' : '') + (!fut && !v ? ';background:#cbd5e1' : '') + '">' + (!fut && v && i === pk ? '<em>' + v + '</em>' : '') + '</i></div>'; }).join("") + '</div>' +
       '<svg class="hr-line" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="' + line + '" fill="none" stroke="#94a3b8" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-dasharray="4 3"/></svg>' +
       '</div></div><div class="hr-ax">' + T.map(function(v, i){ return '<span>' + (i % 3 === 0 ? i + '시' : '') + '</span>'; }).join("") + '</div>';
     var si = HR_SEL != null ? HR_SEL : hr;
