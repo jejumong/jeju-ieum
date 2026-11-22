@@ -1,5 +1,6 @@
 /* 축제정보 데이터 — 매일 오후 1시 예약 작업이 이 파일만 고칩니다 (지시서: tasks/daily-1pm.md).
    seed-extra.js 다음, admin-data.js 앞에서 읽습니다. 끝난 지 7일이 지난 축제는 화면에서 자동으로 빠집니다.
+   시작일이 21일보다 더 남은 축제는 넣어 두어도 시작 21일 전까지 화면에 나오지 않습니다. 새 축제는 시작 7~21일 전에 넣습니다.
 
    항목 (한 줄에 축제 하나)
    id      : 고유 번호. 한 번 정하면 절대 바꾸지 않음 (글 주소 view.html?id=<id>). 새 축제는 "rf" + 가장 큰 번호 다음 숫자
@@ -40,7 +41,11 @@ var FESTIVALS = [
 /* 축제정보 게시판·글 보기에 끼워 넣기 (예시 글이 아닌 운영자 확인 정보로 표시) */
 (function () {
   if (typeof TRADE_SEEDS === "undefined" || typeof SEED_POSTS === "undefined") return;
+  /* 시작 21일 전부터만 게시판에 보임 (너무 먼 축제로 목록이 복잡해지지 않게) */
+  var lim = new Date(); lim.setDate(lim.getDate() + 21);
+  var limS = lim.getFullYear() + "-" + ("0" + (lim.getMonth() + 1)).slice(-2) + "-" + ("0" + lim.getDate()).slice(-2);
   FESTIVALS.forEach(function (f) {
+    if (f.start && f.start > limS) return;
     if (SEED_POSTS.some(function (p) { return p.id === f.id; })) return;
     var p = Object.assign({ board: "축제정보", author: "제주이음", keep: true }, f);
     TRADE_SEEDS.push(p);
