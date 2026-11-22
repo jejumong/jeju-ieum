@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261121c">
+<link rel="stylesheet" href="../assets/style.css?v=20261122a">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -321,6 +321,28 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .stat .d{font-size:12.5px;font-weight:700;margin-top:4px;color:var(--ink-4)}
 .stat .d.up{color:#16a34a}.stat .d.dn{color:#dc2626}
 .stat.live{border-color:#bbf7d0;background:#f0fdf4}
+.hr-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.hr-hd h2{margin:0}
+.hr-tg{display:flex;background:#eef2f7;border-radius:999px;padding:3px}.hr-tg button{border:0;background:none;padding:6px 14px;border-radius:999px;font:inherit;font-size:13px;font-weight:700;color:var(--ink-3);cursor:pointer}.hr-tg button.on{background:#fff;color:#0f172a;box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.hr-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 12px}
+.hr-sum>div{background:#f6f8fb;border-radius:12px;padding:12px 14px}.hr-sum small{display:block;font-size:12px;color:var(--ink-4);font-weight:600}.hr-sum b{display:block;font-size:22px;font-weight:800;margin:4px 0 2px;color:#0f172a}.hr-sum em{font-style:normal;font-size:12.5px;color:var(--ink-3)}.hr-sum em.up{color:#16794a}.hr-sum em.dn{color:#c2410c}
+.hr-lg{display:flex;gap:14px;font-size:12.5px;color:var(--ink-3);margin-bottom:8px}.hr-lg b{display:inline-block;width:12px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:#3b82f6}.hr-lg b.y{background:none;border-top:2px dashed #94a3b8;height:0;width:16px;border-radius:0;vertical-align:3px}.hr-lg b.n{background:#0f172a}
+.hr-wrap{display:flex;gap:8px}
+.hr-y{display:flex;flex-direction:column;justify-content:space-between;height:200px;font-size:11px;color:var(--ink-4);text-align:right;min-width:22px;padding-top:0}
+.hr-y span{line-height:1;transform:translateY(-50%)}.hr-y span:last-child{transform:translateY(50%)}
+.hr-plot{position:relative;flex:1;height:200px}
+.hr-band{position:absolute;top:-2px;bottom:0;background:rgba(241,245,249,.0)}.hr-band.alt{background:#f8fafc}
+.hr-band span{position:absolute;top:2px;left:6px;font-size:11.5px;color:var(--ink-4);font-weight:600}.hr-band span b{color:#334155}
+.hr-grid i{position:absolute;left:0;right:0;border-top:1px solid #e8edf3}
+.hr-bars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:3px;padding-top:20px}
+.hrc{flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative;cursor:pointer;border-radius:6px;padding:0;margin:0;border:0;background:none}
+.hrc:hover,.hrc.sel{background:rgba(59,130,246,.08)}
+.hrc i{display:block;position:relative;width:62%;min-height:2px;border-radius:4px 4px 0 0;background:#3b82f6}
+.hrc.now i{background:#0f172a}
+.hrc i em{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-3px);font-style:normal;font-size:11.5px;font-weight:800;color:#1d4ed8;white-space:nowrap}
+.hr-line{position:absolute;left:0;top:20px;width:100%;height:calc(100% - 20px);pointer-events:none;overflow:visible}
+.hr-ax{display:flex;gap:3px;font-size:11px;color:var(--ink-4);margin:6px 0 0 30px}.hr-ax span{flex:1;text-align:left;white-space:nowrap}
+.hr-det{margin-top:12px;padding:10px 14px;background:#f6f8fb;border-radius:10px;font-size:13.5px;color:#334155}.hr-det b{color:#0f172a;margin-right:6px}.hr-det span{color:#cbd5e1;margin:0 6px}.hr-det small{display:block;color:var(--ink-4);font-size:11.5px;margin-top:3px}
+@media (max-width:680px){ .hr-sum{grid-template-columns:repeat(2,1fr)} .hr-sum b{font-size:19px} .hr-y,.hr-plot{height:170px} .hr-bars{gap:1.5px} .hrc i{width:78%} .hr-band span{font-size:10.5px;left:3px} .hr-ax span{font-size:10px} }
 .tf-bars{display:flex;align-items:flex-end;gap:3px;height:150px;padding-top:8px}
 .tf-bars .c{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:1px;height:100%;position:relative}
 .tf-bars .c i{display:block;width:45%;min-height:1px;border-radius:3px 3px 0 0;background:var(--sea,#1e88e5)}
@@ -463,18 +485,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261121c"></script>
-<script src="../assets/db.js?v=20261121c"></script>
-<script src="../assets/notify.js?v=20261121c"></script>
-<script src="../assets/seed-trade.js?v=20261121c"></script>
-<script src="../assets/seed-extra.js?v=20261121c"></script>
-<script src="../assets/festivals-data.js?v=20261121c"></script>
-<script src="../assets/seed-new.js?v=20261121c"></script>
-<script src="../assets/seed-comments.js?v=20261121c"></script>
-<script src="../assets/photos.js?v=20261121c"></script>
-<script src="../assets/admin-data.js?v=20261121c"></script>
-<script src="../assets/kmap.js?v=20261121c"></script>
-<script src="../assets/op-posts.js?v=20261121c"></script>
+<script src="../assets/common.js?v=20261122a"></script>
+<script src="../assets/db.js?v=20261122a"></script>
+<script src="../assets/notify.js?v=20261122a"></script>
+<script src="../assets/seed-trade.js?v=20261122a"></script>
+<script src="../assets/seed-extra.js?v=20261122a"></script>
+<script src="../assets/festivals-data.js?v=20261122a"></script>
+<script src="../assets/seed-new.js?v=20261122a"></script>
+<script src="../assets/seed-comments.js?v=20261122a"></script>
+<script src="../assets/photos.js?v=20261122a"></script>
+<script src="../assets/admin-data.js?v=20261122a"></script>
+<script src="../assets/kmap.js?v=20261122a"></script>
+<script src="../assets/op-posts.js?v=20261122a"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1767,16 +1789,48 @@ if (SRV) {
     if (TF) paintTraffic(); else M().innerHTML = '<h1>방문 통계</h1><p class="sub">불러오는 중…</p>';
     if (!noFetch) loadTraffic().then(function(){ if (view === "traffic") paintTraffic(); }, function(e){ M().innerHTML = '<h1>방문 통계</h1><div class="panel">불러오지 못했어요: ' + esc(e.message) + '</div>'; });
   };
+  /* 시간대별 차트: 오늘은 막대, 어제는 선. 새벽·오전·오후·저녁 구역과 구역 합계 */
+  var HR_M = "uv", HR_SEL = null;
+  function hourChart(r, hr){
+    var M = HR_M, unit = M === "uv" ? "명" : "회", T = r.t_hours.map(function(h){ return h[M]; }), Y = r.y_hours.map(function(h){ return h[M]; });
+    var mx = Math.max.apply(null, T.concat(Y)), top = mx <= 4 ? 4 : mx <= 10 ? 10 : Math.ceil(mx / 5) * 5;
+    var sumT = T.slice(0, hr + 1).reduce(function(a, b){ return a + b; }, 0), sumY = Y.slice(0, hr + 1).reduce(function(a, b){ return a + b; }, 0);
+    var pk = 0; T.forEach(function(v, i){ if (i <= hr && v > T[pk]) pk = i; });
+    var ypk = 0; Y.forEach(function(v, i){ if (v > Y[ypk]) ypk = i; });
+    var diff = sumY ? Math.round((sumT - sumY) / sumY * 100) : null;
+    var parts = [["새벽", 0, 6], ["오전", 6, 12], ["오후", 12, 18], ["저녁", 18, 24]];
+    var sum = function(a, s0, e0){ var x = 0; for (var i = s0; i < e0; i++) x += a[i]; return x; };
+    var best = parts.slice().sort(function(a, b){ return sum(Y, b[1], b[2]) - sum(Y, a[1], a[2]); })[0];
+    var h = '<div class="hr-sum">' +
+      '<div><small>오늘 지금까지</small><b>' + sumT.toLocaleString() + unit + '</b><em class="' + (diff == null ? '' : diff >= 0 ? 'up' : 'dn') + '">' + (diff == null ? '어제 같은 시각 기록 없음' : '어제 같은 시각보다 ' + (diff >= 0 ? '+' : '') + diff + '%') + '</em></div>' +
+      '<div><small>오늘 가장 많았던 때</small><b>' + (T[pk] ? pk + '시' : '-') + '</b><em>' + (T[pk] ? T[pk] + unit : '아직 없음') + '</em></div>' +
+      '<div><small>어제 가장 많았던 때</small><b>' + (Y[ypk] ? ypk + '시' : '-') + '</b><em>' + (Y[ypk] ? Y[ypk] + unit : '기록 없음') + '</em></div>' +
+      '<div><small>어제 가장 붐빈 구역</small><b>' + (sum(Y, 0, 24) ? best[0] : '-') + '</b><em>' + (sum(Y, 0, 24) ? best[1] + '~' + best[2] + '시 · ' + sum(Y, best[1], best[2]) + unit : '기록 없음') + '</em></div></div>';
+    h += '<div class="hr-lg"><span><b></b>오늘</span><span><b class="y"></b>어제</span><span class="hr-now-lg"><b class="n"></b>지금 (' + hr + '시)</span></div>';
+    // 차트
+    var W = 24, line = Y.map(function(v, i){ return ((i + 0.5) / W * 100).toFixed(2) + ',' + (100 - v / top * 100).toFixed(2); }).join(" ");
+    h += '<div class="hr-wrap"><div class="hr-y">' + [top, top / 2, 0].map(function(v){ return '<span>' + (v % 1 ? v.toFixed(1) : v) + '</span>'; }).join("") + '</div><div class="hr-plot">' +
+      parts.map(function(p, k){ return '<div class="hr-band' + (k % 2 ? ' alt' : '') + '" style="left:' + (p[1] / 24 * 100) + '%;width:' + ((p[2] - p[1]) / 24 * 100) + '%"><span>' + p[0] + ' <b>' + sum(T, p[1], Math.min(p[2], hr + 1)) + '</b></span></div>'; }).join("") +
+      '<div class="hr-grid"><i style="top:0"></i><i style="top:50%"></i><i style="top:100%"></i></div>' +
+      '<div class="hr-bars">' + T.map(function(v, i){ var fut = i > hr; return '<div class="hrc' + (i === hr ? ' now' : '') + (HR_SEL === i ? ' sel' : '') + '" data-i="' + i + '"><i style="height:' + (fut ? 0 : v / top * 100) + '%">' + (!fut && v && i === pk ? '<em>' + v + '</em>' : '') + '</i></div>'; }).join("") + '</div>' +
+      '<svg class="hr-line" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="' + line + '" fill="none" stroke="#94a3b8" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-dasharray="4 3"/></svg>' +
+      '</div></div><div class="hr-ax">' + T.map(function(v, i){ return '<span>' + (i % 3 === 0 ? i + '시' : '') + '</span>'; }).join("") + '</div>';
+    var si = HR_SEL != null ? HR_SEL : hr;
+    h += '<div class="hr-det"><b>' + si + '시</b> 오늘 ' + (si > hr ? '-' : r.t_hours[si].uv + '명 · ' + r.t_hours[si].pv + '회') + ' <span>|</span> 어제 ' + r.y_hours[si].uv + '명 · ' + r.y_hours[si].pv + '회 <small>막대를 누르거나 마우스를 올리면 시간별 숫자가 보여요</small></div>';
+    return h;
+  }
+  function bindHour(r, hr){
+    var box = document.getElementById("hr-box"); if (!box) return;
+    var redraw = function(){ box.innerHTML = hourChart(r, hr); };
+    box.onclick = function(e){ var c = e.target.closest(".hrc"); if (c) { HR_SEL = +c.dataset.i; redraw(); } };
+    box.onmouseover = function(e){ var c = e.target.closest(".hrc"); if (c && HR_SEL !== +c.dataset.i) { HR_SEL = +c.dataset.i; redraw(); } };
+    document.querySelectorAll(".hr-tg button").forEach(function(b){ b.onclick = function(){ HR_M = b.dataset.m; document.querySelectorAll(".hr-tg button").forEach(function(x){ x.classList.toggle("on", x === b); }); redraw(); }; });
+  }
   function paintTraffic(){
     var r = TF, t = r.t, y = r.y, hr = new Date().getHours();
     var sx = window.scrollY;
-    // 시간대별 (오늘 vs 어제)
-    var hmax = Math.max.apply(null, r.t_hours.concat(r.y_hours).map(function(h){ return h.uv; })) || 1;
-    var hours = '<div class="tf-bars">' + r.t_hours.map(function(h, i){
-      var yh = r.y_hours[i];
-      return '<div class="c' + (i === hr ? " now" : "") + '" data-t="' + i + '시 · 오늘 ' + h.uv + '명/' + h.pv + '회 · 어제 ' + yh.uv + '명/' + yh.pv + '회">' +
-        '<i class="y" style="height:' + (yh.uv / hmax * 100) + '%"></i><i style="height:' + (i > hr ? 0 : h.uv / hmax * 100) + '%"></i></div>';
-    }).join("") + '</div><div class="tf-ax">' + r.t_hours.map(function(h, i){ return '<span>' + (i % 3 === 0 ? i : "") + '</span>'; }).join("") + '</div>';
+    // 시간대별 (오늘 vs 어제) — hourChart() 가 그림
+    var hours = '<div id="hr-box">' + hourChart(r, hr) + '</div>';
     // 최근 30일
     var dk = [], d0 = new Date(r.today + "T00:00:00");
     for (var i = 29; i >= 0; i--) { var d = new Date(d0); d.setDate(d.getDate() - i); dk.push(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2)); }
@@ -1802,13 +1856,14 @@ if (SRV) {
         return '<div' + (a[0] === "leaves" ? ' class="lv"' : '') + '>' + a[1] + '<b>' + tfNum(r.t_act[a[0]] || 0) + '</b><small>어제 ' + tfNum(r.y_act[a[0]] || 0) + '</small></div>'; }).join("") + '</div>' +
         '<p class="sub" style="margin:12px 0 0">오늘 방문자 중 처음 온 사람 <b>' + tfNum(t.nv) + '명</b> · 휴대폰 <b>' + (t.uv ? Math.round(t.mob / t.uv * 100) : 0) + '%</b> / PC ' + (t.uv ? 100 - Math.round(t.mob / t.uv * 100) : 0) + '%</p></div>' +
       tfMembers(r.members) +
-      '<div class="panel"><h2>시간대별 방문자</h2><div class="tf-lg"><span><b></b>오늘</span><span><b class="y"></b>어제</span></div>' + hours + '</div>' +
+      '<div class="panel"><div class="hr-hd"><h2>시간대별 방문자</h2><div class="hr-tg"><button data-m="uv"' + (HR_M === "uv" ? ' class="on"' : '') + '>방문자</button><button data-m="pv"' + (HR_M === "pv" ? ' class="on"' : '') + '>조회수</button></div></div>' + hours + '</div>' +
       '<div class="tf-2">' +
         '<div class="panel"><h2>지금 보고 있는 페이지 <small style="font-weight:600;color:var(--ink-4)">최근 5분</small></h2>' + tfList((r.live_pages || []).slice(0, 10), "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
         '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList((D.pages || []).slice(0, 10), "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
       '</div>' + tmPanels() +
       '<div class="panel"><h2>최근 30일 방문자</h2>' + days + '</div>' +
       '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
+    bindHour(r, hr);
     window.scrollTo(0, sx);
   }
 
