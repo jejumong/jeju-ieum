@@ -6,7 +6,7 @@
    - cat: 체류 체험 / 워케이션 / 귀농·귀촌 / 정착 지원 / 청년
    ============================================================ */
 
-var PROGRAMS_CHECKED = "2026-11-23";
+var PROGRAMS_CHECKED = "2026-11-24";
 
 var PROGRAM_CATS = [
   { id: "체류 체험", ico: "🧳", desc: "먼저 살아보기 — 숙박비·체험비 지원" },
@@ -64,11 +64,11 @@ var PROGRAMS = [
     who: "제주 외 지역 초등학생과 함께 이주하는 부모 1명 이상 (농어촌 읍면 거주 학생 제외)",
     what: "자녀 수에 따라 가구당 월 60만~120만 원 주거·생활비 지원, 6개월 단위로 읍면 작은 학교에 다님",
     cond: "배정 후 전입 완료해야 확정, 학교 동의 시 6개월·1년 단위 연장 — 집은 가정이 직접 구함",
-    when: "2026 2학기는 6.15까지 22가구 모집 (마감). 2026 1학기 모집은 2025년 11.26~12.2였음 — 2027 1학기 공고 확인 필요",
+    when: "2026 2학기는 6.15까지 22가구 모집 (마감). 2026 1학기 모집은 2025년 11.26~12.2였음 — 2027 1학기 제주도교육청 공고 확인 필요. 서울 학생은 서울시교육청 2027 1학기 농촌유학(제주 포함)으로 11.26~12.2 재학 학교에 신청 (12.22 최종 확정)",
     contact: "제주도교육청 정책기획과 064-710-0173",
     url: "http://www.ihalla.com/article.php?aid=1780629272786769014",
     school: "귀덕초 · 송당초 · 평대초 · 하도초 · 성읍초 · 신례초 · 창천초 · 흥산초 · 구좌중앙초 · 종달초 · 한동초 · 대정서초 · 무릉초 · 수산초",
-    src: [["한라일보 2026.6", "http://www.ihalla.com/article.php?aid=1780629272786769014"], ["제주도민일보 2025.11", "https://www.jejudomin.co.kr/news/articleView.html?idxno=315436"], ["미디어제주 (2026 1학기 165명 배정)", "https://www.mediajeju.com/news/articleView.html?idxno=362515"]] },
+    src: [["한라일보 2026.6", "http://www.ihalla.com/article.php?aid=1780629272786769014"], ["제주도민일보 2025.11", "https://www.jejudomin.co.kr/news/articleView.html?idxno=315436"], ["미디어제주 (2026 1학기 165명 배정)", "https://www.mediajeju.com/news/articleView.html?idxno=362515"], ["서울세계타임즈 2026.11 (서울시교육청 2027 1학기 모집)", "https://seoul.thesegye.com/news/view/1065562620326046"]] },
 
   /* ── 워케이션 ── */
   { id: "p06", cat: "워케이션", tags: [], status: "open", top: true,
