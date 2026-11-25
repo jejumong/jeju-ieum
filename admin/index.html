@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261125c">
+<link rel="stylesheet" href="../assets/style.css?v=20261125d">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -284,6 +284,9 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .op-pv h3{margin:4px 0 12px}
 .op-pv-body{white-space:pre-wrap;font-size:14.5px;line-height:1.7;color:var(--ink-2);background:#f8fafc;border:1px solid #eef1f5;border-radius:12px;padding:14px 16px;max-height:60vh;overflow:auto;overflow-wrap:anywhere}
 .op-pv-body a{color:#1e6fd9}
+.op-ed{color:#c2410c;font-weight:700}
+.ope-c{min-height:46vh;resize:vertical;line-height:1.65;font-size:14.5px}
+.op-pv .sus-l{display:block;margin:10px 0 4px;font-weight:700;font-size:13.5px}
 .op-tabs button{padding:9px 16px;border:1px solid #dfe3ea;border-radius:999px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer}
 .op-tabs button b{margin-left:4px;color:var(--ink-4);font-weight:700}
 .mem-grp{flex-wrap:wrap;margin:0 0 12px}
@@ -486,18 +489,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261125c"></script>
-<script src="../assets/db.js?v=20261125c"></script>
-<script src="../assets/notify.js?v=20261125c"></script>
-<script src="../assets/seed-trade.js?v=20261125c"></script>
-<script src="../assets/seed-extra.js?v=20261125c"></script>
-<script src="../assets/festivals-data.js?v=20261125c"></script>
-<script src="../assets/seed-new.js?v=20261125c"></script>
-<script src="../assets/seed-comments.js?v=20261125c"></script>
-<script src="../assets/photos.js?v=20261125c"></script>
-<script src="../assets/admin-data.js?v=20261125c"></script>
-<script src="../assets/kmap.js?v=20261125c"></script>
-<script src="../assets/op-posts.js?v=20261125c"></script>
+<script src="../assets/common.js?v=20261125d"></script>
+<script src="../assets/db.js?v=20261125d"></script>
+<script src="../assets/notify.js?v=20261125d"></script>
+<script src="../assets/seed-trade.js?v=20261125d"></script>
+<script src="../assets/seed-extra.js?v=20261125d"></script>
+<script src="../assets/festivals-data.js?v=20261125d"></script>
+<script src="../assets/seed-new.js?v=20261125d"></script>
+<script src="../assets/seed-comments.js?v=20261125d"></script>
+<script src="../assets/photos.js?v=20261125d"></script>
+<script src="../assets/admin-data.js?v=20261125d"></script>
+<script src="../assets/kmap.js?v=20261125d"></script>
+<script src="../assets/op-posts.js?v=20261125d"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1262,7 +1265,8 @@ if (SRV) {
       schRows.forEach(function(x){ if (x.op_k && x.status !== "done") SCH[x.op_k] = x; });
       var done = {};
       var doneAt = {};
-      rs.forEach(function(arr){ (arr || []).forEach(function(p){ if (p.extra && p.extra.op) { done[p.extra.op] = p.id; doneAt[p.extra.op] = p.created_at || ""; } }); });
+      var doneEd = {};
+      rs.forEach(function(arr){ (arr || []).forEach(function(p){ if (p.extra && p.extra.op) { done[p.extra.op] = p.id; doneAt[p.extra.op] = p.created_at || ""; if (p.extra.op_edit) doneEd[p.extra.op] = 1; } }); });
       schRows.forEach(function(x){ if (x.op_k && x.status === "done" && x.post_id && !done[x.op_k]) done[x.op_k] = x.post_id; });
       var IDX = { todo: [], sched: [], done: [] };
       L.forEach(function(p, i){ IDX[done[p.k] ? "done" : SCH[p.k] ? "sched" : "todo"].push(i); });
@@ -1294,7 +1298,7 @@ if (SRV) {
             '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(p.board) + ' · <b class="sch-at">' + schTxt(sc.at) + (sc.status === "fail" ? ' 실패' : ' 예약') + '</b>' + (sc.by_nick ? ' · ' + esc(sc.by_nick) : '') + '</small><b>' + esc(p.title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
             '<button class="mb danger-o" onclick="opSchCancel(' + sc.id + ')">예약 취소</button></div>';
           return '<div class="op-row"><label class="op-chk">' + (d ? '<span class="op-ok">✓</span>' : '<input type="checkbox" class="op-c" data-i="' + i + '"' + (SEL[i] ? ' checked' : '') + '>') + '</label>' +
-            '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + '</small><b>' + esc(p.title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
+            '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + (!d && draft(p.k) ? ' · <b class="op-ed">✏️ 수정함</b>' : '') + '</small><b>' + esc(d ? p.title : cur(i).title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
             (d ? '<a class="mb" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '') + '</div>';
         }).join("") + (pages > 1 ? '<div class="pager">' + Array.apply(null, Array(pages)).map(function(_, k){ return '<button data-pg="' + k + '"' + (k === pg ? ' class="on"' : '') + '>' + (k + 1) + '</button>'; }).join("") + '</div>' : '');
         box.querySelectorAll(".pager button").forEach(function(b){ b.onclick = function(){ pg = +b.dataset.pg; paint(); M().scrollTop = 0; window.scrollTo(0, 0); }; });
@@ -1302,26 +1306,59 @@ if (SRV) {
       paint();
       /* 글 내용 미리 보기 (올리기 전에 확인) */
       function linkify(t){ return esc(t).replace(/https?:\/\/[^\s<]+/g, function(u){ return '<a href="' + u.replace(/&amp;/g, "&") + '" target="_blank" rel="noopener">' + u + '</a>'; }); }
+      /* 수정한 내용: 올리기 전까지 이 브라우저에 임시 저장 (원본 op-posts.js 는 그대로) */
+      var DK = function(k){ return "op_draft:" + k; };
+      function draft(k){ try { var v = localStorage.getItem(DK(k)); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+      function setDraft(k, v){ try { if (v) localStorage.setItem(DK(k), JSON.stringify(v)); else localStorage.removeItem(DK(k)); } catch (e) {} }
+      function cur(i){ var p = L[i], d = draft(p.k); return d ? { k: p.k, board: p.board, head: d.head, title: d.title, content: d.content, edited: true } : p; }
+      function extraOf(p){ return p.edited ? { op: p.k, op_edit: 1 } : { op: p.k }; }
       function postOne(i){
-        var p = L[i]; if (!confirm("'" + p.title + "' 글을 지금 게시판에 올릴까요?")) return;
-        JIDB.call("post_create", { board: p.board, head: p.head || "", title: p.title, content: p.content, extra: { op: p.k } })
-          .then(function(){ closeModal(); toast("올렸어요"); drawOpPosts(); }, function(e){ alert("올리기 실패: " + e.message); });
+        var p = cur(i); if (!confirm("'" + p.title + "' 글을 지금 게시판에 올릴까요?" + (p.edited ? "\n(수정한 내용으로 올라가요)" : ""))) return;
+        JIDB.call("post_create", { board: p.board, head: p.head || "", title: p.title, content: p.content, extra: extraOf(p) })
+          .then(function(){ setDraft(p.k, null); closeModal(); toast("올렸어요"); drawOpPosts(); }, function(e){ alert("올리기 실패: " + e.message); });
       }
+      /* 미리 보기 창 */
+      function openPv(i){
+        var d = done[L[i].k], p = d ? L[i] : cur(i);
+        showModal('<div class="op-pv"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + (d ? ' · <b style="color:#1a7f37">올린 글</b>' : ' · 아직 안 올림') + (p.edited ? ' · <b class="op-ed">✏️ 수정함</b>' : '') + '</small>' +
+          '<h3>' + esc(p.title) + '</h3><div class="op-pv-body">' + linkify(p.content || "") + '</div></div>' +
+          '<div class="bt"><button class="mb" onclick="closeModal()">닫기</button>' +
+          (d ? '<button class="mb" onclick="_opRefresh(' + i + ')">최신 내용으로 바꾸기</button><a class="mb pri" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '<button class="mb" onclick="_opEdit(' + i + ')">✏️ 수정하기</button><button class="mb pri" onclick="_opPost(' + i + ')">이 글 올리기</button>') + '</div>');
+      }
+      window._opPv = openPv;
+      /* 수정하기 창 */
+      window._opEdit = function(i){
+        var o = L[i], p = cur(i);
+        showModal('<div class="op-pv"><small>' + esc(o.board) + ' · 내용 수정</small><h3 style="margin-bottom:6px">글 수정하기</h3>' +
+          '<p class="sub" style="margin:0 0 12px">고친 내용은 올리기 전까지 이 브라우저에 저장돼요. 다른 기기에서는 원래 내용으로 보여요.</p>' +
+          '<label class="sus-l">말머리</label><input id="ope-h" class="sch-in" maxlength="20" value="' + esc(p.head || "") + '">' +
+          '<label class="sus-l">제목</label><input id="ope-t" class="sch-in" maxlength="120" value="' + esc(p.title) + '">' +
+          '<label class="sus-l">내용 <span id="ope-n" style="font-weight:400;color:var(--ink-4)"></span></label><textarea id="ope-c" class="sch-in ope-c">' + esc(p.content || "") + '</textarea></div>' +
+          '<div class="bt">' + (p.edited ? '<button class="mb danger-o" id="ope-reset">원래 내용으로</button>' : '') + '<button class="mb" id="ope-cancel">취소</button><button class="mb" id="ope-save">저장</button><button class="mb pri" id="ope-post">저장하고 올리기</button></div>');
+        var c = document.getElementById("ope-c"), n = document.getElementById("ope-n");
+        var cnt = function(){ n.textContent = "(" + c.value.length.toLocaleString() + "자)"; }; c.oninput = cnt; cnt();
+        var val = function(){ var t = document.getElementById("ope-t").value.trim(), h = document.getElementById("ope-h").value.trim(), ct = c.value.replace(/\s+$/, "");
+          if (!t) { alert("제목을 적어 주세요."); return null; } if (!ct.trim()) { alert("내용을 적어 주세요."); return null; }
+          return { head: h, title: t, content: ct }; };
+        var save = function(){ var v = val(); if (!v) return false;
+          if (v.head === (o.head || "") && v.title === o.title && v.content === (o.content || "").replace(/\s+$/, "")) setDraft(o.k, null); else setDraft(o.k, v);
+          return true; };
+        document.getElementById("ope-cancel").onclick = function(){ openPv(i); };
+        document.getElementById("ope-save").onclick = function(){ if (save()) { toast("수정한 내용을 저장했어요"); paint(); openPv(i); } };
+        document.getElementById("ope-post").onclick = function(){ if (save()) { paint(); postOne(i); } };
+        var rs = document.getElementById("ope-reset"); if (rs) rs.onclick = function(){ if (!confirm("고친 내용을 지우고 원래 준비한 내용으로 되돌릴까요?")) return; setDraft(o.k, null); toast("원래 내용으로 되돌렸어요"); paint(); _opEdit(i); };
+      };
       window._opPost = postOne;
       /* 이미 올린 글을 지금 운영자 글 내용으로 바꾸기 (제목·말머리·본문만, 조회수·댓글은 그대로) */
       window._opRefresh = function(i){
         var p = L[i], d = done[p.k]; if (!d) return;
-        if (!confirm("게시판에 올라가 있는 '" + p.title + "' 글을 지금 보이는 최신 내용으로 바꿀까요?\n조회수·좋아요·댓글은 그대로 남아요.")) return;
+        if (!confirm("게시판에 올라가 있는 '" + p.title + "' 글을 지금 보이는 최신 내용으로 바꿀까요?\n조회수·좋아요·댓글은 그대로 남아요." + (doneEd[p.k] ? "\n\n⚠️ 이 글은 직접 수정해서 올린 글이에요. 바꾸면 고친 내용이 원래 준비한 내용으로 돌아가요." : ""))) return;
         JIDB.call("post_update", { id: d, title: p.title, head: p.head || "", content: p.content })
           .then(function(){ closeModal(); toast("최신 내용으로 바꿨어요"); }, function(e){ alert("바꾸지 못했어요: " + e.message); });
       };
       box.addEventListener("click", function(e){
         var b = e.target.closest(".op-main"); if (!b) return;
-        var i = +b.dataset.pv, p = L[i], d = done[p.k];
-        showModal('<div class="op-pv"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + (d ? ' · <b style="color:#1a7f37">올린 글</b>' : ' · 아직 안 올림') + '</small>' +
-          '<h3>' + esc(p.title) + '</h3><div class="op-pv-body">' + linkify(p.content || "") + '</div></div>' +
-          '<div class="bt"><button class="mb" onclick="closeModal()">닫기</button>' +
-          (d ? '<button class="mb" onclick="_opRefresh(' + i + ')">최신 내용으로 바꾸기</button><a class="mb pri" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '<button class="mb pri" onclick="_opPost(' + i + ')">이 글 올리기</button>') + '</div>');
+        openPv(+b.dataset.pv);
       });
       tabs.onclick = function(e){ var b = e.target.closest("button"); if (!b || b.dataset.t === TAB) return; TAB = window.OP_TAB = b.dataset.t; pg = 0; paint(); };
       box.onchange = function(e){ var c = e.target; if (!c.classList.contains("op-c")) return; if (c.checked) SEL[c.dataset.i] = 1; else delete SEL[c.dataset.i]; sync(); };
@@ -1331,7 +1368,7 @@ if (SRV) {
       all.onchange = function(){ SEL = {}; if (all.checked) F("todo").forEach(function(i){ SEL[i] = 1; }); paint(); sync(); };   // 모든 페이지의 안 올린 글
       window.opSchCancel = function(sid){ if (!confirm("이 예약을 취소할까요? 글은 '안 올린 글'로 돌아가요.")) return; JIDB.call("admin_sched_cancel", { id: sid }).then(function(){ toast("예약을 취소했어요"); drawOpPosts(); }, function(e){ alert(e.message); }); };
       sch.onclick = function(){
-        var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return L[i]; });   // 목록 위쪽 글부터 먼저
+        var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return cur(i); });   // 목록 위쪽 글부터 먼저 (수정한 글은 수정한 내용으로)
         if (!pick.length) return;
         var t = new Date(); t.setDate(t.getDate() + 1); t.setHours(9, 0, 0, 0);
         var loc = function(d){ return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); };
@@ -1351,18 +1388,18 @@ if (SRV) {
           if (!prev()) return; var b = this; b.disabled = true;
           var items = plan().map(function(x){ var d = x.d; return { op_k: x.p.k, board: x.p.board, head: x.p.head || "", title: x.p.title, content: x.p.content,
             at: d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":00" }; });
-          JIDB.call("admin_sched_add", { items: items }).then(function(r){ closeModal(); toast(r.added + "개 글을 예약했어요"); TAB = window.OP_TAB = "sched"; drawOpPosts(); }, function(e){ b.disabled = false; alert(e.message); });
+          JIDB.call("admin_sched_add", { items: items }).then(function(r){ pick.forEach(function(p){ setDraft(p.k, null); }); closeModal(); toast(r.added + "개 글을 예약했어요"); TAB = window.OP_TAB = "sched"; drawOpPosts(); }, function(e){ b.disabled = false; alert(e.message); });
         };
       };
       go.onclick = function(){
-        var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return L[i]; }).reverse();   // 목록 위쪽 글이 가장 최근 글로 보이게 거꾸로 올림
+        var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return cur(i); }).reverse();   // 목록 위쪽 글이 가장 최근 글로 보이게 거꾸로 올림
         if (!pick.length || !confirm(pick.length + "개 글을 지금 게시판에 올릴까요?")) return;
         go.disabled = true; var ok = 0;
         (function next(i){
           if (i >= pick.length) { toast(ok + "개 올렸어요"); return drawOpPosts(); }
           var p = pick[i]; go.textContent = "올리는 중… " + (i + 1) + "/" + pick.length;
-          JIDB.call("post_create", { board: p.board, head: p.head || "", title: p.title, content: p.content, extra: { op: p.k } })
-            .then(function(){ ok++; next(i + 1); }, function(e){ alert("'" + p.title + "' 올리기 실패: " + e.message); drawOpPosts(); });
+          JIDB.call("post_create", { board: p.board, head: p.head || "", title: p.title, content: p.content, extra: extraOf(p) })
+            .then(function(){ setDraft(p.k, null); ok++; next(i + 1); }, function(e){ alert("'" + p.title + "' 올리기 실패: " + e.message); drawOpPosts(); });
         })(0);
       };
     });
