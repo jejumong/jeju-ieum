@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261125d">
+<link rel="stylesheet" href="../assets/style.css?v=20261125e">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -489,18 +489,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261125d"></script>
-<script src="../assets/db.js?v=20261125d"></script>
-<script src="../assets/notify.js?v=20261125d"></script>
-<script src="../assets/seed-trade.js?v=20261125d"></script>
-<script src="../assets/seed-extra.js?v=20261125d"></script>
-<script src="../assets/festivals-data.js?v=20261125d"></script>
-<script src="../assets/seed-new.js?v=20261125d"></script>
-<script src="../assets/seed-comments.js?v=20261125d"></script>
-<script src="../assets/photos.js?v=20261125d"></script>
-<script src="../assets/admin-data.js?v=20261125d"></script>
-<script src="../assets/kmap.js?v=20261125d"></script>
-<script src="../assets/op-posts.js?v=20261125d"></script>
+<script src="../assets/common.js?v=20261125e"></script>
+<script src="../assets/db.js?v=20261125e"></script>
+<script src="../assets/notify.js?v=20261125e"></script>
+<script src="../assets/seed-trade.js?v=20261125e"></script>
+<script src="../assets/seed-extra.js?v=20261125e"></script>
+<script src="../assets/festivals-data.js?v=20261125e"></script>
+<script src="../assets/seed-new.js?v=20261125e"></script>
+<script src="../assets/seed-comments.js?v=20261125e"></script>
+<script src="../assets/photos.js?v=20261125e"></script>
+<script src="../assets/admin-data.js?v=20261125e"></script>
+<script src="../assets/kmap.js?v=20261125e"></script>
+<script src="../assets/op-posts.js?v=20261125e"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1298,7 +1298,7 @@ if (SRV) {
             '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(p.board) + ' · <b class="sch-at">' + schTxt(sc.at) + (sc.status === "fail" ? ' 실패' : ' 예약') + '</b>' + (sc.by_nick ? ' · ' + esc(sc.by_nick) : '') + '</small><b>' + esc(p.title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
             '<button class="mb danger-o" onclick="opSchCancel(' + sc.id + ')">예약 취소</button></div>';
           return '<div class="op-row"><label class="op-chk">' + (d ? '<span class="op-ok">✓</span>' : '<input type="checkbox" class="op-c" data-i="' + i + '"' + (SEL[i] ? ' checked' : '') + '>') + '</label>' +
-            '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(p.board) + (p.head ? ' · ' + esc(p.head) : '') + (!d && draft(p.k) ? ' · <b class="op-ed">✏️ 수정함</b>' : '') + '</small><b>' + esc(d ? p.title : cur(i).title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
+            '<button type="button" class="op-main" data-pv="' + i + '"><small>' + esc(d ? p.board : cur(i).board) + ((d ? p.head : cur(i).head) ? ' · ' + esc(d ? p.head : cur(i).head) : '') + (!d && draft(p.k) ? ' · <b class="op-ed">✏️ 수정함</b>' : '') + '</small><b>' + esc(d ? p.title : cur(i).title) + '</b><span class="op-peek">내용 보기 ›</span></button>' +
             (d ? '<a class="mb" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '') + '</div>';
         }).join("") + (pages > 1 ? '<div class="pager">' + Array.apply(null, Array(pages)).map(function(_, k){ return '<button data-pg="' + k + '"' + (k === pg ? ' class="on"' : '') + '>' + (k + 1) + '</button>'; }).join("") + '</div>' : '');
         box.querySelectorAll(".pager button").forEach(function(b){ b.onclick = function(){ pg = +b.dataset.pg; paint(); M().scrollTop = 0; window.scrollTo(0, 0); }; });
@@ -1310,7 +1310,7 @@ if (SRV) {
       var DK = function(k){ return "op_draft:" + k; };
       function draft(k){ try { var v = localStorage.getItem(DK(k)); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
       function setDraft(k, v){ try { if (v) localStorage.setItem(DK(k), JSON.stringify(v)); else localStorage.removeItem(DK(k)); } catch (e) {} }
-      function cur(i){ var p = L[i], d = draft(p.k); return d ? { k: p.k, board: p.board, head: d.head, title: d.title, content: d.content, edited: true } : p; }
+      function cur(i){ var p = L[i], d = draft(p.k); return d ? { k: p.k, board: d.board || p.board, head: d.head, title: d.title, content: d.content, edited: true } : p; }
       function extraOf(p){ return p.edited ? { op: p.k, op_edit: 1 } : { op: p.k }; }
       function postOne(i){
         var p = cur(i); if (!confirm("'" + p.title + "' 글을 지금 게시판에 올릴까요?" + (p.edited ? "\n(수정한 내용으로 올라가요)" : ""))) return;
@@ -1329,8 +1329,9 @@ if (SRV) {
       /* 수정하기 창 */
       window._opEdit = function(i){
         var o = L[i], p = cur(i);
-        showModal('<div class="op-pv"><small>' + esc(o.board) + ' · 내용 수정</small><h3 style="margin-bottom:6px">글 수정하기</h3>' +
+        showModal('<div class="op-pv"><small>운영자 글 · 내용 수정</small><h3 style="margin-bottom:6px">글 수정하기</h3>' +
           '<p class="sub" style="margin:0 0 12px">고친 내용은 올리기 전까지 이 브라우저에 저장돼요. 다른 기기에서는 원래 내용으로 보여요.</p>' +
+          '<label class="sus-l">게시판' + (p.board !== o.board ? ' <span style="font-weight:400;color:var(--ink-4)">(처음 준비한 곳: ' + esc(o.board) + ')</span>' : '') + '</label><select id="ope-b" class="sch-in">' + MOVE_BOARDS.map(function(g){ return '<optgroup label="' + g[0] + '">' + g[1].map(function(x){ return '<option' + (x === p.board ? ' selected' : '') + '>' + x + '</option>'; }).join("") + '</optgroup>'; }).join("") + '</select>' +
           '<label class="sus-l">말머리</label><input id="ope-h" class="sch-in" maxlength="20" value="' + esc(p.head || "") + '">' +
           '<label class="sus-l">제목</label><input id="ope-t" class="sch-in" maxlength="120" value="' + esc(p.title) + '">' +
           '<label class="sus-l">내용 <span id="ope-n" style="font-weight:400;color:var(--ink-4)"></span></label><textarea id="ope-c" class="sch-in ope-c">' + esc(p.content || "") + '</textarea></div>' +
@@ -1339,9 +1340,9 @@ if (SRV) {
         var cnt = function(){ n.textContent = "(" + c.value.length.toLocaleString() + "자)"; }; c.oninput = cnt; cnt();
         var val = function(){ var t = document.getElementById("ope-t").value.trim(), h = document.getElementById("ope-h").value.trim(), ct = c.value.replace(/\s+$/, "");
           if (!t) { alert("제목을 적어 주세요."); return null; } if (!ct.trim()) { alert("내용을 적어 주세요."); return null; }
-          return { head: h, title: t, content: ct }; };
+          return { board: document.getElementById("ope-b").value, head: h, title: t, content: ct }; };
         var save = function(){ var v = val(); if (!v) return false;
-          if (v.head === (o.head || "") && v.title === o.title && v.content === (o.content || "").replace(/\s+$/, "")) setDraft(o.k, null); else setDraft(o.k, v);
+          if (v.board === o.board && v.head === (o.head || "") && v.title === o.title && v.content === (o.content || "").replace(/\s+$/, "")) setDraft(o.k, null); else setDraft(o.k, v);
           return true; };
         document.getElementById("ope-cancel").onclick = function(){ openPv(i); };
         document.getElementById("ope-save").onclick = function(){ if (save()) { toast("수정한 내용을 저장했어요"); paint(); openPv(i); } };
