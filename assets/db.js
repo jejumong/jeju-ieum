@@ -63,11 +63,11 @@ var JIDB = (function () {
 
   /* 서버 글 → 화면에서 쓰는 글 모양으로 */
   function toPost(r) {
-    var d = new Date(r.created_at), x = r.extra || {};
+    var d = new Date(String(r.created_at || "").replace(" ", "T")), x = r.extra || {};   // 사파리도 읽을 수 있게 T로
     return {
       id: r.id, board: r.board, head: r.head || "", title: r.title, content: r.content || "", loc: r.loc || "", meta: r.meta || "",
       price: r.price || "", author: r.author_nick, authorId: r.author, authorRole: r.author_role || "user", date: (r.created_at || "").slice(0, 10),
-      time: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2), views: r.views || 0, db: true, extra: r.extra || {},
+      time: ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2), ts: isNaN(d) ? 0 : d.getTime(), views: r.views || 0, db: true, extra: r.extra || {},
       // 게시판별 추가 정보 (부동산 집 종류·주소, 구인 급여 등)
       htype: x.htype || "", addr: x.addr || "", start: x.start || "", end: x.end || "", hidden: !!r.hidden, lat: x.lat || "", lng: x.lng || "", hours: x.hours || "", tel: x.tel || "", menu: x.menu || "", perk: x.benefit || "", payType: x.payType || "", pay: x.pay || "", headPrev: x.headPrev || "", editedAt: r.updated_at !== r.created_at ? (r.updated_at || "").slice(0, 10) : ""
     };

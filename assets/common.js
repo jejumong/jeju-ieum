@@ -450,6 +450,13 @@ function viewsOf(p) {
   return (p.views || 0) + (v[p.id] || 0);
 }
 function fmtDate(d) { return d ? d.slice(5).replace("-", ".") : ""; }
+/* 새 글: 올린 지 24시간이 안 된 글 (게시판 목록에서 제목을 진하게) */
+var FRESH_HOURS = 24;
+function isFresh(p) {
+  var t = p && (p.ts || Date.parse((p.date || "") + "T" + (p.time || "00:00") + ":00"));
+  if (!t || isNaN(t)) return false;
+  var age = Date.now() - t; return age < FRESH_HOURS * 3600000 && age > -3600000;
+}
 
 /* ── 레이아웃 주입 ── */
 var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M30 54.4V74H90V56.8M90 40.8V12H30V38.4" stroke="currentColor" stroke-width="4.4"/><path d="M6 64 C20 58 30 44 44 36 C52 32 56 44 60 52 C64 60 74 60 84 52 C92 46 100 47 114 54" stroke="currentColor" stroke-width="4.6" stroke-linecap="round"/><circle cx="73" cy="29" r="6" fill="#F28A2E"/></svg>';
