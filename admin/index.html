@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261124c">
+<link rel="stylesheet" href="../assets/style.css?v=20261125a">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -286,6 +286,7 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .op-pv-body a{color:#1e6fd9}
 .op-tabs button{padding:9px 16px;border:1px solid #dfe3ea;border-radius:999px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer}
 .op-tabs button b{margin-left:4px;color:var(--ink-4);font-weight:700}
+.mem-grp{flex-wrap:wrap;margin:0 0 12px}
 .op-tabs button.on{background:#0e2440;border-color:#0e2440;color:#fff}.op-tabs button.on b{color:#ffc27a}
 .op-bar-b{display:flex;gap:6px;flex-wrap:wrap}
 .op-ok.sch{background:#fff4e5;color:#c2410c}.sch-at{color:#c2410c}
@@ -485,18 +486,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261124c"></script>
-<script src="../assets/db.js?v=20261124c"></script>
-<script src="../assets/notify.js?v=20261124c"></script>
-<script src="../assets/seed-trade.js?v=20261124c"></script>
-<script src="../assets/seed-extra.js?v=20261124c"></script>
-<script src="../assets/festivals-data.js?v=20261124c"></script>
-<script src="../assets/seed-new.js?v=20261124c"></script>
-<script src="../assets/seed-comments.js?v=20261124c"></script>
-<script src="../assets/photos.js?v=20261124c"></script>
-<script src="../assets/admin-data.js?v=20261124c"></script>
-<script src="../assets/kmap.js?v=20261124c"></script>
-<script src="../assets/op-posts.js?v=20261124c"></script>
+<script src="../assets/common.js?v=20261125a"></script>
+<script src="../assets/db.js?v=20261125a"></script>
+<script src="../assets/notify.js?v=20261125a"></script>
+<script src="../assets/seed-trade.js?v=20261125a"></script>
+<script src="../assets/seed-extra.js?v=20261125a"></script>
+<script src="../assets/festivals-data.js?v=20261125a"></script>
+<script src="../assets/seed-new.js?v=20261125a"></script>
+<script src="../assets/seed-comments.js?v=20261125a"></script>
+<script src="../assets/photos.js?v=20261125a"></script>
+<script src="../assets/admin-data.js?v=20261125a"></script>
+<script src="../assets/kmap.js?v=20261125a"></script>
+<script src="../assets/op-posts.js?v=20261125a"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1509,6 +1510,7 @@ if (SRV) {
     document.getElementById("sp-none").onclick = function(){ if (confirm("기한 없이 계속 보이게 할까요?")) save({ until: null, kind: "기한 없음" }, "기한 없음으로 정했어요"); };
     document.getElementById("sp-stop").onclick = function(){ if (confirm("오늘로 끝내고 판매 글을 가릴까요?")) save({ until: addDays(today, -1), kind: "종료" }, "입점 기간을 끝냈어요 — 판매 글이 가려져요"); };
   };
+  window.memGroup = function(k){ MEM_GRP = k; if (window.BSEL) BSEL.mem = {}; drawMembers(); };
   window.sortMembers = function(k){ if ((window.MEM_SORT || "created") === k) MEM_DIR = -(window.MEM_DIR || -1); else { MEM_SORT = k; MEM_DIR = -1; } drawMembers(); };
   window.drawMembers = function(){
     var R = { user: "일반", realtor: "부동산 중개인", shop: "상점판매자", dealer: "공구판매자", staff: "스텝" };
@@ -1524,6 +1526,12 @@ if (SRV) {
       if (srt === "comments") return ((b.comments || 0) - (a.comments || 0)) * -dir || byNew;
       return byNew * -dir;
     });
+    /* 역할별로 모아 보기 */
+    var MG = [["all", "전체", null], ["staff", "관리자·스텝", ["admin", "staff"]], ["seller", "판매자", ["shop", "dealer"]], ["realtor", "부동산 중개인", ["realtor"]], ["user", "일반", ["user"]]];
+    var mg = window.MEM_GRP || "all", mgOf = function(k){ for (var i = 0; i < MG.length; i++) if (MG[i][0] === k) return MG[i]; return MG[0]; };
+    var inG = function(u, g){ return !g[2] || g[2].indexOf(u.role) > -1; };
+    var ALL_N = LIST.length; LIST = LIST.filter(function(u){ return inG(u, mgOf(mg)); });
+    var MTABS = '<div class="op-tabs mem-grp">' + MG.map(function(g){ var n = USERS.filter(function(u){ return inG(u, g); }).length; return '<button class="' + (mg === g[0] ? 'on' : '') + '" onclick="memGroup(\'' + g[0] + '\')">' + g[1] + '<b>' + n + '</b></button>'; }).join("") + '</div>';
     var TH = function(l, k){ return thSort(l, k, srt, dir, "sortMembers"); };
     M().innerHTML = '<h1>회원 관리</h1><div class="mem-tools"><button class="mb" onclick="dlMembers()">⬇ 엑셀로 받기</button><button class="mb" onclick="showSuspLog()">⛔ 활동정지 기록</button></div><p class="sub">가입한 회원 ' + USERS.length + '명 · ' + Object.keys(ROLE_LABEL).filter(function(k){ return cnt[k]; }).map(function(k){ return ROLE_LABEL[k] + ' ' + cnt[k]; }).join(" · ") + '</p>' +
       '<div class="panel role-help"><b>역할별 권한</b><ul>' +
@@ -1532,7 +1540,7 @@ if (SRV) {
         '<li><b>상점판매자</b> — 제주상점 글쓰기 · <b>공구판매자</b> — 특가공구 글쓰기</li>' +
         '<li><b>스텝</b> — 관리자 페이지 이용, 남의 글·댓글 정리 (회원 역할은 못 바꿈)</li>' +
         '<li><b>관리자</b> — 모든 권한. GitHub Secrets 의 ADMIN_EMAILS 로만 정해져요</li></ul></div>' +
-      '<div class="panel">' + (USERS.length ? '<div class="mem-sort-m">정렬 ' + ["created:가입일", "region:지역", "posts:글", "comments:댓글"].map(function(x){ x = x.split(":"); return '<button class="th-s' + (srt === x[0] ? ' on' : '') + '" onclick="sortMembers(\'' + x[0] + '\')">' + x[1] + '<i>' + (srt === x[0] ? (dir < 0 ? '▼' : '▲') : '↕') + '</i></button>'; }).join("") + '</div>' + (boss ? bkBar("mem") : '') + '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr>' + (boss ? bkAll("mem") : '') + '<th>닉네임</th><th>이메일</th>' + TH("지역", "region") + TH("글", "posts") + TH("댓글", "comments") + TH("가입일", "created") + '<th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
+      '<div class="panel">' + (ALL_N ? MTABS : '') + (ALL_N && !LIST.length ? '<div class="empty">' + mgOf(mg)[1] + ' 회원이 아직 없습니다.</div>' : '') + (LIST.length ? '<div class="mem-sort-m">정렬 ' + ["created:가입일", "region:지역", "posts:글", "comments:댓글"].map(function(x){ x = x.split(":"); return '<button class="th-s' + (srt === x[0] ? ' on' : '') + '" onclick="sortMembers(\'' + x[0] + '\')">' + x[1] + '<i>' + (srt === x[0] ? (dir < 0 ? '▼' : '▲') : '↕') + '</i></button>'; }).join("") + '</div>' + (boss ? bkBar("mem") : '') + '<div class="tbl-wrap mem-wrap"><table class="adm-t mem-t"><thead><tr>' + (boss ? bkAll("mem") : '') + '<th>닉네임</th><th>이메일</th>' + TH("지역", "region") + TH("글", "posts") + TH("댓글", "comments") + TH("가입일", "created") + '<th>최근 로그인</th><th>역할</th><th></th></tr></thead><tbody>' +
         LIST.map(function(u){
           var roleCell = u.role === "admin" ? '<span class="bd user">관리자</span>'
             : (!boss || (me && u.id === me.id)) ? '<span class="bd">' + esc(ROLE_LABEL[u.role] || u.role) + '</span>'
@@ -1560,7 +1568,7 @@ if (SRV) {
             '<div class="mc-foot"><small>가입 ' + esc((u.created_at||"").slice(0,10)) + ' · 최근 ' + esc((u.last_login||"").slice(0,10) || "-") + '</small>' +
               '<span class="mc-btns">' + suspBtn(u, me) + (me && u.id === me.id ? '' : '<button class="mb" onclick="msgTo(\'' + u.id + '\',\'' + esc(u.nick).replace(/'/g, "") + '\')">✉️ 쪽지</button>') + '</span></div></div>';
         }).join("") + '</div>'
-        : '<div class="empty">아직 가입한 회원이 없습니다.</div>') + '</div>';
+        : (ALL_N ? '' : '<div class="empty">아직 가입한 회원이 없습니다.</div>')) + '</div>';
 
     paintBulk("mem");
   };
