@@ -59,16 +59,16 @@ var PROGRAMS = [
     url: "https://jejuzine.com/5894",
     src: [["제주진 기사", "https://jejuzine.com/5894"]] },
 
-  { id: "p05", cat: "체류 체험", tags: ["주거비 지원"], status: "wait", top: true,
+  { id: "p05", cat: "체류 체험", tags: ["주거비 지원"], status: "open", top: true,
     name: "함께온제주 농어촌유학 (가족체류형)", org: "제주도교육청 · 제주도 · 서울시교육청",
     who: "제주 외 지역 초등학생과 함께 이주하는 부모 1명 이상 (농어촌 읍면 거주 학생 제외)",
     what: "자녀 수에 따라 가구당 월 60만~120만 원 주거·생활비 지원, 6개월 단위로 읍면 작은 학교에 다님",
     cond: "배정 후 전입 완료해야 확정, 학교 동의 시 6개월·1년 단위 연장 — 집은 가정이 직접 구함",
-    when: "2026 2학기는 6.15까지 22가구 모집 (마감). 2026 1학기 모집은 2025년 11.26~12.2였음 — 2027 1학기 제주도교육청 공고 확인 필요. 서울 학생은 서울시교육청 2027 1학기 농촌유학(제주 포함)으로 11.26~12.2 재학 학교에 신청 (12.22 최종 확정)",
+    when: "2027 1학기 제주도교육청 모집 11.26~12.2 — 초등학교 10곳 34가구 선발 (운영학교 14→17곳, 덕수초·예래초·하례초 신규). 모집 내용·신청 서식은 도교육청 농어촌유학 누리집 확인. 서울 학생은 서울시교육청 2027 1학기 농촌유학(제주 포함)으로 같은 기간 재학 학교에 신청 가능 (12.22 최종 확정). 지난 일정: 2026 2학기 6.15까지 22가구 모집 (마감)",
     contact: "제주도교육청 정책기획과 064-710-0173",
-    url: "http://www.ihalla.com/article.php?aid=1780629272786769014",
-    school: "귀덕초 · 송당초 · 평대초 · 하도초 · 성읍초 · 신례초 · 창천초 · 흥산초 · 구좌중앙초 · 종달초 · 한동초 · 대정서초 · 무릉초 · 수산초",
-    src: [["한라일보 2026.6", "http://www.ihalla.com/article.php?aid=1780629272786769014"], ["제주도민일보 2025.11", "https://www.jejudomin.co.kr/news/articleView.html?idxno=315436"], ["미디어제주 (2026 1학기 165명 배정)", "https://www.mediajeju.com/news/articleView.html?idxno=362515"], ["서울세계타임즈 2026.11 (서울시교육청 2027 1학기 모집)", "https://seoul.thesegye.com/news/view/1065562620326046"]] },
+    url: "https://www.mediajeju.com/news/articleView.html?idxno=367521",
+    school: "2027 1학기 모집교: 귀덕초 · 하도초 · 한동초 · 대정서초 · 덕수초 · 무릉초 · 신례초 · 예래초 · 하례초 · 흥산초",
+    src: [["한라일보 2026.6", "http://www.ihalla.com/article.php?aid=1780629272786769014"], ["제주도민일보 2025.11", "https://www.jejudomin.co.kr/news/articleView.html?idxno=315436"], ["미디어제주 (2026 1학기 165명 배정)", "https://www.mediajeju.com/news/articleView.html?idxno=362515"], ["서울세계타임즈 2026.11 (서울시교육청 2027 1학기 모집)", "https://seoul.thesegye.com/news/view/1065562620326046"], ["미디어제주 2026.11.25 (2027 1학기 34가구 모집)", "https://www.mediajeju.com/news/articleView.html?idxno=367521"], ["교육언론 창 2026.11.25", "https://www.educhang.co.kr/news/articleView.html?idxno=10447"]] },
 
   /* ── 워케이션 ── */
   { id: "p06", cat: "워케이션", tags: [], status: "open", top: true,
