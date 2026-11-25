@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261125f">
+<link rel="stylesheet" href="assets/style.css?v=20261125g">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -68,8 +68,10 @@
 .rep-box textarea{width:100%;box-sizing:border-box;min-height:70px;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:14px;resize:vertical}
 .rep-bt{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .cmt-form{display:flex;gap:8px;margin-top:12px}
-.cmt-form input{flex:1;border:1px solid var(--line);border-radius:8px;padding:11px 12px;outline:none}
-.cmt-form input:focus{border-color:var(--sea)}
+.cmt-form textarea,.edit-box textarea{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:11px 12px;outline:none;font:inherit;font-size:15px;line-height:1.5;resize:none;overflow-y:auto;box-sizing:border-box}
+.cmt-form textarea:focus,.edit-box textarea:focus{border-color:var(--sea)}
+.cmt-form,.edit-box{align-items:flex-end}
+.cmt-item p{white-space:pre-wrap;overflow-wrap:anywhere}
 .cmt-login{background:var(--sand);border:1px dashed var(--line);border-radius:10px;padding:16px;text-align:center;font-size:14px;color:var(--muted);margin-top:12px}
 .cmt-login a{color:var(--sea);font-weight:700}
 </style>
@@ -87,16 +89,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261125f"></script>
-<script src="assets/common.js?v=20261125f"></script>
-<script src="assets/db.js?v=20261125f"></script>
-<script src="assets/notify.js?v=20261125f"></script>
-<script src="assets/seed-trade.js?v=20261125f"></script>
-<script src="assets/seed-extra.js?v=20261125f"></script>
-<script src="assets/festivals-data.js?v=20261125f"></script>
-<script src="assets/seed-new.js?v=20261125f"></script>
-<script src="assets/seed-comments.js?v=20261125f"></script>
-<script src="assets/admin-data.js?v=20261125f"></script>
+<script src="assets/kmap.js?v=20261125g"></script>
+<script src="assets/common.js?v=20261125g"></script>
+<script src="assets/db.js?v=20261125g"></script>
+<script src="assets/notify.js?v=20261125g"></script>
+<script src="assets/seed-trade.js?v=20261125g"></script>
+<script src="assets/seed-extra.js?v=20261125g"></script>
+<script src="assets/festivals-data.js?v=20261125g"></script>
+<script src="assets/seed-new.js?v=20261125g"></script>
+<script src="assets/seed-comments.js?v=20261125g"></script>
+<script src="assets/admin-data.js?v=20261125g"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -503,10 +505,9 @@ function likeDbCmt(i) {
 }
 function startEditDbCmt(i) {
   var c = DB_CMTS[i]; if (!c) return;
-  document.getElementById("dcmt-text-" + i).outerHTML = '<div class="edit-box" id="dcmt-text-' + i + '"><input type="text" id="dcmt-edit-' + i + '" maxlength="300">' +
+  document.getElementById("dcmt-text-" + i).outerHTML = '<div class="edit-box" id="dcmt-text-' + i + '"><textarea rows="1" id="dcmt-edit-' + i + '" maxlength="300"></textarea>' +
     '<button class="btn primary" onclick="saveDbCmt(' + i + ')">저장</button><button class="btn ghost" onclick="renderComments()">취소</button></div>';
-  var inp = document.getElementById("dcmt-edit-" + i); inp.value = c.text; inp.focus();
-  inp.addEventListener("keydown", function (e) { if (e.key === "Enter") saveDbCmt(i); });
+  var inp = document.getElementById("dcmt-edit-" + i); inp.value = c.text; cmtBox(inp, function(){ saveDbCmt(i); }); inp.focus();
 }
 function saveDbCmt(i) {
   var t = document.getElementById("dcmt-edit-" + i).value.trim(); if (!t) { alert("댓글 내용을 입력해주세요."); return; }
@@ -554,11 +555,18 @@ function renderComments() {
   document.getElementById("cmt-input").innerHTML = _sus
     ? '<div class="cmt-login susp">⛔ 활동이 정지된 계정이에요 (' + _sus + '). 정지 기간에는 댓글을 쓸 수 없어요.</div>'
     : u
-    ? '<div class="cmt-form"><input type="text" id="cmt-text" placeholder="' + esc(u.nick) + '님, 따뜻한 댓글을 남겨주세요" maxlength="300"><button class="btn primary" onclick="addComment()">등록</button></div>'
+    ? '<div class="cmt-form"><textarea rows="1" id="cmt-text" placeholder="' + esc(u.nick) + '님, 따뜻한 댓글을 남겨주세요" maxlength="300"></textarea><button class="btn primary" onclick="addComment()">등록</button></div>'
     : '<div class="cmt-login">댓글을 쓰려면 <a href="login.html?next=' + encodeURIComponent("view.html?id=" + id) + '">로그인</a>이 필요해요.</div>';
 
   var inp = document.getElementById("cmt-text");
-  if (inp) inp.addEventListener("keydown", function(e){ if(e.key === "Enter") addComment(); });
+  if (inp) cmtBox(inp, addComment);
+}
+/* 댓글 칸: 글이 길어지면 아래로 줄이 늘어남. Enter = 등록, Shift+Enter = 줄바꿈 (한글 입력 중 Enter 는 무시) */
+function cmtBox(ta, submit){
+  var grow = function(){ ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight + 2, 240) + "px"; };
+  ta.addEventListener("input", grow);
+  ta.addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); submit(); } });
+  grow();
 }
 
 function closeJob(){
@@ -589,13 +597,13 @@ function startEditCmt(i){
   if (!c) return;
   var box = document.getElementById("cmt-text-" + i);
   box.outerHTML = '<div class="edit-box" id="cmt-text-' + i + '">' +
-    '<input type="text" id="cmt-edit-' + i + '" maxlength="300">' +
+    '<textarea rows="1" id="cmt-edit-' + i + '" maxlength="300"></textarea>' +
     '<button class="btn primary" onclick="saveCmt(' + i + ')">저장</button>' +
     '<button class="btn ghost" onclick="renderComments()">취소</button></div>';
   var inp = document.getElementById("cmt-edit-" + i);
   inp.value = c.text;
+  cmtBox(inp, function(){ saveCmt(i); });
   inp.focus();
-  inp.addEventListener("keydown", function(e){ if (e.key === "Enter") saveCmt(i); });
 }
 function saveCmt(i){
   var t = document.getElementById("cmt-edit-" + i).value.trim();
