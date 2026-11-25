@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261125a">
+<link rel="stylesheet" href="assets/style.css?v=20261125b">
 <style>
 .req-status{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r);margin-bottom:20px;font-size:14px}
 .req-status.pending{background:var(--sea-50);border:1px solid var(--sea-100);color:var(--sea-700)}
@@ -98,11 +98,11 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261125a"></script>
-<script src="assets/db.js?v=20261125a"></script>
-<script src="assets/notify.js?v=20261125a"></script>
-<script src="assets/admin-data.js?v=20261125a"></script>
-<script src="assets/kmap.js?v=20261125a"></script>
+<script src="assets/common.js?v=20261125b"></script>
+<script src="assets/db.js?v=20261125b"></script>
+<script src="assets/notify.js?v=20261125b"></script>
+<script src="assets/admin-data.js?v=20261125b"></script>
+<script src="assets/kmap.js?v=20261125b"></script>
 <script>
 var user = currentUser();
 var board = new URLSearchParams(location.search).get("board") || "특가공구";
@@ -148,6 +148,11 @@ if (!user) {
 })();
 function showReq(req){
   document.getElementById("status-box").innerHTML = ""; document.getElementById("form-box").style.display = "";
+  if (req && req.status === "approved" && window.JIDB && JIDB.enabled && JIDB.me() && !isApprovedSeller(board)) {
+    // 서버의 최신 역할(JIDB.ready 에서 받아 옴)이 판매자가 아님 = 운영자가 역할을 바꿔 승인이 풀린 경우 → 다시 요청할 수 있게
+    document.getElementById("status-box").innerHTML = '<div class="req-status rejected"><span class="ico">ℹ️</span><div><div class="rt">' + board + ' 판매자 승인이 해제된 상태예요</div><div class="rs">다시 판매하려면 아래 양식으로 새로 요청해 주세요.</div></div></div>';
+    return;
+  }
   if (req && req.status === "approved") {   // 승인됐는데 이 화면의 회원 정보가 옛것인 경우
     if (!sessionStorage.getItem("sr_reload")) { sessionStorage.setItem("sr_reload", "1"); location.reload(); return; }
     document.getElementById("status-box").innerHTML = '<div class="req-status approved"><span class="ico">✅</span><div><div class="rt">승인되었어요</div><div class="rs">로그아웃 후 다시 로그인하면 ' + board + ' 글쓰기가 열려요.</div></div></div>';
