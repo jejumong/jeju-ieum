@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 19;
+const JI_SCHEMA = 20;
 
 /* ── 응답 ── */
 function cors() {
@@ -198,6 +198,9 @@ function migrate($pdo) {
   }
   if ($v < 19) {   // 대댓글: 어느 댓글에 단 답글인지(parent_id = 맨 위 댓글), 누구에게 단 답글인지, 답글이 남은 채 지운 댓글 표시
     try { $pdo->exec("ALTER TABLE ji_comments ADD COLUMN parent_id CHAR(36) NULL, ADD COLUMN reply_nick VARCHAR(40) NOT NULL DEFAULT '', ADD COLUMN deleted TINYINT NOT NULL DEFAULT 0, ADD INDEX (parent_id)"); } catch (Throwable $e) {}
+  }
+  if ($v < 20) {   // 관리자 콘솔 '내 글 반응': 관리자가 확인한 댓글·좋아요 기록
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ji_react_seen (user_id VARCHAR(36) NOT NULL, rkey VARCHAR(100) NOT NULL, at DATETIME NOT NULL, PRIMARY KEY (user_id, rkey))$T");
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }

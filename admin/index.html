@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126g">
+<link rel="stylesheet" href="../assets/style.css?v=20261126h">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -290,6 +290,22 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .op-tabs button{padding:9px 16px;border:1px solid #dfe3ea;border-radius:999px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer}
 .op-tabs button b{margin-left:4px;color:var(--ink-4);font-weight:700}
 .mem-grp{flex-wrap:wrap;margin:0 0 12px}
+.rx-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.rx-tabs{flex-wrap:wrap;margin:0}
+.rx-list{display:flex;flex-direction:column;gap:8px}
+.rx-row{display:flex;gap:12px;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid #dbe6f3;border-left:4px solid #2f80ed;box-shadow:0 2px 8px rgba(20,50,90,.06);cursor:pointer}
+.rx-row .rx-hd{font-size:14.5px;color:#0e2440}.rx-row .rx-hd b{font-weight:800}.rx-row .rx-post{font-weight:700;color:#0e2440}.rx-row .rx-text{color:#1f2d40;font-weight:600}
+.rx-row.seen{background:#f7f9fb;border-color:#e8edf2;border-left-color:#e8edf2;box-shadow:none;cursor:default}
+.rx-row.seen .rx-hd,.rx-row.seen .rx-post,.rx-row.seen .rx-text{color:#8a97a8;font-weight:400}.rx-row.seen .rx-hd b{font-weight:600}.rx-row.seen .rx-ic{opacity:.45}
+.rx-ic{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:#eaf3ff;color:#2f80ed;font-weight:800}
+.rx-ic.rx-like,.rx-ic.rx-clike{background:#ffecef;color:#e5484d}
+.rx-body{flex:1;min-width:0}.rx-hd{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rx-new{background:#2f80ed;color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px}
+.rx-to{color:#1a71c8;font-weight:700;font-size:13px}.rx-when{margin-left:auto;font-size:12.5px;color:#8a97a8;font-weight:400}
+.rx-post{margin-top:3px;font-size:13.5px}.rx-text{margin-top:6px;font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}.rx-text.q{font-size:13.5px}
+.rx-text.q::before{content:'내 댓글: ';color:#8a97a8;font-weight:400}
+.rx-acts{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:9px}.rx-done{font-size:12.5px;color:#16794a;font-weight:700}
+.rx-form{margin-top:10px;display:flex;flex-direction:column;gap:6px}.rx-form textarea{width:100%;box-sizing:border-box;border:1.5px solid #2f80ed;border-radius:12px;padding:10px 12px;font:inherit;font-size:14.5px;resize:vertical}
+.rx-form div{display:flex;justify-content:flex-end;gap:6px}
 .op-tabs button.on{background:#0e2440;border-color:#0e2440;color:#fff}.op-tabs button.on b{color:#ffc27a}
 .op-bar-b{display:flex;gap:6px;flex-wrap:wrap}
 .op-ok.sch{background:#fff4e5;color:#c2410c}.sch-at{color:#c2410c}
@@ -489,18 +505,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126g"></script>
-<script src="../assets/db.js?v=20261126g"></script>
-<script src="../assets/notify.js?v=20261126g"></script>
-<script src="../assets/seed-trade.js?v=20261126g"></script>
-<script src="../assets/seed-extra.js?v=20261126g"></script>
-<script src="../assets/festivals-data.js?v=20261126g"></script>
-<script src="../assets/seed-new.js?v=20261126g"></script>
-<script src="../assets/seed-comments.js?v=20261126g"></script>
-<script src="../assets/photos.js?v=20261126g"></script>
-<script src="../assets/admin-data.js?v=20261126g"></script>
-<script src="../assets/kmap.js?v=20261126g"></script>
-<script src="../assets/op-posts.js?v=20261126g"></script>
+<script src="../assets/common.js?v=20261126h"></script>
+<script src="../assets/db.js?v=20261126h"></script>
+<script src="../assets/notify.js?v=20261126h"></script>
+<script src="../assets/seed-trade.js?v=20261126h"></script>
+<script src="../assets/seed-extra.js?v=20261126h"></script>
+<script src="../assets/festivals-data.js?v=20261126h"></script>
+<script src="../assets/seed-new.js?v=20261126h"></script>
+<script src="../assets/seed-comments.js?v=20261126h"></script>
+<script src="../assets/photos.js?v=20261126h"></script>
+<script src="../assets/admin-data.js?v=20261126h"></script>
+<script src="../assets/kmap.js?v=20261126h"></script>
+<script src="../assets/op-posts.js?v=20261126h"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -597,7 +613,7 @@ function boot(){
       '<a class="brand" href="index.html#dash" onclick="return goHome()" title="대시보드로 (새로고침)">' + LOGOMARK + '<div>제주이음<small>ADMIN CONSOLE</small></div></a>' +
       '<nav>' + MENU.filter(menuOk).map(function(m){
         return '<button data-v="' + m[0] + '" class="' + (view===m[0]?"on":"") + '" onclick="go(\'' + m[0] + '\')">' + m[1] +
-          (m[0]==="sellers" && pending ? '<span class="cnt">' + pending + '</span>' : '') + (m[0]==="inquiries" && newIq() ? '<span class="cnt">' + newIq() + '</span>' : '') + (m[0]==="reports" && newRep() ? '<span class="cnt">' + newRep() + '</span>' : '') + '</button>';
+          (m[0]==="sellers" && pending ? '<span class="cnt">' + pending + '</span>' : '') + (m[0]==="inquiries" && newIq() ? '<span class="cnt">' + newIq() + '</span>' : '') + (m[0]==="reports" && newRep() ? '<span class="cnt">' + newRep() + '</span>' : '') + (m[0]==="reacts" && newReact() ? '<span class="cnt">' + newReact() + '</span>' : '') + '</button>';
       }).join("") + '</nav>' +
       '<div class="foot"><a href="' + SITE + 'index.html" target="_blank">사이트 열기 ↗</a><button onclick="logoutAdmin()">로그아웃</button></div>' +
     '</aside><main class="main" id="main"></main></div>';
@@ -610,7 +626,7 @@ function boot(){
   draw();
 }
 /* 스텝(관리자가 아닌 운영진)에게 안 보이는 메뉴 */
-var STAFF_HIDE = ["premium", "sellers", "opposts", "account"];
+var STAFF_HIDE = ["premium", "sellers", "opposts", "account", "reacts"];
 function isBoss(){ var u = window.JIDB && JIDB.me && JIDB.me(); return !!(u && u.role === "admin"); }
 function menuOk(m){ return isBoss() || STAFF_HIDE.indexOf(m[0]) < 0; }
 function goHome(){ try { history.replaceState(null, "", "#dash"); } catch (e) { location.hash = "dash"; } location.reload(); return false; }
@@ -627,6 +643,7 @@ var AL_HELP = { signup: "누군가 회원가입하면", leave: "회원이 탈퇴
 var IQ_ST = { "new": "새 신청", "seen": "확인함", "contacted": "연락함", "done": "완료" };
 function newIq(){ return JI.get("inquiries", []).filter(function(q){ return q.status === "new"; }).length; }
 function newRep(){ return (typeof STATS !== "undefined" && STATS && STATS.reports_new) || 0; }
+function newReact(){ return (typeof STATS !== "undefined" && STATS && STATS.react_new) || 0; }
 function drawInquiries(){
   var list = JI.get("inquiries", []).slice().reverse();
   var warn = (SRV || (typeof SITE_CFG !== "undefined" && SITE_CFG.inquiryEndpoint)) ? "" :
@@ -1262,8 +1279,76 @@ if (SRV) {
   MENU.splice(MENU.length - 1, 1, ["opposts", "운영자 글"], ["members", "회원 관리"], ["alerts", "알림 설정"], ["account", "관리자 정보 수정"]);
   MENU.splice(1, 0, ["traffic", "방문 통계"]);
   MENU.splice(MENU.findIndex(function(m){ return m[0] === "inquiries"; }) + 1, 0, ["reports", "신고"]);
+  MENU.splice(MENU.findIndex(function(m){ return m[0] === "traffic"; }) + 1, 0, ["reacts", "내 글 반응"]);
   var _draw = draw;
-  draw = function(){ if (!isBoss() && STAFF_HIDE.indexOf(view) > -1) { view = "dash"; try { history.replaceState(null, "", "#dash"); } catch (e) {} boot(); return; } if (view === "account") return drawAccount(); if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "reports") return drawReports(); if (view === "settings") view = "members"; return _draw(); };
+  draw = function(){ if (!isBoss() && STAFF_HIDE.indexOf(view) > -1) { view = "dash"; try { history.replaceState(null, "", "#dash"); } catch (e) {} boot(); return; } if (view === "account") return drawAccount(); if (view === "traffic") return drawTraffic(); if (view === "members") return drawMembers(); if (view === "alerts") return drawAlerts(); if (view === "opposts") return drawOpPosts(); if (view === "reports") return drawReports(); if (view === "reacts") return drawReacts(); if (view === "settings") view = "members"; return _draw(); };
+
+  /* 내 글 반응 (관리자만): 관리자 계정 글에 달린 댓글·답글·좋아요를 한곳에서 보고, 바로 답글 달기
+     · 확인 안 한 것 = 진하게(왼쪽 파란 줄·'새'), 확인한 것 = 연하게. 줄을 누르거나 '확인'·답글을 하면 확인한 것으로 */
+  var RX = [], RX_F = "all";
+  window.drawReacts = function(){
+    M().innerHTML = '<h1>내 글 반응</h1><p class="sub">관리자 계정으로 쓴 글에 회원이 남긴 댓글·답글과 좋아요예요. <b>진한 줄</b>은 아직 확인하지 않은 반응이고, 확인하면 연하게 바뀌어요. 줄을 누르거나 답글을 달면 확인한 것으로 표시돼요.</p><div class="panel" id="rx-box">불러오는 중…</div>';
+    JIDB.call("admin_reactions").then(function(l){ RX = l || []; paintReacts(); }, function(e){ document.getElementById("rx-box").textContent = "불러오지 못했어요: " + e.message; });
+  };
+  function rxWhen(iso){ var d = new Date(iso); if (isNaN(d)) return ""; var m = Math.floor((Date.now() - d) / 60000);
+    if (m < 1) return "방금"; if (m < 60) return m + "분 전"; if (m < 1440) return Math.floor(m / 60) + "시간 전"; if (m < 1440 * 7) return Math.floor(m / 1440) + "일 전";
+    return (d.getMonth() + 1) + "." + d.getDate(); }
+  function rxSeen(keys){
+    keys = keys.filter(function(k){ return RX.some(function(x){ return x.key === k && !x.seen; }); }); if (!keys.length) return;
+    RX.forEach(function(x){ if (keys.indexOf(x.key) > -1) x.seen = true; });
+    var left = RX.filter(function(x){ return !x.seen; }).length; if (STATS) STATS.react_new = left;
+    var cnt = document.querySelector('.side nav button[data-v="reacts"] .cnt'); if (cnt) { if (left) cnt.textContent = left; else cnt.remove(); }
+    JIDB.call("admin_react_seen", { keys: keys }).catch(function(e){ alert("확인 표시를 저장하지 못했어요: " + e.message); });
+  }
+  function paintReacts(){
+    var unseen = RX.filter(function(x){ return !x.seen; }).length;
+    var F = { all: ["전체", function(){ return true; }], new: ["안 본 것", function(x){ return !x.seen; }], cmt: ["댓글·답글", function(x){ return x.kind === "comment" || x.kind === "reply"; }], like: ["좋아요", function(x){ return x.kind === "like" || x.kind === "clike"; }] };
+    var L = RX.filter(F[RX_F][1]);
+    var ICON = { comment: "💬", reply: "↳", like: "♥", clike: "♥" };
+    var ACT = { comment: "님이 댓글을 남겼어요", reply: "님이 답글을 남겼어요", like: "님이 글을 좋아해요", clike: "님이 내 댓글을 좋아해요" };
+    document.getElementById("rx-box").innerHTML =
+      '<div class="rx-top"><div class="op-tabs rx-tabs">' + Object.keys(F).map(function(k){ var n = RX.filter(F[k][1]).length; return '<button class="' + (RX_F === k ? 'on' : '') + '" data-f="' + k + '">' + F[k][0] + '<b>' + n + '</b></button>'; }).join("") + '</div>' +
+        (unseen ? '<button class="mb" id="rx-all">모두 확인 (' + unseen + ')</button>' : '') + '</div>' +
+      (L.length ? '<div class="rx-list">' + L.map(function(x){
+        var i = RX.indexOf(x), cm = x.kind === "comment" || x.kind === "reply";
+        return '<div class="rx-row' + (x.seen ? ' seen' : '') + '" data-i="' + i + '">' +
+          '<div class="rx-ic rx-' + x.kind + '">' + ICON[x.kind] + '</div><div class="rx-body">' +
+          '<div class="rx-hd">' + (x.seen ? '' : '<span class="rx-new">새</span>') + '<b>' + esc(x.nick) + '</b>' + ACT[x.kind] + (x.kind === "reply" && x.reply_nick ? ' <span class="rx-to">@' + esc(x.reply_nick) + '</span>' : '') + '<span class="rx-when">' + rxWhen(x.at) + '</span></div>' +
+          '<div class="rx-post"><span class="bd">' + esc(x.board || "") + '</span> ' + esc(x.title || "") + '</div>' +
+          (x.text ? '<div class="rx-text' + (x.kind === "clike" ? ' q' : '') + '">' + esc(x.text) + '</div>' : '') +
+          '<div class="rx-acts">' + (cm ? '<button class="mb pri" data-reply="' + i + '">' + (x.replied ? '답글 더 달기' : '답글 달기') + '</button>' : '') +
+            (x.replied ? '<span class="rx-done">✓ 답글 단 댓글</span>' : '') +
+            '<a class="mb" href="' + SITE + 'view.html?id=' + encodeURIComponent(x.post_id) + '#cmt-list" target="_blank">글 보기 ↗</a>' +
+            (x.seen ? '' : '<button class="mb" data-seen="' + i + '">확인</button>') + '</div>' +
+          '<div class="rx-rbox" id="rx-r-' + i + '"></div></div></div>';
+      }).join("") + '</div>' : '<div class="empty">' + (RX.length ? '이 조건에 맞는 반응이 없어요.' : '아직 관리자 글에 달린 반응이 없어요.') + '</div>');
+    var box = document.getElementById("rx-box");
+    box.querySelectorAll(".rx-tabs button").forEach(function(b){ b.onclick = function(){ RX_F = b.dataset.f; paintReacts(); }; });
+    var all = document.getElementById("rx-all"); if (all) all.onclick = function(){ rxSeen(RX.filter(function(x){ return !x.seen; }).map(function(x){ return x.key; })); paintReacts(); };
+    box.querySelectorAll(".rx-row").forEach(function(r){
+      r.addEventListener("click", function(e){
+        if (e.target.closest("a,button,textarea")) return;
+        var x = RX[+r.dataset.i]; if (x && !x.seen) { rxSeen([x.key]); paintReacts(); }
+      });
+    });
+    box.querySelectorAll("[data-seen]").forEach(function(b){ b.onclick = function(){ rxSeen([RX[+b.dataset.seen].key]); paintReacts(); }; });
+    box.querySelectorAll("[data-reply]").forEach(function(b){ b.onclick = function(){
+      var i = +b.dataset.reply, x = RX[i], rb = document.getElementById("rx-r-" + i);
+      box.querySelectorAll(".rx-rbox").forEach(function(o){ if (o !== rb) o.innerHTML = ""; });
+      rb.innerHTML = '<div class="rx-form"><textarea rows="2" maxlength="300" placeholder="@' + esc(x.nick) + ' 님에게 답글 (Enter 등록, Shift+Enter 줄바꿈)"></textarea><div><button class="mb" data-x>취소</button><button class="mb pri" data-go>등록</button></div></div>';
+      var ta = rb.querySelector("textarea"); ta.focus();
+      var send = function(){
+        var t = ta.value.trim(); if (!t) { alert("답글 내용을 적어 주세요."); return; }
+        ta.disabled = true;
+        JIDB.addComment(x.post_id, t, x.comment_id).then(function(){
+          rxSeen([x.key]); x.replied = true; toast("답글을 남겼어요 — " + x.nick + "님에게 알림이 가요"); paintReacts();
+        }, function(e){ ta.disabled = false; alert("답글을 남기지 못했어요: " + e.message); });
+      };
+      ta.addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); send(); } });
+      rb.querySelector("[data-go]").onclick = send;
+      rb.querySelector("[data-x]").onclick = function(){ rb.innerHTML = ""; };
+    }; });
+  }
 
   /* 운영자 글: assets/op-posts.js 초안을 골라 내 계정으로 올림 (이미 올린 글은 표시) */
   window.drawOpPosts = function(){

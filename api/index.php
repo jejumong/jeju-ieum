@@ -37,6 +37,33 @@ function cmt_out($c) {
     'text' => $del ? '' : $c['text'], 'edited' => (bool)$c['edited'], 'created_at' => iso($c['created_at']),
     'parent_id' => $c['parent_id'] ?? null, 'reply_nick' => $c['reply_nick'] ?? '', 'deleted' => $del];
 }
+/* 관리자 콘솔 '내 글 반응': 관리자 계정으로 쓴 글에 회원이 남긴 댓글·답글과 좋아요, 관리자 댓글에 눌린 좋아요 (최신순) */
+function react_items($me) {
+  $aids = array_column(all("SELECT id FROM ji_users WHERE role = 'admin'"), 'id'); if (!$aids) return [];
+  $in = implode(',', array_fill(0, count($aids), '?'));
+  $items = [];
+  $cm = all("SELECT c.id, c.post_id, c.author, c.author_nick, c.text, c.created_at, c.parent_id, c.reply_nick, p.title, p.board FROM ji_comments c JOIN ji_posts p ON p.id = c.post_id
+    WHERE p.author IN ($in) AND c.author NOT IN ($in) AND c.deleted = 0 ORDER BY c.created_at DESC LIMIT 300", array_merge($aids, $aids));
+  foreach ($cm as $c) {
+    $top = $c['parent_id'] ?: $c['id'];
+    $replied = (bool)one("SELECT id FROM ji_comments WHERE parent_id = ? AND author IN ($in) AND created_at >= ? LIMIT 1", array_merge([$top], $aids, [$c['created_at']]));
+    $items[] = ['kind' => $c['parent_id'] ? 'reply' : 'comment', 'key' => 'c:' . $c['id'], 'comment_id' => $c['id'], 'post_id' => $c['post_id'], 'title' => $c['title'], 'board' => $c['board'],
+      'nick' => $c['author_nick'], 'user_id' => $c['author'], 'text' => $c['text'], 'reply_nick' => $c['reply_nick'], 'at' => $c['created_at'], 'replied' => $replied];
+  }
+  $lk = all("SELECT l.post_id, l.user_id, l.created_at, u.nick, p.title, p.board FROM ji_likes l JOIN ji_posts p ON p.id = l.post_id LEFT JOIN ji_users u ON u.id = l.user_id
+    WHERE p.author IN ($in) AND l.active = 1 AND l.user_id NOT IN ($in) ORDER BY l.created_at DESC LIMIT 300", array_merge($aids, $aids));
+  foreach ($lk as $l) $items[] = ['kind' => 'like', 'key' => 'l:' . $l['post_id'] . ':' . $l['user_id'], 'post_id' => $l['post_id'], 'title' => $l['title'], 'board' => $l['board'],
+    'nick' => $l['nick'] ?: '(탈퇴한 회원)', 'user_id' => $l['user_id'], 'text' => '', 'at' => $l['created_at']];
+  $cl = all("SELECT l.post_id lk, l.user_id, l.created_at, u.nick, c.post_id, c.text, p.title, p.board FROM ji_likes l JOIN ji_comments c ON l.post_id = CONCAT('c:', c.id)
+    JOIN ji_posts p ON p.id = c.post_id LEFT JOIN ji_users u ON u.id = l.user_id
+    WHERE c.author IN ($in) AND l.active = 1 AND l.user_id NOT IN ($in) ORDER BY l.created_at DESC LIMIT 200", array_merge($aids, $aids));
+  foreach ($cl as $l) $items[] = ['kind' => 'clike', 'key' => 'l:' . $l['lk'] . ':' . $l['user_id'], 'post_id' => $l['post_id'], 'title' => $l['title'], 'board' => $l['board'],
+    'nick' => $l['nick'] ?: '(탈퇴한 회원)', 'user_id' => $l['user_id'], 'text' => $l['text'], 'at' => $l['created_at']];
+  $seen = []; foreach (all("SELECT rkey FROM ji_react_seen WHERE user_id = ?", [$me['id']]) as $r) $seen[$r['rkey']] = true;
+  foreach ($items as &$it) { $it['seen'] = !empty($seen[$it['key']]); $it['at'] = iso($it['at']); } unset($it);
+  usort($items, function ($a, $b) { return strcmp($b['at'], $a['at']); });
+  return $items;
+}
 function join_out($j) {
   $j['created_at'] = iso($j['created_at']); $j['decided_at'] = iso($j['decided_at'] ?? null); return $j;
 }
@@ -612,14 +639,21 @@ case 'inquiry_add': {
 
 /* ───────── 관리자 ───────── */
 case 'admin_overview': {
-  admin($R);
+  $GLOBALS['ME_U'] = admin($R); $GLOBALS['ME_ROLE'] = $GLOBALS['ME_U']['role'] ?? '';
   out(['users' => (int)one("SELECT COUNT(*) n FROM ji_users")['n'],
        'users_week' => (int)one("SELECT COUNT(*) n FROM ji_users WHERE created_at > (NOW() - INTERVAL 7 DAY)")['n'],
        'posts' => (int)one("SELECT COUNT(*) n FROM ji_posts")['n'],
        'comments' => (int)one("SELECT COUNT(*) n FROM ji_comments")['n'],
        'inquiries_new' => (int)one("SELECT COUNT(*) n FROM ji_inquiries WHERE status = 'new'")['n'],
        'sellers_pending' => (int)one("SELECT COUNT(*) n FROM ji_seller_requests WHERE status = 'pending'")['n'],
-       'reports_new' => (int)one("SELECT COUNT(DISTINCT kind, target_id) n FROM ji_reports WHERE status = 'new'")['n']]);
+       'reports_new' => (int)one("SELECT COUNT(DISTINCT kind, target_id) n FROM ji_reports WHERE status = 'new'")['n'],
+       'react_new' => (($GLOBALS['ME_ROLE'] ?? '') === 'admin') ? count(array_filter(react_items($GLOBALS['ME_U']), function ($x) { return !$x['seen']; })) : 0]);
+}
+case 'admin_reactions': { $me = admin($R, true); out(react_items($me)); }
+case 'admin_react_seen': {   // 확인 표시 (keys 배열)
+  $me = admin($R, true); $n = 0;
+  foreach (array_slice((array)($R['keys'] ?? []), 0, 600) as $k) { if (is_string($k) && $k !== '' && strlen($k) <= 100) { q("INSERT IGNORE INTO ji_react_seen (user_id, rkey, at) VALUES (?,?,?)", [$me['id'], $k, now()]); $n++; } }
+  out(['n' => $n]);
 }
 case 'hit': {   // 방문 기록 한 줄 (로그인 필요 없음, 개인정보 없음)
   $vid = $R['vid'] ?? ''; $path = (string)($R['path'] ?? '');
