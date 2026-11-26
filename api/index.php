@@ -43,7 +43,7 @@ function react_items($me) {
   $in = implode(',', array_fill(0, count($aids), '?'));
   $items = [];
   $cm = all("SELECT c.id, c.post_id, c.author, c.author_nick, c.text, c.created_at, c.parent_id, c.reply_nick, p.title, p.board FROM ji_comments c JOIN ji_posts p ON p.id = c.post_id
-    WHERE p.author IN ($in) AND c.author NOT IN ($in) AND c.deleted = 0 ORDER BY c.created_at DESC LIMIT 300", array_merge($aids, $aids));
+    WHERE p.author IN ($in) AND c.author NOT IN ($in) AND c.deleted = 0 ORDER BY c.created_at DESC LIMIT 1000", array_merge($aids, $aids));
   foreach ($cm as $c) {
     $top = $c['parent_id'] ?: $c['id'];
     $replied = (bool)one("SELECT id FROM ji_comments WHERE parent_id = ? AND author IN ($in) AND created_at >= ? LIMIT 1", array_merge([$top], $aids, [$c['created_at']]));
@@ -51,12 +51,12 @@ function react_items($me) {
       'nick' => $c['author_nick'], 'user_id' => $c['author'], 'text' => $c['text'], 'reply_nick' => $c['reply_nick'], 'at' => $c['created_at'], 'replied' => $replied];
   }
   $lk = all("SELECT l.post_id, l.user_id, l.created_at, u.nick, p.title, p.board FROM ji_likes l JOIN ji_posts p ON p.id = l.post_id LEFT JOIN ji_users u ON u.id = l.user_id
-    WHERE p.author IN ($in) AND l.active = 1 AND l.user_id NOT IN ($in) ORDER BY l.created_at DESC LIMIT 300", array_merge($aids, $aids));
+    WHERE p.author IN ($in) AND l.active = 1 AND l.user_id NOT IN ($in) ORDER BY l.created_at DESC LIMIT 1000", array_merge($aids, $aids));
   foreach ($lk as $l) $items[] = ['kind' => 'like', 'key' => 'l:' . $l['post_id'] . ':' . $l['user_id'], 'post_id' => $l['post_id'], 'title' => $l['title'], 'board' => $l['board'],
     'nick' => $l['nick'] ?: '(탈퇴한 회원)', 'user_id' => $l['user_id'], 'text' => '', 'at' => $l['created_at']];
   $cl = all("SELECT l.post_id lk, l.user_id, l.created_at, u.nick, c.post_id, c.text, p.title, p.board FROM ji_likes l JOIN ji_comments c ON l.post_id = CONCAT('c:', c.id)
     JOIN ji_posts p ON p.id = c.post_id LEFT JOIN ji_users u ON u.id = l.user_id
-    WHERE c.author IN ($in) AND l.active = 1 AND l.user_id NOT IN ($in) ORDER BY l.created_at DESC LIMIT 200", array_merge($aids, $aids));
+    WHERE c.author IN ($in) AND l.active = 1 AND l.user_id NOT IN ($in) ORDER BY l.created_at DESC LIMIT 1000", array_merge($aids, $aids));
   foreach ($cl as $l) $items[] = ['kind' => 'clike', 'key' => 'l:' . $l['lk'] . ':' . $l['user_id'], 'post_id' => $l['post_id'], 'title' => $l['title'], 'board' => $l['board'],
     'nick' => $l['nick'] ?: '(탈퇴한 회원)', 'user_id' => $l['user_id'], 'text' => $l['text'], 'at' => $l['created_at']];
   $seen = []; foreach (all("SELECT rkey FROM ji_react_seen WHERE user_id = ?", [$me['id']]) as $r) $seen[$r['rkey']] = true;
@@ -650,9 +650,10 @@ case 'admin_overview': {
        'react_new' => (($GLOBALS['ME_ROLE'] ?? '') === 'admin') ? count(array_filter(react_items($GLOBALS['ME_U']), function ($x) { return !$x['seen']; })) : 0]);
 }
 case 'admin_reactions': { $me = admin($R, true); out(react_items($me)); }
-case 'admin_react_seen': {   // 확인 표시 (keys 배열)
-  $me = admin($R, true); $n = 0;
-  foreach (array_slice((array)($R['keys'] ?? []), 0, 600) as $k) { if (is_string($k) && $k !== '' && strlen($k) <= 100) { q("INSERT IGNORE INTO ji_react_seen (user_id, rkey, at) VALUES (?,?,?)", [$me['id'], $k, now()]); $n++; } }
+case 'admin_react_seen': {   // 확인 표시 (keys 배열) · undo 면 확인 취소
+  $me = admin($R, true); $n = 0; $undo = !empty($R['undo']);
+  foreach (array_slice((array)($R['keys'] ?? []), 0, 3000) as $k) { if (is_string($k) && $k !== '' && strlen($k) <= 100) {
+    if ($undo) q("DELETE FROM ji_react_seen WHERE user_id = ? AND rkey = ?", [$me['id'], $k]); else q("INSERT IGNORE INTO ji_react_seen (user_id, rkey, at) VALUES (?,?,?)", [$me['id'], $k, now()]); $n++; } }
   out(['n' => $n]);
 }
 case 'hit': {   // 방문 기록 한 줄 (로그인 필요 없음, 개인정보 없음)

@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126h">
+<link rel="stylesheet" href="../assets/style.css?v=20261126i">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -292,9 +292,11 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .mem-grp{flex-wrap:wrap;margin:0 0 12px}
 .rx-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.rx-tabs{flex-wrap:wrap;margin:0}
 .rx-list{display:flex;flex-direction:column;gap:8px}
-.rx-row{display:flex;gap:12px;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid #dbe6f3;border-left:4px solid #2f80ed;box-shadow:0 2px 8px rgba(20,50,90,.06);cursor:pointer}
+.rx-row{display:flex;gap:12px;padding:14px 16px;border-radius:14px;background:#fff;border:1px solid #dbe6f3;border-left:4px solid #2f80ed;box-shadow:0 2px 8px rgba(20,50,90,.06)}
 .rx-row .rx-hd{font-size:14.5px;color:#0e2440}.rx-row .rx-hd b{font-weight:800}.rx-row .rx-post{font-weight:700;color:#0e2440}.rx-row .rx-text{color:#1f2d40;font-weight:600}
-.rx-row.seen{background:#f7f9fb;border-color:#e8edf2;border-left-color:#e8edf2;box-shadow:none;cursor:default}
+.rx-row.seen{background:#f7f9fb;border-color:#e8edf2;border-left-color:#e8edf2;box-shadow:none}
+.rx-ok{min-width:64px}.rx-undo{color:#8a97a8}.rx-tabs .rx-tdone{margin-left:6px}
+.rx-pg{display:flex;justify-content:center;align-items:center;gap:4px;flex-wrap:wrap;margin-top:16px}.rx-pg button{min-width:36px;height:36px;border:1px solid #dfe4ea;background:#fff;border-radius:10px;font:inherit;font-weight:700;color:#4a5a70;cursor:pointer}.rx-pg button.on{background:#0e2440;border-color:#0e2440;color:#fff}.rx-pg button:disabled{opacity:.35;cursor:default}.rx-pg span{color:#8a97a8;padding:0 4px}
 .rx-row.seen .rx-hd,.rx-row.seen .rx-post,.rx-row.seen .rx-text{color:#8a97a8;font-weight:400}.rx-row.seen .rx-hd b{font-weight:600}.rx-row.seen .rx-ic{opacity:.45}
 .rx-ic{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:#eaf3ff;color:#2f80ed;font-weight:800}
 .rx-ic.rx-like,.rx-ic.rx-clike{background:#ffecef;color:#e5484d}
@@ -505,18 +507,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126h"></script>
-<script src="../assets/db.js?v=20261126h"></script>
-<script src="../assets/notify.js?v=20261126h"></script>
-<script src="../assets/seed-trade.js?v=20261126h"></script>
-<script src="../assets/seed-extra.js?v=20261126h"></script>
-<script src="../assets/festivals-data.js?v=20261126h"></script>
-<script src="../assets/seed-new.js?v=20261126h"></script>
-<script src="../assets/seed-comments.js?v=20261126h"></script>
-<script src="../assets/photos.js?v=20261126h"></script>
-<script src="../assets/admin-data.js?v=20261126h"></script>
-<script src="../assets/kmap.js?v=20261126h"></script>
-<script src="../assets/op-posts.js?v=20261126h"></script>
+<script src="../assets/common.js?v=20261126i"></script>
+<script src="../assets/db.js?v=20261126i"></script>
+<script src="../assets/notify.js?v=20261126i"></script>
+<script src="../assets/seed-trade.js?v=20261126i"></script>
+<script src="../assets/seed-extra.js?v=20261126i"></script>
+<script src="../assets/festivals-data.js?v=20261126i"></script>
+<script src="../assets/seed-new.js?v=20261126i"></script>
+<script src="../assets/seed-comments.js?v=20261126i"></script>
+<script src="../assets/photos.js?v=20261126i"></script>
+<script src="../assets/admin-data.js?v=20261126i"></script>
+<script src="../assets/kmap.js?v=20261126i"></script>
+<script src="../assets/op-posts.js?v=20261126i"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1285,53 +1287,66 @@ if (SRV) {
 
   /* 내 글 반응 (관리자만): 관리자 계정 글에 달린 댓글·답글·좋아요를 한곳에서 보고, 바로 답글 달기
      · 확인 안 한 것 = 진하게(왼쪽 파란 줄·'새'), 확인한 것 = 연하게. 줄을 누르거나 '확인'·답글을 하면 확인한 것으로 */
-  var RX = [], RX_F = "all";
+  var RX = [], RX_F = "all", RX_P = 1, RX_PER = 10;
   window.drawReacts = function(){
-    M().innerHTML = '<h1>내 글 반응</h1><p class="sub">관리자 계정으로 쓴 글에 회원이 남긴 댓글·답글과 좋아요예요. <b>진한 줄</b>은 아직 확인하지 않은 반응이고, 확인하면 연하게 바뀌어요. 줄을 누르거나 답글을 달면 확인한 것으로 표시돼요.</p><div class="panel" id="rx-box">불러오는 중…</div>';
+    M().innerHTML = '<h1>내 글 반응</h1><p class="sub">관리자 계정으로 쓴 글에 회원이 남긴 댓글·답글과 좋아요예요. 다 본 반응은 <b>확인</b> 버튼을 누르면 <b>확인한 것</b>으로 옮겨져요.</p><div class="panel" id="rx-box">불러오는 중…</div>';
     JIDB.call("admin_reactions").then(function(l){ RX = l || []; paintReacts(); }, function(e){ document.getElementById("rx-box").textContent = "불러오지 못했어요: " + e.message; });
   };
   function rxWhen(iso){ var d = new Date(iso); if (isNaN(d)) return ""; var m = Math.floor((Date.now() - d) / 60000);
     if (m < 1) return "방금"; if (m < 60) return m + "분 전"; if (m < 1440) return Math.floor(m / 60) + "시간 전"; if (m < 1440 * 7) return Math.floor(m / 1440) + "일 전";
     return (d.getMonth() + 1) + "." + d.getDate(); }
-  function rxSeen(keys){
-    keys = keys.filter(function(k){ return RX.some(function(x){ return x.key === k && !x.seen; }); }); if (!keys.length) return;
-    RX.forEach(function(x){ if (keys.indexOf(x.key) > -1) x.seen = true; });
+  /* 확인(또는 확인 취소) — 버튼을 눌렀을 때만 */
+  function rxSeen(keys, undo){
+    keys = keys.filter(function(k){ return RX.some(function(x){ return x.key === k && !!x.seen === !!undo; }); }); if (!keys.length) return;
+    RX.forEach(function(x){ if (keys.indexOf(x.key) > -1) x.seen = !undo; });
     var left = RX.filter(function(x){ return !x.seen; }).length; if (STATS) STATS.react_new = left;
-    var cnt = document.querySelector('.side nav button[data-v="reacts"] .cnt'); if (cnt) { if (left) cnt.textContent = left; else cnt.remove(); }
-    JIDB.call("admin_react_seen", { keys: keys }).catch(function(e){ alert("확인 표시를 저장하지 못했어요: " + e.message); });
+    var nb = document.querySelector('.side nav button[data-v="reacts"]'), cnt = nb && nb.querySelector(".cnt");
+    if (left) { if (!cnt && nb) { cnt = document.createElement("span"); cnt.className = "cnt"; nb.appendChild(cnt); } if (cnt) cnt.textContent = left; } else if (cnt) cnt.remove();
+    JIDB.call("admin_react_seen", { keys: keys, undo: !!undo }).catch(function(e){ alert("저장하지 못했어요: " + e.message); });
   }
   function paintReacts(){
-    var unseen = RX.filter(function(x){ return !x.seen; }).length;
-    var F = { all: ["전체", function(){ return true; }], new: ["안 본 것", function(x){ return !x.seen; }], cmt: ["댓글·답글", function(x){ return x.kind === "comment" || x.kind === "reply"; }], like: ["좋아요", function(x){ return x.kind === "like" || x.kind === "clike"; }] };
-    var L = RX.filter(F[RX_F][1]);
+    var isC = function(x){ return x.kind === "comment" || x.kind === "reply"; }, isL = function(x){ return x.kind === "like" || x.kind === "clike"; };
+    var F = { all: ["전체", function(x){ return !x.seen; }], cmt: ["댓글·답글", function(x){ return !x.seen && isC(x); }], like: ["좋아요", function(x){ return !x.seen && isL(x); }], done: ["확인한 것", function(x){ return x.seen; }] };
+    var L = RX.filter(F[RX_F][1]), pages = Math.max(1, Math.ceil(L.length / RX_PER));
+    if (RX_P > pages) RX_P = pages;
+    var V = L.slice((RX_P - 1) * RX_PER, RX_P * RX_PER), unseen = RX.filter(F.all[1]).length;
     var ICON = { comment: "💬", reply: "↳", like: "♥", clike: "♥" };
     var ACT = { comment: "님이 댓글을 남겼어요", reply: "님이 답글을 남겼어요", like: "님이 글을 좋아해요", clike: "님이 내 댓글을 좋아해요" };
+    /* 페이지 번호: 앞뒤 2개씩 + 처음·끝 */
+    var pg = "";
+    if (pages > 1) {
+      var nums = [], lo = Math.max(1, RX_P - 2), hi = Math.min(pages, RX_P + 2);
+      if (lo > 1) { nums.push(1); if (lo > 2) nums.push("…"); }
+      for (var n = lo; n <= hi; n++) nums.push(n);
+      if (hi < pages) { if (hi < pages - 1) nums.push("…"); nums.push(pages); }
+      pg = '<div class="rx-pg"><button data-p="' + (RX_P - 1) + '"' + (RX_P === 1 ? ' disabled' : '') + ' aria-label="이전 페이지">‹</button>' +
+        nums.map(function(v){ return v === "…" ? '<span>…</span>' : '<button data-p="' + v + '"' + (v === RX_P ? ' class="on" aria-current="page"' : '') + '>' + v + '</button>'; }).join("") +
+        '<button data-p="' + (RX_P + 1) + '"' + (RX_P === pages ? ' disabled' : '') + ' aria-label="다음 페이지">›</button></div>';
+    }
+    var done = RX_F === "done";
     document.getElementById("rx-box").innerHTML =
-      '<div class="rx-top"><div class="op-tabs rx-tabs">' + Object.keys(F).map(function(k){ var n = RX.filter(F[k][1]).length; return '<button class="' + (RX_F === k ? 'on' : '') + '" data-f="' + k + '">' + F[k][0] + '<b>' + n + '</b></button>'; }).join("") + '</div>' +
-        (unseen ? '<button class="mb" id="rx-all">모두 확인 (' + unseen + ')</button>' : '') + '</div>' +
-      (L.length ? '<div class="rx-list">' + L.map(function(x){
-        var i = RX.indexOf(x), cm = x.kind === "comment" || x.kind === "reply";
-        return '<div class="rx-row' + (x.seen ? ' seen' : '') + '" data-i="' + i + '">' +
+      '<div class="rx-top"><div class="op-tabs rx-tabs">' + Object.keys(F).map(function(k){ var n = RX.filter(F[k][1]).length; return '<button class="' + (RX_F === k ? 'on' : '') + (k === "done" ? ' rx-tdone' : '') + '" data-f="' + k + '">' + F[k][0] + '<b>' + n + '</b></button>'; }).join("") + '</div>' +
+        (!done && L.length ? '<button class="mb" id="rx-all">이 목록 모두 확인 (' + L.length + ')</button>' : '') + '</div>' +
+      (V.length ? '<div class="rx-list">' + V.map(function(x){
+        var i = RX.indexOf(x), cm = isC(x);
+        return '<div class="rx-row' + (x.seen ? ' seen' : '') + '">' +
           '<div class="rx-ic rx-' + x.kind + '">' + ICON[x.kind] + '</div><div class="rx-body">' +
-          '<div class="rx-hd">' + (x.seen ? '' : '<span class="rx-new">새</span>') + '<b>' + esc(x.nick) + '</b>' + ACT[x.kind] + (x.kind === "reply" && x.reply_nick ? ' <span class="rx-to">@' + esc(x.reply_nick) + '</span>' : '') + '<span class="rx-when">' + rxWhen(x.at) + '</span></div>' +
+          '<div class="rx-hd"><b>' + esc(x.nick) + '</b>' + ACT[x.kind] + (x.kind === "reply" && x.reply_nick ? ' <span class="rx-to">@' + esc(x.reply_nick) + '</span>' : '') + '<span class="rx-when">' + rxWhen(x.at) + '</span></div>' +
           '<div class="rx-post"><span class="bd">' + esc(x.board || "") + '</span> ' + esc(x.title || "") + '</div>' +
           (x.text ? '<div class="rx-text' + (x.kind === "clike" ? ' q' : '') + '">' + esc(x.text) + '</div>' : '') +
-          '<div class="rx-acts">' + (cm ? '<button class="mb pri" data-reply="' + i + '">' + (x.replied ? '답글 더 달기' : '답글 달기') + '</button>' : '') +
+          '<div class="rx-acts">' + (cm ? '<button class="mb" data-reply="' + i + '">' + (x.replied ? '답글 더 달기' : '답글 달기') + '</button>' : '') +
             (x.replied ? '<span class="rx-done">✓ 답글 단 댓글</span>' : '') +
             '<a class="mb" href="' + SITE + 'view.html?id=' + encodeURIComponent(x.post_id) + '#cmt-list" target="_blank">글 보기 ↗</a>' +
-            (x.seen ? '' : '<button class="mb" data-seen="' + i + '">확인</button>') + '</div>' +
+            (x.seen ? '<button class="mb rx-undo" data-undo="' + i + '">안 본 것으로 되돌리기</button>' : '<button class="mb pri rx-ok" data-seen="' + i + '">확인</button>') + '</div>' +
           '<div class="rx-rbox" id="rx-r-' + i + '"></div></div></div>';
-      }).join("") + '</div>' : '<div class="empty">' + (RX.length ? '이 조건에 맞는 반응이 없어요.' : '아직 관리자 글에 달린 반응이 없어요.') + '</div>');
+      }).join("") + '</div>' + pg
+      : '<div class="empty">' + (done ? '아직 확인한 반응이 없어요.' : (RX.length ? '새 반응을 모두 확인했어요. 🎉' : '아직 관리자 글에 달린 반응이 없어요.')) + '</div>');
     var box = document.getElementById("rx-box");
-    box.querySelectorAll(".rx-tabs button").forEach(function(b){ b.onclick = function(){ RX_F = b.dataset.f; paintReacts(); }; });
-    var all = document.getElementById("rx-all"); if (all) all.onclick = function(){ rxSeen(RX.filter(function(x){ return !x.seen; }).map(function(x){ return x.key; })); paintReacts(); };
-    box.querySelectorAll(".rx-row").forEach(function(r){
-      r.addEventListener("click", function(e){
-        if (e.target.closest("a,button,textarea")) return;
-        var x = RX[+r.dataset.i]; if (x && !x.seen) { rxSeen([x.key]); paintReacts(); }
-      });
-    });
-    box.querySelectorAll("[data-seen]").forEach(function(b){ b.onclick = function(){ rxSeen([RX[+b.dataset.seen].key]); paintReacts(); }; });
+    box.querySelectorAll(".rx-tabs button").forEach(function(b){ b.onclick = function(){ RX_F = b.dataset.f; RX_P = 1; paintReacts(); }; });
+    box.querySelectorAll(".rx-pg button[data-p]").forEach(function(b){ b.onclick = function(){ RX_P = +b.dataset.p; paintReacts(); box.scrollIntoView({ block: "start", behavior: "smooth" }); }; });
+    var all = document.getElementById("rx-all"); if (all) all.onclick = function(){ if (!confirm("지금 목록의 반응 " + L.length + "개를 모두 확인한 것으로 옮길까요?")) return; rxSeen(L.map(function(x){ return x.key; })); paintReacts(); };
+    box.querySelectorAll("[data-seen]").forEach(function(b){ b.onclick = function(){ rxSeen([RX[+b.dataset.seen].key]); paintReacts(); toast("확인한 것으로 옮겼어요"); }; });
+    box.querySelectorAll("[data-undo]").forEach(function(b){ b.onclick = function(){ rxSeen([RX[+b.dataset.undo].key], true); paintReacts(); toast("안 본 것으로 되돌렸어요"); }; });
     box.querySelectorAll("[data-reply]").forEach(function(b){ b.onclick = function(){
       var i = +b.dataset.reply, x = RX[i], rb = document.getElementById("rx-r-" + i);
       box.querySelectorAll(".rx-rbox").forEach(function(o){ if (o !== rb) o.innerHTML = ""; });
@@ -1341,7 +1356,7 @@ if (SRV) {
         var t = ta.value.trim(); if (!t) { alert("답글 내용을 적어 주세요."); return; }
         ta.disabled = true;
         JIDB.addComment(x.post_id, t, x.comment_id).then(function(){
-          rxSeen([x.key]); x.replied = true; toast("답글을 남겼어요 — " + x.nick + "님에게 알림이 가요"); paintReacts();
+          x.replied = true; toast("답글을 남겼어요 — " + x.nick + "님에게 알림이 가요"); paintReacts();
         }, function(e){ ta.disabled = false; alert("답글을 남기지 못했어요: " + e.message); });
       };
       ta.addEventListener("keydown", function(e){ if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); send(); } });
