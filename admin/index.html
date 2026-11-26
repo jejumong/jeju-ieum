@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126n">
+<link rel="stylesheet" href="../assets/style.css?v=20261126o">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -412,10 +412,6 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .tm-title{display:flex;align-items:center;gap:12px}.tm-ico{width:48px;height:48px;border-radius:14px;background:#1e6fd9;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 16px rgba(30,111,217,.3)}
 .tm-sec .tm-title h2{font-size:23px;font-weight:900;color:#0e2a4f;letter-spacing:-.03em}.tm-title p{margin:2px 0 0;font-size:13.5px;color:#4a6585}
 .tm-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
-.yt-make{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}.yt-make input{flex:1;min-width:220px;border:1.5px solid #cfd8e3;border-radius:10px;padding:9px 12px;font:inherit}.yt-make select{border:1.5px solid #cfd8e3;border-radius:10px;padding:9px;font:inherit;background:#fff}
-.yt-new{display:flex;flex-direction:column;gap:6px;background:#fff7e6;border:1.5px solid #ffd591;border-radius:12px;padding:12px 14px;margin-bottom:12px}.yt-new code{word-break:break-all;background:#fff;border-radius:8px;padding:8px 10px;font-size:13px}.yt-new button{align-self:flex-start}.yt-new small{color:#8a6a3d}
-.yt-tw{overflow-x:auto}table.yt-t th small{display:block;font-weight:500;font-size:11px;color:#8a97a8}td.yt-t b{display:block}td.yt-t small{color:#8a97a8;font-size:12px}
-td.yt-n{text-align:right;white-space:nowrap}td.yt-n b{font-size:16px}td.yt-n small{display:block;color:#8a97a8;font-size:11.5px}td.yt-n.all b{color:#5b6b80}td.yt-a{white-space:nowrap;text-align:right}.yt-x{margin-left:4px;color:#b42318}
 .ap-bars{height:90px}
 .au-row{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid #eef2f6}.au-dot{width:12px;height:12px;border-radius:50%;background:#22a06b;box-shadow:0 0 0 4px rgba(34,160,107,.15)}
 .au-row.bad .au-dot{background:#e5484d;box-shadow:0 0 0 4px rgba(229,72,77,.15)}.au-row.run .au-dot{background:#f59e0b;box-shadow:0 0 0 4px rgba(245,158,11,.15)}
@@ -547,18 +543,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126n"></script>
-<script src="../assets/db.js?v=20261126n"></script>
-<script src="../assets/notify.js?v=20261126n"></script>
-<script src="../assets/seed-trade.js?v=20261126n"></script>
-<script src="../assets/seed-extra.js?v=20261126n"></script>
-<script src="../assets/festivals-data.js?v=20261126n"></script>
-<script src="../assets/seed-new.js?v=20261126n"></script>
-<script src="../assets/seed-comments.js?v=20261126n"></script>
-<script src="../assets/photos.js?v=20261126n"></script>
-<script src="../assets/admin-data.js?v=20261126n"></script>
-<script src="../assets/kmap.js?v=20261126n"></script>
-<script src="../assets/op-posts.js?v=20261126n"></script>
+<script src="../assets/common.js?v=20261126o"></script>
+<script src="../assets/db.js?v=20261126o"></script>
+<script src="../assets/notify.js?v=20261126o"></script>
+<script src="../assets/seed-trade.js?v=20261126o"></script>
+<script src="../assets/seed-extra.js?v=20261126o"></script>
+<script src="../assets/festivals-data.js?v=20261126o"></script>
+<script src="../assets/seed-new.js?v=20261126o"></script>
+<script src="../assets/seed-comments.js?v=20261126o"></script>
+<script src="../assets/photos.js?v=20261126o"></script>
+<script src="../assets/admin-data.js?v=20261126o"></script>
+<script src="../assets/kmap.js?v=20261126o"></script>
+<script src="../assets/op-posts.js?v=20261126o"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1886,60 +1882,10 @@ if (SRV) {
       return '<div class="tf-row"><span class="nm">' + nameFn(r) + '</span><span class="bar"><i style="width:' + Math.round(r[key] / mx * 100) + '%"></i></span><span class="n">' + tfNum(r[key]) + unit + '</span></div>';
     }).join("");
   }
-  var CAMPS = null;   // 유튜브 추적 링크 이름표
   window.loadTraffic = function(){
-    return Promise.all([JIDB.call("admin_traffic"), JIDB.call("admin_traffic_more", tmArgs()).catch(function(){ return null; }),
-        CAMPS ? Promise.resolve(CAMPS) : JIDB.call("admin_camps").catch(function(){ return []; })])
-      .then(function(a){ TF = a[0]; TM = a[1]; CAMPS = a[2] || []; return TF; });
+    return Promise.all([JIDB.call("admin_traffic"), JIDB.call("admin_traffic_more", tmArgs()).catch(function(){ return null; })])
+      .then(function(a){ TF = a[0]; TM = a[1]; return TF; });
   };
-  /* ── 유튜브 영상별 유입: 영상마다 추적 링크를 만들어 설명란에 넣으면 방문·가입을 따로 셈 ── */
-  var YT_PAGES = [["", "첫 화면"], ["guide.html", "제주살이 가이드"], ["stay.html", "한달살기·이주"], ["school.html", "학교 연계 집"], ["community.html", "동네 커뮤니티"], ["tools.html", "생활도구"]];
-  function ytLink(c){ return "https://jejuieum.com/" + (c.page || "") + "?utm_source=youtube&utm_campaign=" + c.k; }
-  function ytBox(m){
-    var names = {}; (CAMPS || []).forEach(function(c){ names[c.k] = c; });
-    var cur = {}; (m.camps || []).forEach(function(x){ cur[x.k] = x; });
-    var all = {}; (m.camps_all || []).forEach(function(x){ all[x.k] = x; });
-    var keys = (CAMPS || []).map(function(c){ return c.k; });
-    Object.keys(all).forEach(function(k){ if (keys.indexOf(k) < 0) keys.push(k); });
-    var z = { uv: 0, pv: 0, join: 0 };
-    var rows = keys.map(function(k){ var c = names[k] || { k: k, title: "" }, a = cur[k] || z, t = all[k] || z;
-      return '<tr><td class="yt-t"><b>' + esc(c.title || "(이름 없는 링크)") + '</b><small>' + esc(k) + (c.at ? ' · ' + esc(c.at.replace(/-/g, ".")) + ' 만듦' : '') + '</small></td>' +
-        '<td class="yt-n"><b>' + tfNum(a.uv) + '</b><small>' + tfNum(a.pv) + '회</small></td><td class="yt-n"><b>' + tfNum(a.join) + '</b></td>' +
-        '<td class="yt-n all"><b>' + tfNum(t.uv) + '</b><small>가입 ' + tfNum(t.join) + '</small></td>' +
-        '<td class="yt-a">' + (names[k] ? '<button class="mb" data-ytc="' + esc(k) + '">링크 복사</button>' + (isBoss() ? '<button class="mb yt-x" data-ytd="' + esc(k) + '" title="목록에서 빼기 (기록은 남음)">✕</button>' : '') : '') + '</td></tr>'; }).join("");
-    return '<div class="panel yt-panel"><h2>▶ 유튜브 영상별 유입 <small style="font-weight:600;color:var(--ink-4)">영상마다 만든 링크로 들어온 사람</small></h2>' +
-      (isBoss() ? '<div class="yt-make"><input id="yt-title" maxlength="80" placeholder="영상 제목 (예: 제주 겨울 오일장 브이로그)"><select id="yt-page">' + YT_PAGES.map(function(p){ return '<option value="' + p[0] + '">연결할 곳: ' + p[1] + '</option>'; }).join("") + '</select><button class="mb pri" id="yt-make">링크 만들기</button></div>' +
-        '<div id="yt-out"></div>' : '') +
-      (rows ? '<div class="yt-tw"><table class="adm-t yt-t"><thead><tr><th>영상</th><th>방문자<small>이 기간</small></th><th>가입<small>이 기간</small></th><th>방문자<small>지금까지</small></th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>'
-        : '<div class="empty" style="padding:16px">아직 만든 링크가 없어요. 위에서 영상 제목을 적고 링크를 만들어 영상 설명란·고정 댓글에 붙여 주세요.</div>') +
-      '<p class="sub" style="margin:10px 0 0">링크로 들어온 사람이 그 방문에서 본 페이지를 모두 세요. 들어온 뒤 30일 안에 가입하면 그 영상의 가입으로 셉니다.</p></div>';
-  }
-  function bindYt(){
-    var box = document.querySelector(".yt-panel"); if (!box) return;
-    var copy = function(t){ (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ toast("링크를 복사했어요"); }, function(){ prompt("이 링크를 복사해 주세요", t); }); };
-    var mk = document.getElementById("yt-make");
-    if (mk) mk.onclick = function(){
-      var title = document.getElementById("yt-title").value.trim(); if (!title) { alert("영상 제목을 적어 주세요."); return; }
-      var d = new Date(), base = "yt" + String(d.getFullYear()).slice(2) + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2), k = base, n = 1;
-      while ((CAMPS || []).some(function(c){ return c.k === k; })) k = base + "-" + (++n);
-      var c = { k: k, title: title, at: ymd(d), page: document.getElementById("yt-page").value };
-      var list = (CAMPS || []).concat([c]);
-      JIDB.call("admin_camps", { set: list }).then(function(){
-        CAMPS = list; paintTraffic();
-        var out = document.getElementById("yt-out");
-        if (out) { out.innerHTML = '<div class="yt-new"><b>링크를 만들었어요</b><code>' + esc(ytLink(c)) + '</code><button class="mb pri" id="yt-cp">복사하기</button><small>이 링크를 영상 설명란이나 고정 댓글에 붙여 주세요.</small></div>'; document.getElementById("yt-cp").onclick = function(){ copy(ytLink(c)); }; }
-      }, function(e){ alert("저장하지 못했어요: " + e.message); });
-    };
-    box.querySelectorAll("[data-ytc]").forEach(function(b){ b.onclick = function(){
-      var k = b.dataset.ytc, c = (CAMPS || []).filter(function(x){ return x.k === k; })[0] || { k: k };
-      copy(ytLink(c));
-    }; });
-    box.querySelectorAll("[data-ytd]").forEach(function(b){ b.onclick = function(){
-      var k = b.dataset.ytd; if (!confirm("이 링크를 목록에서 뺄까요? 이미 영상에 붙인 링크로 들어온 기록은 그대로 남아요.")) return;
-      var list = (CAMPS || []).filter(function(c){ return c.k !== k; });
-      JIDB.call("admin_camps", { set: list }).then(function(){ CAMPS = list; paintTraffic(); }, function(e){ alert(e.message); });
-    }; });
-  }
   /* ── 홈 화면 앱 사용자 · 알림 켠 회원 ── */
   function appBox(m){
     var A = m.app; if (!A) return "";
@@ -2045,7 +1991,7 @@ if (SRV) {
         '<div class="dv-col"><h3 class="tm-h3">자세한 경로</h3>' + kv((m.refs || []).slice(0, 8)) + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">SNS · 다른 사이트</h3>' + (otherRefs.length ? kv(otherRefs.slice(0, 8)) : '<div class="empty" style="padding:14px 0">이 기간에는 없어요. 카카오톡·인스타그램 등에 링크를 공유하면 여기에 나타나요.</div>') + '</div>' +
       '</div></div>' +
-      srBox + ytBox(m) + appBox(m) + siteBox +
+      srBox + appBox(m) + siteBox +
       '<div class="panel"><h2>기기별 분포</h2><div class="dv-grid">' +
         '<div class="dv-col"><h3 class="tm-h3">휴대폰 · PC</h3>' + dev + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">운영체제</h3>' + kv(m.os) + '</div>' +
@@ -2164,7 +2110,7 @@ if (SRV) {
         '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList((D.pages || []).slice(0, 10), "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
       '</div>' + tmPanels(days) +
       '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
-    bindHour(r, hr); bindYt();
+    bindHour(r, hr);
     window.scrollTo(0, sx);
   }
 

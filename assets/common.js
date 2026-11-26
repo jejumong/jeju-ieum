@@ -736,17 +736,10 @@ document.addEventListener("click", function (e) {
         /instagram/.test(h) ? "인스타그램" : /facebook|fb\./.test(h) ? "페이스북" : /youtube|youtu\.be/.test(h) ? "유튜브" :
         /band\.us/.test(h) ? "밴드" : /bing/.test(h) ? "빙" : /threads/.test(h) ? "스레드" : h);
     }
-    // 유튜브 추적 링크(utm_campaign): 이번 방문 동안 모든 페이지에 붙이고, 가입 연결용으로 30일 기억
-    var camp = "";
-    try {
-      var cq = (new URLSearchParams(location.search).get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60);
-      if (cq) { sessionStorage.setItem("ji_camp", cq); localStorage.setItem("ji_camp_join", JSON.stringify({ k: cq, t: Date.now() })); }
-      camp = cq || sessionStorage.getItem("ji_camp") || "";
-    } catch (e) {}
     var path = location.pathname.replace(/\/index\.html$/, "/") || "/";
     var id = new URLSearchParams(location.search).get("id"); if (id) path += "?id=" + id.slice(0, 40);
     var body = JSON.stringify({ vid: vid, nw: nw, path: path.slice(0, 120), title: (document.title || "").replace(/\s*[—|-]\s*제주이음\s*$/, "").slice(0, 80),
-      ref: ref.slice(0, 40), kw: kw.slice(0, 60), os: os, br: br, camp: camp, dev: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "m" : "p" });
+      ref: ref.slice(0, 40), kw: kw.slice(0, 60), os: os, br: br, dev: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "m" : "p" });
     setTimeout(function () {
       fetch(api.replace(/\/?$/, "/") + "?a=hit", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: body, keepalive: true }).catch(function () {});
     }, 600);
