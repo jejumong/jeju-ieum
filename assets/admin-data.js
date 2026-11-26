@@ -40,7 +40,7 @@ function isBuiltinNotice(id) { return builtinNoticeBase().some(function (n) { re
   builtinNoticeBase().forEach(function (n) {
     var o = ov[n.id]; if (!o) return;
     var keepText = !n.rev || o.rev === n.rev;
-    EDIT_FIELDS.concat(["target", "pinned", "off"]).forEach(function (k) {
+    EDIT_FIELDS.concat(["target", "pinned", "off", "likes_add"]).forEach(function (k) {
       if (!keepText && (k === "title" || k === "content" || k === "head" || k === "author")) return;
       if (o[k] !== undefined) n[k] = o[k];
     });
@@ -99,7 +99,16 @@ function noticesFor(board) {
     return ((h >>> 0) % 23) + (p.views > 300 ? 4 : 0) + real;
   };
   // 관리자가 숫자를 정한 예시 글은 그 숫자 (회원 글은 항상 실제 숫자)
-  likesOf = function (p) { return p && !(typeof isUserPost === "function" && isUserPost(p)) && p.likes !== undefined && p.likes !== null && p.likes !== "" ? +p.likes : base(p); };
+  likesOf = function (p) {
+    // 공지(target 이 있는 글): 실제로 누른 수 + 관리자가 정한 보정값(likes_add) — 예시 숫자 없이
+    if (p && (p.target !== undefined || p.likes_add !== undefined || isBuiltinNotice(p.id)) && !(typeof isUserPost === "function" && isUserPost(p))) {
+      var real = typeof realLikes === "function" ? realLikes(p.id) : 0;
+      if (p.likes_add !== undefined && p.likes_add !== null) return Math.max(0, real + (+p.likes_add || 0));
+      if (p.likes !== undefined && p.likes !== null && p.likes !== "") return +p.likes;
+      return real;
+    }
+    return p && !(typeof isUserPost === "function" && isUserPost(p)) && p.likes !== undefined && p.likes !== null && p.likes !== "" ? +p.likes : base(p);
+  };
 })();
 
 /* ── 프리미엄 ── */

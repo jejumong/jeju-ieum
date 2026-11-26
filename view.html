@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261126b">
+<link rel="stylesheet" href="assets/style.css?v=20261126c">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -89,16 +89,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261126b"></script>
-<script src="assets/common.js?v=20261126b"></script>
-<script src="assets/db.js?v=20261126b"></script>
-<script src="assets/notify.js?v=20261126b"></script>
-<script src="assets/seed-trade.js?v=20261126b"></script>
-<script src="assets/seed-extra.js?v=20261126b"></script>
-<script src="assets/festivals-data.js?v=20261126b"></script>
-<script src="assets/seed-new.js?v=20261126b"></script>
-<script src="assets/seed-comments.js?v=20261126b"></script>
-<script src="assets/admin-data.js?v=20261126b"></script>
+<script src="assets/kmap.js?v=20261126c"></script>
+<script src="assets/common.js?v=20261126c"></script>
+<script src="assets/db.js?v=20261126c"></script>
+<script src="assets/notify.js?v=20261126c"></script>
+<script src="assets/seed-trade.js?v=20261126c"></script>
+<script src="assets/seed-extra.js?v=20261126c"></script>
+<script src="assets/festivals-data.js?v=20261126c"></script>
+<script src="assets/seed-new.js?v=20261126c"></script>
+<script src="assets/seed-comments.js?v=20261126c"></script>
+<script src="assets/admin-data.js?v=20261126c"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -321,6 +321,17 @@ function likeBtnHtml(p, big) {
   return '<button type="button" class="pv-like' + (on ? ' on' : '') + '" id="pv-like" onclick="toggleLikeBtn()" aria-pressed="' + on + '" title="' + (on ? '좋아요 취소' : '좋아요') + '">' +
     '<span class="hz">' + (on ? '♥' : '♡') + '</span> <b id="pv-like-n">' + n + '</b></button>';
 }
+/* 공지: 서버에서 관리자 설정(좋아요 보정값)을 받아오면 좋아요 숫자를 다시 그림 (처음 들어온 방문자용) */
+window.onJIData = function () {
+  if (!post || post.db) return;
+  var src = null;
+  if (typeof isBuiltinNotice === "function" && isBuiltinNotice(post.id)) src = (adminOv() || {})[post.id];
+  else if (typeof adminNotices === "function") adminNotices().forEach(function (n) { if (n.id === post.id) src = n; });
+  if (!src || src.likes_add === undefined) return;
+  post.likes_add = src.likes_add;
+  var t = document.getElementById("pv-like"); if (t) t.outerHTML = likeBtnHtml(post);
+  var e = document.querySelector(".pv-like-end"); if (e) e.outerHTML = likeBtnHtml(post, true);
+};
 function toggleLikeBtn() {
   if (!(window.JIDB && JIDB.enabled)) return;
   var u = currentUser();

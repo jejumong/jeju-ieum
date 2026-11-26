@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126b">
+<link rel="stylesheet" href="../assets/style.css?v=20261126c">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -489,18 +489,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126b"></script>
-<script src="../assets/db.js?v=20261126b"></script>
-<script src="../assets/notify.js?v=20261126b"></script>
-<script src="../assets/seed-trade.js?v=20261126b"></script>
-<script src="../assets/seed-extra.js?v=20261126b"></script>
-<script src="../assets/festivals-data.js?v=20261126b"></script>
-<script src="../assets/seed-new.js?v=20261126b"></script>
-<script src="../assets/seed-comments.js?v=20261126b"></script>
-<script src="../assets/photos.js?v=20261126b"></script>
-<script src="../assets/admin-data.js?v=20261126b"></script>
-<script src="../assets/kmap.js?v=20261126b"></script>
-<script src="../assets/op-posts.js?v=20261126b"></script>
+<script src="../assets/common.js?v=20261126c"></script>
+<script src="../assets/db.js?v=20261126c"></script>
+<script src="../assets/notify.js?v=20261126c"></script>
+<script src="../assets/seed-trade.js?v=20261126c"></script>
+<script src="../assets/seed-extra.js?v=20261126c"></script>
+<script src="../assets/festivals-data.js?v=20261126c"></script>
+<script src="../assets/seed-new.js?v=20261126c"></script>
+<script src="../assets/seed-comments.js?v=20261126c"></script>
+<script src="../assets/photos.js?v=20261126c"></script>
+<script src="../assets/admin-data.js?v=20261126c"></script>
+<script src="../assets/kmap.js?v=20261126c"></script>
+<script src="../assets/op-posts.js?v=20261126c"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -879,14 +879,16 @@ function drawNotices(){
   M().innerHTML = '<h1>공지 관리</h1><p class="sub">공지는 선택한 게시판 맨 위에 표시됩니다. ‘전체’로 올리면 홈 화면과 모든 게시판에 나옵니다. 내릴 때는 <b>공지 해제</b>를 누르세요 — 지워지지 않고 사이트의 <a href="' + SITE + 'community.html?board=%EA%B3%B5%EC%A7%80" target="_blank">공지사항</a> 목록에 계속 남아요.</p>' +
     '<div class="panel"><h2>새 공지 작성</h2>' + noticeForm(null) +
     '<div class="bt" style="display:flex;justify-content:flex-end"><button class="btn primary" onclick="saveNotice(null)">공지 올리기</button></div></div>' +
-    '<div class="panel"><h2>등록된 공지 (표시 중 ' + on + ' · 지난 공지 ' + (list.length - on) + ')</h2>' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>상태</th><th>표시할 곳</th><th>제목</th><th>조회수</th><th>관리</th></tr></thead><tbody>' +
+    '<div class="panel"><h2>등록된 공지 (표시 중 ' + on + ' · 지난 공지 ' + (list.length - on) + ')</h2>' + (list.length ? '<div class="tbl-wrap"><table class="adm-t"><thead><tr><th>상태</th><th>표시할 곳</th><th>제목</th><th>조회수</th><th>좋아요</th><th>관리</th></tr></thead><tbody>' +
       list.map(function(n){
         var ex = !n.off && noticeExpired(n), off = n.off || ex;
         return '<tr' + (off ? ' style="opacity:.62"' : '') + '><td>' + (off ? '<span class="bd">' + (ex ? '기간 끝남' : '지난 공지') + '</span>' : '<span class="bd" style="background:#e7f6ec;color:#16794a">표시 중</span>' + (n.pinned ? ' 📌' : '')) +
           '<small class="n-until">' + (n.until ? '~' + esc(n.until.slice(5).replace("-", ".")) + '까지' : '영구') + '</small></td>' +
           '<td><span class="bd">' + esc(n.target) + '</span></td>' +
           '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(n.id) + '" target="_blank">' + esc(n.title) + '</a><small>' + esc(n.date) + '</small></td>' +
-          '<td><input class="num" type="number" min="0" value="' + viewsOf(n) + '" data-nid="' + n.id + '"></td>' +
+          (isBoss() ? '<td><input class="num" type="number" min="0" value="' + viewsOf(n) + '" data-nid="' + n.id + '"></td>' +
+            '<td><input class="num" type="number" min="0" value="' + likesOf(n) + '" data-nlike="' + n.id + '" title="실제로 누른 좋아요 ' + realLikes(n.id) + '개"></td>'
+            : '<td>' + viewsOf(n).toLocaleString() + '</td><td>' + likesOf(n).toLocaleString() + '</td>') +
           '<td><div class="acts"><button class="mb" onclick="editNotice(\'' + n.id + '\')">수정</button>' +
             '<button class="mb" onclick="toggleNotice(\'' + n.id + '\')">' + (off ? '다시 공지' : '공지 해제') + '</button>' +
             '<button class="mb del" onclick="delNotice(\'' + n.id + '\')">삭제</button></div></td></tr>';
@@ -894,6 +896,19 @@ function drawNotices(){
   bindNoticePer(M());
   M().querySelectorAll("input[data-nid]").forEach(function(inp){
     function save(){ setNotice(inp.dataset.nid, { views: Math.max(0, parseInt(inp.value,10)||0) }, true); toast("조회수를 바꿨습니다"); }
+    inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { save(); inp.blur(); } });
+    inp.addEventListener("change", save);
+  });
+  /* 좋아요: 실제로 누른 수는 그대로 두고, 화면에 보일 총수와의 차이만 likes_add 로 저장 */
+  M().querySelectorAll("input[data-nlike]").forEach(function(inp){
+    var last = inp.value;
+    function save(){
+      if (inp.value === last) return;
+      var id = inp.dataset.nlike, n = Math.max(0, parseInt(inp.value, 10) || 0);
+      setNotice(id, { likes_add: n - realLikes(id) }); inp.value = last = String(n);
+      inp.classList.add("saved"); setTimeout(function(){ inp.classList.remove("saved"); }, 900);
+      toast("좋아요를 " + n.toLocaleString() + "(으)로 바꿨습니다");
+    }
     inp.addEventListener("keydown", function(e){ if (e.key === "Enter") { save(); inp.blur(); } });
     inp.addEventListener("change", save);
   });
