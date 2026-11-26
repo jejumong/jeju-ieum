@@ -239,6 +239,7 @@ var JIDB = (function () {
   }
   /* 홈 화면 앱 아이콘 숫자 — 안 읽은 쪽지+알림 수 (서비스 워커와 같은 저장소에 기록) */
   function setAppBadge(n) {
+    if (/\/admin\//.test(location.pathname)) n = 0;   // 관리자 콘솔 앱: 열면 아이콘 숫자를 지움 (사이트 알림함의 안 읽은 수와 따로)
     try {
       if (navigator.setAppBadge) { if (n) navigator.setAppBadge(n).catch(function () {}); else navigator.clearAppBadge().catch(function () {}); }
       var r = indexedDB.open("ji-badge", 1);
