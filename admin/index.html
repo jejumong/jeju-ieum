@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126p">
+<link rel="stylesheet" href="../assets/style.css?v=20261126q">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -327,6 +327,13 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .sp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.sp-chips button{border:1.5px solid #dfe4ea;background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13.5px;font-weight:700;color:#4a5a70;cursor:pointer}
 .sp-chips button.on{background:#0e2440;border-color:#0e2440;color:#fff}.sp-own{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#5b6b80}.sp-own input{border:1.5px solid #dfe4ea;border-radius:10px;padding:5px 8px;font:inherit}
 .sp-mode{display:flex;flex-direction:column;gap:7px;font-size:13.5px}.sp-mode select{border:1px solid #dfe4ea;border-radius:8px;padding:3px 6px;font:inherit}
+.tp{border:1px solid #e3e8ef;border-radius:14px;padding:10px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+.tp button{border:1.5px solid #dfe4ea;background:#fff;border-radius:10px;font:inherit;font-weight:700;color:#4a5a70;cursor:pointer}.tp button.on{background:#0e2440;border-color:#0e2440;color:#fff}
+.tp-ap{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tp-ap button{padding:8px;font-size:14.5px}
+.tp-h{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}.tp-h button{padding:8px 0;font-size:13.5px}
+.tp-m{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.tp-m>span:first-child{font-weight:700;font-size:13.5px;color:#4a5a70}
+.tp-m [data-mm]{width:38px;height:38px;font-size:20px;padding:0}.tp-m input{width:64px;height:38px;box-sizing:border-box;text-align:center;border:1.5px solid #2f80ed;border-radius:10px;font:inherit;font-size:18px;font-weight:800;color:#0e2440}
+.tp-hint{color:#8a97a8;font-size:12px;flex-basis:100%}
 .sp-row{display:flex;gap:10px}.sp-row b{flex:none;color:#c2410c;font-weight:700}.sp-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sp-cal,.sp-side{min-width:0}
 @media (max-width:640px){ .sp-wrap{grid-template-columns:1fr;gap:10px} .sp-side{order:-1} .sp-cal{padding:8px} .sp-d{aspect-ratio:auto;height:40px;font-size:13.5px} .sp-g{gap:2px} }
@@ -561,18 +568,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126p"></script>
-<script src="../assets/db.js?v=20261126p"></script>
-<script src="../assets/notify.js?v=20261126p"></script>
-<script src="../assets/seed-trade.js?v=20261126p"></script>
-<script src="../assets/seed-extra.js?v=20261126p"></script>
-<script src="../assets/festivals-data.js?v=20261126p"></script>
-<script src="../assets/seed-new.js?v=20261126p"></script>
-<script src="../assets/seed-comments.js?v=20261126p"></script>
-<script src="../assets/photos.js?v=20261126p"></script>
-<script src="../assets/admin-data.js?v=20261126p"></script>
-<script src="../assets/kmap.js?v=20261126p"></script>
-<script src="../assets/op-posts.js?v=20261126p"></script>
+<script src="../assets/common.js?v=20261126q"></script>
+<script src="../assets/db.js?v=20261126q"></script>
+<script src="../assets/notify.js?v=20261126q"></script>
+<script src="../assets/seed-trade.js?v=20261126q"></script>
+<script src="../assets/seed-extra.js?v=20261126q"></script>
+<script src="../assets/festivals-data.js?v=20261126q"></script>
+<script src="../assets/seed-new.js?v=20261126q"></script>
+<script src="../assets/seed-comments.js?v=20261126q"></script>
+<script src="../assets/photos.js?v=20261126q"></script>
+<script src="../assets/admin-data.js?v=20261126q"></script>
+<script src="../assets/kmap.js?v=20261126q"></script>
+<script src="../assets/op-posts.js?v=20261126q"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1593,12 +1600,14 @@ if (SRV) {
         var today = new Date(); today.setHours(0, 0, 0, 0);
         var S = { day: new Date(today.getTime() + 864e5), time: "09:00", mode: pick.length > 1 ? "perday" : "same", per: 2, gap: 3, view: null };
         S.view = new Date(S.day.getFullYear(), S.day.getMonth(), 1);
-        var TIMES = ["07:00", "09:00", "12:00", "15:00", "18:00", "21:00"];
         showModal('<h3>운영자 글 ' + pick.length + '개 예약</h3><p class="sub" style="margin-bottom:10px">고른 날짜와 시간이 되면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 올라가요.</p>' +
           '<div class="sp-wrap"><div class="sp-cal" id="sp-cal"></div><div class="sp-side">' +
             '<div class="sp-l">① 날짜 <span id="sp-dtxt"></span></div><div class="sp-chips" id="sp-qd"></div>' +
-            '<div class="sp-l">② 시간</div><div class="sp-chips" id="sp-tm">' + TIMES.map(function(t){ return '<button type="button" data-t="' + t + '">' + (+t.slice(0, 2) < 12 ? "오전 " : "오후 ") + ((+t.slice(0, 2)) % 12 || 12) + '시</button>'; }).join("") +
-              '<label class="sp-own">직접 <input type="time" id="sp-tin" value="09:00" step="600"></label></div>' +
+            '<div class="sp-l">② 시간 <span id="sp-ttxt"></span></div><div class="tp" id="sp-tp">' +
+              '<div class="tp-ap"><button type="button" data-ap="am">오전</button><button type="button" data-ap="pm">오후</button></div>' +
+              '<div class="tp-h">' + [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function(h){ return '<button type="button" data-h="' + h + '">' + h + '시</button>'; }).join("") + '</div>' +
+              '<div class="tp-m"><span>분</span><button type="button" data-mm="-1" aria-label="1분 빼기">−</button><input type="number" id="sp-min" min="0" max="59" step="1" inputmode="numeric" aria-label="분">' +
+                '<button type="button" data-mm="1" aria-label="1분 더하기">+</button><small class="tp-hint">숫자를 눌러 바로 입력하거나 − + 로 1분씩 바꿔요</small></div></div>' +
             (pick.length > 1 ? '<div class="sp-l">③ ' + pick.length + '개 글을 어떻게 올릴까요?</div><div class="sp-mode" id="sp-mode">' +
               '<label><input type="radio" name="spm" value="perday"> 하루에 <select id="sp-per">' + [1, 2, 3, 4].map(function(n){ return '<option' + (n === 2 ? ' selected' : '') + '>' + n + '</option>'; }).join("") + '</select>개씩 다음 날로 나눠서</label>' +
               '<label><input type="radio" name="spm" value="gap"> 같은 날 <select id="sp-gap">' + [1, 2, 3, 4, 6].map(function(n){ return '<option' + (n === 3 ? ' selected' : '') + '>' + n + '</option>'; }).join("") + '</select>시간 간격으로</label>' +
@@ -1633,8 +1642,11 @@ if (SRV) {
           var QD = [["오늘", 0], ["내일", 1], ["모레", 2]], sat = (6 - today.getDay() + 7) % 7 || 7; QD.push(["이번 토요일", sat]);
           document.getElementById("sp-qd").innerHTML = QD.map(function(q){ var d = new Date(today.getTime() + q[1] * 864e5); return '<button type="button" data-q="' + q[1] + '"' + (dkey(d) === dkey(S.day) ? ' class="on"' : '') + '>' + q[0] + '</button>'; }).join("");
           document.getElementById("sp-dtxt").textContent = (S.day.getMonth() + 1) + "월 " + S.day.getDate() + "일 (" + WK[S.day.getDay()] + ")";
-          box.querySelectorAll("#sp-tm [data-t]").forEach(function(b){ b.classList.toggle("on", b.dataset.t === S.time); });
-          document.getElementById("sp-tin").value = S.time;
+          var H = +S.time.slice(0, 2), Mi = +S.time.slice(3, 5), pm = H >= 12, h12 = H % 12 || 12;
+          box.querySelectorAll("#sp-tp [data-ap]").forEach(function(b){ b.classList.toggle("on", (b.dataset.ap === "pm") === pm); });
+          box.querySelectorAll("#sp-tp [data-h]").forEach(function(b){ b.classList.toggle("on", +b.dataset.h === h12); });
+          var mi = document.getElementById("sp-min"); if (document.activeElement !== mi) mi.value = two(Mi);
+          document.getElementById("sp-ttxt").textContent = (pm ? "오후 " : "오전 ") + h12 + "시 " + two(Mi) + "분";
           box.querySelectorAll("#sp-mode input").forEach(function(r){ r.checked = r.value === S.mode; });
         }
         var prev = function(){ var pl = plan(), bad = pl[0].d < new Date();
@@ -1647,9 +1659,19 @@ if (SRV) {
           if (t.dataset.mv) { S.view = new Date(S.view.getFullYear(), S.view.getMonth() + (+t.dataset.mv), 1); redraw(); }
           else if (t.dataset.d) { var p = t.dataset.d.split("-"); S.day = new Date(+p[0], +p[1] - 1, +p[2]); redraw(); }
           else if (t.dataset.q !== undefined) { S.day = new Date(today.getTime() + (+t.dataset.q) * 864e5); S.view = new Date(S.day.getFullYear(), S.day.getMonth(), 1); redraw(); }
-          else if (t.dataset.t) { S.time = t.dataset.t; redraw(); }
+          else if (t.dataset.ap || t.dataset.h || t.dataset.m !== undefined || t.dataset.mm) {
+            var H = +S.time.slice(0, 2), Mi = +S.time.slice(3, 5);
+            if (t.dataset.ap) { if (t.dataset.ap === "pm" && H < 12) H += 12; if (t.dataset.ap === "am" && H >= 12) H -= 12; }
+            if (t.dataset.h) { var h = +t.dataset.h % 12; H = H >= 12 ? h + 12 : h; }
+            if (t.dataset.m !== undefined) Mi = +t.dataset.m;
+            if (t.dataset.mm) { Mi += +t.dataset.mm; if (Mi > 59) Mi = 0; if (Mi < 0) Mi = 59; }
+            S.time = two(H) + ":" + two(Mi); redraw();
+          }
         };
-        document.getElementById("sp-tin").onchange = function(){ if (this.value) { S.time = this.value; redraw(); } };
+        var minIn = document.getElementById("sp-min");
+        minIn.oninput = function(){ var v = parseInt(minIn.value, 10); if (isNaN(v)) return; v = Math.max(0, Math.min(59, v)); S.time = S.time.slice(0, 3) + two(v); drawSide(); prev(); };
+        minIn.onblur = function(){ minIn.value = S.time.slice(3, 5); };
+        minIn.onfocus = function(){ minIn.select(); };
         box.querySelectorAll("#sp-mode input").forEach(function(r){ r.onchange = function(){ S.mode = r.value; redraw(); }; });
         var per = document.getElementById("sp-per"), gap = document.getElementById("sp-gap");
         if (per) per.onchange = function(){ S.per = +per.value; S.mode = "perday"; redraw(); };
