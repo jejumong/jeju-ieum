@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126l">
+<link rel="stylesheet" href="../assets/style.css?v=20261126m">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -412,6 +412,7 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .tm-title{display:flex;align-items:center;gap:12px}.tm-ico{width:48px;height:48px;border-radius:14px;background:#1e6fd9;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 16px rgba(30,111,217,.3)}
 .tm-sec .tm-title h2{font-size:23px;font-weight:900;color:#0e2a4f;letter-spacing:-.03em}.tm-title p{margin:2px 0 0;font-size:13.5px;color:#4a6585}
 .tm-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+.tm-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:22px 0 12px;padding:10px 12px;background:#fff;border:1px solid var(--line,#e5e9ef);border-radius:14px}.tm-bar>b{font-size:14px;font-weight:800;color:#0e2440}.tm-bar .tm-dl{margin-left:auto}
 .sr-panel h2{font-size:18px}
 .sr-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 18px}.sr-kpi>div{background:#f2f7fd;border-radius:14px;padding:12px 14px}
 .sr-kpi b{display:block;font-size:26px;font-weight:900;color:#0e2a4f;letter-spacing:-.02em}.sr-kpi b small{font-size:14px;font-weight:700;margin-left:2px}.sr-kpi span{font-size:12.5px;color:#5b6b80}
@@ -528,18 +529,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126l"></script>
-<script src="../assets/db.js?v=20261126l"></script>
-<script src="../assets/notify.js?v=20261126l"></script>
-<script src="../assets/seed-trade.js?v=20261126l"></script>
-<script src="../assets/seed-extra.js?v=20261126l"></script>
-<script src="../assets/festivals-data.js?v=20261126l"></script>
-<script src="../assets/seed-new.js?v=20261126l"></script>
-<script src="../assets/seed-comments.js?v=20261126l"></script>
-<script src="../assets/photos.js?v=20261126l"></script>
-<script src="../assets/admin-data.js?v=20261126l"></script>
-<script src="../assets/kmap.js?v=20261126l"></script>
-<script src="../assets/op-posts.js?v=20261126l"></script>
+<script src="../assets/common.js?v=20261126m"></script>
+<script src="../assets/db.js?v=20261126m"></script>
+<script src="../assets/notify.js?v=20261126m"></script>
+<script src="../assets/seed-trade.js?v=20261126m"></script>
+<script src="../assets/seed-extra.js?v=20261126m"></script>
+<script src="../assets/festivals-data.js?v=20261126m"></script>
+<script src="../assets/seed-new.js?v=20261126m"></script>
+<script src="../assets/seed-comments.js?v=20261126m"></script>
+<script src="../assets/photos.js?v=20261126m"></script>
+<script src="../assets/admin-data.js?v=20261126m"></script>
+<script src="../assets/kmap.js?v=20261126m"></script>
+<script src="../assets/op-posts.js?v=20261126m"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1866,7 +1867,7 @@ if (SRV) {
   };
   function tmPanels(daysBox){
     var d30 = '<div class="panel"><h2>최근 30일 방문자 <small style="font-weight:600;color:var(--ink-4)">막대에 마우스를 올리면 그날 숫자가 보여요</small></h2>' + (daysBox || "") + '</div>';
-    var m = TM; if (!m) return '<section class="tm-sec"><div class="tm-head"><div class="tm-title"><span class="tm-ico">📊</span><div><h2>자세히 보기</h2></div></div></div>' + d30 + '</section>';
+    var m = TM; if (!m) return d30;
     var today = ymd(new Date()), mx = ' max="' + today + '"';
     var segP = '<span class="tm-date"><button class="tm-nav" onclick="tmSet(\'shift\',-1)" aria-label="이전 기간">◀</button>' +
       '<input type="date" value="' + m.from + '"' + mx + ' onchange="tmSet(\'from\',this.value)" aria-label="시작 날짜"><span>~</span>' +
@@ -1931,9 +1932,8 @@ if (SRV) {
           : '<div class="empty" style="padding:14px">아직 기록이 없어요.</div>') + '</div></div>' +
       '<h3 class="tm-h3 sr-kwh"><span class="sr-no">3</span>검색어</h3>' + (m.kws.length ? tfList(m.kws, "n", function(x){ return esc(x.k) + ' <small>' + esc(x.ref) + '</small>'; }, "명") :
         '<div class="empty" style="padding:14px">아직 잡힌 검색어가 없어요. 구글은 검색어를 알려 주지 않고, 네이버도 일부만 알려 줘요.</div>') + '</div>';
-    return '<section class="tm-sec"><div class="tm-head"><div class="tm-title"><span class="tm-ico">📊</span><div><h2>자세히 보기</h2><p>기간을 골라 방문자·유입 경로·검색·기기·글 순위를 살펴봐요</p></div></div>' +
-        '<div class="tm-ctl">' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div></div>' +
-      d30 + cmpBox +
+    return d30 +
+      '<div class="tm-bar"><b>아래 통계 기간</b>' + segP + '<span class="tm-range">' + range + '</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div>' +
       '<div class="panel"><h2>유입 경로</h2><div class="dv-grid">' +
         '<div class="dv-col"><h3 class="tm-h3">어디서 왔나</h3>' + refRing + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">자세한 경로</h3>' + kv((m.refs || []).slice(0, 8)) + '</div>' +
@@ -1945,7 +1945,7 @@ if (SRV) {
         '<div class="dv-col"><h3 class="tm-h3">운영체제</h3>' + kv(m.os) + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">브라우저·앱</h3>' + kv(m.br) + '</div></div></div>' +
       '<div class="panel"><h2>글 순위 ' + segR + '</h2>' + rank +
-        '<p class="sub" style="margin:10px 0 0">조회수·댓글·좋아요는 위에서 고른 기간 기준이고, 누적 조회수는 글이 올라온 뒤 전체 합계예요.</p></div></section>';
+        '<p class="sub" style="margin:10px 0 0">조회수·댓글·좋아요는 위에서 고른 기간 기준이고, 누적 조회수는 글이 올라온 뒤 전체 합계예요.</p></div>';
   }
   window.tfSetDay = function(d){ tfDay = d; drawTraffic(true); };
   /* 방문 통계 엑셀: 최근 30일 일별 + 지금 고른 기간의 자세히 보기 */
