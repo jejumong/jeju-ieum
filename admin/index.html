@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126o">
+<link rel="stylesheet" href="../assets/style.css?v=20261126p">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -312,6 +312,24 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .op-bar-b{display:flex;gap:6px;flex-wrap:wrap}
 .op-ok.sch{background:#fff4e5;color:#c2410c}.sch-at{color:#c2410c}
 .sch-in{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #dfe3ea;border-radius:10px;font:inherit}
+.op-dellink{font-size:13px;color:#8a97a8;margin-left:10px;text-decoration:underline}
+.op-delrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #eef2f6}.op-delrow span{min-width:0}.op-delrow small{display:block;color:#8a97a8;font-size:12px}
+.btn.danger-o{color:#b42318;border-color:#f3c6c2;background:#fff}.btn.danger-o:disabled{opacity:.45}
+.sp-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.sp-cal{border:1px solid #e3e8ef;border-radius:14px;padding:10px}.sp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.sp-hd b{font-size:15px}
+.sp-hd button{width:32px;height:32px;border-radius:10px;border:1px solid #dfe4ea;background:#fff;font-size:18px;cursor:pointer}.sp-hd button:disabled{opacity:.3;cursor:default}
+.sp-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.sp-w{text-align:center;font-size:11.5px;font-weight:700;color:#8a97a8;padding:3px 0}.sp-w.sun{color:#e5484d}.sp-w.sat{color:#2f80ed}
+.sp-d{position:relative;aspect-ratio:1;border:0;border-radius:10px;background:#f4f6f9;font:inherit;font-size:14px;font-weight:700;color:#1f2d40;cursor:pointer}.sp-d:hover{background:#e3edfb}
+.sp-d.sun{color:#e5484d}.sp-d.sat{color:#2f80ed}.sp-d.today{box-shadow:inset 0 0 0 2px #2f80ed}.sp-d.on{background:#2f80ed;color:#fff}.sp-d:disabled{background:transparent;color:#c7ced8;cursor:default}
+.sp-d i{position:absolute;top:2px;right:3px;min-width:15px;height:15px;border-radius:8px;background:#f59e0b;color:#fff;font-size:10px;font-style:normal;line-height:15px}.sp-d.on i{background:#fff;color:#2f80ed}
+.sp-note{margin-top:6px;font-size:11.5px;color:#8a97a8}.sp-note i{display:inline-block;min-width:15px;height:15px;border-radius:8px;background:#f59e0b;color:#fff;font-size:10px;font-style:normal;text-align:center;line-height:15px;margin-right:3px}
+.sp-l{font-weight:800;font-size:14px;margin:4px 0 6px;color:#0e2440}.sp-l span{font-weight:700;color:#2f80ed;margin-left:4px}
+.sp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.sp-chips button{border:1.5px solid #dfe4ea;background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13.5px;font-weight:700;color:#4a5a70;cursor:pointer}
+.sp-chips button.on{background:#0e2440;border-color:#0e2440;color:#fff}.sp-own{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#5b6b80}.sp-own input{border:1.5px solid #dfe4ea;border-radius:10px;padding:5px 8px;font:inherit}
+.sp-mode{display:flex;flex-direction:column;gap:7px;font-size:13.5px}.sp-mode select{border:1px solid #dfe4ea;border-radius:8px;padding:3px 6px;font:inherit}
+.sp-row{display:flex;gap:10px}.sp-row b{flex:none;color:#c2410c;font-weight:700}.sp-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-cal,.sp-side{min-width:0}
+@media (max-width:640px){ .sp-wrap{grid-template-columns:1fr;gap:10px} .sp-side{order:-1} .sp-cal{padding:8px} .sp-d{aspect-ratio:auto;height:40px;font-size:13.5px} .sp-g{gap:2px} }
 .sch-prev{margin-top:12px;padding:10px 12px;background:#f8fafc;border-radius:10px;font-size:13px;line-height:1.8;color:var(--ink-2);max-height:180px;overflow:auto}
 .op-ok{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#e6f4ea;color:#1a7f37;font-size:12px;font-weight:800}
 .op-chk{flex:none}.op-chk input{width:18px;height:18px}
@@ -543,18 +561,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126o"></script>
-<script src="../assets/db.js?v=20261126o"></script>
-<script src="../assets/notify.js?v=20261126o"></script>
-<script src="../assets/seed-trade.js?v=20261126o"></script>
-<script src="../assets/seed-extra.js?v=20261126o"></script>
-<script src="../assets/festivals-data.js?v=20261126o"></script>
-<script src="../assets/seed-new.js?v=20261126o"></script>
-<script src="../assets/seed-comments.js?v=20261126o"></script>
-<script src="../assets/photos.js?v=20261126o"></script>
-<script src="../assets/admin-data.js?v=20261126o"></script>
-<script src="../assets/kmap.js?v=20261126o"></script>
-<script src="../assets/op-posts.js?v=20261126o"></script>
+<script src="../assets/common.js?v=20261126p"></script>
+<script src="../assets/db.js?v=20261126p"></script>
+<script src="../assets/notify.js?v=20261126p"></script>
+<script src="../assets/seed-trade.js?v=20261126p"></script>
+<script src="../assets/seed-extra.js?v=20261126p"></script>
+<script src="../assets/festivals-data.js?v=20261126p"></script>
+<script src="../assets/seed-new.js?v=20261126p"></script>
+<script src="../assets/seed-comments.js?v=20261126p"></script>
+<script src="../assets/photos.js?v=20261126p"></script>
+<script src="../assets/admin-data.js?v=20261126p"></script>
+<script src="../assets/kmap.js?v=20261126p"></script>
+<script src="../assets/op-posts.js?v=20261126p"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -917,7 +935,7 @@ function lockPage(){ if (_mLocked) return; _mLocked = true; document.documentEle
 function unlockPage(){ if (!_mLocked) return; _mLocked = false; document.documentElement.classList.remove("m-lock"); }
 /* 창 바깥(어두운 부분)을 밀어도 뒤 화면이 움직이지 않게 */
 document.addEventListener("touchmove", function(e){ if (!_mLocked) return; var box = document.getElementById("modal-box"); if (!box || !box.contains(e.target)) e.preventDefault(); }, { passive: false });
-function showModal(html){ var box = document.getElementById("modal-box"); box.innerHTML = html; box.scrollTop = 0; document.getElementById("modal").classList.add("on"); lockPage(); }
+function showModal(html){ var box = document.getElementById("modal-box"); box.onclick = null; box.style.maxWidth = ""; box.innerHTML = html; box.scrollTop = 0; document.getElementById("modal").classList.add("on"); lockPage(); }
 function closeModal(){ document.getElementById("modal").classList.remove("on"); unlockPage(); }
 /* 바깥(어두운 곳)을 눌렀다 뗄 때만 닫기 — 창 안에서 글자를 끌어 선택하다 바깥에서 떼도 닫히지 않게 */
 (function(){ var m = document.getElementById("modal"), downOut = false;
@@ -1407,13 +1425,28 @@ if (SRV) {
   }
 
   /* 운영자 글: assets/op-posts.js 초안을 골라 내 계정으로 올림 (이미 올린 글은 표시) */
+  /* 운영자 글 삭제: 안 올린 글을 목록에서 지움 (admin_ov.__opdel 에 기록 — 언제든 되살리기) */
+  function opDelKeys(){ var o = (adminOv() || {}).__opdel; return (o && o.keys) || []; }
+  function opDelSave(keys){ var ov = adminOv() || {}; ov.__opdel = { keys: keys }; var prev = JI._push; JI._push = true; try { JI.set("admin_ov", ov); } finally { JI._push = prev; } }
+  window.opRestore = function(k){
+    var keys = opDelKeys().filter(function(x){ return k === "*" ? false : x !== k; }); opDelSave(keys); toast("되살렸어요");
+    if (k === "*" || !keys.length) closeModal(); else opShowDeleted(); drawOpPosts();
+  };
+  window.opShowDeleted = function(){
+    var keys = opDelKeys(), all = window.OP_POSTS || [];
+    var rows = keys.map(function(k){ var p = all.filter(function(x){ return x.k === k; })[0]; if (!p) return "";
+      return '<div class="op-delrow"><span><small>' + esc(p.board) + '</small>' + esc(p.title) + '</span><button class="mb" onclick="opRestore(\'' + k + '\')">되살리기</button></div>'; }).join("");
+    showModal('<h3>삭제한 운영자 글 ' + keys.length + '개</h3><p class="sub">되살리면 다시 \'안 올린 글\'에 나와요.</p>' + (rows || '<div class="empty">삭제한 글이 없어요.</div>') +
+      '<div class="bt"><button class="mb" onclick="closeModal()">닫기</button>' + (keys.length > 1 ? '<button class="mb pri" onclick="opRestore(\'*\')">모두 되살리기</button>' : '') + '</div>');
+  };
   window.drawOpPosts = function(){
-    var L = window.OP_POSTS || [];
+    var DELK = opDelKeys();
+    var L = (window.OP_POSTS || []).filter(function(p){ return DELK.indexOf(p.k) < 0; });
     var TAB = window.OP_TAB || "todo";   // todo = 안 올린 글, done = 올린 글
     M().innerHTML = '<h1>운영자 글</h1><p class="sub">미리 준비한 정보 글 ' + L.length + '개예요. 올릴 글을 고르면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 게시판에 올라가요. 올린 뒤에도 글 화면에서 고치거나 지울 수 있어요.</p>' +
       '<div class="op-top"><div class="op-tabs" id="op-tabs"><button data-t="todo">안 올린 글</button><button data-t="sched">예약</button><button data-t="done">올린 글</button></div>' +
       '<div class="op-q"><input type="search" id="op-q" placeholder="제목·내용·게시판 검색" value="' + esc(window.OP_Q || "") + '" autocomplete="off"><span id="op-q-n"></span></div></div>' +
-      '<div class="panel"><div class="op-bar" id="op-bar"><label><input type="checkbox" id="op-all"> 안 올린 글 모두 고르기</label><span class="op-bar-b"><button class="btn" id="op-sch" disabled>⏰ 예약해서 올리기</button><button class="btn accent" id="op-go" disabled>고른 글 지금 올리기</button></span></div><div id="op-list">확인하는 중…</div></div>';
+      '<div class="panel"><div class="op-bar" id="op-bar"><label><input type="checkbox" id="op-all"> 안 올린 글 모두 고르기</label>' + (DELK.length ? '<a href="#" class="op-dellink" onclick="opShowDeleted();return false">삭제한 글 ' + DELK.length + '개</a>' : '') + '<span class="op-bar-b"><button class="btn danger-o" id="op-del" disabled>🗑 고른 글 삭제</button><button class="btn" id="op-sch" disabled>⏰ 예약해서 올리기</button><button class="btn accent" id="op-go" disabled>고른 글 지금 올리기</button></span></div><div id="op-list">확인하는 중…</div></div>';
     var boards = [].concat.apply([], MOVE_BOARDS.map(function(g){ return g[1]; }));   // 게시판을 옮긴 글도 '올림'으로 잡히게 전체 게시판 확인
     Promise.all(boards.map(function(b){ return JIDB.call("post_list", { board: b }).catch(function(){ return []; }); })
       .concat([JIDB.call("admin_sched_list").catch(function(){ return []; })])).then(function(rs){
@@ -1431,7 +1464,8 @@ if (SRV) {
       var box = document.getElementById("op-list"), PER = 15, pg = 0, SEL = {};
       var go = document.getElementById("op-go"), all = document.getElementById("op-all"), tabs = document.getElementById("op-tabs");
       var sch = document.getElementById("op-sch");
-      function sync(){ var n = Object.keys(SEL).length; go.disabled = sch.disabled = !n; go.textContent = n ? "고른 글 " + n + "개 지금 올리기" : "고른 글 지금 올리기"; sch.textContent = n ? "⏰ " + n + "개 예약해서 올리기" : "⏰ 예약해서 올리기"; }
+      var del = document.getElementById("op-del");
+      function sync(){ var n = Object.keys(SEL).length; go.disabled = sch.disabled = del.disabled = !n; del.textContent = n ? "🗑 " + n + "개 삭제" : "🗑 고른 글 삭제"; go.textContent = n ? "고른 글 " + n + "개 지금 올리기" : "고른 글 지금 올리기"; sch.textContent = n ? "⏰ " + n + "개 예약해서 올리기" : "⏰ 예약해서 올리기"; }
       var schTxt = function(at){ var d = new Date(at); return (d.getMonth() + 1) + "." + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); };
       /* 검색: 띄어쓰기로 나눈 낱말이 제목·말머리·게시판·본문에 모두 들어 있는 글만 */
       var Q = window.OP_Q || "", qIn = document.getElementById("op-q"), qN = document.getElementById("op-q-n");
@@ -1549,29 +1583,90 @@ if (SRV) {
         paint(); }, 150); };
       all.onchange = function(){ SEL = {}; if (all.checked) F("todo").forEach(function(i){ SEL[i] = 1; }); paint(); sync(); };   // 모든 페이지의 안 올린 글
       window.opSchCancel = function(sid){ if (!confirm("이 예약을 취소할까요? 글은 '안 올린 글'로 돌아가요.")) return; JIDB.call("admin_sched_cancel", { id: sid }).then(function(){ toast("예약을 취소했어요"); drawOpPosts(); }, function(e){ alert(e.message); }); };
+      /* 예약하기 창: 달력에서 날짜 누르기 + 시간 고르기 + 여러 글 나눠 올리기 */
       sch.onclick = function(){
         var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return cur(i); });   // 목록 위쪽 글부터 먼저 (수정한 글은 수정한 내용으로)
         if (!pick.length) return;
-        var t = new Date(); t.setDate(t.getDate() + 1); t.setHours(9, 0, 0, 0);
-        var loc = function(d){ return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); };
-        showModal('<h3>운영자 글 ' + pick.length + '개 예약</h3><p class="sub">고른 날짜와 시간이 되면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 올라가요.</p>' +
-          '<label class="sus-l">올릴 날짜와 시간</label><input type="datetime-local" id="sch-at" class="sch-in" value="' + loc(t) + '">' +
-          '<div id="sch-prev" class="sch-prev"></div>' +
+        var two = function(n){ return ("0" + n).slice(-2); };
+        var dkey = function(d){ return d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()); };
+        var BUSY = {}; schRows.forEach(function(x){ if (x.status === "wait" || x.status === "busy") { var k = dkey(new Date(x.at)); BUSY[k] = (BUSY[k] || 0) + 1; } });
+        var today = new Date(); today.setHours(0, 0, 0, 0);
+        var S = { day: new Date(today.getTime() + 864e5), time: "09:00", mode: pick.length > 1 ? "perday" : "same", per: 2, gap: 3, view: null };
+        S.view = new Date(S.day.getFullYear(), S.day.getMonth(), 1);
+        var TIMES = ["07:00", "09:00", "12:00", "15:00", "18:00", "21:00"];
+        showModal('<h3>운영자 글 ' + pick.length + '개 예약</h3><p class="sub" style="margin-bottom:10px">고른 날짜와 시간이 되면 지금 로그인한 계정(' + esc((JIDB.me() || {}).nick || "") + ') 이름으로 올라가요.</p>' +
+          '<div class="sp-wrap"><div class="sp-cal" id="sp-cal"></div><div class="sp-side">' +
+            '<div class="sp-l">① 날짜 <span id="sp-dtxt"></span></div><div class="sp-chips" id="sp-qd"></div>' +
+            '<div class="sp-l">② 시간</div><div class="sp-chips" id="sp-tm">' + TIMES.map(function(t){ return '<button type="button" data-t="' + t + '">' + (+t.slice(0, 2) < 12 ? "오전 " : "오후 ") + ((+t.slice(0, 2)) % 12 || 12) + '시</button>'; }).join("") +
+              '<label class="sp-own">직접 <input type="time" id="sp-tin" value="09:00" step="600"></label></div>' +
+            (pick.length > 1 ? '<div class="sp-l">③ ' + pick.length + '개 글을 어떻게 올릴까요?</div><div class="sp-mode" id="sp-mode">' +
+              '<label><input type="radio" name="spm" value="perday"> 하루에 <select id="sp-per">' + [1, 2, 3, 4].map(function(n){ return '<option' + (n === 2 ? ' selected' : '') + '>' + n + '</option>'; }).join("") + '</select>개씩 다음 날로 나눠서</label>' +
+              '<label><input type="radio" name="spm" value="gap"> 같은 날 <select id="sp-gap">' + [1, 2, 3, 4, 6].map(function(n){ return '<option' + (n === 3 ? ' selected' : '') + '>' + n + '</option>'; }).join("") + '</select>시간 간격으로</label>' +
+              '<label><input type="radio" name="spm" value="same"> 모두 같은 시간에</label></div>' : '') +
+          '</div></div>' +
+          '<div class="sp-l" style="margin-top:12px">올라갈 순서</div><div id="sch-prev" class="sch-prev"></div>' +
           '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" id="sch-ok">예약하기</button></div>');
+        var box = document.getElementById("modal-box") || document.body; box.style.maxWidth = "880px";
+        var at = function(d, t){ var x = new Date(d); x.setHours(+t.slice(0, 2), +t.slice(3, 5), 0, 0); return x; };
         var plan = function(){
-          var st = new Date(document.getElementById("sch-at").value);
-          return pick.map(function(p){ return { p: p, d: st }; });
+          var st = at(S.day, S.time);
+          return pick.map(function(p, i){ var d = new Date(st);
+            if (S.mode === "perday") { d.setDate(d.getDate() + Math.floor(i / S.per)); d.setHours(d.getHours() + (i % S.per) * 3); }
+            else if (S.mode === "gap") d.setHours(d.getHours() + i * S.gap);
+            return { p: p, d: d }; });
         };
-        var prev = function(){ var pl = plan(), bad = isNaN(pl[0].d.getTime()) || pl[0].d < new Date();
+        var WK = ["일", "월", "화", "수", "목", "금", "토"];
+        var fmt = function(d){ return (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + WK[d.getDay()] + ") " + (d.getHours() < 12 ? "오전 " : "오후 ") + (d.getHours() % 12 || 12) + "시" + (d.getMinutes() ? " " + d.getMinutes() + "분" : ""); };
+        function drawCal(){
+          var y = S.view.getFullYear(), m = S.view.getMonth(), first = new Date(y, m, 1).getDay(), dim = new Date(y, m + 1, 0).getDate(), h = "";
+          var canPrev = new Date(y, m, 1) > new Date(today.getFullYear(), today.getMonth(), 1);
+          h += '<div class="sp-hd"><button type="button" data-mv="-1"' + (canPrev ? '' : ' disabled') + ' aria-label="이전 달">‹</button><b>' + y + '년 ' + (m + 1) + '월</b><button type="button" data-mv="1" aria-label="다음 달">›</button></div><div class="sp-g">';
+          h += WK.map(function(w, i){ return '<span class="sp-w' + (i === 0 ? ' sun' : i === 6 ? ' sat' : '') + '">' + w + '</span>'; }).join("");
+          for (var b = 0; b < first; b++) h += '<span></span>';
+          for (var d = 1; d <= dim; d++) {
+            var dt = new Date(y, m, d), k = dkey(dt), past = dt < today, on = dkey(S.day) === k, n = BUSY[k] || 0, wd = dt.getDay();
+            h += '<button type="button" class="sp-d' + (on ? ' on' : '') + (dt.getTime() === today.getTime() ? ' today' : '') + (wd === 0 ? ' sun' : wd === 6 ? ' sat' : '') + '" data-d="' + k + '"' + (past ? ' disabled' : '') + ' title="' + (n ? '이미 예약 ' + n + '개' : '') + '">' + d + (n ? '<i>' + n + '</i>' : '') + '</button>';
+          }
+          document.getElementById("sp-cal").innerHTML = h + '</div><div class="sp-note"><i>2</i> 이미 예약된 글 수</div>';
+        }
+        function drawSide(){
+          var QD = [["오늘", 0], ["내일", 1], ["모레", 2]], sat = (6 - today.getDay() + 7) % 7 || 7; QD.push(["이번 토요일", sat]);
+          document.getElementById("sp-qd").innerHTML = QD.map(function(q){ var d = new Date(today.getTime() + q[1] * 864e5); return '<button type="button" data-q="' + q[1] + '"' + (dkey(d) === dkey(S.day) ? ' class="on"' : '') + '>' + q[0] + '</button>'; }).join("");
+          document.getElementById("sp-dtxt").textContent = (S.day.getMonth() + 1) + "월 " + S.day.getDate() + "일 (" + WK[S.day.getDay()] + ")";
+          box.querySelectorAll("#sp-tm [data-t]").forEach(function(b){ b.classList.toggle("on", b.dataset.t === S.time); });
+          document.getElementById("sp-tin").value = S.time;
+          box.querySelectorAll("#sp-mode input").forEach(function(r){ r.checked = r.value === S.mode; });
+        }
+        var prev = function(){ var pl = plan(), bad = pl[0].d < new Date();
           document.getElementById("sch-prev").innerHTML = bad ? '<span style="color:#b42318">지금보다 나중 시간을 골라 주세요.</span>' :
-            '<b>' + schTxt(pl[0].d) + '</b>에 올라갈 글' + pl.slice(0, 6).map(function(x){ return '<div>· ' + esc(x.p.title) + '</div>'; }).join("") + (pl.length > 6 ? '<div>… 외 ' + (pl.length - 6) + '개</div>' : ''); return !bad; };
-        document.getElementById("sch-at").oninput = prev; prev();
+            pl.slice(0, 12).map(function(x){ return '<div class="sp-row"><b>' + fmt(x.d) + '</b><span>' + esc(x.p.title) + '</span></div>'; }).join("") + (pl.length > 12 ? '<div>… 외 ' + (pl.length - 12) + '개</div>' : '');
+          return !bad; };
+        var redraw = function(){ drawCal(); drawSide(); prev(); };
+        box.onclick = function(e){
+          var t = e.target.closest("button"); if (!t || t.disabled) return;
+          if (t.dataset.mv) { S.view = new Date(S.view.getFullYear(), S.view.getMonth() + (+t.dataset.mv), 1); redraw(); }
+          else if (t.dataset.d) { var p = t.dataset.d.split("-"); S.day = new Date(+p[0], +p[1] - 1, +p[2]); redraw(); }
+          else if (t.dataset.q !== undefined) { S.day = new Date(today.getTime() + (+t.dataset.q) * 864e5); S.view = new Date(S.day.getFullYear(), S.day.getMonth(), 1); redraw(); }
+          else if (t.dataset.t) { S.time = t.dataset.t; redraw(); }
+        };
+        document.getElementById("sp-tin").onchange = function(){ if (this.value) { S.time = this.value; redraw(); } };
+        box.querySelectorAll("#sp-mode input").forEach(function(r){ r.onchange = function(){ S.mode = r.value; redraw(); }; });
+        var per = document.getElementById("sp-per"), gap = document.getElementById("sp-gap");
+        if (per) per.onchange = function(){ S.per = +per.value; S.mode = "perday"; redraw(); };
+        if (gap) gap.onchange = function(){ S.gap = +gap.value; S.mode = "gap"; redraw(); };
+        redraw();
         document.getElementById("sch-ok").onclick = function(){
           if (!prev()) return; var b = this; b.disabled = true;
           var items = plan().map(function(x){ var d = x.d; return { op_k: x.p.k, board: x.p.board, head: x.p.head || "", title: x.p.title, content: x.p.content,
-            at: d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":00" }; });
+            at: d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()) + " " + two(d.getHours()) + ":" + two(d.getMinutes()) + ":00" }; });
           JIDB.call("admin_sched_add", { items: items }).then(function(r){ pick.forEach(function(p){ setDraft(p.k, null); }); closeModal(); toast(r.added + "개 글을 예약했어요"); TAB = window.OP_TAB = "sched"; drawOpPosts(); }, function(e){ b.disabled = false; alert(e.message); });
         };
+      };
+      del.onclick = function(){
+        var ks = Object.keys(SEL).map(Number).map(function(i){ return L[i].k; }); if (!ks.length) return;
+        if (!confirm("고른 운영자 글 " + ks.length + "개를 삭제할까요?\n삭제한 글은 '삭제한 글'에서 언제든 되살릴 수 있어요.")) return;
+        ks.forEach(function(k){ setDraft(k, null); });
+        var cur0 = opDelKeys(); opDelSave(cur0.concat(ks.filter(function(k){ return cur0.indexOf(k) < 0; }))); toast(ks.length + "개 글을 삭제했어요"); drawOpPosts();
       };
       go.onclick = function(){
         var pick = Object.keys(SEL).map(Number).sort(function(a, b){ return a - b; }).map(function(i){ return cur(i); }).reverse();   // 목록 위쪽 글이 가장 최근 글로 보이게 거꾸로 올림
