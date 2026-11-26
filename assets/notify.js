@@ -182,6 +182,7 @@ var JINotify = (function () {
   function snooze(k, days) { ls(k, String(Date.now() + days * 864e5)); }
   function autoPrompt() {
     if (!cfg.onesignalAppId) return;
+    if (document.getElementById("ji-a2hs")) { setTimeout(autoPrompt, 4000); return; }   // 홈 화면 안내 팝업이 떠 있으면 닫힌 뒤에
     if (/\/(login|signup)\.html$/.test(location.pathname)) return;
     var u = (typeof currentUser === "function") ? currentUser() : null;
     if (!u || !u.id) return;

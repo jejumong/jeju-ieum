@@ -772,3 +772,11 @@ document.addEventListener("click", function (e) {
   if (confirm("글쓰기는 로그인 후 이용할 수 있어요.\n로그인 페이지로 이동할까요?"))
     location.href = "login.html?next=" + encodeURIComponent(a.getAttribute("href"));
 });
+
+/* 휴대폰 첫 방문 안내 팝업(홈 화면에 추가·알림) — 이 파일과 같은 폴더의 a2hs.js 를 불러옴 */
+(function () {
+  try {
+    var me = document.currentScript && document.currentScript.src; if (!me || /\/admin\//.test(location.pathname)) return;
+    var s = document.createElement("script"); s.src = me.replace(/common\.js(\?.*)?$/, "a2hs.js$1"); s.defer = true; document.head.appendChild(s);
+  } catch (e) {}
+})();
