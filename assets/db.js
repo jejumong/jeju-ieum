@@ -154,13 +154,13 @@ var JIDB = (function () {
   function sendSellerRequest(board, details, message) { return call("seller_request", { board: board, details: details, message: message || "" }); }
 
   /* ── 댓글 ── */
-  function toCmt(c) { return { id: c.id, author: c.author_nick, authorId: c.author, text: c.text, edited: c.edited, date: (c.created_at || "").slice(0, 10), db: true, likes: c.likes || 0, liked: !!c.liked }; }
+  function toCmt(c) { return { id: c.id, author: c.author_nick, authorId: c.author, text: c.text, edited: c.edited, date: (c.created_at || "").slice(0, 10), db: true, likes: c.likes || 0, liked: !!c.liked, parentId: c.parent_id || null, replyNick: c.reply_nick || "", deleted: !!c.deleted }; }
   function setCount(postId, n) { var m = JI.get("dbcounts", {}); m[postId] = n; JI.set("dbcounts", m); }
   function comments(postId) {
     if (!enabled) return Promise.resolve([]);
-    return call("comments", { post_id: postId }).then(function (l) { var r = l.map(toCmt); setCount(postId, r.length); return r; });
+    return call("comments", { post_id: postId }).then(function (l) { var r = l.map(toCmt); setCount(postId, r.filter(function (c) { return !c.deleted; }).length); return r; });
   }
-  function addComment(postId, text) { return call("comment_add", { post_id: postId, text: text }).then(toCmt); }
+  function addComment(postId, text, parentId) { return call("comment_add", parentId ? { post_id: postId, text: text, parent_id: parentId } : { post_id: postId, text: text }).then(toCmt); }
   function updateComment(id, text) { return call("comment_update", { id: id, text: text }).then(toCmt); }
   function deleteComment(id) { return call("comment_delete", { id: id }); }
   function myComments() { return me() ? call("my_comments").then(function (l) { return l.map(function (c) { var o = toCmt(c); o.postId = c.post_id; return o; }); }) : Promise.resolve([]); }

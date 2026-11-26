@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 18;
+const JI_SCHEMA = 19;
 
 /* ── 응답 ── */
 function cors() {
@@ -195,6 +195,9 @@ function migrate($pdo) {
       id BIGINT AUTO_INCREMENT PRIMARY KEY, op_k VARCHAR(60) NOT NULL DEFAULT '', board VARCHAR(30) NOT NULL, head VARCHAR(30) NOT NULL DEFAULT '',
       title VARCHAR(120) NOT NULL, content MEDIUMTEXT, at DATETIME NOT NULL, by_id VARCHAR(36) NOT NULL, status VARCHAR(10) NOT NULL DEFAULT 'wait',
       post_id VARCHAR(36) NULL, created_at DATETIME NOT NULL, INDEX (status, at))$T");
+  }
+  if ($v < 19) {   // 대댓글: 어느 댓글에 단 답글인지(parent_id = 맨 위 댓글), 누구에게 단 답글인지, 답글이 남은 채 지운 댓글 표시
+    try { $pdo->exec("ALTER TABLE ji_comments ADD COLUMN parent_id CHAR(36) NULL, ADD COLUMN reply_nick VARCHAR(40) NOT NULL DEFAULT '', ADD COLUMN deleted TINYINT NOT NULL DEFAULT 0, ADD INDEX (parent_id)"); } catch (Throwable $e) {}
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }

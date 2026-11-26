@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261126d">
+<link rel="stylesheet" href="assets/style.css?v=20261126e">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -72,6 +72,10 @@
 .cmt-form textarea:focus,.edit-box textarea:focus{border-color:var(--sea)}
 .cmt-form,.edit-box{align-items:flex-end}
 .cmt-item p{white-space:pre-wrap;overflow-wrap:anywhere}
+.cmt-rbtn{margin-top:6px;font-size:12.5px}
+.cmt-item div[style*="display:flex"]{flex-wrap:wrap;row-gap:4px}
+.cmt-rform{margin-top:8px}
+.cmt-gone p{color:var(--muted);font-style:italic;margin:0}
 .cmt-login{background:var(--sand);border:1px dashed var(--line);border-radius:10px;padding:16px;text-align:center;font-size:14px;color:var(--muted);margin-top:12px}
 .cmt-login a{color:var(--sea);font-weight:700}
 </style>
@@ -89,16 +93,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261126d"></script>
-<script src="assets/common.js?v=20261126d"></script>
-<script src="assets/db.js?v=20261126d"></script>
-<script src="assets/notify.js?v=20261126d"></script>
-<script src="assets/seed-trade.js?v=20261126d"></script>
-<script src="assets/seed-extra.js?v=20261126d"></script>
-<script src="assets/festivals-data.js?v=20261126d"></script>
-<script src="assets/seed-new.js?v=20261126d"></script>
-<script src="assets/seed-comments.js?v=20261126d"></script>
-<script src="assets/admin-data.js?v=20261126d"></script>
+<script src="assets/kmap.js?v=20261126e"></script>
+<script src="assets/common.js?v=20261126e"></script>
+<script src="assets/db.js?v=20261126e"></script>
+<script src="assets/notify.js?v=20261126e"></script>
+<script src="assets/seed-trade.js?v=20261126e"></script>
+<script src="assets/seed-extra.js?v=20261126e"></script>
+<script src="assets/festivals-data.js?v=20261126e"></script>
+<script src="assets/seed-new.js?v=20261126e"></script>
+<script src="assets/seed-comments.js?v=20261126e"></script>
+<script src="assets/admin-data.js?v=20261126e"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -470,12 +474,27 @@ function loadDbComments() {
   if (!(window.JIDB && JIDB.enabled)) return;
   JIDB.comments(id).then(function (l) { DB_CMTS = l; dbCmtLoaded = true; renderComments(); }, function () {});
 }
+/* 댓글 + 대댓글: 맨 위 댓글 아래에 답글을 모아 보여 줌 (답글의 답글도 같은 줄기, '@누구 님에게 답글') */
 function dbCmtHtml() {
+  var ids = {}; DB_CMTS.forEach(function (c) { ids[c.id] = 1; });
+  var kids = {}; DB_CMTS.forEach(function (c, i) { if (c.parentId && ids[c.parentId]) (kids[c.parentId] = kids[c.parentId] || []).push(i); });
+  var out = "";
+  DB_CMTS.forEach(function (c, i) {
+    if (c.parentId && ids[c.parentId]) return;
+    if (c.deleted && !(kids[c.id] || []).length) return;
+    out += dbCmtOne(c, i, false);
+    (kids[c.id] || []).forEach(function (j) { out += dbCmtOne(DB_CMTS[j], j, true); });
+  });
+  return out;
+}
+function dbCmtOne(c, i, reply) {
   var u = currentUser();
-  return DB_CMTS.map(function (c, i) {
-    var own = u && u.id && c.authorId === u.id;
-    var isAuthor = post && post.authorId && c.authorId === post.authorId;
-    return '<div class="cmt-item" id="dcmt-' + i + '"><div style="display:flex;align-items:center">' +
+  if (c.deleted) return '<div class="cmt-item cmt-gone" id="dcmt-' + i + '"><p>삭제된 댓글이에요.</p></div>';
+  var own = u && u.id && c.authorId === u.id;
+  var isAuthor = post && post.authorId && c.authorId === post.authorId;
+  var replyBtn = '<button type="button" class="mini-btn cmt-rbtn" onclick="openReply(' + i + ')">답글</button>';
+  var body = (function () {
+    return '<div style="display:flex;align-items:center">' +
       '<span class="who">' + esc(c.author) + (isAuthor ? ' <span class="own-tag">작성자</span>' : '') + (own ? '' : msgLink(c.authorId, c.author)) + '</span>' +
       '<span class="when">' + esc(c.date) + (c.edited ? ' (수정됨)' : '') + '</span>' +
       '<button type="button" class="cmt-like' + (c.liked ? ' on' : '') + '" onclick="likeDbCmt(' + i + ')" aria-pressed="' + !!c.liked + '" title="' + (c.liked ? '좋아요 취소' : '좋아요') + '">' + (c.liked ? '♥' : '♡') + (c.likes ? ' ' + c.likes : '') + '</button>' +
@@ -483,8 +502,30 @@ function dbCmtHtml() {
         '<button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')">삭제</button></div>'
         : '<div class="own-actions">' + (isMod() ? '<button class="mini-btn danger-btn" onclick="removeDbCmt(' + i + ')" title="관리자·스텝 권한">삭제</button>' : '') +
           '<button class="mini-btn rep-btn" onclick="reportIt(\'comment\', DB_CMTS[' + i + '].id)" title="문제가 있는 댓글을 운영진에게 알리기">신고</button></div>') +
-      '</div><p id="dcmt-text-' + i + '">' + esc(c.text) + '</p></div>';
-  }).join("");
+      '</div><p id="dcmt-text-' + i + '">' + esc(c.text) + '</p>' + replyBtn + '<div id="rbox-' + i + '"></div>';
+  })();
+  if (reply) return '<div class="cmt-item cmt-reply" id="dcmt-' + i + '"><span class="reply-arrow" aria-hidden="true">↳</span><div class="reply-body">' +
+    (c.replyNick ? '<div class="reply-to">@' + esc(c.replyNick) + ' 님에게 답글</div>' : '') + body + '</div></div>';
+  return '<div class="cmt-item" id="dcmt-' + i + '">' + body + '</div>';
+}
+/* 답글 쓰기 칸 열기 */
+function openReply(i) {
+  var c = DB_CMTS[i]; if (!c) return;
+  var u = currentUser();
+  if (!u || !u.id) { if (confirm("로그인하면 답글을 남길 수 있어요. 로그인할까요?")) location.href = "login.html?next=" + encodeURIComponent(location.pathname.split("/").pop() + location.search); return; }
+  if (typeof canWrite === "function" && !canWrite()) return;
+  document.querySelectorAll('[id^="rbox-"]').forEach(function (b) { b.innerHTML = ""; });
+  var box = document.getElementById("rbox-" + i); if (!box) return;
+  box.innerHTML = '<div class="cmt-form cmt-rform"><textarea rows="1" id="rtext-' + i + '" maxlength="300" placeholder="@' + esc(c.author) + ' 님에게 답글"></textarea>' +
+    '<button class="btn primary" onclick="sendReply(' + i + ')">등록</button><button class="btn ghost" onclick="this.closest(\'[id^=rbox-]\').innerHTML=\'\'">취소</button></div>';
+  var ta = document.getElementById("rtext-" + i); cmtBox(ta, function () { sendReply(i); }); ta.focus();
+}
+function sendReply(i) {
+  var c = DB_CMTS[i], ta = document.getElementById("rtext-" + i); if (!c || !ta) return;
+  var t = ta.value.trim(); if (!t) { alert("답글 내용을 입력해주세요."); return; }
+  ta.disabled = true;
+  JIDB.addComment(id, t, c.id).then(function (n) { DB_CMTS.push(n); renderComments(); },
+    function (e) { ta.disabled = false; alert("답글을 등록하지 못했어요: " + (e.message || e)); });
 }
 /* 신고: 이유를 골라 운영진에게 알림 (로그인 회원만, 같은 글은 한 번만) */
 function reportIt(kind, tid) {
@@ -526,7 +567,7 @@ function saveDbCmt(i) {
 }
 function removeDbCmt(i) {
   if (!confirm("이 댓글을 삭제할까요?")) return;
-  JIDB.deleteComment(DB_CMTS[i].id).then(function () { DB_CMTS.splice(i, 1); renderComments(); }, function (e) { alert(e.message || e); });
+  JIDB.deleteComment(DB_CMTS[i].id).then(function () { loadDbComments(); }, function (e) { alert(e.message || e); });
 }
 function renderComments() {
   if (!DB_CMTS) DB_CMTS = [];   // 글을 그리는 코드가 이 선언보다 먼저 실행될 때 대비
@@ -534,7 +575,7 @@ function renderComments() {
   var all = JI.get("comments", {});
   var list = all[id] || [];
   var seeds = seedCommentsOf(id);
-  document.getElementById("cmt-count").textContent = seeds.length + list.length + DB_CMTS.length;
+  document.getElementById("cmt-count").textContent = seeds.length + list.length + DB_CMTS.filter(function (c) { return !c.deleted; }).length;
   var seedHtml = seeds.map(function(c){
     var isAuthor = post && c.author === post.author;
     var isReply = c.reply !== undefined && seeds[c.reply];

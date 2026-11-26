@@ -32,8 +32,10 @@ function likes_map() {
   return $m ?: new stdClass();
 }
 function cmt_out($c) {
-  return ['id' => $c['id'], 'post_id' => $c['post_id'], 'author' => $c['author'], 'author_nick' => $c['author_nick'],
-    'text' => $c['text'], 'edited' => (bool)$c['edited'], 'created_at' => iso($c['created_at'])];
+  $del = !empty($c['deleted']);
+  return ['id' => $c['id'], 'post_id' => $c['post_id'], 'author' => $del ? '' : $c['author'], 'author_nick' => $del ? '' : $c['author_nick'],
+    'text' => $del ? '' : $c['text'], 'edited' => (bool)$c['edited'], 'created_at' => iso($c['created_at']),
+    'parent_id' => $c['parent_id'] ?? null, 'reply_nick' => $c['reply_nick'] ?? '', 'deleted' => $del];
 }
 function join_out($j) {
   $j['created_at'] = iso($j['created_at']); $j['decided_at'] = iso($j['decided_at'] ?? null); return $j;
@@ -275,7 +277,7 @@ case 'mail_check': {
 }
 case 'my_comments': {
   $u = me($R);
-  out(array_map('cmt_out', all("SELECT * FROM ji_comments WHERE author = ? ORDER BY created_at DESC LIMIT 300", [$u['id']])));
+  out(array_map('cmt_out', all("SELECT * FROM ji_comments WHERE author = ? AND deleted = 0 ORDER BY created_at DESC LIMIT 300", [$u['id']])));
 }
 
 /* ───────── 사진 올리기 ───────── */
@@ -412,7 +414,7 @@ case 'feed': {
   foreach ($rows as &$r) if (mb_strlen($r['content']) > 400) $r['content'] = mb_substr($r['content'], 0, 400) . '…';   // 목록용: 앞부분만 (전문은 글 화면에서)
   unset($r);
   $counts = [];
-  foreach (all("SELECT post_id, COUNT(*) n FROM ji_comments GROUP BY post_id") as $c) $counts[$c['post_id']] = (int)$c['n'];
+  foreach (all("SELECT post_id, COUNT(*) n FROM ji_comments WHERE deleted = 0 GROUP BY post_id") as $c) $counts[$c['post_id']] = (int)$c['n'];
   out(['posts' => array_map('post_out', $rows), 'counts' => $counts ?: new stdClass(),
        'site' => ['admin_ov' => setting('admin_ov', new stdClass()) ?: new stdClass(), 'notices' => setting('notices', [])],
        'likes' => likes_map(), 'my_likes' => ($fu = me($R, false)) ? array_column(all("SELECT post_id FROM ji_likes WHERE user_id = ? AND active = 1", [$fu['id']]), 'post_id') : []]);
@@ -436,9 +438,19 @@ case 'comment_add': {
   if ($pid === '' || $text === '') fail('댓글 내용을 입력해 주세요.');
   $recent = one("SELECT COUNT(*) n FROM ji_comments WHERE author = ? AND created_at > (NOW() - INTERVAL 1 MINUTE)", [$u['id']])['n'];
   if ($recent >= 6) fail('댓글을 너무 빨리 달고 있어요. 잠시 후 다시 해 주세요.', 429);
-  $id = uuid(); q("INSERT INTO ji_comments (id, post_id, author, author_nick, text, created_at) VALUES (?,?,?,?,?,?)", [$id, $pid, $u['id'], $u['nick'], $text, now()]);
+  // 대댓글: 답글의 답글도 맨 위 댓글 아래로 모음 (한 단계), 누구에게 단 답글인지는 reply_nick 으로
+  $top = null; $rn = ''; $to = null;
+  if (!empty($R['parent_id'])) {
+    $pc = one("SELECT id, post_id, parent_id, author, author_nick, deleted FROM ji_comments WHERE id = ?", [(string)$R['parent_id']]);
+    if (!$pc || $pc['post_id'] !== $pid) fail('답글을 달 댓글을 찾을 수 없어요', 404);
+    if (!empty($pc['deleted'])) fail('삭제된 댓글에는 답글을 달 수 없어요');
+    $top = $pc['parent_id'] ?: $pc['id']; $rn = $pc['author_nick']; $to = $pc['author'];
+  }
+  $id = uuid(); q("INSERT INTO ji_comments (id, post_id, author, author_nick, text, created_at, parent_id, reply_nick) VALUES (?,?,?,?,?,?,?,?)", [$id, $pid, $u['id'], $u['nick'], $text, now(), $top, $rn]);
   $p = is_uuid($pid) ? one("SELECT author, title FROM ji_posts WHERE id = ?", [$pid]) : null;
-  if ($p && $p['author'] !== $u['id'])
+  if ($to && $to !== $u['id'])
+    notify($to, 'comment', '새 답글', $u['nick'] . '님이 내 댓글에 답글: ' . mb_substr($text, 0, 60), 'view.html?id=' . $pid . '#cmt-list', '제주이음 · 내 댓글에 새 답글', $u['nick'] . '님: ' . mb_substr($text, 0, 60));
+  if ($p && $p['author'] !== $u['id'] && $p['author'] !== $to)
     notify($p['author'], 'comment', '새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60), 'view.html?id=' . $pid . '#cmt-list', '제주이음 · 「' . mb_substr($p['title'], 0, 30) . '」 새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60));
   alert_admins('comment', '💬 새 댓글', $u['nick'] . '님: ' . mb_substr($text, 0, 60), 'view.html?id=' . $pid . '#cmt-list', $u['id']);
   out(cmt_out(one("SELECT * FROM ji_comments WHERE id = ?", [$id])));
@@ -446,14 +458,21 @@ case 'comment_add': {
 case 'comment_update': {
   $u = active($R); $text = str($R['text'] ?? '', 1000); if ($text === '') fail('댓글 내용을 입력해 주세요.');
   $c = one("SELECT * FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
-  if ($c['author'] !== $u['id']) fail('내가 쓴 댓글만 고칠 수 있어요', 403);
+  if ($c['author'] !== $u['id'] || !empty($c['deleted'])) fail('내가 쓴 댓글만 고칠 수 있어요', 403);
   q("UPDATE ji_comments SET text = ?, edited = 1 WHERE id = ?", [$text, $c['id']]);
   out(cmt_out(one("SELECT * FROM ji_comments WHERE id = ?", [$c['id']])));
 }
 case 'comment_delete': {
-  $u = me($R); $c = one("SELECT author FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
-  if ($c['author'] !== $u['id'] && !is_mod($u)) fail('내가 쓴 댓글만 지울 수 있어요', 403);
-  q("DELETE FROM ji_comments WHERE id = ?", [$R['id']]); q("DELETE FROM ji_likes WHERE post_id = ?", ['c:' . $R['id']]); out(true);
+  $u = me($R); $c = one("SELECT id, author, parent_id, deleted FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
+  if (!empty($c['deleted']) || ($c['author'] !== $u['id'] && !is_mod($u))) fail('내가 쓴 댓글만 지울 수 있어요', 403);
+  q("DELETE FROM ji_likes WHERE post_id = ?", ['c:' . $c['id']]);
+  // 답글이 달린 댓글은 '삭제된 댓글'로만 남겨 답글 흐름을 지킴
+  if (!$c['parent_id'] && one("SELECT id FROM ji_comments WHERE parent_id = ? LIMIT 1", [$c['id']])) { q("UPDATE ji_comments SET deleted = 1, text = '' WHERE id = ?", [$c['id']]); out(['soft' => true]); }
+  q("DELETE FROM ji_comments WHERE id = ?", [$c['id']]);
+  // 마지막 답글을 지우면, 이미 삭제 표시만 남은 맨 위 댓글도 정리
+  if ($c['parent_id'] && one("SELECT id FROM ji_comments WHERE id = ? AND deleted = 1", [$c['parent_id']]) && !one("SELECT id FROM ji_comments WHERE parent_id = ? LIMIT 1", [$c['parent_id']]))
+    q("DELETE FROM ji_comments WHERE id = ?", [$c['parent_id']]);
+  out(true);
 }
 
 /* ───────── 동호회 가입 신청 ───────── */
