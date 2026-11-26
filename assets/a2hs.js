@@ -1,6 +1,6 @@
 /* 제주이음 — 휴대폰 첫 방문 안내 팝업: 홈 화면에 추가하는 방법 + 알림 받기
    · 휴대폰에서만, 홈 화면 앱으로 연 경우·관리자/로그인/글쓰기 화면에서는 띄우지 않음
-   · '오늘은 그만 보기'(하루) / '다시 보지 않기'(영구) — 이 기기 브라우저에만 기억 */
+   · '확인했어요'(1시간 뒤 다시) / '다시 보지 않기'(영구) — 이 기기 브라우저에만 기억 */
 (function () {
   var ME = document.currentScript && document.currentScript.src;
   function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
@@ -60,7 +60,7 @@
       '<h3>알림도 받을 수 있어요</h3><div class="a2-nt">알림을 켜 두면 이런 소식을 휴대폰으로 받아요.<ul><li>관심 있는 지원 프로그램의 모집 시작 (한달살기·이주 화면의 🔔 새 공고 알림)</li><li>로그인하면 내 글에 달린 댓글·좋아요와 새 쪽지</li></ul>' +
         (ios ? '<small>아이폰은 홈 화면에 추가한 아이콘으로 열어야 알림을 받을 수 있어요. (iOS 16.4 이상)</small>' : '<small>알림은 언제든 끌 수 있고, 비용은 들지 않아요.</small>') + '</div>' +
       '<div class="a2-bt"><button type="button" class="a2-in" id="a2hs-install" hidden>지금 홈 화면에 추가하기</button><button type="button" class="a2-ok">확인했어요</button>' +
-        '<div class="a2-sub"><button type="button" data-k="day">오늘은 그만 보기</button><button type="button" data-k="never">다시 보지 않기</button></div></div></div>';
+        '<div class="a2-sub"><button type="button" data-k="never">다시 보지 않기</button></div></div></div>';
     document.body.appendChild(w);
     if (deferred) document.getElementById("a2hs-install").hidden = false;
     w.querySelectorAll(".a2-tabs button").forEach(function (b) {
@@ -71,13 +71,13 @@
     });
     var close = function (k) {
       if (k === "never") ls("ji_a2hs_never", "1");
-      else ls("ji_a2hs_until", String(Date.now() + (k === "day" ? 864e5 : 3 * 864e5)));   // '확인했어요'는 사흘 뒤 다시
+      else ls("ji_a2hs_until", String(Date.now() + 3600e3));   // '확인했어요'(바깥 누름 포함)는 1시간 뒤 다시
       if (ios) ls("ji_push_ios", String(Date.now() + 7 * 864e5));   // 아이폰: 같은 내용의 아래쪽 알림 띠는 일주일 쉼
       w.remove();
     };
     w.querySelector(".a2-ok").onclick = function () { close("ok"); };
     w.querySelectorAll(".a2-sub button").forEach(function (b) { b.onclick = function () { close(b.dataset.k); }; });
-    w.addEventListener("click", function (e) { if (e.target === w) close("day"); });
+    w.addEventListener("click", function (e) { if (e.target === w) close("ok"); });
     document.getElementById("a2hs-install").onclick = function () {
       if (!deferred) return; deferred.prompt();
       deferred.userChoice.then(function (r) { deferred = null; if (r && r.outcome === "accepted") { ls("ji_a2hs_never", "1"); w.remove(); } });
