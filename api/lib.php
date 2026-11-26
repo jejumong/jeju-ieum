@@ -267,6 +267,13 @@ function active($req) {
   return $u;
 }
 function is_mod($u) { return in_array($u['role'] ?? '', ['admin', 'staff'], true); }   // 글·댓글 관리 가능
+/* 이 글·댓글을 고치거나 지울 수 있나: 내 것, 또는 관리자, 또는 스텝(단 관리자 계정이 쓴 것은 못 건드림) */
+function can_manage($u, $authorId) {
+  if (($u['id'] ?? '') === $authorId || ($u['role'] ?? '') === 'admin') return true;
+  if (($u['role'] ?? '') !== 'staff') return false;
+  $a = $authorId ? one("SELECT role FROM ji_users WHERE id = ?", [$authorId]) : null;
+  return !($a && $a['role'] === 'admin');
+}
 /* 관리자 페이지: 스텝도 들어올 수 있음. $strict 이면 관리자만 (역할 바꾸기 등) */
 function admin($req, $strict = false) {
   $u = me($req);

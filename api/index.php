@@ -35,7 +35,7 @@ function cmt_out($c) {
   $del = !empty($c['deleted']);
   return ['id' => $c['id'], 'post_id' => $c['post_id'], 'author' => $del ? '' : $c['author'], 'author_nick' => $del ? '' : $c['author_nick'],
     'text' => $del ? '' : $c['text'], 'edited' => (bool)$c['edited'], 'created_at' => iso($c['created_at']),
-    'parent_id' => $c['parent_id'] ?? null, 'reply_nick' => $c['reply_nick'] ?? '', 'deleted' => $del];
+    'parent_id' => $c['parent_id'] ?? null, 'reply_nick' => $c['reply_nick'] ?? '', 'deleted' => $del, 'author_role' => $del ? '' : ($c['author_role'] ?? '')];
 }
 /* 관리자 콘솔 '내 글 반응': 관리자 계정으로 쓴 글에 회원이 남긴 댓글·답글과 좋아요, 관리자 댓글에 눌린 좋아요 (최신순) */
 function react_items($me) {
@@ -400,7 +400,7 @@ case 'post_create': {
 case 'post_update': {
   $u = active($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT * FROM ji_posts WHERE id = ?", [$id]) : null;
   if (!$r) fail('글을 찾을 수 없어요', 404);
-  if ($r['author'] !== $u['id'] && !is_mod($u)) fail('내가 쓴 글만 고칠 수 있어요', 403);
+  if (!can_manage($u, $r['author'])) fail(is_mod($u) ? '관리자가 쓴 글은 스텝이 고칠 수 없어요' : '내가 쓴 글만 고칠 수 있어요', 403);
   $title = str($R['title'] ?? $r['title'], 120); if ($title === '') fail('제목을 입력해 주세요.');
   if (array_key_exists('extra', $R)) {
     $x = is_array($R['extra']) ? $R['extra'] : [];
@@ -423,7 +423,7 @@ case 'post_update': {
 case 'post_delete': {
   $u = me($R); $id = $R['id'] ?? ''; $r = is_uuid($id) ? one("SELECT author FROM ji_posts WHERE id = ?", [$id]) : null;
   if (!$r) fail('글을 찾을 수 없어요', 404);
-  if ($r['author'] !== $u['id'] && !is_mod($u)) fail('내가 쓴 글만 지울 수 있어요', 403);
+  if (!can_manage($u, $r['author'])) fail(is_mod($u) ? '관리자가 쓴 글은 스텝이 지울 수 없어요' : '내가 쓴 글만 지울 수 있어요', 403);
   q("DELETE FROM ji_posts WHERE id = ?", [$id]);
   q("DELETE FROM ji_club_joins WHERE club_id = ?", [$id]);
   q("DELETE FROM ji_club_notices WHERE club_id = ?", [$id]);
@@ -450,7 +450,7 @@ case 'feed': {
 /* ───────── 댓글 (예시 글에도 달 수 있게 post_id 는 아무 글 id) ───────── */
 case 'comments': {
   $pid = str($R['post_id'] ?? '', 40); if ($pid === '') out([]);
-  $rows = all("SELECT * FROM ji_comments WHERE post_id = ? ORDER BY created_at, id LIMIT 500", [$pid]);
+  $rows = all("SELECT c.*, u.role author_role FROM ji_comments c LEFT JOIN ji_users u ON u.id = c.author WHERE c.post_id = ? ORDER BY c.created_at, c.id LIMIT 500", [$pid]);
   // 댓글 좋아요 수와 내가 눌렀는지 (좋아요 키는 'c:댓글id')
   $cnt = []; $mine = []; $me = me($R, false);
   if ($rows) {
@@ -491,7 +491,8 @@ case 'comment_update': {
 }
 case 'comment_delete': {
   $u = me($R); $c = one("SELECT id, author, parent_id, deleted FROM ji_comments WHERE id = ?", [$R['id'] ?? '']); if (!$c) fail('댓글을 찾을 수 없어요', 404);
-  if (!empty($c['deleted']) || ($c['author'] !== $u['id'] && !is_mod($u))) fail('내가 쓴 댓글만 지울 수 있어요', 403);
+  if (!empty($c['deleted'])) fail('이미 삭제된 댓글이에요', 403);
+  if (!can_manage($u, $c['author'])) fail(is_mod($u) ? '관리자가 쓴 댓글은 스텝이 지울 수 없어요' : '내가 쓴 댓글만 지울 수 있어요', 403);
   q("DELETE FROM ji_likes WHERE post_id = ?", ['c:' . $c['id']]);
   // 답글이 달린 댓글은 '삭제된 댓글'로만 남겨 답글 흐름을 지킴
   if (!$c['parent_id'] && one("SELECT id FROM ji_comments WHERE parent_id = ? LIMIT 1", [$c['id']])) { q("UPDATE ji_comments SET deleted = 1, text = '' WHERE id = ?", [$c['id']]); out(['soft' => true]); }

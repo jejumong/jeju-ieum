@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126i">
+<link rel="stylesheet" href="../assets/style.css?v=20261126j">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -507,18 +507,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126i"></script>
-<script src="../assets/db.js?v=20261126i"></script>
-<script src="../assets/notify.js?v=20261126i"></script>
-<script src="../assets/seed-trade.js?v=20261126i"></script>
-<script src="../assets/seed-extra.js?v=20261126i"></script>
-<script src="../assets/festivals-data.js?v=20261126i"></script>
-<script src="../assets/seed-new.js?v=20261126i"></script>
-<script src="../assets/seed-comments.js?v=20261126i"></script>
-<script src="../assets/photos.js?v=20261126i"></script>
-<script src="../assets/admin-data.js?v=20261126i"></script>
-<script src="../assets/kmap.js?v=20261126i"></script>
-<script src="../assets/op-posts.js?v=20261126i"></script>
+<script src="../assets/common.js?v=20261126j"></script>
+<script src="../assets/db.js?v=20261126j"></script>
+<script src="../assets/notify.js?v=20261126j"></script>
+<script src="../assets/seed-trade.js?v=20261126j"></script>
+<script src="../assets/seed-extra.js?v=20261126j"></script>
+<script src="../assets/festivals-data.js?v=20261126j"></script>
+<script src="../assets/seed-new.js?v=20261126j"></script>
+<script src="../assets/seed-comments.js?v=20261126j"></script>
+<script src="../assets/photos.js?v=20261126j"></script>
+<script src="../assets/admin-data.js?v=20261126j"></script>
+<script src="../assets/kmap.js?v=20261126j"></script>
+<script src="../assets/op-posts.js?v=20261126j"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -629,6 +629,8 @@ function boot(){
 }
 /* 스텝(관리자가 아닌 운영진)에게 안 보이는 메뉴 */
 var STAFF_HIDE = ["premium", "sellers", "opposts", "account", "reacts"];
+/* 스텝은 관리자 계정이 쓴 글(회원 글 중 역할이 admin)과 사이트 기본 글을 고치거나 지울 수 없음 */
+function staffLocked(p){ if (isBoss() || !p) return false; return p.db ? p.authorRole === "admin" : !(p.id && p.id.charAt(0) === "u"); }
 function isBoss(){ var u = window.JIDB && JIDB.me && JIDB.me(); return !!(u && u.role === "admin"); }
 function menuOk(m){ return isBoss() || STAFF_HIDE.indexOf(m[0]) < 0; }
 function goHome(){ try { history.replaceState(null, "", "#dash"); } catch (e) { location.hash = "dash"; } location.reload(); return false; }
@@ -776,7 +778,7 @@ function drawPostTable(){
   var boss = isBoss();
   var rows = list.slice((postPage-1)*PER, postPage*PER).map(function(p){
     var canPm = PREMIUM_BOARDS.indexOf(p.board) > -1;
-    return '<tr>' + bkBox("posts", p.id) +
+    return '<tr>' + bkBox("posts", p.id, staffLocked(p)) +
       '<td><span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></td>' +
       '<td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank" title="새 탭에서 보기">' + esc(p.title) + '</a>' +
         '<small>' + esc(p.author) + ' · 댓글 ' + cmtCount(p) + (p.hidden ? ' · <b style="color:#b4372d">🔒 비공개(판매 기간 끝남)</b>' : '') + '</small></td>' +
@@ -786,8 +788,9 @@ function drawPostTable(){
       : '<td class="num-ro">' + viewsOf(p).toLocaleString() + '</td><td class="num-ro">' + likesOf(p).toLocaleString() + '</td>') +
       (boss ? '<td><label class="sw' + (canPm?'':' na') + '" title="' + (canPm?'프리미엄 상단 노출':'커뮤니티 게시판은 프리미엄이 없습니다') + '"><input type="checkbox" data-pm="' + p.id + '"' + (isPremium(p)?' checked':'') + '><i></i></label></td>'
       : '<td class="num-ro">' + (isPremium(p) ? '<span class="bd">PREMIUM</span>' : '-') + '</td>') +
-      '<td><div class="acts"><button class="mb" onclick="openEdit(\'' + p.id + '\')">수정</button>' +
-        '<button class="mb del" onclick="askDelete(\'' + p.id + '\')">삭제</button></div></td></tr>';
+      (staffLocked(p) ? '<td><span class="bd" title="관리자가 쓴 글은 스텝이 고치거나 지울 수 없어요">관리자 글</span></td></tr>'
+      : '<td><div class="acts"><button class="mb" onclick="openEdit(\'' + p.id + '\')">수정</button>' +
+        '<button class="mb del" onclick="askDelete(\'' + p.id + '\')">삭제</button></div></td></tr>');
   }).join("");
   document.getElementById("f-total").textContent = "총 " + list.length.toLocaleString() + "건";
   document.getElementById("post-table").innerHTML = list.length
@@ -842,6 +845,7 @@ var MOVE_BOARDS = [["커뮤니티", ["자유게시판", "질문하기", "최신�
   ["생활·장터", ["중고사고팔기", "구인구직", "부동산", "제주상점", "특가공구", "동호회", "축제정보"]]];
 function openEdit(id){
   var p = findAny(id); if (!p) return;
+  if (staffLocked(p)) { alert("관리자가 쓴 글은 스텝이 고칠 수 없어요."); return; }
   var trade = TRADE_BOARDS.indexOf(p.board) > -1;
   showModal('<h3>글 수정 <span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></h3>' +
     (p.db ? '<div class="fld"><label>게시판 (바꾸면 그 게시판으로 옮겨져요)</label><select id="e-board">' + MOVE_BOARDS.map(function(g){ return '<optgroup label="' + g[0] + '">' + g[1].map(function(x){ return '<option' + (x === p.board ? ' selected' : '') + '>' + x + '</option>'; }).join("") + '</optgroup>'; }).join("") + '</select></div>' : '') +
@@ -865,6 +869,7 @@ function saveEdit(id){
 }
 function askDelete(id){
   var p = findAny(id); if (!p) return;
+  if (staffLocked(p)) { alert("관리자가 쓴 글은 스텝이 지울 수 없어요."); return; }
   showModal('<h3>글을 삭제할까요?</h3><p style="margin:0 0 14px;color:var(--ink-2);line-height:1.6"><b>' + esc(p.title) + '</b><br>' +
     (isUserPost(p) ? '회원이 쓴 글은 댓글과 함께 완전히 지워집니다.' : '기본 글은 사이트에서 숨겨지며, ‘삭제된 글’에서 되살릴 수 있습니다.') + '</p>' +
     '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb del" onclick="doDelete(\'' + id + '\')">삭제</button></div>');
