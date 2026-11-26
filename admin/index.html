@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126k">
+<link rel="stylesheet" href="../assets/style.css?v=20261126l">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -407,6 +407,27 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .dash-tf .go{margin-left:auto;font-weight:800;color:var(--sea-700)}
 @media (max-width:900px){ .tf-2{grid-template-columns:1fr} .tf-act{grid-template-columns:repeat(4,1fr)} .tf-mem{grid-template-columns:repeat(2,1fr)} .tf-row .bar{display:none} }
 .tm-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:26px 0 12px}
+.tm-sec{margin-top:34px;padding:20px 20px 4px;border-radius:22px;background:linear-gradient(180deg,#eaf3ff,#f4f8fc 220px);border:1.5px solid #cfe1f7}
+.tm-sec .tm-head{margin:0 0 16px;justify-content:space-between}
+.tm-title{display:flex;align-items:center;gap:12px}.tm-ico{width:48px;height:48px;border-radius:14px;background:#1e6fd9;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 16px rgba(30,111,217,.3)}
+.tm-sec .tm-title h2{font-size:23px;font-weight:900;color:#0e2a4f;letter-spacing:-.03em}.tm-title p{margin:2px 0 0;font-size:13.5px;color:#4a6585}
+.tm-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+.sr-panel h2{font-size:18px}
+.sr-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 18px}.sr-kpi>div{background:#f2f7fd;border-radius:14px;padding:12px 14px}
+.sr-kpi b{display:block;font-size:26px;font-weight:900;color:#0e2a4f;letter-spacing:-.02em}.sr-kpi b small{font-size:14px;font-weight:700;margin-left:2px}.sr-kpi span{font-size:12.5px;color:#5b6b80}
+.sr-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:22px}.sr-col h3,.sr-kwh{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;margin:0 0 10px;color:#0e2440}
+.sr-no{width:22px;height:22px;border-radius:50%;background:#0e2a4f;color:#fff;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.sr-eng{display:grid;grid-template-columns:12px 64px 1fr auto;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #eef2f6}.sr-dot{width:12px;height:12px;border-radius:4px}
+.sr-nm{font-weight:800;font-size:14.5px}.sr-bar{display:block;height:10px;border-radius:6px;background:#eef2f6;overflow:hidden}.sr-bar>i{display:block;height:100%;border-radius:6px;background:#1e6fd9}
+.sr-n{font-size:13px;color:#5b6b80;white-space:nowrap}.sr-n b{font-size:16px;color:#0e2440}.sr-n small{margin-left:4px;color:#8a97a8}
+.sr-land{list-style:none;margin:0;padding:0}.sr-land li{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #eef2f6}
+.sr-land .no{width:24px;height:24px;border-radius:8px;background:#eef2f6;color:#4a5a70;font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center}.sr-land .no.top{background:#1e6fd9;color:#fff}
+.sr-land .nm{min-width:0}.sr-land .nm a{display:block;font-weight:800;color:#0e2440;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sr-land .nm small{display:block;color:#8a97a8;font-size:12px}
+.sr-land .nm .sr-bar{margin-top:5px;height:6px}.sr-land .n{font-size:13px;color:#5b6b80;white-space:nowrap}.sr-land .n b{font-size:16px;color:#0e2440}
+.sr-kwh{margin-top:20px}
+@media (max-width:760px){ .sr-grid{grid-template-columns:1fr} .sr-kpi b{font-size:21px} .tm-sec{padding:14px 12px 2px;margin-left:-4px;margin-right:-4px} }
+.hr-tip{position:absolute;z-index:5;pointer-events:none;background:#0f172a;color:#fff;border-radius:10px;padding:7px 11px;font-size:12.5px;line-height:1.45;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.hr-tip b{display:block;font-size:14px}.hr-tip span{display:block}.hr-tip em{font-style:normal;font-weight:800;color:#7cc4ff}.hr-tip small{display:block;color:#94a3b8;font-size:11.5px}
 .tm-head h2{font-size:19px;font-weight:800;margin:0}
 .tm-head .tf-seg{margin:0}
 .tm-range{font-size:13px;color:var(--ink-4);font-weight:600}
@@ -507,18 +528,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126k"></script>
-<script src="../assets/db.js?v=20261126k"></script>
-<script src="../assets/notify.js?v=20261126k"></script>
-<script src="../assets/seed-trade.js?v=20261126k"></script>
-<script src="../assets/seed-extra.js?v=20261126k"></script>
-<script src="../assets/festivals-data.js?v=20261126k"></script>
-<script src="../assets/seed-new.js?v=20261126k"></script>
-<script src="../assets/seed-comments.js?v=20261126k"></script>
-<script src="../assets/photos.js?v=20261126k"></script>
-<script src="../assets/admin-data.js?v=20261126k"></script>
-<script src="../assets/kmap.js?v=20261126k"></script>
-<script src="../assets/op-posts.js?v=20261126k"></script>
+<script src="../assets/common.js?v=20261126l"></script>
+<script src="../assets/db.js?v=20261126l"></script>
+<script src="../assets/notify.js?v=20261126l"></script>
+<script src="../assets/seed-trade.js?v=20261126l"></script>
+<script src="../assets/seed-extra.js?v=20261126l"></script>
+<script src="../assets/festivals-data.js?v=20261126l"></script>
+<script src="../assets/seed-new.js?v=20261126l"></script>
+<script src="../assets/seed-comments.js?v=20261126l"></script>
+<script src="../assets/photos.js?v=20261126l"></script>
+<script src="../assets/admin-data.js?v=20261126l"></script>
+<script src="../assets/kmap.js?v=20261126l"></script>
+<script src="../assets/op-posts.js?v=20261126l"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1843,8 +1864,9 @@ if (SRV) {
     }
     tmLoad();
   };
-  function tmPanels(){
-    var m = TM; if (!m) return "";
+  function tmPanels(daysBox){
+    var d30 = '<div class="panel"><h2>최근 30일 방문자 <small style="font-weight:600;color:var(--ink-4)">막대에 마우스를 올리면 그날 숫자가 보여요</small></h2>' + (daysBox || "") + '</div>';
+    var m = TM; if (!m) return '<section class="tm-sec"><div class="tm-head"><div class="tm-title"><span class="tm-ico">📊</span><div><h2>자세히 보기</h2></div></div></div>' + d30 + '</section>';
     var today = ymd(new Date()), mx = ' max="' + today + '"';
     var segP = '<span class="tm-date"><button class="tm-nav" onclick="tmSet(\'shift\',-1)" aria-label="이전 기간">◀</button>' +
       '<input type="date" value="' + m.from + '"' + mx + ' onchange="tmSet(\'from\',this.value)" aria-label="시작 날짜"><span>~</span>' +
@@ -1892,42 +1914,38 @@ if (SRV) {
       ((m.site_kws || []).length ? tfList(m.site_kws, "n", function(x){ return esc(x.k) + (x.res ? ' <small>결과 ' + x.res + '건</small>' : ' <small class="zero">결과 없음</small>'); }, "명")
         : '<div class="empty" style="padding:14px">이 기간에 사이트 안에서 검색한 기록이 없어요.</div>') +
       ((m.site_zero || []).length ? '<h3 class="tm-h3">찾았는데 결과가 없던 말 <small style="font-weight:600;color:var(--ink-4)">— 새 글 주제 후보</small></h3>' + tfList(m.site_zero, "n", function(x){ return esc(x.k); }, "명") : '') + '</div>';
-    var engBox = '<div class="panel"><h2>페이지별 머문 시간·이탈 <small style="font-weight:600;color:var(--ink-4)">평균 머문 시간 ' + fmtDur(m.avg_dur) + ' · 전체 이탈률 ' + (m.bounce === null || m.bounce === undefined ? "-" : m.bounce + "%") + '</small></h2>' +
-      ((m.eng || []).length ? (function(){
-        var maxD = Math.max.apply(null, m.eng.map(function(x){ return x.dur || 0; })) || 1;
-        var nm = function(x){ var t = (x.title || "").trim(), pth = (x.path || "").replace(/^\//, "").replace(/\.html/, "") || "홈"; return '<b>' + esc(t || pth) + '</b><small>' + esc(pth) + '</small>'; };
-        var head = '<div class="eng-head"><span class="eng-no"></span><span class="eng-nm">페이지</span><span class="eng-v">조회</span><span class="eng-v w">머문 시간</span><span class="eng-v">들어옴</span><span class="eng-v">이탈</span></div>';
-        var rows = m.eng.map(function(x, i){
-          return '<div class="eng-row' + (i >= 10 ? ' m-hide' : '') + (i >= 12 ? ' pc-hide' : '') + '"><span class="eng-no">' + (i + 1) + '</span><span class="eng-nm">' + nm(x) +
-            '<i class="eng-bar"><i style="width:' + Math.round((x.dur || 0) / maxD * 100) + '%"></i></i></span>' +
-            '<span class="eng-v"><em>조회</em>' + tfNum(x.pv) + '</span>' +
-            '<span class="eng-v w"><em>머문 시간</em>' + fmtDur(x.dur) + '</span>' +
-            '<span class="eng-v" title="이 페이지로 처음 들어온 방문"><em>들어옴</em>' + tfNum(x.land) + '</span>' +
-            '<span class="eng-v"><em>이탈</em>' + (x.bounce === null ? "-" : '<span class="' + (x.bounce >= 70 ? "hi" : "") + '">' + x.bounce + '%</span>') + '</span></div>';
-        });
-        // PC: 왼쪽 1~6위, 오른쪽 7~12위 (각 칸 위에 머리글 한 줄)
-        return '<div class="eng-list">' + head + rows.slice(0, 6).join("") + (rows.length > 6 ? head.replace('class="eng-head"', 'class="eng-head h2"') : '') + rows.slice(6).join("") + '</div>';
-      })() : '<div class="empty">이 기간에는 기록이 없어요.</div>') +
-      '<p class="sub" style="margin:10px 0 0">머문 시간은 화면을 보고 있던 시간만 세요 (오늘부터 기록). 이탈률은 그 페이지로 들어와 다른 페이지를 하나도 보지 않고 나간 비율이에요. 하루 한 사람의 방문을 한 번으로 셉니다.</p></div>';
-    return '<div class="tm-head"><h2>자세히 보기</h2>' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div>' +
-      cmpBox +
+    /* 검색 유입: 검색 사이트 → 처음 들어온 페이지 → 검색어 순서로 한눈에 */
+    var SEC = { "네이버": "#03c75a", "구글": "#4285f4", "다음": "#f5b400", "빙": "#00809d", "줌": "#3d7bf7", "ChatGPT": "#10a37f" };
+    var sRows = m.search || [], sTot = sRows.reduce(function(a, x){ return a + (x.n || 0); }, 0), sMax = Math.max.apply(null, sRows.map(function(x){ return x.n; }).concat([1]));
+    var lRows = m.landing || [], lMax = Math.max.apply(null, lRows.map(function(x){ return x.n; }).concat([1]));
+    var srBox = '<div class="panel sr-panel"><h2>🔍 검색으로 들어온 방문자</h2>' +
+      '<div class="sr-kpi"><div><b>' + tfNum(sTot) + '<small>명</small></b><span>검색으로 온 사람</span></div><div><b>' + pct(sTot, m.uv) + '<small>%</small></b><span>전체 방문자 ' + tfNum(m.uv) + '명 중</span></div><div><b>' + tfNum(lRows.length) + '<small>곳</small></b><span>검색으로 처음 들어온 페이지</span></div></div>' +
+      '<div class="sr-grid"><div class="sr-col"><h3><span class="sr-no">1</span>어느 검색 사이트에서 왔나</h3>' +
+        (sRows.length ? sRows.map(function(x){ var c = SEC[x.k] || "#94a3b8";
+          return '<div class="sr-eng"><span class="sr-dot" style="background:' + c + '"></span><span class="sr-nm">' + esc(x.k) + '</span><span class="sr-bar"><i style="width:' + Math.round(x.n / sMax * 100) + '%;background:' + c + '"></i></span><span class="sr-n"><b>' + tfNum(x.n) + '</b>명 <small>' + pct(x.n, sTot) + '%</small></span></div>'; }).join("")
+          : '<div class="empty" style="padding:14px">이 기간에는 검색으로 들어온 방문자가 없어요.</div>') + '</div>' +
+      '<div class="sr-col"><h3><span class="sr-no">2</span>검색으로 처음 들어온 페이지</h3>' +
+        (lRows.length ? '<ol class="sr-land">' + lRows.slice(0, 10).map(function(x, i){
+          var t = (x.title || "").trim(), pth = (x.path || "").replace(/^\//, "");
+          return '<li><span class="no' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</span><span class="nm"><a href="' + SITE + pth + '" target="_blank">' + esc(t || pth || "첫 화면") + '</a><small>' + esc(pth.replace(/\.html/, "") || "홈") + '</small><i class="sr-bar"><i style="width:' + Math.round(x.n / lMax * 100) + '%"></i></i></span><span class="n"><b>' + tfNum(x.n) + '</b>명</span></li>'; }).join("") + '</ol>'
+          : '<div class="empty" style="padding:14px">아직 기록이 없어요.</div>') + '</div></div>' +
+      '<h3 class="tm-h3 sr-kwh"><span class="sr-no">3</span>검색어</h3>' + (m.kws.length ? tfList(m.kws, "n", function(x){ return esc(x.k) + ' <small>' + esc(x.ref) + '</small>'; }, "명") :
+        '<div class="empty" style="padding:14px">아직 잡힌 검색어가 없어요. 구글은 검색어를 알려 주지 않고, 네이버도 일부만 알려 줘요.</div>') + '</div>';
+    return '<section class="tm-sec"><div class="tm-head"><div class="tm-title"><span class="tm-ico">📊</span><div><h2>자세히 보기</h2><p>기간을 골라 방문자·유입 경로·검색·기기·글 순위를 살펴봐요</p></div></div>' +
+        '<div class="tm-ctl">' + segP + '<span class="tm-range">' + range + ' · 방문자 ' + tfNum(m.uv) + '명</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div></div>' +
+      d30 + cmpBox +
       '<div class="panel"><h2>유입 경로</h2><div class="dv-grid">' +
         '<div class="dv-col"><h3 class="tm-h3">어디서 왔나</h3>' + refRing + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">자세한 경로</h3>' + kv((m.refs || []).slice(0, 8)) + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">SNS · 다른 사이트</h3>' + (otherRefs.length ? kv(otherRefs.slice(0, 8)) : '<div class="empty" style="padding:14px 0">이 기간에는 없어요. 카카오톡·인스타그램 등에 링크를 공유하면 여기에 나타나요.</div>') + '</div>' +
       '</div></div>' +
-      '<div class="tf-2">' +
-        '<div class="panel"><h2>검색 유입 <small style="font-weight:600;color:var(--ink-4)">검색 사이트별 방문자</small></h2>' + kv(m.search) +
-          '<h3 class="tm-h3">검색어</h3>' + (m.kws.length ? tfList(m.kws, "n", function(x){ return esc(x.k) + ' <small>' + esc(x.ref) + '</small>'; }, "명") :
-            '<div class="empty" style="padding:14px">아직 잡힌 검색어가 없어요. 구글은 검색어를 알려 주지 않고, 네이버도 일부만 알려 줘요.</div>') + '</div>' +
-        '<div class="panel"><h2>검색으로 처음 들어온 페이지</h2>' + tfList(m.landing, "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
-      '</div>' + siteBox + engBox +
+      srBox + siteBox +
       '<div class="panel"><h2>기기별 분포</h2><div class="dv-grid">' +
         '<div class="dv-col"><h3 class="tm-h3">휴대폰 · PC</h3>' + dev + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">운영체제</h3>' + kv(m.os) + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">브라우저·앱</h3>' + kv(m.br) + '</div></div></div>' +
       '<div class="panel"><h2>글 순위 ' + segR + '</h2>' + rank +
-        '<p class="sub" style="margin:10px 0 0">조회수·댓글·좋아요는 위에서 고른 기간 기준이고, 누적 조회수는 글이 올라온 뒤 전체 합계예요.</p></div>';
+        '<p class="sub" style="margin:10px 0 0">조회수·댓글·좋아요는 위에서 고른 기간 기준이고, 누적 조회수는 글이 올라온 뒤 전체 합계예요.</p></div></section>';
   }
   window.tfSetDay = function(d){ tfDay = d; drawTraffic(true); };
   /* 방문 통계 엑셀: 최근 30일 일별 + 지금 고른 기간의 자세히 보기 */
@@ -1944,7 +1962,6 @@ if (SRV) {
       sec("검색어", ["검색어", "검색 사이트", "방문자"], m.kws, function(x){ return [x.k, x.ref, x.n]; });
       sec("검색으로 처음 들어온 페이지", ["페이지", "주소", "방문자"], m.landing, function(x){ return [tit(x), x.path, x.n]; });
       sec("사이트 안 검색어", ["검색어", "검색한 사람", "결과 수"], m.site_kws, function(x){ return [x.k, x.n, x.res]; });
-      sec("페이지별 머문 시간·이탈", ["페이지", "주소", "조회", "평균 머문 시간(초)", "들어온 방문", "이탈률(%)"], m.eng, function(x){ return [tit(x), x.path, x.pv, x.dur === null ? "" : x.dur, x.land, x.bounce === null ? "" : x.bounce]; });
       sec("기기", ["기기", "방문자"], m.dev, function(x){ return [x.k === "m" ? "휴대폰" : "PC", x.n]; });
     }
     dlCSV("제주이음_방문통계_" + (m ? m.from + "_" + m.to : ymdNow()), rows);
@@ -1982,14 +1999,27 @@ if (SRV) {
       '<svg class="hr-line" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="' + line + '" fill="none" stroke="#94a3b8" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-dasharray="4 3"/></svg>' +
       '</div></div><div class="hr-ax">' + T.map(function(v, i){ return '<span>' + (i % 3 === 0 ? i + '시' : '') + '</span>'; }).join("") + '</div>';
     var si = HR_SEL != null ? HR_SEL : hr;
-    h += '<div class="hr-det"><b>' + si + '시</b> 오늘 ' + (si > hr ? '-' : r.t_hours[si].uv + '명 · ' + r.t_hours[si].pv + '회') + ' <span>|</span> 어제 ' + r.y_hours[si].uv + '명 · ' + r.y_hours[si].pv + '회 <small>막대를 누르거나 마우스를 올리면 시간별 숫자가 보여요</small></div>';
+    h += '<div class="hr-det"><b>' + si + '시</b> 오늘 ' + (si > hr ? '-' : r.t_hours[si].uv + '명 · ' + r.t_hours[si].pv + '회') + ' <span>|</span> 어제 ' + r.y_hours[si].uv + '명 · ' + r.y_hours[si].pv + '회 <small>막대에 마우스를 올리면 시간별 숫자가 보이고, 누르면 여기에 고정돼요</small></div>';
     return h;
   }
   function bindHour(r, hr){
     var box = document.getElementById("hr-box"); if (!box) return;
     var redraw = function(){ box.innerHTML = hourChart(r, hr); };
     box.onclick = function(e){ var c = e.target.closest(".hrc"); if (c) { HR_SEL = +c.dataset.i; redraw(); } };
-    box.onmouseover = function(e){ var c = e.target.closest(".hrc"); if (c && HR_SEL !== +c.dataset.i) { HR_SEL = +c.dataset.i; redraw(); } };
+    /* 마우스를 올리면 막대 위에 시간·방문자 수 말풍선 (다시 그리지 않고 말풍선만 움직임) */
+    box.onmousemove = function(e){
+      var c = e.target.closest(".hrc"), tip = box.querySelector(".hr-tip"), plot = box.querySelector(".hr-plot");
+      if (!c || !plot) { if (tip) tip.hidden = true; return; }
+      if (!tip) { tip = document.createElement("div"); tip.className = "hr-tip"; plot.appendChild(tip); }
+      var i = +c.dataset.i, fut = i > hr, T = r.t_hours[i], Yd = r.y_hours[i];
+      tip.innerHTML = '<b>' + i + '시</b>' + (fut ? '<span>아직 오지 않은 시간</span>' : '<span>방문자 <em>' + T.uv + '명</em> · 조회 ' + T.pv + '회</span>') + '<small>어제 ' + Yd.uv + '명 · ' + Yd.pv + '회</small>';
+      tip.hidden = false;
+      var pr = plot.getBoundingClientRect(), x = e.clientX - pr.left, y = e.clientY - pr.top;
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      tip.style.left = Math.max(0, Math.min(pr.width - w, x - w / 2)) + "px";
+      tip.style.top = Math.max(-h - 4, y - h - 14) + "px";
+    };
+    box.onmouseleave = function(){ var tip = box.querySelector(".hr-tip"); if (tip) tip.hidden = true; };
     document.querySelectorAll(".hr-tg button").forEach(function(b){ b.onclick = function(){ HR_M = b.dataset.m; document.querySelectorAll(".hr-tg button").forEach(function(x){ x.classList.toggle("on", x === b); }); redraw(); }; });
   }
   function paintTraffic(){
@@ -2026,8 +2056,7 @@ if (SRV) {
       '<div class="tf-2">' +
         '<div class="panel"><h2>지금 보고 있는 페이지 <small style="font-weight:600;color:var(--ink-4)">최근 5분</small></h2>' + tfList((r.live_pages || []).slice(0, 10), "n", function(x){ return tfName(x.path, x.title); }, "명") + '</div>' +
         '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList((D.pages || []).slice(0, 10), "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
-      '</div>' + tmPanels() +
-      '<div class="panel"><h2>최근 30일 방문자</h2>' + days + '</div>' +
+      '</div>' + tmPanels(days) +
       '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
     bindHour(r, hr);
     window.scrollTo(0, sx);
