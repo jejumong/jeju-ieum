@@ -97,7 +97,9 @@ var JIDB = (function () {
 
   /* ── 회원 ── */
   function signUp(email, pw, nick, region) {
-    return call("signup", { email: email, pw: pw, nick: nick, region: region }).then(function (r) {
+    var camp = "";   // 30일 안에 유튜브 추적 링크로 들어왔으면 어느 영상인지 함께
+    try { var cj = JSON.parse(localStorage.getItem("ji_camp_join") || "null"); if (cj && cj.k && Date.now() - cj.t < 30 * 864e5) camp = cj.k; } catch (e) {}
+    return call("signup", { email: email, pw: pw, nick: nick, region: region, camp: camp }).then(function (r) {
       JI.set(AK, r.token); setUser(r.user); linkPush(); return { needConfirm: false };
     });
   }

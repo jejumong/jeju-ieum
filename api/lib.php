@@ -9,7 +9,7 @@ if (!defined('JI_API')) { http_response_code(403); exit; }
 date_default_timezone_set('Asia/Seoul');
 $CFG = require __DIR__ . '/config.php';
 
-const JI_SCHEMA = 20;
+const JI_SCHEMA = 21;
 
 /* ── 응답 ── */
 function cors() {
@@ -201,6 +201,10 @@ function migrate($pdo) {
   }
   if ($v < 20) {   // 관리자 콘솔 '내 글 반응': 관리자가 확인한 댓글·좋아요 기록
     $pdo->exec("CREATE TABLE IF NOT EXISTS ji_react_seen (user_id VARCHAR(36) NOT NULL, rkey VARCHAR(100) NOT NULL, at DATETIME NOT NULL, PRIMARY KEY (user_id, rkey))$T");
+  }
+  if ($v < 21) {   // 유튜브 영상별 유입: 방문 기록·가입 회원에 추적 링크 이름(camp)
+    try { $pdo->exec("ALTER TABLE ji_hits ADD COLUMN camp VARCHAR(60) NOT NULL DEFAULT ''"); } catch (Throwable $e) {}
+    try { $pdo->exec("ALTER TABLE ji_users ADD COLUMN camp VARCHAR(60) NOT NULL DEFAULT ''"); } catch (Throwable $e) {}
   }
   $pdo->prepare("REPLACE INTO ji_meta (k, v) VALUES ('schema', ?)")->execute([JI_SCHEMA]);
 }

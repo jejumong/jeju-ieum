@@ -729,17 +729,24 @@ document.addEventListener("click", function (e) {
       if (RQ && /naver|google|daum|bing|zum|yahoo|nate|duckduckgo|ecosia|baidu|yandex/.test(h)) kw = RQ.get("query") || RQ.get("q") || RQ.get("p") || RQ.get("wd") || RQ.get("text") || "";
       kw = P.get("utm_term") || kw;
       if (!h && /카카오톡|인스타그램|페이스북/.test(br)) h = br;
-      ref = P.get("utm_source") || (!h ? "직접 방문" : /^(카카오톡|인스타그램|페이스북)$/.test(h) ? h : h.indexOf("jejuieum") > -1 || h === location.hostname ? "" :
+      ref = (P.get("utm_source") === "youtube" ? "유튜브" : P.get("utm_source")) || (!h ? "직접 방문" : /^(카카오톡|인스타그램|페이스북)$/.test(h) ? h : h.indexOf("jejuieum") > -1 || h === location.hostname ? "" :
         /naver/.test(h) ? "네이버" : /gemini\.google/.test(h) ? "제미나이" : /google/.test(h) ? "구글" :
         /chatgpt|openai/.test(h) ? "ChatGPT" : /perplexity/.test(h) ? "퍼플렉시티" : /copilot/.test(h) ? "코파일럿" : /nate\.com/.test(h) ? "네이트" :
         /yahoo/.test(h) ? "야후" : /duckduckgo/.test(h) ? "덕덕고" : /ecosia/.test(h) ? "에코시아" : /baidu/.test(h) ? "바이두" : /yandex/.test(h) ? "얀덱스" : /daum/.test(h) ? "다음" : /kakao/.test(h) ? "카카오" : /zum/.test(h) ? "줌" :
         /instagram/.test(h) ? "인스타그램" : /facebook|fb\./.test(h) ? "페이스북" : /youtube|youtu\.be/.test(h) ? "유튜브" :
         /band\.us/.test(h) ? "밴드" : /bing/.test(h) ? "빙" : /threads/.test(h) ? "스레드" : h);
     }
+    // 유튜브 추적 링크(utm_campaign): 이번 방문 동안 모든 페이지에 붙이고, 가입 연결용으로 30일 기억
+    var camp = "";
+    try {
+      var cq = (new URLSearchParams(location.search).get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60);
+      if (cq) { sessionStorage.setItem("ji_camp", cq); localStorage.setItem("ji_camp_join", JSON.stringify({ k: cq, t: Date.now() })); }
+      camp = cq || sessionStorage.getItem("ji_camp") || "";
+    } catch (e) {}
     var path = location.pathname.replace(/\/index\.html$/, "/") || "/";
     var id = new URLSearchParams(location.search).get("id"); if (id) path += "?id=" + id.slice(0, 40);
     var body = JSON.stringify({ vid: vid, nw: nw, path: path.slice(0, 120), title: (document.title || "").replace(/\s*[—|-]\s*제주이음\s*$/, "").slice(0, 80),
-      ref: ref.slice(0, 40), kw: kw.slice(0, 60), os: os, br: br, dev: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "m" : "p" });
+      ref: ref.slice(0, 40), kw: kw.slice(0, 60), os: os, br: br, camp: camp, dev: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "m" : "p" });
     setTimeout(function () {
       fetch(api.replace(/\/?$/, "/") + "?a=hit", { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: body, keepalive: true }).catch(function () {});
     }, 600);

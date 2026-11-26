@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261126m">
+<link rel="stylesheet" href="../assets/style.css?v=20261126n">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -412,6 +412,24 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .tm-title{display:flex;align-items:center;gap:12px}.tm-ico{width:48px;height:48px;border-radius:14px;background:#1e6fd9;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 16px rgba(30,111,217,.3)}
 .tm-sec .tm-title h2{font-size:23px;font-weight:900;color:#0e2a4f;letter-spacing:-.03em}.tm-title p{margin:2px 0 0;font-size:13.5px;color:#4a6585}
 .tm-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+.yt-make{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}.yt-make input{flex:1;min-width:220px;border:1.5px solid #cfd8e3;border-radius:10px;padding:9px 12px;font:inherit}.yt-make select{border:1.5px solid #cfd8e3;border-radius:10px;padding:9px;font:inherit;background:#fff}
+.yt-new{display:flex;flex-direction:column;gap:6px;background:#fff7e6;border:1.5px solid #ffd591;border-radius:12px;padding:12px 14px;margin-bottom:12px}.yt-new code{word-break:break-all;background:#fff;border-radius:8px;padding:8px 10px;font-size:13px}.yt-new button{align-self:flex-start}.yt-new small{color:#8a6a3d}
+.yt-tw{overflow-x:auto}table.yt-t th small{display:block;font-weight:500;font-size:11px;color:#8a97a8}td.yt-t b{display:block}td.yt-t small{color:#8a97a8;font-size:12px}
+td.yt-n{text-align:right;white-space:nowrap}td.yt-n b{font-size:16px}td.yt-n small{display:block;color:#8a97a8;font-size:11.5px}td.yt-n.all b{color:#5b6b80}td.yt-a{white-space:nowrap;text-align:right}.yt-x{margin-left:4px;color:#b42318}
+.ap-bars{height:90px}
+.au-row{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid #eef2f6}.au-dot{width:12px;height:12px;border-radius:50%;background:#22a06b;box-shadow:0 0 0 4px rgba(34,160,107,.15)}
+.au-row.bad .au-dot{background:#e5484d;box-shadow:0 0 0 4px rgba(229,72,77,.15)}.au-row.run .au-dot{background:#f59e0b;box-shadow:0 0 0 4px rgba(245,158,11,.15)}
+.au-b{min-width:0}.au-b b{display:block;font-size:14.5px}.au-b small{display:block;color:#8a97a8;font-size:12px}.au-b em{display:block;font-style:normal;font-size:12.5px;color:#5b6b80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.au-t{text-align:right;white-space:nowrap}.au-t b{display:block;font-size:14px}.au-t small{display:block;color:#8a97a8;font-size:12px}.au-row.bad .au-t b{color:#c4320a}.au-warn{display:block;font-size:12px;font-weight:700;color:#c4320a}
+.sc-cal{border:1px solid #e3e8ef;border-radius:14px;padding:12px;margin-bottom:14px;background:#fff}.sc-hd{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}.sc-hd b{font-size:15.5px}
+.sc-lg{margin-left:auto;font-size:12px;color:#5b6b80;display:flex;align-items:center;gap:4px}.sc-lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:6px}
+.sc-lg i.wait,.sc-it.wait{background:#e8f1ff}.sc-lg i.wait{background:#2f80ed}.sc-lg i.done{background:#22a06b}.sc-lg i.fail{background:#e5484d}
+.sc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.sc-w{text-align:center;font-size:12px;font-weight:700;color:#8a97a8;padding:2px 0}
+.sc-d{min-height:86px;border-radius:10px;background:#f7f9fb;padding:5px;display:flex;flex-direction:column;gap:3px;min-width:0}.sc-e{background:transparent}.sc-d.today{outline:2px solid #2f80ed}.sc-d.has{background:#fff;border:1px solid #e3e8ef}
+.sc-n{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:#4a5a70}.sc-n b{font-size:11px;color:#2f80ed}.sc-d.sun .sc-n{color:#e5484d}.sc-d.sat .sc-n{color:#2f80ed}
+.sc-it{display:block;width:100%;text-align:left;border:0;border-radius:6px;padding:3px 5px;font:inherit;font-size:11.5px;line-height:1.3;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0e2440}
+.sc-it i{font-style:normal;font-weight:800;margin-right:3px}.sc-it.wait{background:#e8f1ff}.sc-it.done{background:#e3f6ec;color:#16794a}.sc-it.fail{background:#fde8e8;color:#b42318}.sc-more{font-size:11px;color:#8a97a8}
+@media (max-width:680px){ .sc-d{min-height:64px;padding:3px} .sc-it{font-size:10.5px;padding:2px 3px} .sc-it i{display:none} .sc-lg{margin-left:0} }
 .tm-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:22px 0 12px;padding:10px 12px;background:#fff;border:1px solid var(--line,#e5e9ef);border-radius:14px}.tm-bar>b{font-size:14px;font-weight:800;color:#0e2440}.tm-bar .tm-dl{margin-left:auto}
 .sr-panel h2{font-size:18px}
 .sr-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 18px}.sr-kpi>div{background:#f2f7fd;border-radius:14px;padding:12px 14px}
@@ -529,18 +547,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261126m"></script>
-<script src="../assets/db.js?v=20261126m"></script>
-<script src="../assets/notify.js?v=20261126m"></script>
-<script src="../assets/seed-trade.js?v=20261126m"></script>
-<script src="../assets/seed-extra.js?v=20261126m"></script>
-<script src="../assets/festivals-data.js?v=20261126m"></script>
-<script src="../assets/seed-new.js?v=20261126m"></script>
-<script src="../assets/seed-comments.js?v=20261126m"></script>
-<script src="../assets/photos.js?v=20261126m"></script>
-<script src="../assets/admin-data.js?v=20261126m"></script>
-<script src="../assets/kmap.js?v=20261126m"></script>
-<script src="../assets/op-posts.js?v=20261126m"></script>
+<script src="../assets/common.js?v=20261126n"></script>
+<script src="../assets/db.js?v=20261126n"></script>
+<script src="../assets/notify.js?v=20261126n"></script>
+<script src="../assets/seed-trade.js?v=20261126n"></script>
+<script src="../assets/seed-extra.js?v=20261126n"></script>
+<script src="../assets/festivals-data.js?v=20261126n"></script>
+<script src="../assets/seed-new.js?v=20261126n"></script>
+<script src="../assets/seed-comments.js?v=20261126n"></script>
+<script src="../assets/photos.js?v=20261126n"></script>
+<script src="../assets/admin-data.js?v=20261126n"></script>
+<script src="../assets/kmap.js?v=20261126n"></script>
+<script src="../assets/op-posts.js?v=20261126n"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1429,6 +1447,27 @@ if (SRV) {
         document.getElementById("op-bar").style.display = TAB === "todo" && F("todo").length ? "" : "none";
         qN.textContent = Q.trim() ? "전체 " + (F("todo").length + F("sched").length + F("done").length) + "개 찾음" : "";
       }
+      /* 예약 달력: 예약한 운영자 글을 날짜별로 (파랑 = 예약, 초록 = 올라감, 빨강 = 실패) */
+      var KI = {}; L.forEach(function(p, i){ KI[p.k] = i; });
+      function schCal(){
+        if (!schRows.length) return "";
+        var now = new Date(), base = window.OP_CALM ? new Date(window.OP_CALM + "-01T00:00:00") : new Date(now.getFullYear(), now.getMonth(), 1);
+        var y = base.getFullYear(), mo = base.getMonth(), first = new Date(y, mo, 1).getDay(), dim = new Date(y, mo + 1, 0).getDate();
+        var by = {}; schRows.forEach(function(x){ var d = new Date(x.at); if (d.getFullYear() !== y || d.getMonth() !== mo) return; (by[d.getDate()] = by[d.getDate()] || []).push(x); });
+        var tk = now.getFullYear() === y && now.getMonth() === mo ? now.getDate() : -1, cells = "";
+        for (var b = 0; b < first; b++) cells += '<div class="sc-d sc-e"></div>';
+        for (var d = 1; d <= dim; d++) {
+          var it = (by[d] || []).sort(function(a, b2){ return a.at < b2.at ? -1 : 1; }), wd = (first + d - 1) % 7;
+          cells += '<div class="sc-d' + (d === tk ? ' today' : '') + (wd === 0 ? ' sun' : wd === 6 ? ' sat' : '') + (it.length ? ' has' : '') + '"><div class="sc-n">' + d + (it.length ? '<b>' + it.length + '개</b>' : '') + '</div>' +
+            it.slice(0, 3).map(function(x){ var t = new Date(x.at), cls = x.status === "done" ? "done" : x.status === "fail" ? "fail" : "wait";
+              return '<button type="button" class="sc-it ' + cls + '"' + (KI[x.op_k] !== undefined ? ' data-pv="' + KI[x.op_k] + '"' : '') + ' title="' + esc(x.board + " · " + x.title) + '"><i>' + ("0" + t.getHours()).slice(-2) + ':' + ("0" + t.getMinutes()).slice(-2) + '</i>' + esc(x.title) + '</button>'; }).join("") +
+            (it.length > 3 ? '<span class="sc-more">+' + (it.length - 3) + '개 더</span>' : '') + '</div>';
+        }
+        var mk = function(dm){ var t = new Date(y, mo + dm, 1); return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2); };
+        return '<div class="sc-cal"><div class="sc-hd"><button type="button" class="mb" data-calm="' + mk(-1) + '">‹</button><b>' + y + '년 ' + (mo + 1) + '월 예약 달력</b><button type="button" class="mb" data-calm="' + mk(1) + '">›</button>' +
+          '<span class="sc-lg"><i class="wait"></i>예약 <i class="done"></i>올라감 <i class="fail"></i>실패</span></div>' +
+          '<div class="sc-grid">' + ["일", "월", "화", "수", "목", "금", "토"].map(function(w){ return '<div class="sc-w">' + w + '</div>'; }).join("") + cells + '</div></div>';
+      }
       function paint(){
         paintTabs();
         var list = F(TAB), pages = Math.ceil(list.length / PER) || 1; pg = Math.min(pg, pages - 1);
@@ -1444,6 +1483,10 @@ if (SRV) {
             (d ? '<a class="mb" href="../view.html?id=' + d + '" target="_blank">게시판에서 보기</a>' : '') + '</div>';
         }).join("") + (pages > 1 ? '<div class="pager">' + Array.apply(null, Array(pages)).map(function(_, k){ return '<button data-pg="' + k + '"' + (k === pg ? ' class="on"' : '') + '>' + (k + 1) + '</button>'; }).join("") + '</div>' : '');
         box.querySelectorAll(".pager button").forEach(function(b){ b.onclick = function(){ pg = +b.dataset.pg; paint(); M().scrollTop = 0; window.scrollTo(0, 0); }; });
+        if (TAB === "sched" && !Q.trim()) {
+          box.insertAdjacentHTML("afterbegin", schCal());
+          box.querySelectorAll("[data-calm]").forEach(function(b){ b.onclick = function(){ window.OP_CALM = b.dataset.calm; paint(); }; });
+        }
       }
       paint();
       /* 글 내용 미리 보기 (올리기 전에 확인) */
@@ -1500,7 +1543,7 @@ if (SRV) {
           .then(function(){ closeModal(); toast("최신 내용으로 바꿨어요"); }, function(e){ alert("바꾸지 못했어요: " + e.message); });
       };
       box.addEventListener("click", function(e){
-        var b = e.target.closest(".op-main"); if (!b) return;
+        var b = e.target.closest(".op-main, .sc-it[data-pv]"); if (!b) return;
         openPv(+b.dataset.pv);
       });
       tabs.onclick = function(e){ var b = e.target.closest("button"); if (!b || b.dataset.t === TAB) return; TAB = window.OP_TAB = b.dataset.t; pg = 0; paint(); };
@@ -1843,10 +1886,73 @@ if (SRV) {
       return '<div class="tf-row"><span class="nm">' + nameFn(r) + '</span><span class="bar"><i style="width:' + Math.round(r[key] / mx * 100) + '%"></i></span><span class="n">' + tfNum(r[key]) + unit + '</span></div>';
     }).join("");
   }
+  var CAMPS = null;   // 유튜브 추적 링크 이름표
   window.loadTraffic = function(){
-    return Promise.all([JIDB.call("admin_traffic"), JIDB.call("admin_traffic_more", tmArgs()).catch(function(){ return null; })])
-      .then(function(a){ TF = a[0]; TM = a[1]; return TF; });
+    return Promise.all([JIDB.call("admin_traffic"), JIDB.call("admin_traffic_more", tmArgs()).catch(function(){ return null; }),
+        CAMPS ? Promise.resolve(CAMPS) : JIDB.call("admin_camps").catch(function(){ return []; })])
+      .then(function(a){ TF = a[0]; TM = a[1]; CAMPS = a[2] || []; return TF; });
   };
+  /* ── 유튜브 영상별 유입: 영상마다 추적 링크를 만들어 설명란에 넣으면 방문·가입을 따로 셈 ── */
+  var YT_PAGES = [["", "첫 화면"], ["guide.html", "제주살이 가이드"], ["stay.html", "한달살기·이주"], ["school.html", "학교 연계 집"], ["community.html", "동네 커뮤니티"], ["tools.html", "생활도구"]];
+  function ytLink(c){ return "https://jejuieum.com/" + (c.page || "") + "?utm_source=youtube&utm_campaign=" + c.k; }
+  function ytBox(m){
+    var names = {}; (CAMPS || []).forEach(function(c){ names[c.k] = c; });
+    var cur = {}; (m.camps || []).forEach(function(x){ cur[x.k] = x; });
+    var all = {}; (m.camps_all || []).forEach(function(x){ all[x.k] = x; });
+    var keys = (CAMPS || []).map(function(c){ return c.k; });
+    Object.keys(all).forEach(function(k){ if (keys.indexOf(k) < 0) keys.push(k); });
+    var z = { uv: 0, pv: 0, join: 0 };
+    var rows = keys.map(function(k){ var c = names[k] || { k: k, title: "" }, a = cur[k] || z, t = all[k] || z;
+      return '<tr><td class="yt-t"><b>' + esc(c.title || "(이름 없는 링크)") + '</b><small>' + esc(k) + (c.at ? ' · ' + esc(c.at.replace(/-/g, ".")) + ' 만듦' : '') + '</small></td>' +
+        '<td class="yt-n"><b>' + tfNum(a.uv) + '</b><small>' + tfNum(a.pv) + '회</small></td><td class="yt-n"><b>' + tfNum(a.join) + '</b></td>' +
+        '<td class="yt-n all"><b>' + tfNum(t.uv) + '</b><small>가입 ' + tfNum(t.join) + '</small></td>' +
+        '<td class="yt-a">' + (names[k] ? '<button class="mb" data-ytc="' + esc(k) + '">링크 복사</button>' + (isBoss() ? '<button class="mb yt-x" data-ytd="' + esc(k) + '" title="목록에서 빼기 (기록은 남음)">✕</button>' : '') : '') + '</td></tr>'; }).join("");
+    return '<div class="panel yt-panel"><h2>▶ 유튜브 영상별 유입 <small style="font-weight:600;color:var(--ink-4)">영상마다 만든 링크로 들어온 사람</small></h2>' +
+      (isBoss() ? '<div class="yt-make"><input id="yt-title" maxlength="80" placeholder="영상 제목 (예: 제주 겨울 오일장 브이로그)"><select id="yt-page">' + YT_PAGES.map(function(p){ return '<option value="' + p[0] + '">연결할 곳: ' + p[1] + '</option>'; }).join("") + '</select><button class="mb pri" id="yt-make">링크 만들기</button></div>' +
+        '<div id="yt-out"></div>' : '') +
+      (rows ? '<div class="yt-tw"><table class="adm-t yt-t"><thead><tr><th>영상</th><th>방문자<small>이 기간</small></th><th>가입<small>이 기간</small></th><th>방문자<small>지금까지</small></th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+        : '<div class="empty" style="padding:16px">아직 만든 링크가 없어요. 위에서 영상 제목을 적고 링크를 만들어 영상 설명란·고정 댓글에 붙여 주세요.</div>') +
+      '<p class="sub" style="margin:10px 0 0">링크로 들어온 사람이 그 방문에서 본 페이지를 모두 세요. 들어온 뒤 30일 안에 가입하면 그 영상의 가입으로 셉니다.</p></div>';
+  }
+  function bindYt(){
+    var box = document.querySelector(".yt-panel"); if (!box) return;
+    var copy = function(t){ (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ toast("링크를 복사했어요"); }, function(){ prompt("이 링크를 복사해 주세요", t); }); };
+    var mk = document.getElementById("yt-make");
+    if (mk) mk.onclick = function(){
+      var title = document.getElementById("yt-title").value.trim(); if (!title) { alert("영상 제목을 적어 주세요."); return; }
+      var d = new Date(), base = "yt" + String(d.getFullYear()).slice(2) + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2), k = base, n = 1;
+      while ((CAMPS || []).some(function(c){ return c.k === k; })) k = base + "-" + (++n);
+      var c = { k: k, title: title, at: ymd(d), page: document.getElementById("yt-page").value };
+      var list = (CAMPS || []).concat([c]);
+      JIDB.call("admin_camps", { set: list }).then(function(){
+        CAMPS = list; paintTraffic();
+        var out = document.getElementById("yt-out");
+        if (out) { out.innerHTML = '<div class="yt-new"><b>링크를 만들었어요</b><code>' + esc(ytLink(c)) + '</code><button class="mb pri" id="yt-cp">복사하기</button><small>이 링크를 영상 설명란이나 고정 댓글에 붙여 주세요.</small></div>'; document.getElementById("yt-cp").onclick = function(){ copy(ytLink(c)); }; }
+      }, function(e){ alert("저장하지 못했어요: " + e.message); });
+    };
+    box.querySelectorAll("[data-ytc]").forEach(function(b){ b.onclick = function(){
+      var k = b.dataset.ytc, c = (CAMPS || []).filter(function(x){ return x.k === k; })[0] || { k: k };
+      copy(ytLink(c));
+    }; });
+    box.querySelectorAll("[data-ytd]").forEach(function(b){ b.onclick = function(){
+      var k = b.dataset.ytd; if (!confirm("이 링크를 목록에서 뺄까요? 이미 영상에 붙인 링크로 들어온 기록은 그대로 남아요.")) return;
+      var list = (CAMPS || []).filter(function(c){ return c.k !== k; });
+      JIDB.call("admin_camps", { set: list }).then(function(){ CAMPS = list; paintTraffic(); }, function(e){ alert(e.message); });
+    }; });
+  }
+  /* ── 홈 화면 앱 사용자 · 알림 켠 회원 ── */
+  function appBox(m){
+    var A = m.app; if (!A) return "";
+    var dk = [], d0 = new Date(); for (var i = 29; i >= 0; i--) { var d = new Date(d0); d.setDate(d.getDate() - i); dk.push(ymd(d)); }
+    var mx = Math.max.apply(null, dk.map(function(k){ return A.days[k] || 0; }).concat([1]));
+    return '<div class="panel"><h2>📱 홈 화면 앱 · 알림</h2><div class="sr-kpi ap-kpi">' +
+      '<div><b>' + tfNum(A.uv) + '<small>명</small></b><span>홈 화면 앱으로 연 사람 (위 기간, ' + tfNum(A.pv) + '회)</span></div>' +
+      '<div><b>' + tfNum(A.all) + '<small>명</small></b><span>지금까지 홈 화면 앱을 쓴 사람</span></div>' +
+      '<div><b>' + tfNum(A.push_users) + '<small>명</small></b><span>알림 켠 회원 (기기 ' + tfNum(A.push_devs) + '대 · 최근 60일 ' + tfNum(A.push_devs60) + '대)</span></div></div>' +
+      '<h3 class="tm-h3">최근 30일 홈 화면 앱 사용자</h3><div class="tf-bars ap-bars">' + dk.map(function(k, i){ var v = A.days[k] || 0;
+        return '<div class="c' + (i === 29 ? ' now' : '') + '" data-t="' + k.slice(5).replace("-", ".") + ' · ' + v + '명"><i style="width:70%;height:' + (v / mx * 100) + '%"></i></div>'; }).join("") + '</div>' +
+      '<p class="sub" style="margin:10px 0 0">아이폰·안드로이드에서 홈 화면 아이콘으로 연 방문을 세요. 알림 수는 로그인한 회원이 켠 것만 세고, 로그인 없이 지원 프로그램 🔔만 켠 사람은 OneSignal 화면에서 볼 수 있어요.</p></div>';
+  }
   function tmArgs(){ if (!tmFrom) { var t = ymd(new Date()); tmFrom = tmTo = t; } return { from: tmFrom, to: tmTo || tmFrom }; }
   function tmLoad(){ JIDB.call("admin_traffic_more", tmArgs()).then(function(r){ TM = r; if (view === "traffic") paintTraffic(); }); }
   window.tmSet = function(k, v){
@@ -1939,7 +2045,7 @@ if (SRV) {
         '<div class="dv-col"><h3 class="tm-h3">자세한 경로</h3>' + kv((m.refs || []).slice(0, 8)) + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">SNS · 다른 사이트</h3>' + (otherRefs.length ? kv(otherRefs.slice(0, 8)) : '<div class="empty" style="padding:14px 0">이 기간에는 없어요. 카카오톡·인스타그램 등에 링크를 공유하면 여기에 나타나요.</div>') + '</div>' +
       '</div></div>' +
-      srBox + siteBox +
+      srBox + ytBox(m) + appBox(m) + siteBox +
       '<div class="panel"><h2>기기별 분포</h2><div class="dv-grid">' +
         '<div class="dv-col"><h3 class="tm-h3">휴대폰 · PC</h3>' + dev + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">운영체제</h3>' + kv(m.os) + '</div>' +
@@ -2058,7 +2164,7 @@ if (SRV) {
         '<div class="panel"><h2>많이 본 페이지 ' + seg + '</h2>' + tfList((D.pages || []).slice(0, 10), "pv", function(x){ return tfName(x.path, x.title) + ' <small>' + x.uv + '명</small>'; }, "회") + '</div>' +
       '</div>' + tmPanels(days) +
       '<p class="sub">방문자 = 그날 들어온 서로 다른 브라우저 수(같은 사람이 휴대폰·PC로 오면 2명). 관리자 계정·로봇은 세지 않아요. 이름·이메일·IP 같은 개인정보는 기록하지 않아요.</p>';
-    bindHour(r, hr);
+    bindHour(r, hr); bindYt();
     window.scrollTo(0, sx);
   }
 
@@ -2093,7 +2199,50 @@ if (SRV) {
       box.innerHTML = '<span class="tf-dot"></span><span>지금 <b>' + tfNum(r.live) + '</b>명</span><span>오늘 방문자 <b>' + tfNum(r.t.uv) + '</b>명 · ' + tfNum(r.t.pv) + '회</span>' +
         '<span>어제 <b>' + tfNum(r.y.uv) + '</b>명 · ' + tfNum(r.y.pv) + '회</span><span>오늘 가입 <b>' + tfNum(r.t_act.users) + '</b> · 새 글 <b>' + tfNum(r.t_act.posts) + '</b></span><span class="go">방문 통계 →</span>';
     }, function(){ box.remove(); });
+    var st = document.createElement("div"); st.className = "panel au-panel"; st.innerHTML = '<h2>자동 작업 상태</h2><div class="au-list">불러오는 중…</div>';
+    box.after(st); autoStatus(st);
   };
+
+  /* 자동 작업 상태판: 매일 도는 작업이 마지막으로 언제 성공했는지 (GitHub 공개 기록에서 읽음, 5분 동안 기억) */
+  var AU_REPO = "https://api.github.com/repos/jejumong/jeju-ieum";
+  function auFetch(){
+    try { var c = JSON.parse(sessionStorage.getItem("ji_au") || "null"); if (c && Date.now() - c.t < 300000) return Promise.resolve(c.d); } catch (e) {}
+    var j = function(u){ return fetch(u, { headers: { Accept: "application/vnd.github+json" } }).then(function(r){ if (!r.ok) throw new Error("GitHub " + r.status); return r.json(); }); };
+    return Promise.all([j(AU_REPO + "/commits?per_page=100"), j(AU_REPO + "/actions/runs?per_page=60")]).then(function(a){
+      var d = { commits: a[0].map(function(c){ return { m: (c.commit.message || "").split("\n")[0], at: c.commit.committer.date }; }),
+        runs: (a[1].workflow_runs || []).map(function(r){ return { n: r.name, st: r.status, c: r.conclusion, at: r.updated_at || r.created_at, url: r.html_url }; }) };
+      try { sessionStorage.setItem("ji_au", JSON.stringify({ t: Date.now(), d: d })); } catch (e) {}
+      return d;
+    });
+  }
+  function auAgo(iso){ var m = Math.floor((Date.now() - new Date(iso)) / 60000); if (m < 60) return m + "분 전"; if (m < 1440) return Math.floor(m / 60) + "시간 전"; return Math.floor(m / 1440) + "일 전"; }
+  function auWhen(iso){ var d = new Date(iso); return (d.getMonth() + 1) + "." + d.getDate() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+  function autoStatus(el){
+    var list = el.querySelector(".au-list");
+    auFetch().then(function(d){
+      var JOBS = [
+        { t: "축제·달력 갱신", s: "매일 오후 1시", re: /^달력·축제 갱신|^마을 행사 갱신/, max: 26 },
+        { t: "지원 프로그램·학교 연계 집 확인", s: "매일 아침 8시 (오후 3시는 바뀐 게 있을 때만 기록)", re: /^지원 프로그램·학교 연계 집 확인|^지원 프로그램/, max: 26 },
+        { t: "검색용 페이지 자동 갱신", s: "글·데이터가 바뀔 때마다", re: /^검색용 페이지 자동 갱신/, max: 48 }
+      ];
+      var rows = JOBS.map(function(j){
+        var c = d.commits.filter(function(x){ return j.re.test(x.m); })[0];
+        var h = c ? (Date.now() - new Date(c.at)) / 36e5 : 1e9, ok = h <= j.max;
+        return '<div class="au-row ' + (ok ? 'ok' : 'bad') + '"><span class="au-dot"></span><div class="au-b"><b>' + j.t + '</b><small>' + j.s + '</small>' +
+          (c ? '<em title="' + esc(c.m) + '">' + esc(c.m.length > 70 ? c.m.slice(0, 70) + "…" : c.m) + '</em>' : '') + '</div>' +
+          '<div class="au-t">' + (c ? '<b>' + auAgo(c.at) + '</b><small>' + auWhen(c.at) + '</small>' : '<b>기록 없음</b>') + (ok ? '' : '<span class="au-warn">늦어지고 있어요</span>') + '</div></div>';
+      });
+      var WF = [["build-search-pages", "검색용 페이지·사이트맵 만들기"], ["pages build and deployment", "홈페이지(GitHub Pages) 반영"], ["카페24 서버(api) 올리기", "카페24 서버 올리기"], ["notify-subscribers", "새 공고 알림 보내기"], ["메일 발송 점검", "메일 발송 점검"]];
+      var wr = WF.map(function(w){
+        var r = d.runs.filter(function(x){ return x.n === w[0]; })[0]; if (!r) return "";
+        var run = r.st !== "completed", ok = run || r.c === "success" || r.c === "skipped";
+        return '<div class="au-row ' + (run ? 'run' : ok ? 'ok' : 'bad') + '"><span class="au-dot"></span><div class="au-b"><b>' + w[1] + '</b><small>마지막 실행 결과</small></div>' +
+          '<div class="au-t"><b>' + (run ? '실행 중' : ok ? '성공' : '실패') + '</b><small>' + auAgo(r.at) + '</small>' + (ok ? '' : '<a href="' + r.url + '" target="_blank" class="au-warn">기록 보기 ↗</a>') + '</div></div>';
+      }).join("");
+      list.innerHTML = '<h3 class="tm-h3">매일 도는 작업</h3>' + rows.join("") + (wr ? '<h3 class="tm-h3">자동 반영 작업</h3>' + wr : '') +
+        '<p class="sub" style="margin:10px 0 0">초록 = 정상, 빨강 = 정해진 시간보다 오래 기록이 없거나 실패. 5분마다 새로 읽어요.</p>';
+    }, function(e){ list.innerHTML = '<div class="empty" style="padding:12px">상태를 불러오지 못했어요 (' + esc(e.message) + '). 잠시 뒤 다시 열어 주세요.</div>'; });
+  }
 
   /* 관리자 정보 수정 (비밀번호) */
   window.drawAccount = function(){

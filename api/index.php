@@ -106,8 +106,9 @@ case 'signup': {
   if (in_array($email, $CFG['admins'], true) && one("SELECT id FROM ji_users WHERE role = 'admin'")) fail('이 이메일로는 가입할 수 없어요.');
   $role = in_array($email, $CFG['admins'], true) ? 'admin' : 'user';
   $id = uuid();
-  q("INSERT INTO ji_users (id, email, pass, nick, region, role, created_at, last_login) VALUES (?,?,?,?,?,?,?,?)",
-    [$id, $email, password_hash($pw, PASSWORD_DEFAULT), $nick, $region, $role, now(), now()]);
+  $camp = substr(preg_replace('/[^a-z0-9_-]/', '', strtolower((string)($R['camp'] ?? ''))), 0, 60);   // 유튜브 추적 링크로 와서 가입했으면
+  q("INSERT INTO ji_users (id, email, pass, nick, region, role, created_at, last_login, camp) VALUES (?,?,?,?,?,?,?,?,?)",
+    [$id, $email, password_hash($pw, PASSWORD_DEFAULT), $nick, $region, $role, now(), now(), $camp]);
   alert_admins('signup', '👋 새 회원가입', $nick . '님이 가입했어요' . ($region ? ' (' . $region . ')' : ''), 'admin/index.html#members', $id);
   out(['token' => new_session($id), 'user' => ['id' => $id, 'email' => $email, 'nick' => $nick, 'region' => $region, 'role' => $role]]);
 }
@@ -650,6 +651,18 @@ case 'admin_overview': {
        'reports_new' => (int)one("SELECT COUNT(DISTINCT kind, target_id) n FROM ji_reports WHERE status = 'new'")['n'],
        'react_new' => (($GLOBALS['ME_ROLE'] ?? '') === 'admin') ? count(array_filter(react_items($GLOBALS['ME_U']), function ($x) { return !$x['seen']; })) : 0]);
 }
+case 'admin_camps': {   // 유튜브 추적 링크 이름표 (관리자만): set 이면 목록 저장
+  admin($R, true);
+  if (isset($R['set']) && is_array($R['set'])) {
+    $list = [];
+    foreach (array_slice($R['set'], 0, 200) as $c) { $k = substr(preg_replace('/[^a-z0-9_-]/', '', strtolower((string)($c['k'] ?? ''))), 0, 60); if ($k === '') continue;
+      $list[] = ['k' => $k, 'title' => mb_substr(trim((string)($c['title'] ?? '')), 0, 80), 'at' => substr((string)($c['at'] ?? date('Y-m-d')), 0, 10),
+        'page' => substr(preg_replace('/[^a-z0-9\/._-]/', '', strtolower((string)($c['page'] ?? ''))), 0, 60)]; }
+    q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", ['yt_camps', json_encode($list, JSON_UNESCAPED_UNICODE), now()]);
+    out($list);
+  }
+  out((array)setting('yt_camps', []));
+}
 case 'admin_reactions': { $me = admin($R, true); out(react_items($me)); }
 case 'admin_react_seen': {   // 확인 표시 (keys 배열) · undo 면 확인 취소
   $me = admin($R, true); $n = 0; $undo = !empty($R['undo']);
@@ -664,9 +677,10 @@ case 'hit': {   // 방문 기록 한 줄 (로그인 필요 없음, 개인정보 
   $path = mb_substr($path, 0, 120);
   // 같은 사람이 같은 페이지를 10초 안에 다시 열면 한 번만
   if (one("SELECT id FROM ji_hits WHERE vid = ? AND path = ? AND at > (NOW() - INTERVAL 10 SECOND) LIMIT 1", [$vid, $path])) out(true);
-  q("INSERT INTO ji_hits (at, vid, nw, path, title, ref, dev, os, br, kw) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  $camp = substr(preg_replace('/[^a-z0-9_-]/', '', strtolower((string)($R['camp'] ?? ''))), 0, 60);
+  q("INSERT INTO ji_hits (at, vid, nw, path, title, ref, dev, os, br, kw, camp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [now(), $vid, !empty($R['nw']) ? 1 : 0, $path, mb_substr((string)($R['title'] ?? ''), 0, 80), mb_substr((string)($R['ref'] ?? ''), 0, 40), ($R['dev'] ?? '') === 'm' ? 'm' : 'p',
-     mb_substr((string)($R['os'] ?? ''), 0, 12), mb_substr((string)($R['br'] ?? ''), 0, 12), mb_substr(trim((string)($R['kw'] ?? '')), 0, 60)]);
+     mb_substr((string)($R['os'] ?? ''), 0, 12), mb_substr((string)($R['br'] ?? ''), 0, 12), mb_substr(trim((string)($R['kw'] ?? '')), 0, 60), $camp]);
   if (mt_rand(1, 500) === 1) q("DELETE FROM ji_hits WHERE at < (NOW() - INTERVAL 400 DAY)");
   out(true);
 }
@@ -831,7 +845,23 @@ case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기
   $len = (strtotime($to) - strtotime($from));
   $cmp = ['cur' => $sum($from, $to), 'prev' => $sum(date('Y-m-d', strtotime($from) - $len), $from),
           'prev_from' => date('Y-m-d', strtotime($from) - $len), 'prev_to' => date('Y-m-d', strtotime($from) - 86400)];
+  // 유튜브 추적 링크별 (이 기간 / 지금까지)
+  $campRows = function ($W2, $A2, $UW, $UA) {
+    $m = [];
+    foreach (all("SELECT camp, COUNT(DISTINCT vid) uv, COUNT(*) pv FROM ji_hits WHERE camp <> '' AND $W2 GROUP BY camp", $A2) as $x) $m[$x['camp']] = ['k' => $x['camp'], 'uv' => (int)$x['uv'], 'pv' => (int)$x['pv'], 'join' => 0];
+    foreach (all("SELECT camp, COUNT(*) n FROM ji_users WHERE camp <> '' AND $UW GROUP BY camp", $UA) as $x) { if (!isset($m[$x['camp']])) $m[$x['camp']] = ['k' => $x['camp'], 'uv' => 0, 'pv' => 0, 'join' => 0]; $m[$x['camp']]['join'] = (int)$x['n']; }
+    $m = array_values($m); usort($m, function ($a, $b) { return $b['uv'] - $a['uv']; }); return $m;
+  };
+  $camps = $campRows($W, $A, "created_at >= ? AND created_at < ?", [$from, $to]);
+  $campsAll = $campRows("1", [], "1", []);
+  // 홈 화면 앱으로 연 방문 · 알림 켠 회원(기기)
+  $app = one("SELECT COUNT(DISTINCT vid) uv, COUNT(*) pv FROM ji_hits WHERE br = '홈 화면 앱' AND $W", $A);
+  $appAll = one("SELECT COUNT(DISTINCT vid) uv FROM ji_hits WHERE br = '홈 화면 앱'");
+  $appDays = []; foreach (all("SELECT DATE(at) d, COUNT(DISTINCT vid) uv FROM ji_hits WHERE br = '홈 화면 앱' AND at >= (CURDATE() - INTERVAL 29 DAY) GROUP BY DATE(at)") as $x) $appDays[$x['d']] = (int)$x['uv'];
+  $pu = 0; $pd = 0; $pd60 = 0;
+  foreach (all("SELECT v FROM ji_settings WHERE k LIKE 'ps:%'") as $x) { $m = json_decode($x['v'], true); if (!is_array($m) || !$m) continue; $pu++; foreach ($m as $d) { $pd++; if (!empty($d['at']) && strtotime($d['at']) >= time() - 60 * 86400) $pd60++; } }
   out(['p' => $p, 'from' => $from, 'to' => date('Y-m-d', strtotime($to . ' -1 day')), 'uv' => $tot,
+    'camps' => $camps, 'camps_all' => $campsAll, 'app' => ['uv' => (int)$app['uv'], 'pv' => (int)$app['pv'], 'all' => (int)$appAll['uv'], 'days' => $appDays, 'push_users' => $pu, 'push_devs' => $pd, 'push_devs60' => $pd60],
     'site_kws' => $site, 'site_zero' => $siteZero, 'eng' => $eng, 'bounce' => $sN ? (int)round($sOne / $sN * 100) : null,
     'avg_dur' => $avgDur !== null ? (int)round($avgDur) : null, 'cmp' => $cmp,
     'groups' => $groups, 'refs' => $refs, 'search' => $search, 'kws' => $kws, 'landing' => $land,
