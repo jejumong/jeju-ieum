@@ -22,10 +22,17 @@
   var SHARE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
   var DOTS = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
 
+  var STEPS = {
+    ios: '<ol class="a2-st"><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b> ' + SHARE + ' 을 누르세요.</li><li>목록을 내려 <b>홈 화면에 추가</b>를 누르세요.</li><li>오른쪽 위 <b>추가</b>를 누르면 홈 화면에 제주이음 아이콘이 생겨요.</li></ol>',
+    android: '<ol class="a2-st"><li>크롬 오른쪽 위 <b>메뉴</b> ' + DOTS + ' 를 누르세요.</li><li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b>를 누르세요.</li><li><b>설치</b>를 누르면 홈 화면에 제주이음 아이콘이 생겨요.</li></ol>'
+  };
+  var INAPP = '<ol><li>지금은 카카오톡·네이버 같은 앱 안의 브라우저로 열려 있어요.</li><li>화면 위나 아래의 ' + DOTS + ' 메뉴에서 <b>다른 브라우저로 열기</b>를 눌러 주세요.</li><li>' + (ios ? 'Safari' : '크롬') + '로 열린 뒤 이 안내를 따라 홈 화면에 추가하면 됩니다.</li></ol>';
+  /* 아이폰·안드로이드 탭 (지금 쓰는 기기 쪽을 먼저 보여 줌) */
   function steps() {
-    if (inApp) return '<ol class="a2-st"><li>지금은 카카오톡·네이버 같은 앱 안의 브라우저로 열려 있어요.</li><li>화면 위나 아래의 ' + DOTS + ' 메뉴에서 <b>다른 브라우저로 열기</b>를 눌러 주세요.</li><li>' + (ios ? 'Safari' : '크롬') + '로 열린 뒤 이 안내를 따라 홈 화면에 추가하면 됩니다.</li></ol>';
-    if (ios) return '<ol class="a2-st"><li>Safari 아래쪽(또는 위쪽)의 <b>공유 버튼</b> ' + SHARE + ' 을 누르세요.</li><li>목록을 내려 <b>홈 화면에 추가</b>를 누르세요.</li><li>오른쪽 위 <b>추가</b>를 누르면 홈 화면에 제주이음 아이콘이 생겨요.</li></ol>';
-    return '<ol class="a2-st"><li>크롬 오른쪽 위 <b>메뉴</b> ' + DOTS + ' 를 누르세요.</li><li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b>를 누르세요.</li><li><b>설치</b>를 누르면 홈 화면에 제주이음 아이콘이 생겨요.</li></ol>';
+    var cur = ios ? "ios" : "android";
+    return (inApp ? '<div class="a2-warn">' + INAPP + '</div>' : '') +
+      '<div class="a2-tabs" role="tablist"><button type="button" role="tab" data-t="ios"' + (cur === "ios" ? ' class="on" aria-selected="true"' : '') + '>아이폰</button><button type="button" role="tab" data-t="android"' + (cur === "android" ? ' class="on" aria-selected="true"' : '') + '>안드로이드</button></div>' +
+      '<div class="a2-pane">' + STEPS[cur] + '</div>';
   }
 
   function show() {
@@ -37,6 +44,8 @@
       "#ji-a2hs .a2-hd{display:flex;align-items:center;gap:12px;margin-bottom:12px}#ji-a2hs .a2-hd img{width:48px;height:48px;border-radius:13px;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.12)}" +
       "#ji-a2hs h2{margin:0;font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1.35}#ji-a2hs .a2-hd p{margin:2px 0 0;font-size:13.5px;color:#5b6b80}" +
       "#ji-a2hs h3{margin:13px 0 6px;font-size:15px;font-weight:800;color:#0d2440}" +
+      "#ji-a2hs .a2-tabs{display:flex;gap:6px;margin:0 0 8px}#ji-a2hs .a2-tabs button{flex:1;padding:9px;border-radius:12px;background:#eef2f6;color:#4a5a70;font-weight:700;font-size:14px}#ji-a2hs .a2-tabs button.on{background:#0d2440;color:#fff}" +
+      "#ji-a2hs .a2-warn{margin:0 0 8px;padding:10px 14px;background:#fff1f0;border-radius:14px;font-size:13.5px}#ji-a2hs .a2-warn ol{margin:0;padding-left:18px;list-style:decimal}" +
       "#ji-a2hs .a2-st{margin:0;padding:10px 14px 10px 32px;background:#f3f7fb;border-radius:14px;list-style:decimal}#ji-a2hs .a2-st li{margin:3px 0}#ji-a2hs .a2-st svg{vertical-align:-3px;color:#2f80ed}" +
       "#ji-a2hs .a2-nt{margin:0;padding:10px 14px;background:#fff7ec;border-radius:14px;font-size:14px}#ji-a2hs .a2-nt ul{margin:4px 0 0;padding-left:18px;list-style:disc}#ji-a2hs .a2-nt small{display:block;margin-top:6px;color:#8a6a3d;font-size:12.5px}" +
       "#ji-a2hs .a2-bt{display:flex;flex-direction:column;gap:8px;margin-top:14px}#ji-a2hs button{font:inherit;border:0;border-radius:14px;padding:13px;font-weight:800;cursor:pointer}" +
@@ -54,6 +63,12 @@
         '<div class="a2-sub"><button type="button" data-k="day">오늘은 그만 보기</button><button type="button" data-k="never">다시 보지 않기</button></div></div></div>';
     document.body.appendChild(w);
     if (deferred) document.getElementById("a2hs-install").hidden = false;
+    w.querySelectorAll(".a2-tabs button").forEach(function (b) {
+      b.onclick = function () {
+        w.querySelectorAll(".a2-tabs button").forEach(function (x) { x.classList.remove("on"); x.removeAttribute("aria-selected"); });
+        b.classList.add("on"); b.setAttribute("aria-selected", "true"); w.querySelector(".a2-pane").innerHTML = STEPS[b.dataset.t];
+      };
+    });
     var close = function (k) {
       if (k === "never") ls("ji_a2hs_never", "1");
       else ls("ji_a2hs_until", String(Date.now() + (k === "day" ? 864e5 : 3 * 864e5)));   // '확인했어요'는 사흘 뒤 다시
