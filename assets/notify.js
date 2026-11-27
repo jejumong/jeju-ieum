@@ -105,6 +105,38 @@ var JINotify = (function () {
       });
     }).catch(function () { return { push: false }; });
   }
+  /* 관리자 알림 설정: 이 브라우저의 알림 상태 보기·다시 연결 */
+  function pushStatus() {
+    var st = { supported: pushSupported(), perm: window.Notification ? Notification.permission : "unsupported", dev: devKey(), sid: "", optedIn: null };
+    if (!st.supported) return Promise.resolve(st);
+    return loadPush().then(function (OneSignal) {
+      var ps = OneSignal && OneSignal.User && OneSignal.User.PushSubscription;
+      if (ps) { st.sid = ps.id || ""; st.optedIn = ps.optedIn; }
+      return st;
+    }).catch(function () { return st; });
+  }
+  function reconnect() {
+    if (!pushSupported()) return Promise.reject(new Error("이 브라우저는 웹 알림을 지원하지 않아요"));
+    return loadPush().then(function (OneSignal) {
+      if (!OneSignal) throw new Error("알림 서비스를 불러오지 못했어요");
+      return OneSignal.Notifications.requestPermission().then(function () {
+        if (!OneSignal.Notifications.permission) throw new Error("브라우저에서 알림이 차단돼 있어요. 주소창 왼쪽 자물쇠 → 알림 → 허용으로 바꿔 주세요.");
+        var u = (typeof currentUser === "function") ? currentUser() : null;
+        try { if (u && u.id) OneSignal.login(u.id); } catch (e) {}
+        var ps = OneSignal.User.PushSubscription;
+        return Promise.resolve(ps.optedIn === false ? ps.optIn() : null).then(function () {
+          // 구독 id 가 생길 때까지 잠깐 기다렸다가 서버에 이 기기로 등록
+          return new Promise(function (res, rej) {
+            var n = 0; (function wait() {
+              if (ps.id) return JIDB.call("push_reg", { sid: ps.id, dev: devKey() }).then(function () { res(ps.id); }, rej);
+              if (++n > 20) return rej(new Error("구독 id 를 받지 못했어요. 잠시 뒤 다시 눌러 주세요."));
+              setTimeout(wait, 500);
+            })();
+          });
+        });
+      });
+    });
+  }
   function accountPushOn() { return pushSupported() && window.Notification && Notification.permission === "granted"; }
 
   function unsubscribe(topic) {
@@ -224,6 +256,6 @@ var JINotify = (function () {
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startAuto); else startAuto();
 
-  return { linkAccount: linkAccount, enableAccountPush: enableAccountPush, accountPushOn: accountPushOn, isIOSBrowser: isIOSBrowser,
+  return { pushStatus: pushStatus, reconnect: reconnect, devKey: devKey, linkAccount: linkAccount, enableAccountPush: enableAccountPush, accountPushOn: accountPushOn, isIOSBrowser: isIOSBrowser,
     subscribe: subscribe, unsubscribe: unsubscribe, isOn: isOn, changes: changes, acknowledge: acknowledge, openSheet: openSheet, pushSupported: pushSupported };
 })();
