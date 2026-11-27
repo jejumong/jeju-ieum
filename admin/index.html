@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261127e">
+<link rel="stylesheet" href="../assets/style.css?v=20261127f">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -473,6 +473,23 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .tm-head h2{font-size:19px;font-weight:800;margin:0}
 .tm-head .tf-seg{margin:0}
 .tm-range{font-size:13px;color:var(--ink-4);font-weight:600}
+.dy-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line,#e5e9ef);border-radius:12px}
+.dy-wrap.all{max-height:520px;overflow-y:auto}
+.dy-t thead th{z-index:2}.dy-t thead th:first-child{z-index:3}
+.dy-more{display:block;width:100%;margin-top:10px;padding:11px;border:1px dashed #cdd6e2;border-radius:12px;background:#f8fafc;font:inherit;font-size:14px;font-weight:700;color:#0e2440;cursor:pointer}
+.dy-more:hover{background:#eef4fd;border-color:#9fb8d9}.dy-more small{font-weight:600;color:var(--ink-4);margin-left:6px}
+.dy-t{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
+.dy-t th,.dy-t td{padding:9px 12px;border-bottom:1px solid #eef1f5;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dy-t thead th{background:#f6f8fb;font-size:12.5px;font-weight:700;color:var(--ink-3);position:sticky;top:0}
+.dy-t th:first-child{text-align:left;font-weight:700;color:#0e2440;position:sticky;left:0;background:#fff}
+.dy-t thead th:first-child{background:#f6f8fb}
+.dy-t td{font-weight:700;color:#0e2440}.dy-t td.z{color:#c3cad5;font-weight:500}.dy-t td.neg{color:#c2410c}
+.dy-t small{font-weight:600;color:var(--ink-4)}.dy-t small.sun{color:#d4483b}.dy-t small.sat{color:#2f6fd1}
+.dy-t tr.sum th,.dy-t tr.sum td{background:#eef4fd;color:#0e2440;font-weight:800}
+.dy-t tr.avg th,.dy-t tr.avg td{background:#f7f9fc;color:var(--ink-3);font-weight:700;border-bottom:2px solid #dbe3ee}
+.dy-t tr.now th,.dy-t tr.now td{background:#f2fbf5}
+.dy-t tbody tr:last-child th,.dy-t tbody tr:last-child td{border-bottom:0}
+.dy-tag{display:inline-block;margin-left:4px;padding:1px 7px;border-radius:999px;background:#16794a;color:#fff;font-size:11px;font-weight:700;vertical-align:1px}.dy-tag.y{background:#94a3b8}
 .tm-stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#eef2f6}
 .tm-stack i{display:block;height:100%}
 .tm-leg{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:13.5px;color:var(--ink-2)}
@@ -570,18 +587,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261127e"></script>
-<script src="../assets/db.js?v=20261127e"></script>
-<script src="../assets/notify.js?v=20261127e"></script>
-<script src="../assets/seed-trade.js?v=20261127e"></script>
-<script src="../assets/seed-extra.js?v=20261127e"></script>
-<script src="../assets/festivals-data.js?v=20261127e"></script>
-<script src="../assets/seed-new.js?v=20261127e"></script>
-<script src="../assets/seed-comments.js?v=20261127e"></script>
-<script src="../assets/photos.js?v=20261127e"></script>
-<script src="../assets/admin-data.js?v=20261127e"></script>
-<script src="../assets/kmap.js?v=20261127e"></script>
-<script src="../assets/op-posts.js?v=20261127e"></script>
+<script src="../assets/common.js?v=20261127f"></script>
+<script src="../assets/db.js?v=20261127f"></script>
+<script src="../assets/notify.js?v=20261127f"></script>
+<script src="../assets/seed-trade.js?v=20261127f"></script>
+<script src="../assets/seed-extra.js?v=20261127f"></script>
+<script src="../assets/festivals-data.js?v=20261127f"></script>
+<script src="../assets/seed-new.js?v=20261127f"></script>
+<script src="../assets/seed-comments.js?v=20261127f"></script>
+<script src="../assets/photos.js?v=20261127f"></script>
+<script src="../assets/admin-data.js?v=20261127f"></script>
+<script src="../assets/kmap.js?v=20261127f"></script>
+<script src="../assets/op-posts.js?v=20261127f"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1109,7 +1126,8 @@ function bindNoticePer(root){
     }
     txt.textContent = d === "keep" ? "" : d === "0" ? "직접 해제할 때까지 표시돼요" : noticeUntil(+d).slice(5).replace("-", ".") + "까지 표시되고, 그다음 날 '지난 공지'로 넘어가요"; }
   box.onclick = function(e){ var b = e.target.closest("button"); if (!b) return; box.querySelectorAll("button").forEach(function(x){ x.classList.toggle("on", x === b); }); show();
-    if (b.dataset.d === "date" && dt) { try { dt.showPicker(); } catch (er) { dt.focus(); } } };
+    /* 칸이 화면에 그려진 다음에 달력을 열어야 칸 바로 아래에 열림 (바로 열면 화면 왼쪽 위에 뜸) */
+    if (b.dataset.d === "date" && dt) requestAnimationFrame(function(){ requestAnimationFrame(function(){ try { dt.showPicker(); } catch (er) { dt.focus(); } }); }); };
   if (dt) dt.oninput = dt.onchange = show;
   show();
 }
@@ -2161,6 +2179,7 @@ if (SRV) {
         '<div class="empty" style="padding:14px">아직 잡힌 검색어가 없어요. 구글은 검색어를 알려 주지 않고, 네이버도 일부만 알려 줘요.</div>') + '</div>';
     return d30 +
       '<div class="tm-bar"><b>아래 통계 기간</b>' + segP + '<span class="tm-range">' + range + '</span><button class="mb tm-dl" onclick="dlTraffic()">⬇ 엑셀로 받기</button></div>' +
+      dayBox(m) +
       '<div class="panel"><h2>유입 경로</h2><div class="dv-grid">' +
         '<div class="dv-col"><h3 class="tm-h3">어디서 왔나</h3>' + refRing + '</div>' +
         '<div class="dv-col"><h3 class="tm-h3">자세한 경로</h3>' + kv((m.refs || []).slice(0, 8)) + '</div>' +
@@ -2174,6 +2193,30 @@ if (SRV) {
       '<div class="panel"><h2>글 순위 ' + segR + '</h2>' + rank +
         '<p class="sub" style="margin:10px 0 0">조회수·댓글·좋아요는 위에서 고른 기간 기준이고, 누적 조회수는 글이 올라온 뒤 전체 합계예요.</p></div>';
   }
+  /* 하루 단위 통계: 고른 기간의 날짜마다 한 줄 (최신 날짜가 위) */
+  /* 처음에는 최근 7일만, '펼치기'를 누르면 기간 전체를 표 안에서 스크롤해 봄 */
+  var dayAll = false;
+  window.dayMore = function(){ dayAll = !dayAll; paintTraffic(); if (!dayAll) { var t = document.querySelector(".dy-panel"); if (t) t.scrollIntoView({ block: "nearest" }); } };
+  function dayBox(m){
+    var L = m.daily; if (!L || !L.length) return "";
+    var C = [["uv","방문자"],["pv","페이지뷰"],["nv","처음 온 사람"],["join","가입"],["leave","탈퇴"],["posts","새 글"],["comments","댓글"],["likes","좋아요"]];
+    var WD = ["일","월","화","수","목","금","토"], today = ymd(new Date()), yest = ymd(new Date(Date.now() - 864e5));
+    var sum = {}; C.forEach(function(c){ sum[c[0]] = L.reduce(function(a, x){ return a + (x[c[0]] || 0); }, 0); });
+    var cell = function(v, k){ return '<td class="' + (v ? (k === "leave" ? "neg" : "") : "z") + '">' + (v ? tfNum(v) : "0") + '</td>'; };
+    var FOLD = 7, rows = (dayAll ? L : L.slice(0, FOLD)).map(function(x){
+      var dt = new Date(x.d + "T00:00:00"), w = dt.getDay();
+      var lab = x.d.slice(5).replace("-", ".") + ' <small class="' + (w === 0 ? "sun" : w === 6 ? "sat" : "") + '">(' + WD[w] + ')</small>' +
+        (x.d === today ? ' <span class="dy-tag">오늘</span>' : x.d === yest ? ' <span class="dy-tag y">어제</span>' : '');
+      return '<tr' + (x.d === today ? ' class="now"' : '') + '><th>' + lab + '</th>' + C.map(function(c){ return cell(x[c[0]], c[0]); }).join("") + '</tr>';
+    }).join("");
+    return '<div class="panel dy-panel"><h2>하루 단위 통계 <small style="font-weight:600;color:var(--ink-4)">위에서 고른 기간 · 날짜마다 한 줄</small></h2>' +
+      '<div class="dy-wrap' + (dayAll ? ' all' : '') + '"><table class="dy-t"><thead><tr><th>날짜</th>' + C.map(function(c){ return '<th>' + c[1] + '</th>'; }).join("") + '</tr></thead><tbody>' +
+      (L.length > 1 ? '<tr class="sum"><th>합계 <small>' + L.length + '일</small></th>' + C.map(function(c){ return '<td>' + tfNum(sum[c[0]]) + '</td>'; }).join("") + '</tr>' +
+        '<tr class="avg"><th>하루 평균</th>' + C.map(function(c){ var a = sum[c[0]] / L.length; return '<td>' + (a >= 10 ? tfNum(Math.round(a)) : (Math.round(a * 10) / 10)) + '</td>'; }).join("") + '</tr>' : '') +
+      rows + '</tbody></table></div>' +
+      (L.length > FOLD ? '<button class="dy-more" onclick="dayMore()">' + (dayAll ? '접기 ▲ <small>최근 ' + FOLD + '일만 보기</small>' : '펼치기 ▼ <small>나머지 ' + (L.length - FOLD) + '일 더 보기 · 전체 ' + L.length + '일</small>') + '</button>' : '') +
+      '<p class="sub" style="margin:10px 0 0">방문자 합계는 날마다 센 숫자를 더한 값이라, 같은 사람이 여러 날 오면 그날마다 한 번씩 세져요. 가입은 그 뒤 탈퇴한 사람까지 포함해요.</p></div>';
+  }
   window.tfSetDay = function(d){ tfDay = d; drawTraffic(true); };
   /* 방문 통계 엑셀: 최근 30일 일별 + 지금 고른 기간의 자세히 보기 */
   window.dlTraffic = function(){
@@ -2184,6 +2227,7 @@ if (SRV) {
       rows.push(["■ 기간 " + m.from + " ~ " + m.to, "방문자 " + m.uv]);
       if (m.cmp) { rows.push([]); rows.push(["지난 기간과 비교", "이번", "지난"]); [["방문자", "uv"], ["페이지뷰", "pv"], ["검색으로 온 사람", "search"], ["새 회원", "join"], ["새 글", "posts"]].forEach(function(x){ rows.push([x[0], m.cmp.cur[x[1]], m.cmp.prev[x[1]]]); }); }
       var sec = function(title, head, list, f){ rows.push([]); rows.push([title]); rows.push(head); (list || []).forEach(function(x){ rows.push(f(x)); }); };
+      sec("하루 단위 통계", ["날짜", "방문자", "페이지뷰", "처음 온 사람", "가입", "탈퇴", "새 글", "댓글", "좋아요"], (m.daily || []).slice().reverse(), function(x){ return [x.d, x.uv, x.pv, x.nv, x.join, x.leave, x.posts, x.comments, x.likes]; });
       sec("유입 경로", ["경로", "방문자"], m.refs, function(x){ return [x.k, x.n]; });
       sec("검색 유입", ["검색 사이트", "방문자", "페이지뷰"], m.search, function(x){ return [x.k, x.n, x.pv]; });
       sec("검색어", ["검색어", "검색 사이트", "방문자"], m.kws, function(x){ return [x.k, x.ref, x.n]; });

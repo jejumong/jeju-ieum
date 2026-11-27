@@ -860,8 +860,25 @@ case 'admin_traffic_more': {   // 관리자: 기간별 유입경로·검색·기
   $appDays = []; foreach (all("SELECT DATE(at) d, COUNT(DISTINCT vid) uv FROM ji_hits WHERE br = '홈 화면 앱' AND at >= (CURDATE() - INTERVAL 29 DAY) GROUP BY DATE(at)") as $x) $appDays[$x['d']] = (int)$x['uv'];
   $pu = 0; $pd = 0; $pd60 = 0;
   foreach (all("SELECT v FROM ji_settings WHERE k LIKE 'ps:%'") as $x) { $m = json_decode($x['v'], true); if (!is_array($m) || !$m) continue; $pu++; foreach ($m as $d) { $pd++; if (!empty($d['at']) && strtotime($d['at']) >= time() - 60 * 86400) $pd60++; } }
+  // 하루 단위 통계: 방문자·페이지뷰·처음 온 사람·가입·탈퇴·새 글·댓글·좋아요 (고른 기간, 날짜마다 한 줄)
+  $daily = [];
+  for ($d = $from; $d < $to; $d = date('Y-m-d', strtotime($d . ' +1 day')))
+    $daily[$d] = ['d' => $d, 'uv' => 0, 'pv' => 0, 'nv' => 0, 'join' => 0, 'leave' => 0, 'posts' => 0, 'comments' => 0, 'likes' => 0];
+  foreach (all("SELECT DATE(at) d, COUNT(*) pv, COUNT(DISTINCT vid) uv, COUNT(DISTINCT CASE WHEN nw = 1 THEN vid END) nv FROM ji_hits WHERE $W GROUP BY DATE(at)", $A) as $x)
+    if (isset($daily[$x['d']])) { $daily[$x['d']]['uv'] = (int)$x['uv']; $daily[$x['d']]['pv'] = (int)$x['pv']; $daily[$x['d']]['nv'] = (int)$x['nv']; }
+  $dayCnt = function ($key, $sql) use (&$daily, $from, $to) {
+    foreach (all($sql, [$from, $to]) as $x) if (isset($daily[$x['d']])) $daily[$x['d']][$key] += (int)$x['n'];
+  };
+  // 가입: 지금 회원 + 그 뒤 탈퇴한 사람의 가입일 (회원 현황과 같은 기준)
+  $dayCnt('join', "SELECT DATE(created_at) d, COUNT(*) n FROM ji_users WHERE created_at >= ? AND created_at < ? GROUP BY DATE(created_at)");
+  $dayCnt('join', "SELECT DATE(joined_at) d, COUNT(*) n FROM ji_leaves WHERE joined_at >= ? AND joined_at < ? GROUP BY DATE(joined_at)");
+  $dayCnt('leave', "SELECT DATE(left_at) d, COUNT(*) n FROM ji_leaves WHERE left_at >= ? AND left_at < ? GROUP BY DATE(left_at)");
+  $dayCnt('posts', "SELECT DATE(created_at) d, COUNT(*) n FROM ji_posts WHERE created_at >= ? AND created_at < ? GROUP BY DATE(created_at)");
+  $dayCnt('comments', "SELECT DATE(created_at) d, COUNT(*) n FROM ji_comments WHERE created_at >= ? AND created_at < ? GROUP BY DATE(created_at)");
+  $dayCnt('likes', "SELECT DATE(created_at) d, COUNT(*) n FROM ji_likes WHERE created_at >= ? AND created_at < ? GROUP BY DATE(created_at)");
+  $daily = array_reverse(array_values($daily));
   out(['p' => $p, 'from' => $from, 'to' => date('Y-m-d', strtotime($to . ' -1 day')), 'uv' => $tot,
-    'camps' => $camps, 'camps_all' => $campsAll, 'app' => ['uv' => (int)$app['uv'], 'pv' => (int)$app['pv'], 'all' => (int)$appAll['uv'], 'days' => $appDays, 'push_users' => $pu, 'push_devs' => $pd, 'push_devs60' => $pd60],
+    'daily' => $daily, 'camps' => $camps, 'camps_all' => $campsAll, 'app' => ['uv' => (int)$app['uv'], 'pv' => (int)$app['pv'], 'all' => (int)$appAll['uv'], 'days' => $appDays, 'push_users' => $pu, 'push_devs' => $pd, 'push_devs60' => $pd60],
     'site_kws' => $site, 'site_zero' => $siteZero, 'eng' => $eng, 'bounce' => $sN ? (int)round($sOne / $sN * 100) : null,
     'avg_dur' => $avgDur !== null ? (int)round($avgDur) : null, 'cmp' => $cmp,
     'groups' => $groups, 'refs' => $refs, 'search' => $search, 'kws' => $kws, 'landing' => $land,
