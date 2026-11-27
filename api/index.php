@@ -1191,6 +1191,19 @@ case 'push_reg': {   // 이 기기(dev)의 최근 푸시 구독 id 를 기억 �
   q("REPLACE INTO ji_settings (k, v, updated_at) VALUES (?,?,?)", ['ps:' . $u['id'], json_encode($m), now()]);
   out(count($m));
 }
+case 'push_devices': {   // 관리자 알림 설정: 내 계정에 연결된 기기(브라우저·앱) 목록
+  $u = me($R); if (!is_mod($u)) fail('권한이 없어요');
+  $m = (array)setting('ps:' . $u['id'], []); $L = [];
+  foreach ($m as $k => $d) $L[] = ['dev' => $k, 'sid' => substr($d['sid'] ?? '', 0, 8), 'at' => $d['at'] ?? ''];
+  usort($L, function ($a, $b) { return strcmp($b['at'], $a['at']); });
+  out(['list' => $L, 'push' => !empty($CFG['onesignal_key'])]);
+}
+case 'push_test': {   // 관리자 알림 설정: 연결된 모든 기기로 시험 알림 (알림함에는 남기지 않음)
+  $u = me($R); if (!is_mod($u)) fail('권한이 없어요');
+  if (empty($CFG['onesignal_key'])) fail('서버에 푸시 키가 설정돼 있지 않아요');
+  notify($u['id'], 'admin_test', '시험 알림', '이 알림이 보이면 이 기기에서 관리자 알림을 받을 수 있어요.', 'admin/#alerts', '제주이음 · 시험 알림', '이 알림이 보이면 이 기기에서 관리자 알림을 받을 수 있어요.', false);
+  out(count((array)setting('ps:' . $u['id'], [])));
+}
 case 'noti_read_admin': {   // 관리자 콘솔을 열면: 운영 알림(새 문의·가입·댓글 등)은 확인한 것으로 — 앱 아이콘 숫자가 남지 않게
   $u = me($R); if (!is_mod($u)) out(0);
   q("UPDATE ji_notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0 AND kind LIKE 'admin\\_%'", [$u['id']]); out(true);
