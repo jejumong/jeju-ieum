@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261127c">
+<link rel="stylesheet" href="../assets/style.css?v=20261127d">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -568,18 +568,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261127c"></script>
-<script src="../assets/db.js?v=20261127c"></script>
-<script src="../assets/notify.js?v=20261127c"></script>
-<script src="../assets/seed-trade.js?v=20261127c"></script>
-<script src="../assets/seed-extra.js?v=20261127c"></script>
-<script src="../assets/festivals-data.js?v=20261127c"></script>
-<script src="../assets/seed-new.js?v=20261127c"></script>
-<script src="../assets/seed-comments.js?v=20261127c"></script>
-<script src="../assets/photos.js?v=20261127c"></script>
-<script src="../assets/admin-data.js?v=20261127c"></script>
-<script src="../assets/kmap.js?v=20261127c"></script>
-<script src="../assets/op-posts.js?v=20261127c"></script>
+<script src="../assets/common.js?v=20261127d"></script>
+<script src="../assets/db.js?v=20261127d"></script>
+<script src="../assets/notify.js?v=20261127d"></script>
+<script src="../assets/seed-trade.js?v=20261127d"></script>
+<script src="../assets/seed-extra.js?v=20261127d"></script>
+<script src="../assets/festivals-data.js?v=20261127d"></script>
+<script src="../assets/seed-new.js?v=20261127d"></script>
+<script src="../assets/seed-comments.js?v=20261127d"></script>
+<script src="../assets/photos.js?v=20261127d"></script>
+<script src="../assets/admin-data.js?v=20261127d"></script>
+<script src="../assets/kmap.js?v=20261127d"></script>
+<script src="../assets/op-posts.js?v=20261127d"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -851,6 +851,7 @@ function drawPostTable(){
       : '<td class="num-ro">' + (isPremium(p) ? '<span class="bd">PREMIUM</span>' : '-') + '</td>') +
       (staffLocked(p) ? '<td><span class="bd" title="관리자가 쓴 글은 스텝이 고치거나 지울 수 없어요">관리자 글</span></td></tr>'
       : '<td><div class="acts"><button class="mb" onclick="openEdit(\'' + p.id + '\')">수정</button>' +
+        (p.board !== "공지" ? (noticeOfPost(p.id) ? '<button class="mb ntc-on" onclick="go(\'notices\')" title="공지 관리에서 해제·기간을 바꿀 수 있어요">📌 공지</button>' : '<button class="mb" onclick="postToNotice(\'' + p.id + '\')">공지로</button>') : '') +
         '<button class="mb del" onclick="askDelete(\'' + p.id + '\')">삭제</button></div></td></tr>');
   }).join("");
   document.getElementById("f-total").textContent = "총 " + list.length.toLocaleString() + "건";
@@ -970,7 +971,7 @@ function drawNotices(){
         return '<tr' + (off ? ' style="opacity:.62"' : '') + '><td>' + (off ? '<span class="bd">' + (ex ? '기간 끝남' : '지난 공지') + '</span>' : '<span class="bd" style="background:#e7f6ec;color:#16794a">표시 중</span>' + (n.pinned ? ' 📌' : '')) +
           '<small class="n-until">' + (n.until ? '~' + esc(n.until.slice(5).replace("-", ".")) + '까지' : '영구') + '</small></td>' +
           '<td><span class="bd">' + esc(n.target) + '</span></td>' +
-          '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(n.id) + '" target="_blank">' + esc(n.title) + '</a><small>' + esc(n.date) + '</small></td>' +
+          '<td class="ttl"><a href="' + SITE + 'view.html?id=' + encodeURIComponent(n.ref || n.id) + '" target="_blank">' + esc(n.title) + '</a><small>' + esc(n.date) + (n.ref ? ' · ' + esc(n.refBoard || "게시판") + ' 글을 공지로 올림' : '') + '</small></td>' +
           (isBoss() ? '<td><input class="num" type="number" min="0" value="' + viewsOf(n) + '" data-nid="' + n.id + '"></td>' +
             '<td><input class="num" type="number" min="0" value="' + likesOf(n) + '" data-nlike="' + n.id + '" title="실제로 누른 좋아요 ' + realLikes(n.id) + '개"></td>'
             : '<td>' + viewsOf(n).toLocaleString() + '</td><td>' + likesOf(n).toLocaleString() + '</td>') +
@@ -1013,8 +1014,38 @@ function noticeForm(n){
       (isNew ? '' : '<button type="button" data-d="keep" class="on">그대로' + (n.until ? ' (~' + esc(n.until.slice(5).replace("-", ".")) + ')' : ' (영구)') + '</button>') +
       [["7", "7일"], ["14", "14일"], ["30", "30일"], ["0", "영구"]].map(function(o){ return '<button type="button" data-d="' + o[0] + '"' + (isNew && o[0] === "0" ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("") +
       '<span class="n-per-t"></span></div></div>' +
+    (n.ref ? '<div class="fld"><label>내용</label><p class="sub" style="margin:4px 0 0">게시판 글을 공지로 올린 것이라 제목·내용은 원래 글(' + esc(n.refBoard || "") + ')을 그대로 따라가요. 고치려면 게시글 관리에서 그 글을 수정하세요.</p></div>' :
     '<div class="fld"><label>제목</label><input id="n-title" value="' + esc(n.title) + '" placeholder="공지 제목"></div>' +
-    '<div class="fld"><label>내용</label><textarea id="n-content" placeholder="회원들에게 알릴 내용을 적어주세요">' + esc(n.content) + '</textarea></div>';
+    '<div class="fld"><label>내용</label><textarea id="n-content" placeholder="회원들에게 알릴 내용을 적어주세요">' + esc(n.content) + '</textarea></div>');
+}
+/* ── 게시판 글을 공지로 올리기 ──
+   글을 복사하지 않고 원래 글을 가리키는 공지(ref)를 만듭니다. 댓글·좋아요·조회수는 원래 글 하나에 모이고,
+   공지를 해제해도 원래 글은 게시판에 그대로 남아요. */
+function noticeOfPost(pid){ return adminNotices().filter(function(n){ return n.ref === pid && !noticeOff(n); })[0]; }
+function postToNotice(pid){
+  var p = findPost(pid); if (!p) return;
+  var targets = ["전체","커뮤니티"].concat(ALL_BOARDS);
+  showModal('<h3>공지로 올리기</h3><p class="sub" style="margin:0 0 12px">「' + esc(p.title) + '」 글이 게시판 맨 위에 공지로 보여요. 글은 원래 게시판(' + esc(p.board) + ')에도 그대로 남고, 댓글·좋아요도 그 글 하나에 모여요.</p>' +
+    '<div class="row2"><div class="fld"><label>표시할 곳</label><select id="pn-target">' +
+      targets.map(function(t){ return '<option' + (t === p.board ? ' selected' : '') + '>' + t + '</option>'; }).join("") + '</select></div>' +
+    '<div class="fld"><label>상단 고정</label><label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding-top:8px"><input type="checkbox" id="pn-pin"> 다른 공지보다 위에 고정</label></div></div>' +
+    '<div class="fld"><label>공지 기간</label><div class="n-per" id="n-per">' +
+      [["7", "7일"], ["14", "14일"], ["30", "30일"], ["0", "영구"]].map(function(o){ return '<button type="button" data-d="' + o[0] + '"' + (o[0] === "7" ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("") +
+      '<span class="n-per-t"></span></div></div>' +
+    '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" onclick="savePostNotice(\'' + pid + '\')">공지로 올리기</button></div>');
+  bindNoticePer(document.getElementById("modal"));
+}
+function savePostNotice(pid){
+  var p = findPost(pid); if (!p) return;
+  var box = document.getElementById("modal");
+  var per = box.querySelector("#n-per button.on"), dd = per ? per.dataset.d : "0";
+  var ns = adminNotices();
+  ns.push({ id: "an" + Date.now(), ref: pid, board: "공지", head: "공지", author: "제주이음", date: today(), views: 0,
+    title: p.title, content: String(p.content || "").slice(0, 200), target: box.querySelector("#pn-target").value, pinned: box.querySelector("#pn-pin").checked,
+    until: dd === "0" ? null : noticeUntil(+dd) });
+  JI.set("notices", ns); closeModal();
+  toast("공지로 올렸습니다 — 공지 관리에서 해제·기간을 바꿀 수 있어요");
+  if (document.getElementById("post-table")) drawPostTable();
 }
 function setNotice(id, obj, viewsReset){
   if (viewsReset) { var v = JI.get("views", {}); delete v[id]; JI.set("views", v); }
@@ -1031,8 +1062,9 @@ function saveNotice(id){
   /* 수정 창과 새 공지 칸의 입력 이름이 같아서, 수정할 때는 수정 창 안에서만 찾음 */
   var box = id ? document.getElementById("modal") : M();
   function F(x){ return box.querySelector("#" + x); }
-  var obj = { target: F("n-target").value, pinned: F("n-pin").checked,
-    title: F("n-title").value.trim(), content: F("n-content").value.trim() };
+  var obj = { target: F("n-target").value, pinned: F("n-pin").checked };
+  if (F("n-title")) { obj.title = F("n-title").value.trim(); obj.content = F("n-content").value.trim(); }
+  else obj.title = (allNoticeItems().filter(function(x){ return x.id === id; })[0] || {}).title || "공지";
   var offSel = F("n-off"); if (offSel) obj.off = offSel.value === "off";
   var per = box.querySelector("#n-per button.on"), dd = per ? per.dataset.d : "0";
   if (dd !== "keep") obj.until = dd === "0" ? null : noticeUntil(+dd);
@@ -1212,7 +1244,7 @@ if (SRV) {
     return _deletePost(p);
   });
   restorePost = pushOn(restorePost);
-  saveNotice = pushOn(saveNotice); delNotice = pushOn(delNotice); setNotice = pushOn(setNotice); toggleNotice = pushOn(toggleNotice);
+  saveNotice = pushOn(saveNotice); savePostNotice = pushOn(savePostNotice); delNotice = pushOn(delNotice); setNotice = pushOn(setNotice); toggleNotice = pushOn(toggleNotice);
   if (typeof togglePm === "function") togglePm = pushOn(togglePm);
 
   /* 서버 글 수정: 목록에는 본문 앞부분만 있으니 전문을 불러온 뒤 수정 창 열기 */

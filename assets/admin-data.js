@@ -54,7 +54,17 @@ function allNotices() {
   var ov = adminOv();
   var b = builtinNoticeBase().filter(function (n) { return !(ov[n.id] && ov[n.id].deleted); });
   b.forEach(function (n) { n.target = n.target || "커뮤니티"; });
-  return adminNotices().concat(b);
+  /* 게시판 글을 공지로 올린 것(ref): 제목·내용·조회수는 원래 글을 그대로 따라감 (글을 고치면 공지도 같이 바뀜) */
+  var base = window._findPostBase || findPost;
+  var mine = adminNotices().map(function (n) {
+    if (!n.ref) return n;
+    var p = base(n.ref); if (!p) return n;
+    var m = {}; for (var k in n) m[k] = n[k];
+    m.title = p.title; m.content = p.content; m.refBoard = p.board;
+    if (p.db) { m.db = true; m.views = p.views || 0; }
+    return m;
+  });
+  return mine.concat(b);
 }
 /* 공지 기간: until(YYYY-MM-DD, 그날까지 표시)이 지나면 '지난 공지'로 */
 function noticeToday() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
@@ -80,6 +90,7 @@ function noticesFor(board) {
 /* findPost 가 관리자 공지·삭제된 글도 알도록 */
 (function () {
   var base = findPost;
+  window._findPostBase = base;
   findPost = function (id) {
     if (!id) return null;
     if (isBuiltinNotice(id) && adminOv()[id] && adminOv()[id].deleted) return null;
