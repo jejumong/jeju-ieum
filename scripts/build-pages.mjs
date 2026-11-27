@@ -84,6 +84,7 @@ function guideStatic(g) {
     if (s.table) h += `<div class="tbl-scroll"><table class="cmp${s.table.head.length <= 3 ? " two" : ""}"><thead><tr>${s.table.head.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>` +
       s.table.rows.map((r) => `<tr>${r.map((c, j) => (j === 0 ? `<th>${eb(c)}</th>` : `<td>${eb(c)}</td>`)).join("")}</tr>`).join("") + `</tbody></table></div>`;
     if (s.list) h += `<ul class="dots">${s.list.map((t) => `<li>${t}</li>`).join("")}</ul>`;
+    (s.after || []).forEach((t) => { h += `<p>${eb(t)}</p>`; });
     return h;
   }).join("");
   return `<header class="art-head"><div class="chips"><span class="chip region">${esc(g.cat)}</span>${(g.stage || []).map((s) => `<span class="chip stage">${esc(stageLabel(s))}</span>`).join("")}</div>
