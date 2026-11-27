@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261127d">
+<link rel="stylesheet" href="../assets/style.css?v=20261127e">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -206,6 +206,8 @@ table.mem-t td small{font-size:13px}
 .n-per button{padding:8px 16px;border:1px solid #dfe3ea;border-radius:999px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:var(--ink-3);cursor:pointer}
 .n-per button.on{background:#0e2440;border-color:#0e2440;color:#fff}
 .n-per-t{font-size:13px;color:var(--ink-3);margin-left:4px}
+.n-per-date{padding:7px 10px;border:1px solid #0e2440;border-radius:10px;font:inherit;font-size:14px;font-weight:600;color:var(--ink-1,#111)}
+.n-per-date[hidden]{display:none}
 small.n-until{display:block;margin-top:4px;font-size:12px;color:var(--ink-4)}
 .adm-t td.num-ro{color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .op-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0 12px}.op-top .op-tabs{margin:0}
@@ -568,18 +570,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261127d"></script>
-<script src="../assets/db.js?v=20261127d"></script>
-<script src="../assets/notify.js?v=20261127d"></script>
-<script src="../assets/seed-trade.js?v=20261127d"></script>
-<script src="../assets/seed-extra.js?v=20261127d"></script>
-<script src="../assets/festivals-data.js?v=20261127d"></script>
-<script src="../assets/seed-new.js?v=20261127d"></script>
-<script src="../assets/seed-comments.js?v=20261127d"></script>
-<script src="../assets/photos.js?v=20261127d"></script>
-<script src="../assets/admin-data.js?v=20261127d"></script>
-<script src="../assets/kmap.js?v=20261127d"></script>
-<script src="../assets/op-posts.js?v=20261127d"></script>
+<script src="../assets/common.js?v=20261127e"></script>
+<script src="../assets/db.js?v=20261127e"></script>
+<script src="../assets/notify.js?v=20261127e"></script>
+<script src="../assets/seed-trade.js?v=20261127e"></script>
+<script src="../assets/seed-extra.js?v=20261127e"></script>
+<script src="../assets/festivals-data.js?v=20261127e"></script>
+<script src="../assets/seed-new.js?v=20261127e"></script>
+<script src="../assets/seed-comments.js?v=20261127e"></script>
+<script src="../assets/photos.js?v=20261127e"></script>
+<script src="../assets/admin-data.js?v=20261127e"></script>
+<script src="../assets/kmap.js?v=20261127e"></script>
+<script src="../assets/op-posts.js?v=20261127e"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -1013,7 +1015,7 @@ function noticeForm(n){
     '<div class="fld"><label>공지 기간</label><div class="n-per" id="n-per">' +
       (isNew ? '' : '<button type="button" data-d="keep" class="on">그대로' + (n.until ? ' (~' + esc(n.until.slice(5).replace("-", ".")) + ')' : ' (영구)') + '</button>') +
       [["7", "7일"], ["14", "14일"], ["30", "30일"], ["0", "영구"]].map(function(o){ return '<button type="button" data-d="' + o[0] + '"' + (isNew && o[0] === "0" ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("") +
-      '<span class="n-per-t"></span></div></div>' +
+      perDateHtml() + '<span class="n-per-t"></span></div></div>' +
     (n.ref ? '<div class="fld"><label>내용</label><p class="sub" style="margin:4px 0 0">게시판 글을 공지로 올린 것이라 제목·내용은 원래 글(' + esc(n.refBoard || "") + ')을 그대로 따라가요. 고치려면 게시글 관리에서 그 글을 수정하세요.</p></div>' :
     '<div class="fld"><label>제목</label><input id="n-title" value="' + esc(n.title) + '" placeholder="공지 제목"></div>' +
     '<div class="fld"><label>내용</label><textarea id="n-content" placeholder="회원들에게 알릴 내용을 적어주세요">' + esc(n.content) + '</textarea></div>');
@@ -1031,18 +1033,18 @@ function postToNotice(pid){
     '<div class="fld"><label>상단 고정</label><label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;padding-top:8px"><input type="checkbox" id="pn-pin"> 다른 공지보다 위에 고정</label></div></div>' +
     '<div class="fld"><label>공지 기간</label><div class="n-per" id="n-per">' +
       [["7", "7일"], ["14", "14일"], ["30", "30일"], ["0", "영구"]].map(function(o){ return '<button type="button" data-d="' + o[0] + '"' + (o[0] === "7" ? ' class="on"' : '') + '>' + o[1] + '</button>'; }).join("") +
-      '<span class="n-per-t"></span></div></div>' +
+      perDateHtml() + '<span class="n-per-t"></span></div></div>' +
     '<div class="bt"><button class="mb" onclick="closeModal()">취소</button><button class="mb pri" onclick="savePostNotice(\'' + pid + '\')">공지로 올리기</button></div>');
   bindNoticePer(document.getElementById("modal"));
 }
 function savePostNotice(pid){
   var p = findPost(pid); if (!p) return;
   var box = document.getElementById("modal");
-  var per = box.querySelector("#n-per button.on"), dd = per ? per.dataset.d : "0";
+  var until = perUntil(box); if (until === false) return;
   var ns = adminNotices();
   ns.push({ id: "an" + Date.now(), ref: pid, board: "공지", head: "공지", author: "제주이음", date: today(), views: 0,
     title: p.title, content: String(p.content || "").slice(0, 200), target: box.querySelector("#pn-target").value, pinned: box.querySelector("#pn-pin").checked,
-    until: dd === "0" ? null : noticeUntil(+dd) });
+    until: until });
   JI.set("notices", ns); closeModal();
   toast("공지로 올렸습니다 — 공지 관리에서 해제·기간을 바꿀 수 있어요");
   if (document.getElementById("post-table")) drawPostTable();
@@ -1066,8 +1068,8 @@ function saveNotice(id){
   if (F("n-title")) { obj.title = F("n-title").value.trim(); obj.content = F("n-content").value.trim(); }
   else obj.title = (allNoticeItems().filter(function(x){ return x.id === id; })[0] || {}).title || "공지";
   var offSel = F("n-off"); if (offSel) obj.off = offSel.value === "off";
-  var per = box.querySelector("#n-per button.on"), dd = per ? per.dataset.d : "0";
-  if (dd !== "keep") obj.until = dd === "0" ? null : noticeUntil(+dd);
+  var until = perUntil(box); if (until === false) return;
+  if (until !== undefined) obj.until = until;
   if (!obj.title) { alert("제목을 입력하세요."); return; }
   if (id) { setNotice(id, obj); closeModal(); toast(obj.off ? "공지를 해제했습니다 (공지사항 목록에 보관)" : "공지를 수정했습니다"); }
   else {
@@ -1079,12 +1081,36 @@ function saveNotice(id){
 }
 /* 오늘부터 d일 동안 (오늘 포함) → 마지막 날 */
 function noticeUntil(d){ var t = new Date(); t.setDate(t.getDate() + d - 1); return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2); }
+/* 공지 기간: 7·14·30일·영구 버튼 + 달력으로 마지막 날 직접 고르기 */
+function perDateHtml(){ return '<button type="button" data-d="date">📅 날짜 선택</button><input type="date" class="n-per-date" min="' + today() + '" hidden>'; }
+/* undefined: 그대로 · null: 영구 · "YYYY-MM-DD": 그날까지 · false: 날짜를 아직 안 골라서 저장하지 않음 */
+function perUntil(box){
+  var per = box.querySelector("#n-per button.on"), dd = per ? per.dataset.d : "0";
+  if (dd === "keep") return undefined;
+  if (dd === "0") return null;
+  if (dd === "date") {
+    var v = box.querySelector(".n-per-date").value;
+    if (!v) { alert("공지를 표시할 마지막 날을 달력에서 골라 주세요."); return false; }
+    if (v < today()) { alert("오늘이나 그 뒤의 날짜를 골라 주세요."); return false; }
+    return v;
+  }
+  return noticeUntil(+dd);
+}
 function bindNoticePer(root){
   var box = root.querySelector("#n-per"); if (!box) return;
-  var txt = box.querySelector(".n-per-t");
+  var txt = box.querySelector(".n-per-t"), dt = box.querySelector(".n-per-date");
+  var WD = ["일","월","화","수","목","금","토"];
   function show(){ var b = box.querySelector("button.on"), d = b ? b.dataset.d : "0";
+    if (dt) dt.hidden = d !== "date";
+    if (d === "date") {
+      if (!dt.value) { txt.textContent = "달력에서 마지막 날을 골라 주세요"; return; }
+      var x = new Date(dt.value + "T00:00:00");
+      txt.textContent = dt.value.slice(5).replace("-", ".") + "(" + WD[x.getDay()] + ")까지 표시되고, 그다음 날 '지난 공지'로 넘어가요"; return;
+    }
     txt.textContent = d === "keep" ? "" : d === "0" ? "직접 해제할 때까지 표시돼요" : noticeUntil(+d).slice(5).replace("-", ".") + "까지 표시되고, 그다음 날 '지난 공지'로 넘어가요"; }
-  box.onclick = function(e){ var b = e.target.closest("button"); if (!b) return; box.querySelectorAll("button").forEach(function(x){ x.classList.toggle("on", x === b); }); show(); };
+  box.onclick = function(e){ var b = e.target.closest("button"); if (!b) return; box.querySelectorAll("button").forEach(function(x){ x.classList.toggle("on", x === b); }); show();
+    if (b.dataset.d === "date" && dt) { try { dt.showPicker(); } catch (er) { dt.focus(); } } };
+  if (dt) dt.oninput = dt.onchange = show;
   show();
 }
 function editNotice(id){
