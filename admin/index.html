@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261127g">
+<link rel="stylesheet" href="../assets/style.css?v=20261127h">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -348,6 +348,7 @@ button.op-main:hover b{color:#1e6fd9;text-decoration:underline}
 .op-main pre{white-space:pre-wrap;font:inherit;font-size:13.5px;line-height:1.7;background:var(--bg-2,#f6f8fa);border-radius:10px;padding:12px;margin:8px 0 0}
 .th-s{border:0;background:none;font:inherit;font-weight:inherit;color:inherit;cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;letter-spacing:inherit}
 .th-s i{font-style:normal;font-size:12.5px;opacity:.6;color:var(--ink-3,#5b6774);margin-left:1px}.th-s.on{color:var(--sea-700,#1a5fae)}.th-s.on i{opacity:1;color:var(--sea,#1f74d0)}
+.adm-t td.au{font-size:13.5px;font-weight:600;color:var(--ink-1,#1d2733);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.adm-t td.au small{display:block;font-size:11.5px;font-weight:600;color:var(--sea-700,#1a5fae)}
 .adm-t td.dt{white-space:nowrap;font-size:13px;color:var(--ink-2,#3a4652)}.adm-t td.dt small{display:block;font-size:11.5px;color:var(--ink-4,#8a96a3)}
 .mem-sort-m{display:none;gap:14px;align-items:center;font-size:13px;color:var(--ink-3);margin:0 0 10px;flex-wrap:wrap}
 @media(max-width:760px){.mem-sort-m{display:flex}}
@@ -587,18 +588,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261127g"></script>
-<script src="../assets/db.js?v=20261127g"></script>
-<script src="../assets/notify.js?v=20261127g"></script>
-<script src="../assets/seed-trade.js?v=20261127g"></script>
-<script src="../assets/seed-extra.js?v=20261127g"></script>
-<script src="../assets/festivals-data.js?v=20261127g"></script>
-<script src="../assets/seed-new.js?v=20261127g"></script>
-<script src="../assets/seed-comments.js?v=20261127g"></script>
-<script src="../assets/photos.js?v=20261127g"></script>
-<script src="../assets/admin-data.js?v=20261127g"></script>
-<script src="../assets/kmap.js?v=20261127g"></script>
-<script src="../assets/op-posts.js?v=20261127g"></script>
+<script src="../assets/common.js?v=20261127h"></script>
+<script src="../assets/db.js?v=20261127h"></script>
+<script src="../assets/notify.js?v=20261127h"></script>
+<script src="../assets/seed-trade.js?v=20261127h"></script>
+<script src="../assets/seed-extra.js?v=20261127h"></script>
+<script src="../assets/festivals-data.js?v=20261127h"></script>
+<script src="../assets/seed-new.js?v=20261127h"></script>
+<script src="../assets/seed-comments.js?v=20261127h"></script>
+<script src="../assets/photos.js?v=20261127h"></script>
+<script src="../assets/admin-data.js?v=20261127h"></script>
+<script src="../assets/kmap.js?v=20261127h"></script>
+<script src="../assets/op-posts.js?v=20261127h"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -861,7 +862,8 @@ function drawPostTable(){
     return '<tr>' + bkBox("posts", p.id, staffLocked(p)) +
       '<td><span class="bd' + (isUserPost(p)?' user':'') + '">' + esc(p.board) + '</span></td>' +
       '<td class="ttl"><a href="' + SITE + 'view.html?id=' + p.id + '" target="_blank" title="새 탭에서 보기">' + esc(p.title) + '</a>' +
-        '<small>' + esc(p.author) + ' · 댓글 ' + cmtCount(p) + (p.hidden ? ' · <b style="color:#b4372d">🔒 비공개(판매 기간 끝남)</b>' : '') + '</small></td>' +
+        '<small>댓글 ' + cmtCount(p) + (p.hidden ? ' · <b style="color:#b4372d">🔒 비공개(판매 기간 끝남)</b>' : '') + '</small></td>' +
+      '<td class="au">' + esc(p.author || "-") + (p.authorRole === "admin" ? '<small>관리자</small>' : p.authorRole === "staff" ? '<small>스텝</small>' : '') + '</td>' +
       '<td class="dt">' + esc(String(p.date || "").replace(/-/g, ".")) + (p.time ? '<small>' + esc(p.time) + '</small>' : '') + '</td>' +
       (boss ? '<td><input class="num" type="number" min="0" value="' + viewsOf(p) + '" data-id="' + p.id + '" data-f="views"></td>' +
       '<td><input class="num" type="number" min="0" value="' + likesOf(p) + '" data-id="' + p.id + '" data-f="likes"></td>'
@@ -875,7 +877,7 @@ function drawPostTable(){
   }).join("");
   document.getElementById("f-total").textContent = "총 " + list.length.toLocaleString() + "건";
   document.getElementById("post-table").innerHTML = list.length
-    ? '<table class="adm-t"><thead><tr>' + bkAll("posts") + '<th>게시판</th><th>제목</th>' + thSort("날짜", "date", postSort, postDir, "sortPosts") + thSort("조회수", "views", postSort, postDir, "sortPosts") + thSort("좋아요", "likes", postSort, postDir, "sortPosts") + '<th>프리미엄</th><th>관리</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    ? '<table class="adm-t"><thead><tr>' + bkAll("posts") + '<th>게시판</th><th>제목</th><th>작성자</th>' + thSort("날짜", "date", postSort, postDir, "sortPosts") + thSort("조회수", "views", postSort, postDir, "sortPosts") + thSort("좋아요", "likes", postSort, postDir, "sortPosts") + '<th>프리미엄</th><th>관리</th></tr></thead><tbody>' + rows + '</tbody></table>'
     : '<div class="empty">조건에 맞는 글이 없습니다.</div>';
   var pg = "";
   for (var i = 1; i <= pages; i++) pg += '<button class="' + (i===postPage?'on':'') + '" onclick="postPage=' + i + ';drawPostTable();window.scrollTo(0,0)">' + i + '</button>';
