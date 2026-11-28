@@ -29,7 +29,7 @@ jobs:
       - run: node scripts/build-pages.mjs
       - name: 바뀐 페이지 올리기
         run: |
-          git add guide house program info sitemap.xml robots.txt rss.xml
+          git add guide house program info sitemap.xml robots.txt rss.xml *.html
           if git diff --cached --quiet; then echo "바뀐 페이지 없음"; exit 0; fi
           git config user.name "jeju-ieum-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

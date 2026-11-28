@@ -12,16 +12,16 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261127j">
+<link rel="stylesheet" href="assets/style.css?v=20261128a">
 <style>
-.tool-big{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.tool-big{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .tool-big .tool-tile{min-height:0;padding:16px 18px 15px}
 .tool-big .tool-tile .tt-ico{font-size:24px}
 .tool-big .tool-tile b{font-size:17px;margin-top:10px}
 .tool-big .tool-tile span{font-size:13px;line-height:1.5;margin-top:4px}
 .tool-big .tool-tile em{font-style:normal;margin-top:auto;padding-top:10px;font-size:12.5px;font-weight:800;opacity:.9}
 .tool-sub{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media (max-width:960px){.tool-big{grid-template-columns:1fr 1fr}.tool-sub{grid-template-columns:1fr 1fr}}
+@media (max-width:960px){.tool-big{grid-template-columns:1fr 1fr}.tool-big .tool-tile:last-child:nth-child(odd){grid-column:1/-1}.tool-sub{grid-template-columns:1fr 1fr}}
 @media (max-width:680px){.tool-big{gap:10px}.tool-big .tool-tile{min-height:0;padding:14px 14px 13px}.tool-big .tool-tile .tt-ico{font-size:21px}.tool-big .tool-tile b{font-size:15.5px;margin-top:8px}.tool-big .tool-tile span{font-size:12px}.tool-big .tool-tile em{display:none}}
 </style>
 </head>
@@ -45,6 +45,8 @@
       <span>오늘 만조·간조 시각, 바릇잡이·낚시 전에</span><em>열기 →</em></a>
     <a class="tool-tile citrus" id="t-jang" href="jangnal.html"><span class="tt-ico">🧺</span><b>제주 오일장 달력</b>
       <span>오늘 열리는 장과 이번 달 장날</span><em>열기 →</em></a>
+    <a class="tool-tile sea" id="t-rain" href="rain.html"><span class="tt-ico">🌧️</span><b>제주 비구름·태풍 지도</b>
+      <span>몰려오는 비구름·번개, 멀리서 오는 태풍</span><em>열기 →</em></a>
   </div>
 
   <div class="sec-title">
@@ -64,9 +66,9 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261127j"></script>
-<script src="assets/db.js?v=20261127j"></script>
-<script src="assets/notify.js?v=20261127j"></script>
+<script src="assets/common.js?v=20261128a"></script>
+<script src="assets/db.js?v=20261128a"></script>
+<script src="assets/notify.js?v=20261128a"></script>
 <script>
 </script>
 </body>
