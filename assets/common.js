@@ -239,6 +239,32 @@ function jobDeadlineText(p) {
   var d = jobDday(p); if (d === null) return "";
   return d < 0 ? "마감" : d === 0 ? "오늘 마감" : "마감 D-" + d;
 }
+/* 선 아이콘 모음 (메인 화면 아이콘과 같은 모양·굵기) — lineIco("house", 22) */
+var LINE_ICO = {
+  compass: '<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+  book: '<path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7z"/>',
+  tool: '<rect x="3" y="8" width="18" height="12" rx="2"/><path d="M9 8V5h6v3M3 13h18M11 13v2h2v-2"/>',
+  ask: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5V14M12 17.2v.1"/>',
+  bag: '<rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 7V4h6v3"/>',
+  box: '<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>',
+  house: '<path d="M4 20V9l8-5 8 5v11zM9 20v-6h6v6"/>',
+  pin: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  cal: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  school: '<path d="M3 11l9-6 9 6M5 10v9h14v-9M10 19v-5h4v5"/>',
+  job: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 12h18"/>',
+  people: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 2 6 5.5"/>',
+  wave: '<path d="M3 9c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0M3 14c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0M3 19c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/>',
+  basket: '<path d="M3 10h18l-2 10H5zM7 10l4-6M17 10l-4-6M9 14v3M15 14v3"/>',
+  rain: '<path d="M7 15a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 8a3.5 3.5 0 0 1 .5 7H7z"/><path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5"/>',
+  child: '<circle cx="12" cy="5.5" r="2.5"/><path d="M7 11l5-2 5 2M12 9v6M9 21l3-6 3 6"/>',
+  check: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/>',
+  storm: '<path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0"/><path d="M12 4c-3 2-3 6 0 8s3 6 0 8"/>',
+  recycle: '<path d="M7 19H4l3-5M17 19h3l-3-5M9 5l3-2 3 5M7 14l-2-3M17 14l2-3M10 19h4"/>',
+  coin: '<circle cx="12" cy="12" r="9"/><path d="M9 9h6M9 12h6M12 9v8"/>'
+};
+function lineIco(k, size) {
+  return '<svg class="lico" viewBox="0 0 24 24" width="' + (size || 22) + '" height="' + (size || 22) + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (LINE_ICO[k] || LINE_ICO.book) + '</svg>';
+}
 function payText(p) {
   if (!p || !p.payType) return "";
   if (p.payType === "협의" || !p.pay) return p.payType === "협의" ? "급여 협의" : p.payType + " 협의";
@@ -483,7 +509,7 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
   }
   /* 펼침 메뉴의 큰 카드: 묶음 전체가 버튼 하나 (안의 항목은 안내용 글씨) */
   function ddCard(ico, label, href, desc, items) {
-    return '<a class="dd-card" href="' + href + '"><span class="dc-ico">' + ico + '</span><b>' + label + ' <em>›</em></b><small>' + desc + '</small>' +
+    return '<a class="dd-card" href="' + href + '"><span class="dc-ico">' + lineIco(ico, 22) + '</span><b>' + label + ' <em>›</em></b><small>' + desc + '</small>' +
       '<span class="dc-items">' + items.map(function (t) { return '<i>' + t + '</i>'; }).join("") + '</span></a>';
   }
   function boardLinks(names) {
@@ -493,9 +519,9 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
   var menus = [
     { id: "guide", label: "제주살이 가이드", href: "guide.html", match: ["guide", "article", "tools", "tool"],
       dd: '<div class="dd-cards">' +
-          ddCard("🧭", "상황별로 보기", "guide.html?view=stage", "지금 내 상황에 맞는 글", ["이주 고민 중", "한달살기 준비", "막 이사 왔어요", "제주 사는 도민"]) +
-          ddCard("📚", "주제별로 보기", "guide.html?view=topic", "궁금한 주제로 골라 읽기", ["동네 고르기", "계절 생활", "집·생활", "아이랑 제주", "일·돈", "마을·관계"]) +
-          ddCard("🧰", "생활도구", "tools.html", "매일 쓰는 제주 생활 도구", ["열두 달 달력", "내 근처 찾기", "물때 시간표", "오일장 달력", "비구름·태풍 지도"]) +
+          ddCard("compass", "상황별로 보기", "guide.html?view=stage", "지금 내 상황에 맞는 글", ["이주 고민 중", "한달살기 준비", "막 이사 왔어요", "제주 사는 도민"]) +
+          ddCard("book", "주제별로 보기", "guide.html?view=topic", "궁금한 주제로 골라 읽기", ["동네 고르기", "계절 생활", "집·생활", "아이랑 제주", "일·돈", "마을·관계"]) +
+          ddCard("tool", "생활도구", "tools.html", "매일 쓰는 제주 생활 도구", ["열두 달 달력", "내 근처 찾기", "물때 시간표", "오일장 달력", "비구름·태풍 지도"]) +
         '</div>' },
     { id: "stay", label: "한달살기·이주", href: "stay.html" },
     { id: "school", label: "학교 연계 집", href: "school.html" },

@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261128d">
+<link rel="stylesheet" href="assets/style.css?v=20261128e">
 <style>
 .sr-posts{background:var(--card,#fff);border:1px solid var(--line,#e5e9f0);border-radius:var(--r,14px);padding:6px 4px;margin:0 0 18px}
 .sr-h{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px;font-size:15px}
@@ -53,34 +53,37 @@
   </div>
 </main>
 
-<script src="assets/common.js?v=20261128d"></script>
-<script src="assets/db.js?v=20261128d"></script>
-<script src="assets/notify.js?v=20261128d"></script>
-<script src="assets/seed-trade.js?v=20261128d"></script>
-<script src="assets/seed-extra.js?v=20261128d"></script>
-<script src="assets/festivals-data.js?v=20261128d"></script>
-<script src="assets/seed-new.js?v=20261128d"></script>
-<script src="assets/admin-data.js?v=20261128d"></script>
-<script src="assets/guide-data.js?v=20261128d"></script>
+<script src="assets/common.js?v=20261128e"></script>
+<script src="assets/db.js?v=20261128e"></script>
+<script src="assets/notify.js?v=20261128e"></script>
+<script src="assets/seed-trade.js?v=20261128e"></script>
+<script src="assets/seed-extra.js?v=20261128e"></script>
+<script src="assets/festivals-data.js?v=20261128e"></script>
+<script src="assets/seed-new.js?v=20261128e"></script>
+<script src="assets/admin-data.js?v=20261128e"></script>
+<script src="assets/guide-data.js?v=20261128e"></script>
 <script>
 (function(){
   var P = new URLSearchParams(location.search);
   var stage = P.get("stage") || "", cat = P.get("cat") || "", q = (P.get("q") || "").trim();
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
   function $(id){ return document.getElementById(id); }
-  var STAGE_ICO = { "": "📚", "고민": "🤔", "한달살기": "🧳", "정착": "📦", "도민": "🏠" };
+  var STAGE_ICO = { "": "book", "고민": "ask", "한달살기": "bag", "정착": "box", "도민": "house" };
+  var CAT_ICO = { "동네 고르기": "pin", "계절 생활": "cal", "집·생활": "house", "아이랑 제주": "child", "일·돈": "job", "마을·관계": "people" };
+  var GUIDE_ICO = { "settle-checklist": "check", "trial-stay": "bag", "typhoon-humidity": "storm", "humidity-typhoon": "storm", "waste": "recycle", "living-cost": "coin", "calendar": "cal", "month-calendar": "cal" };
+  var I = function(k, n){ return lineIco(k, n || 22); };
 
   var view = P.get("view") || "";
   var CATS = [
-    ["동네 고르기", "🧭", "동·서·남·북 어디에 살지, 먼저 살아보기"],
-    ["계절 생활", "🗓️", "열두 달 날씨와 계절마다 할 일"],
-    ["집·생활", "🏡", "이사 첫 달, 습기·태풍, 쓰레기 버리기"],
-    ["아이랑 제주", "🧒", "학교·돌봄, 아이와 사는 제주"],
-    ["일·돈", "💼", "일과 수입 만들기, 생활비"],
-    ["마을·관계", "🤝", "이웃·마을과 잘 지내는 법"]
+    ["동네 고르기", "pin", "동·서·남·북 어디에 살지, 먼저 살아보기"],
+    ["계절 생활", "cal", "열두 달 날씨와 계절마다 할 일"],
+    ["집·생활", "house", "이사 첫 달, 습기·태풍, 쓰레기 버리기"],
+    ["아이랑 제주", "child", "학교·돌봄, 아이와 사는 제주"],
+    ["일·돈", "job", "일과 수입 만들기, 생활비"],
+    ["마을·관계", "people", "이웃·마을과 잘 지내는 법"]
   ];
-  var TOOLS = [["🗓️", "열두 달 달력", "tool.html?t=cal"], ["📍", "내 근처 찾기", "tool.html?t=near"], ["🌊", "물때 시간표", "tool.html?t=tide"],
-    ["🧺", "오일장 달력", "jangnal.html"], ["🌧️", "비구름·태풍 지도", "rain.html"]];
+  var TOOLS = [["cal", "열두 달 달력", "tool.html?t=cal"], ["pin", "내 근처 찾기", "tool.html?t=near"], ["wave", "물때 시간표", "tool.html?t=tide"],
+    ["basket", "오일장 달력", "jangnal.html"], ["rain", "비구름·태풍 지도", "rain.html"]];
   function stageUrl(id){ return "guide.html" + (id ? "?stage=" + encodeURIComponent(id) : ""); }
   function catUrl(c){ return "guide.html?cat=" + encodeURIComponent(c); }
   function nStage(id){ return GUIDES.filter(function(g){ return (g.stage||[]).indexOf(id) > -1; }).length; }
@@ -91,12 +94,12 @@
   if (!stage && !cat && !q && !view) {
     // 가이드 첫 화면: 세 묶음을 크게
     hub.innerHTML = '<div class="gh3">' +
-      '<section class="gh-panel stage"><a class="gh-head" href="guide.html?view=stage"><span class="gh-ico">🧭</span><div><h2>상황별로 보기</h2><p>지금 내 상황을 고르면 꼭 필요한 글만</p></div><em>›</em></a>' +
-        '<div class="gh-btns">' + GUIDE_STAGES.map(function(s){ return '<a href="' + stageUrl(s.id) + '"><span>' + STAGE_ICO[s.id] + '</span><b>' + esc(s.label) + '</b><small>' + esc(s.sub) + ' · ' + nStage(s.id) + '편</small></a>'; }).join("") + '</div></section>' +
-      '<section class="gh-panel topic"><a class="gh-head" href="guide.html?view=topic"><span class="gh-ico">📚</span><div><h2>주제별로 보기</h2><p>궁금한 주제로 골라 읽기</p></div><em>›</em></a>' +
-        '<div class="gh-btns">' + CATS.map(function(c){ return '<a href="' + catUrl(c[0]) + '"><span>' + c[1] + '</span><b>' + esc(c[0]) + '</b><small>' + nCat(c[0]) + '편</small></a>'; }).join("") + '</div></section>' +
-      '<section class="gh-panel tool"><a class="gh-head" href="tools.html"><span class="gh-ico">🧰</span><div><h2>생활도구</h2><p>매일 쓰는 제주 생활 도구</p></div><em>›</em></a>' +
-        '<div class="gh-btns">' + TOOLS.map(function(t){ return '<a href="' + t[2] + '"><span>' + t[0] + '</span><b>' + esc(t[1]) + '</b></a>'; }).join("") + '</div></section>' +
+      '<section class="gh-panel stage"><a class="gh-head" href="guide.html?view=stage"><span class="gh-ico">' + I("compass", 24) + '</span><div><h2>상황별로 보기</h2><p>지금 내 상황을 고르면 꼭 필요한 글만</p></div><em>›</em></a>' +
+        '<div class="gh-btns">' + GUIDE_STAGES.map(function(s){ return '<a href="' + stageUrl(s.id) + '"><span>' + I(STAGE_ICO[s.id]) + '</span><b>' + esc(s.label) + '</b><small>' + esc(s.sub) + ' · ' + nStage(s.id) + '편</small></a>'; }).join("") + '</div></section>' +
+      '<section class="gh-panel topic"><a class="gh-head" href="guide.html?view=topic"><span class="gh-ico">' + I("book", 24) + '</span><div><h2>주제별로 보기</h2><p>궁금한 주제로 골라 읽기</p></div><em>›</em></a>' +
+        '<div class="gh-btns">' + CATS.map(function(c){ return '<a href="' + catUrl(c[0]) + '"><span>' + I(c[1]) + '</span><b>' + esc(c[0]) + '</b><small>' + nCat(c[0]) + '편</small></a>'; }).join("") + '</div></section>' +
+      '<section class="gh-panel tool"><a class="gh-head" href="tools.html"><span class="gh-ico">' + I("tool", 24) + '</span><div><h2>생활도구</h2><p>매일 쓰는 제주 생활 도구</p></div><em>›</em></a>' +
+        '<div class="gh-btns">' + TOOLS.map(function(t){ return '<a href="' + t[2] + '"><span>' + I(t[0]) + '</span><b>' + esc(t[1]) + '</b></a>'; }).join("") + '</div></section>' +
     '</div>';
     strip.style.display = "none";
     document.querySelector(".gd-top p").textContent = "상황이나 주제로 골라 읽고, 생활도구도 바로 써 보세요.";
@@ -108,9 +111,9 @@
     document.title = $("g-title").textContent + " — 제주살이 가이드 — 제주이음";
     var cards = isS ? GUIDE_STAGES.map(function(s){ return ['<a class="gv-card" href="' + stageUrl(s.id) + '">', STAGE_ICO[s.id], s.label, s.sub, nStage(s.id), titlesOf(function(g){ return (g.stage||[]).indexOf(s.id) > -1; })]; })
       : CATS.map(function(c){ return ['<a class="gv-card" href="' + catUrl(c[0]) + '">', c[1], c[0], c[2], nCat(c[0]), titlesOf(function(g){ return g.cat === c[0]; })]; });
-    hub.innerHTML = '<div class="gd-back"><a href="guide.html">← 가이드 첫 화면</a><a href="guide.html?view=' + (isS ? "topic" : "stage") + '">' + (isS ? "📚 주제별로 보기" : "🧭 상황별로 보기") + '</a><a href="tools.html">🧰 생활도구</a></div>' +
+    hub.innerHTML = '<div class="gd-back"><a href="guide.html">← 가이드 첫 화면</a><a href="guide.html?view=' + (isS ? "topic" : "stage") + '">' + (isS ? I("book", 16) + " 주제별로 보기" : I("compass", 16) + " 상황별로 보기") + '</a><a href="tools.html">' + I("tool", 16) + ' 생활도구</a></div>' +
       '<div class="gv-grid">' + cards.map(function(c){
-        return c[0] + '<span class="gv-ico">' + c[1] + '</span><b>' + esc(c[2]) + '</b><small>' + esc(c[3]) + '</small><ul>' + c[5] + '</ul><span class="gv-go">가이드 ' + c[4] + '편 보기 →</span></a>';
+        return c[0] + '<span class="gv-ico">' + I(c[1], 26) + '</span><b>' + esc(c[2]) + '</b><small>' + esc(c[3]) + '</small><ul>' + c[5] + '</ul><span class="gv-go">가이드 ' + c[4] + '편 보기 →</span></a>';
       }).join("") + '</div>';
     strip.style.display = "none";
     $("list-h").style.display = "none"; $("gd-list").style.display = "none";
@@ -118,8 +121,8 @@
     document.querySelector(".gd-top p").textContent = stage ? "이 상황에 꼭 필요한 글만 모았어요. 옆 상황으로 바로 옮겨 갈 수도 있어요." : "이 주제의 가이드만 모았어요. 다른 주제로 바로 옮겨 갈 수도 있어요.";
     // 고른 상황·주제 안: 옆 항목으로 바로 옮겨 갈 수 있게
     strip.innerHTML = '<a href="guide.html?view=' + (stage ? "stage" : "topic") + '" class="back">← ' + (stage ? "상황별로 보기" : "주제별로 보기") + '</a>' +
-      (stage ? GUIDE_STAGES.map(function(s){ return '<a href="' + stageUrl(s.id) + '" class="' + (stage === s.id ? "on" : "") + '"><span class="s-ico">' + STAGE_ICO[s.id] + '</span>' + esc(s.label) + ' <small>' + nStage(s.id) + '</small></a>'; }).join("")
-        : CATS.map(function(c){ return '<a href="' + catUrl(c[0]) + '" class="' + (cat === c[0] ? "on" : "") + '"><span class="s-ico">' + c[1] + '</span>' + esc(c[0]) + ' <small>' + nCat(c[0]) + '</small></a>'; }).join(""));
+      (stage ? GUIDE_STAGES.map(function(s){ return '<a href="' + stageUrl(s.id) + '" class="' + (stage === s.id ? "on" : "") + '"><span class="s-ico">' + I(STAGE_ICO[s.id], 18) + '</span>' + esc(s.label) + ' <small>' + nStage(s.id) + '</small></a>'; }).join("")
+        : CATS.map(function(c){ return '<a href="' + catUrl(c[0]) + '" class="' + (cat === c[0] ? "on" : "") + '"><span class="s-ico">' + I(c[1], 18) + '</span>' + esc(c[0]) + ' <small>' + nCat(c[0]) + '</small></a>'; }).join(""));
   } else strip.style.display = "none";
 
   // 목록
@@ -175,7 +178,7 @@
     var parts = g.title.split(" — ");
     var n = first[g.id];
     return '<a class="gd-card" href="guide/' + g.id + '.html">' +
-      '<span class="c-ico">' + g.ico + '</span>' +
+      '<span class="c-ico">' + I(GUIDE_ICO[g.id] || CAT_ICO[g.cat] || "book") + '</span>' +
       '<span class="c-body">' +
         '<span class="c-cat">' + (n ? '<em class="c-first">처음이라면 ' + n + '번째</em>' : esc(g.cat)) + '</span>' +
         '<b>' + esc(parts[0]) + '</b>' +

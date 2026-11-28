@@ -2438,3 +2438,23 @@ main.wrap > section > ul.dots a:hover{background:var(--sea-50);color:var(--sea-7
 .gd-stages a.back{background:var(--ink-2);color:#fff;border-color:var(--ink-2)}
 @media (max-width:960px){.gh3{grid-template-columns:minmax(0,1fr)}.gv-grid{grid-template-columns:1fr 1fr}}
 @media (max-width:680px){.gv-grid{grid-template-columns:minmax(0,1fr)}.gh-panel.topic .gh-btns{grid-template-columns:1fr 1fr}}
+
+/* 제주살이 가이드: 선 아이콘 (메인 화면과 같은 파란 아이콘 상자) */
+.dd-card .dc-ico,.gh-ico,.gv-ico,.gh-btns a span{display:grid;place-items:center;border-radius:12px;background:#eaf3fb;color:#1f6fb2}
+.dd-card .dc-ico{width:42px;height:42px;font-size:0}
+.gh-ico{width:46px;height:46px;background:#fff;color:#1f6fb2}
+.gh-btns a span{width:38px;height:38px;border-radius:11px}
+.gh-btns a:hover span{background:#1f6fb2;color:#fff}
+.gv-ico{width:52px;height:52px;border-radius:14px}
+.gv-card:hover .gv-ico{background:#1f6fb2;color:#fff}
+.gd-back a,.gd-stages a{display:inline-flex;align-items:center;gap:6px}
+.gd-stages .s-ico{display:inline-grid;place-items:center;color:#1f6fb2}
+.gd-stages a.on .s-ico,.gd-stages a.back .s-ico{color:inherit}
+.gd-card .c-ico{color:#1f6fb2;background:#eaf3fb}
+/* 펼침 메뉴 카드 안 항목 크게 */
+.dd-card{padding:18px 18px 16px}
+.dd-card b{font-size:17px}
+.dd-card small{font-size:13px}
+.dc-items{gap:6px;margin-top:10px}
+.dc-items i{font-size:13.5px;padding:6px 11px;color:var(--ink-2)}
+.dropdown:has(.dd-cards){width:820px}
