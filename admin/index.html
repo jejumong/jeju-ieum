@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="../assets/icons/favicon.png?v=2">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../assets/style.css?v=20261128e">
+<link rel="stylesheet" href="../assets/style.css?v=20261128f">
 <style>
 body{background:#f3f5f8;margin:0}
 .adm{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -145,6 +145,9 @@ tr.iq-new .iq-clamp{font-weight:700;color:var(--ink)}
 .al-row input:checked + i{background:var(--sea-600)}
 .al-row input:checked + i::after{left:23px}
 .al-row input:focus-visible + i{outline:2px solid var(--sea-600);outline-offset:2px}
+#live-note{position:fixed;right:20px;bottom:20px;z-index:300;display:flex;align-items:center;gap:10px;background:#0e2440;color:#fff;padding:12px 14px 12px 18px;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.25);font-size:14px;font-weight:700}
+#live-note button{border:0;border-radius:10px;padding:7px 12px;font:inherit;font-size:13px;font-weight:800;background:#2f86e6;color:#fff;cursor:pointer}
+#live-note button.x{background:transparent;color:#9fb3c8;padding:4px 6px}
 .pd-now{padding:14px 16px;border-radius:12px;margin-bottom:12px}.pd-now.ok{background:#ecf8f0;color:#14532d}.pd-now.no{background:#fff4e5;color:#7c2d12}
 .pd-now b{display:block;font-size:15px}.pd-now small{display:block;margin-top:4px;font-size:13px;line-height:1.5;opacity:.9}
 .pd-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
@@ -594,18 +597,18 @@ document.addEventListener("touchmove", function(e){ if (e.touches && e.touches.l
 (function(){ var last = 0; document.addEventListener("touchend", function(e){ var n = Date.now(); if (n - last < 300 && !e.target.closest("input,textarea,select,button,a")) e.preventDefault(); last = n; }, { passive: false }); })();
 </script>
 <script>window.JI_AUTH_NS = "admin";   // 관리자 로그인은 사이트와 따로</script>
-<script src="../assets/common.js?v=20261128e"></script>
-<script src="../assets/db.js?v=20261128e"></script>
-<script src="../assets/notify.js?v=20261128e"></script>
-<script src="../assets/seed-trade.js?v=20261128e"></script>
-<script src="../assets/seed-extra.js?v=20261128e"></script>
-<script src="../assets/festivals-data.js?v=20261128e"></script>
-<script src="../assets/seed-new.js?v=20261128e"></script>
-<script src="../assets/seed-comments.js?v=20261128e"></script>
-<script src="../assets/photos.js?v=20261128e"></script>
-<script src="../assets/admin-data.js?v=20261128e"></script>
-<script src="../assets/kmap.js?v=20261128e"></script>
-<script src="../assets/op-posts.js?v=20261128e"></script>
+<script src="../assets/common.js?v=20261128f"></script>
+<script src="../assets/db.js?v=20261128f"></script>
+<script src="../assets/notify.js?v=20261128f"></script>
+<script src="../assets/seed-trade.js?v=20261128f"></script>
+<script src="../assets/seed-extra.js?v=20261128f"></script>
+<script src="../assets/festivals-data.js?v=20261128f"></script>
+<script src="../assets/seed-new.js?v=20261128f"></script>
+<script src="../assets/seed-comments.js?v=20261128f"></script>
+<script src="../assets/photos.js?v=20261128f"></script>
+<script src="../assets/admin-data.js?v=20261128f"></script>
+<script src="../assets/kmap.js?v=20261128f"></script>
+<script src="../assets/op-posts.js?v=20261128f"></script>
 <script>
 /* ─────────────────────────────────────────────
    제주이음 관리자 콘솔
@@ -2525,7 +2528,7 @@ if (SRV) {
         }));
       }),
       JIDB.call("admin_users").then(function(l){ USERS = l; })
-    ]).then(function(){ boot(); clearAdminBadge(); });
+    ]).then(function(){ boot(); clearAdminBadge(); try { LIVE.sig = liveSig(); liveTitle(); } catch (e) {} });
   };
 
   JIDB.ready.then(function(){
@@ -2535,6 +2538,61 @@ if (SRV) {
     document.getElementById("root").innerHTML = '<div class="gate"><div class="box">' + LOGOMARK + '<h2>불러오는 중…</h2></div></div>';
     reloadAll().catch(function(e){ alert("관리자 데이터를 불러오지 못했어요: " + e.message); });
   });
+  /* ── 실시간 반영: 콘솔을 띄워 두면 30초마다 새 소식(댓글·좋아요·문의·신고·승인 요청·새 글)을 확인 ──
+     바뀐 게 있으면 왼쪽 메뉴 숫자와 탭 제목 (N)을 바로 바꾸고, 지금 보는 화면도 다시 그림.
+     다만 글을 쓰는 중(입력 칸에 커서)이거나 창(모달)이 열려 있으면 화면은 그대로 두고 '새로 보기' 안내만 띄움 */
+  var LIVE = { sig: "", busy: false };
+  function liveCount(){ var pend = JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length;
+    return newIq() + newRep() + newReact() + (isBoss() ? pend : 0); }
+  function liveTitle(){ var n = liveCount(); document.title = (n ? "(" + n + ") " : "") + "제주이음 관리자 콘솔"; }
+  function liveSig(){ return [newIq(), newRep(), newReact(), JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length, (STATS && STATS.posts) || 0, (STATS && STATS.comments) || 0, (STATS && STATS.users) || 0].join("|"); }
+  function liveTyping(){ var a = document.activeElement; var m = document.getElementById("modal");
+    return (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== "checkbox") || (m && m.offsetParent !== null && m.innerHTML.trim()) || String(window.getSelection && window.getSelection()).length > 0; }
+  function livePatchNav(){
+    var pend = JI.get("seller_requests", []).filter(function(r){ return r.status === "pending"; }).length;
+    var N = { inquiries: newIq(), reports: newRep(), reacts: newReact(), sellers: pend };
+    Object.keys(N).forEach(function(k){
+      var b = document.querySelector('.side nav button[data-v="' + k + '"]'); if (!b) return;
+      var c = b.querySelector(".cnt");
+      if (N[k]) { if (!c) { c = document.createElement("span"); c.className = "cnt"; b.appendChild(c); } c.textContent = N[k]; } else if (c) c.remove();
+    });
+  }
+  function liveNote(){
+    if (document.getElementById("live-note")) return;
+    var d = document.createElement("div"); d.id = "live-note";
+    d.innerHTML = '🔔 새 소식이 있어요 <button type="button">화면 새로 보기</button><button type="button" class="x" aria-label="닫기">✕</button>';
+    d.querySelector("button").onclick = function(){ d.remove(); var y = window.scrollY; boot(); window.scrollTo(0, y); };
+    d.querySelector(".x").onclick = function(){ d.remove(); };
+    document.body.appendChild(d);
+  }
+  function liveTick(force){
+    if (LIVE.busy || !JIDB.me() || (!force && document.visibilityState !== "visible")) return;
+    LIVE.busy = true;
+    Promise.all([
+      JIDB.syncFeed().catch(function(){ return false; }),
+      JIDB.call("admin_overview").then(function(r){ STATS = r; }).catch(function(){}),
+      JIDB.call("admin_inquiries").then(function(l){ _set.call(JI, "inquiries", l.reverse()); }).catch(function(){}),
+      (isBoss() ? JIDB.call("admin_sellers").then(function(l){
+        var old = JI.get("seller_requests", []);
+        _set.call(JI, "seller_requests", old.map(function(o){ var n = l.filter(function(x){ return x.id === o.id; })[0]; if (n) o.status = n.status; return o; }));
+        if (l.length !== old.length) LIVE.reload = true;   // 새 승인 요청이 생기면 전체를 다시 불러옴
+      }).catch(function(){}) : Promise.resolve())
+    ]).then(function(rs){
+      LIVE.busy = false;
+      var sig = liveSig(), changed = rs[0] || sig !== LIVE.sig;
+      LIVE.sig = sig; liveTitle(); livePatchNav();
+      if (LIVE.reload) { LIVE.reload = false; if (!liveTyping()) { reloadAll(); return; } }
+      if (!changed) return;
+      if (view === "traffic") return;   // 방문 통계는 따로 30초마다 새로 그림
+      if (liveTyping()) liveNote();
+      else { var y = window.scrollY; boot(); window.scrollTo(0, y); }
+      clearAdminBadge();
+    }, function(){ LIVE.busy = false; });
+  }
+  setInterval(liveTick, 30000);
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") liveTick(); });
+  window.addEventListener("focus", function(){ liveTick(); });
+
   /* 앱 아이콘의 숫자 — 콘솔을 열거나 다시 보면 운영 알림을 확인한 것으로 처리하고 숫자를 다시 맞춤 (새 문의는 콘솔 안 주황 표시로 계속 보임) */
   function clearAdminBadge(){
     return JIDB.call("noti_read_admin").catch(function(){}).then(function(){ if (JIDB.refreshUnread) JIDB.refreshUnread(); });
