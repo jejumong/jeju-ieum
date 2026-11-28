@@ -2385,3 +2385,56 @@ main.wrap > section > ul.dots a:hover{background:var(--sea-50);color:var(--sea-7
 .am-sec .dd-label{font-size:12px;font-weight:700;color:var(--ink-4);margin-bottom:6px}
 .am-sec .dd-grid{display:flex;flex-wrap:wrap;gap:6px}
 .am-sec .dd-grid a{padding:7px 11px;border-radius:999px;background:var(--bg-2);font-size:13.5px;font-weight:600;color:var(--ink-2);text-decoration:none}
+
+/* 제주살이 가이드 펼침 메뉴: 묶음 하나가 큰 버튼 하나 */
+.dropdown:has(.dd-cards){width:760px}
+.dd-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dd-card{display:flex;flex-direction:column;gap:4px;padding:16px 16px 14px;border-radius:16px;background:var(--bg-2);border:1.5px solid transparent;text-decoration:none;color:var(--ink);transition:background .15s,border-color .15s,transform .15s}
+.dd-card:hover{background:#fff;border-color:var(--sea);transform:translateY(-2px);box-shadow:0 10px 22px rgba(20,60,100,.1)}
+.dd-card .dc-ico{font-size:24px;line-height:1}
+.dd-card b{font-size:16px;font-weight:800;letter-spacing:-0.03em;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.dd-card b em{font-style:normal;color:var(--sea);font-size:18px}
+.dd-card small{font-size:12.5px;color:var(--ink-4);font-weight:600}
+.dc-items{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.dc-items i{font-style:normal;font-size:12px;font-weight:600;color:var(--ink-3);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 8px}
+.dd-card:hover .dc-items i{border-color:var(--sea-100,#d6e8fb)}
+.am-sec .dd-cards{grid-template-columns:minmax(0,1fr);margin-top:8px;gap:8px}
+@media (max-width:960px){.dropdown:has(.dd-cards){width:auto}.dd-cards{grid-template-columns:minmax(0,1fr)}}
+
+/* 제주살이 가이드 첫 화면: 세 묶음 */
+.gh3{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:14px;margin:22px 0 28px}
+.gh-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh-1);display:flex;flex-direction:column;gap:12px}
+.gh-panel.stage{background:linear-gradient(160deg,#eef6ff,#fff 60%)}
+.gh-panel.topic{background:linear-gradient(160deg,#f2fbf5,#fff 60%)}
+.gh-panel.tool{background:linear-gradient(160deg,#fff6ea,#fff 60%)}
+.gh-head{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.gh-ico{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#fff;box-shadow:0 2px 8px rgba(20,60,100,.08);font-size:24px;flex:none}
+.gh-head h2{font-size:19px;font-weight:800;letter-spacing:-0.04em}
+.gh-head p{font-size:13px;color:var(--ink-4);margin-top:1px}
+.gh-head em{margin-left:auto;font-style:normal;font-size:22px;color:var(--ink-4)}
+.gh-head:hover h2{color:var(--sea-700)}
+.gh-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gh-panel.topic .gh-btns{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gh-btns a{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:14px;background:#fff;border:1.5px solid var(--line);text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s,box-shadow .15s}
+.gh-btns a:hover{border-color:var(--sea);transform:translateY(-2px);box-shadow:0 8px 18px rgba(20,60,100,.1)}
+.gh-btns a span{font-size:22px;line-height:1.1}
+.gh-btns a b{font-size:14.5px;font-weight:800;letter-spacing:-0.03em;margin-top:4px}
+.gh-btns a small{font-size:12px;color:var(--ink-4);font-weight:600}
+/* 상황별·주제별 크게 보기 */
+.gd-back{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 14px}
+.gd-back a{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:700;color:var(--ink-2);text-decoration:none}
+.gd-back a:first-child{background:var(--ink-2);color:#fff;border-color:var(--ink-2)}
+.gv-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:28px}
+.gv-card{display:flex;flex-direction:column;gap:4px;padding:20px;border-radius:var(--r-lg);background:var(--surface);border:1.5px solid var(--line);text-decoration:none;color:var(--ink);box-shadow:var(--sh-1);transition:border-color .15s,transform .15s}
+.gv-card:hover{border-color:var(--sea);transform:translateY(-3px)}
+.gv-ico{font-size:30px}
+.gv-card b{font-size:19px;font-weight:800;letter-spacing:-0.04em;margin-top:6px}
+.gv-card small{font-size:13.5px;color:var(--ink-3)}
+.gv-card ul{margin:10px 0 0;padding:0 0 0 16px;font-size:13.5px;color:var(--ink-2);line-height:1.7;flex:1}
+.gv-go{margin-top:12px;font-size:14px;font-weight:800;color:var(--sea-700)}
+/* 고른 상황·주제 안의 옆 항목 줄 */
+.gd-stages:has(.back){display:flex;flex-wrap:wrap}
+.gd-stages:has(.back) a{flex-direction:row;align-items:center;gap:6px;padding:9px 14px;border-radius:999px}
+.gd-stages a.back{background:var(--ink-2);color:#fff;border-color:var(--ink-2)}
+@media (max-width:960px){.gh3{grid-template-columns:minmax(0,1fr)}.gv-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:680px){.gv-grid{grid-template-columns:minmax(0,1fr)}.gh-panel.topic .gh-btns{grid-template-columns:1fr 1fr}}
