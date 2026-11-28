@@ -481,19 +481,22 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
     return '<div class="dd-group"><div class="dd-label">' + label + '</div><div class="dd-grid' + (cls ? " " + cls : "") + '">' +
       links.map(function (l) { return '<a href="' + l[1] + '">' + l[0] + "</a>"; }).join("") + "</div></div>";
   }
+  /* 펼침 메뉴의 큰 카드: 묶음 전체가 버튼 하나 (안의 항목은 안내용 글씨) */
+  function ddCard(ico, label, href, desc, items) {
+    return '<a class="dd-card" href="' + href + '"><span class="dc-ico">' + ico + '</span><b>' + label + ' <em>›</em></b><small>' + desc + '</small>' +
+      '<span class="dc-items">' + items.map(function (t) { return '<i>' + t + '</i>'; }).join("") + '</span></a>';
+  }
   function boardLinks(names) {
     return names.map(function (n) { return [n, "community.html?board=" + encodeURIComponent(n)]; });
   }
 
   var menus = [
     { id: "guide", label: "제주살이 가이드", href: "guide.html", match: ["guide", "article", "tools", "tool"],
-      dd: ddGroup("상황별로 보기", [["이주 고민 중", "guide.html?stage=고민"], ["한달살기 준비", "guide.html?stage=한달살기"],
-            ["막 이사 왔어요", "guide.html?stage=정착"], ["제주 사는 도민", "guide.html?stage=도민"]]) +
-          ddGroup("주제별로 보기", [["동네 고르기", "guide.html?cat=동네 고르기"], ["계절 생활", "guide.html?cat=계절 생활"],
-            ["집·생활", "guide.html?cat=집·생활"], ["아이랑 제주", "guide.html?cat=아이랑 제주"],
-            ["일·돈", "guide.html?cat=일·돈"], ["마을·관계", "guide.html?cat=마을·관계"]]) +
-          ddGroup("생활도구", [["🗓️ 열두 달 달력", "tool.html?t=cal"], ["📍 내 근처 찾기", "tool.html?t=near"], ["🌊 물때 시간표", "tool.html?t=tide"],
-            ["🧺 오일장 달력", "jangnal.html"], ["🌧️ 비구름·태풍", "rain.html"], ["전체 도구 →", "tools.html"]]) },
+      dd: '<div class="dd-cards">' +
+          ddCard("🧭", "상황별로 보기", "guide.html?view=stage", "지금 내 상황에 맞는 글", ["이주 고민 중", "한달살기 준비", "막 이사 왔어요", "제주 사는 도민"]) +
+          ddCard("📚", "주제별로 보기", "guide.html?view=topic", "궁금한 주제로 골라 읽기", ["동네 고르기", "계절 생활", "집·생활", "아이랑 제주", "일·돈", "마을·관계"]) +
+          ddCard("🧰", "생활도구", "tools.html", "매일 쓰는 제주 생활 도구", ["열두 달 달력", "내 근처 찾기", "물때 시간표", "오일장 달력", "비구름·태풍 지도"]) +
+        '</div>' },
     { id: "stay", label: "한달살기·이주", href: "stay.html" },
     { id: "school", label: "학교 연계 집", href: "school.html" },
     { id: "realestate", label: "부동산", href: "realestate.html",
