@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제주 비구름 24시간 — 제주이음</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="제주로 몰려오는 비구름과 번개를 넓은 지도로 24시간 동안 미리 봐요.">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f74d0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="제주이음">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
+<link rel="stylesheet" href="assets/style.css?v=20261127j">
+<style>
+.rn-box{position:relative;background:#0e2440;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-1);aspect-ratio:16/10;min-height:420px}
+.rn-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+/* 지도 영역 고정: 지도를 끌거나 확대하지 못하게 덮고, 아래 재생 막대만 누를 수 있게 비워 둠 */
+.rn-lock{position:absolute;left:0;right:0;top:0;bottom:78px;z-index:2;cursor:default}
+.rn-tag{position:absolute;left:14px;top:14px;z-index:3;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+.rn-tag span{background:rgba(14,36,64,.82);color:#fff;font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:999px;backdrop-filter:blur(4px)}
+.rn-help{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.rn-help div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md,14px);padding:14px 16px}
+.rn-help b{display:block;font-size:14.5px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.rn-help p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-3)}
+.rn-src{margin-top:12px;font-size:12.5px;color:var(--ink-4)}
+.rn-src a{color:var(--ink-3)}
+@media (max-width:680px){
+  .rn-box{aspect-ratio:auto;height:72vh;min-height:460px;border-radius:14px}
+  .rn-lock{bottom:96px}
+  .rn-help{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-active="tools">
+
+<div class="page-head"><div class="inner">
+  <div>
+    <div class="crumb"><a href="index.html">홈</a> › <a href="tools.html">생활도구</a> › 비구름 24시간</div>
+    <h1>제주 비구름 24시간</h1>
+    <p>제주로 몰려오는 비구름과 번개를 넓은 지도로 미리 봐요. 아래 ▶ 버튼을 누르면 앞으로 24시간 동안 비구름이 움직이는 모습이 재생돼요.</p>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <div class="rn-box">
+    <iframe id="rn-map" title="제주 비구름 24시간 지도" loading="lazy" allowfullscreen
+      src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=%C2%B0C&metricWind=m%2Fs&zoom=5&overlay=rain&product=ecmwf&level=surface&lat=33.0&lon=126.5&calendar=24&message=true&marker=true&pressure=&menu=&detail=&radarRange=-1"></iframe>
+    <div class="rn-lock" aria-hidden="true"></div>
+    <div class="rn-tag"><span>🌧️ 비·번개</span><span>📍 제주 중심 · 넓게 보기</span></div>
+  </div>
+
+  <div class="rn-help">
+    <div><b>▶ 재생해 보세요</b><p>지도 아래 재생 버튼을 누르면 지금부터 24시간 뒤까지 비구름이 시간 순서대로 움직여요.</p></div>
+    <div><b>색이 진할수록 많은 비</b><p>지도 아래 색 막대가 비의 양이에요. 오른쪽 색으로 갈수록 강한 비예요.</p></div>
+    <div><b>서쪽을 먼저 보세요</b><p>제주 비구름은 대개 서쪽(중국 쪽)에서 와요. 서해 쪽 구름이 언제 섬에 닿는지 보면 우산 챙길 때를 가늠할 수 있어요.</p></div>
+  </div>
+  <p class="rn-src">지도·예보: <a href="https://www.windy.com/?rain,33.0,126.5,5" target="_blank" rel="noopener">Windy.com</a> (ECMWF 예보 모델) · 예보라서 실제와 다를 수 있어요.</p>
+</main>
+
+<script src="assets/common.js?v=20261127j"></script>
+<script src="assets/db.js?v=20261127j"></script>
+<script src="assets/notify.js?v=20261127j"></script>
+</body>
+</html>
