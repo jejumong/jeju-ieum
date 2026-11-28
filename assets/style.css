@@ -2352,3 +2352,21 @@ main.wrap > section > ul.dots a:hover{background:var(--sea-50);color:var(--sea-7
 .cmt-login.susp{background:#fdecec;color:#8a1c12}
 
 .hx-pk-ico{width:30px;height:30px;border-radius:9px;margin-right:8px;vertical-align:-6px}
+
+/* 일자리·장터: 목적별 세 묶음 */
+.hub-group{margin-bottom:30px}
+.hub-gh{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+.hub-gi{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:var(--sea-50);font-size:21px;flex:none}
+.hub-gh h2{font-size:20px;font-weight:800;letter-spacing:-0.04em;color:var(--ink)}
+.hub-gh p{font-size:13.5px;color:var(--ink-4);margin-top:1px}
+.hub-group.job .hub-gi{background:var(--citrus-50,#fff4e5)}
+.job-grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.job-grid .hub-box{border-color:var(--citrus-100,#ffe1b8)}
+.job-side{display:flex;flex-direction:column;gap:10px;background:linear-gradient(160deg,#fff8ee,#fff)}
+.job-side h3{font-size:15px;font-weight:800;color:var(--ink)}
+.job-side a:not(.btn){display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;text-decoration:none}
+.job-side a:not(.btn):hover{border-color:var(--sea-200)}
+.job-side a b{display:block;font-size:14.5px;color:var(--ink)}
+.job-side a span{display:block;font-size:12.5px;color:var(--ink-4);margin-top:2px;line-height:1.45}
+.job-side .btn{margin-top:auto}
+@media (max-width:960px){.job-grid{grid-template-columns:minmax(0,1fr)}}

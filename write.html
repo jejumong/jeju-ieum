@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261128a">
+<link rel="stylesheet" href="assets/style.css?v=20261128b">
 </head>
 <body data-active="">
 
@@ -102,6 +102,11 @@
           <label for="pay">급여 금액 (원)</label>
           <input type="text" id="pay" inputmode="numeric" placeholder="예: 11000 (협의면 비워 두세요)">
         </div>
+        <div class="field">
+          <label for="deadline">모집 마감일</label>
+          <input type="date" id="deadline">
+          <div class="hint">비워 두면 '채용 시 마감'으로 보여요</div>
+        </div>
       </div>
       <div class="field-row" id="price-row">
         <div class="field">
@@ -181,16 +186,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261128a"></script>
-<script src="assets/common.js?v=20261128a"></script>
-<script src="assets/db.js?v=20261128a"></script>
-<script src="assets/notify.js?v=20261128a"></script>
-<script src="assets/seed-trade.js?v=20261128a"></script>
-<script src="assets/seed-extra.js?v=20261128a"></script>
-<script src="assets/festivals-data.js?v=20261128a"></script>
-<script src="assets/seed-new.js?v=20261128a"></script>
-<script src="assets/seed-comments.js?v=20261128a"></script>
-<script src="assets/admin-data.js?v=20261128a"></script>
+<script src="assets/kmap.js?v=20261128b"></script>
+<script src="assets/common.js?v=20261128b"></script>
+<script src="assets/db.js?v=20261128b"></script>
+<script src="assets/notify.js?v=20261128b"></script>
+<script src="assets/seed-trade.js?v=20261128b"></script>
+<script src="assets/seed-extra.js?v=20261128b"></script>
+<script src="assets/festivals-data.js?v=20261128b"></script>
+<script src="assets/seed-new.js?v=20261128b"></script>
+<script src="assets/seed-comments.js?v=20261128b"></script>
+<script src="assets/admin-data.js?v=20261128b"></script>
 <script>
 var user = currentUser();
 var editId = new URLSearchParams(location.search).get("edit");
@@ -266,6 +271,7 @@ function fillEdit(editing) {
     if (editing.htype) document.getElementById("htype").value = editing.htype;
     document.getElementById("addr").value = editing.addr || "";
     if (editing.payType) document.getElementById("paytype").value = editing.payType;
+    if (editing.deadline) document.getElementById("deadline").value = editing.deadline;
     document.getElementById("pay").value = editing.pay || "";
     document.getElementById("fest-start").value = editing.start || (editing.extra && editing.extra.start) || "";
     document.getElementById("fest-end").value = editing.end || (editing.extra && editing.extra.end) || "";
@@ -399,7 +405,7 @@ document.getElementById("fest-name-find").addEventListener("click", function (e)
 function toggleExtra() {
   var HEADS = {
     "부동산": ["선택 안 함", "매매", "연세", "월세", "단기", "일년살이", "학교근처"],
-    "구인구직": ["구인", "알바", "재택"],
+    "구인구직": ["구인", "알바", "단기·계절", "재택", "구직"],
     "중고사고팔기": ["팝니다", "삽니다", "교환", "나눔", "기타"],
     "동호회": ["운동·아웃도어", "문화·취미", "육아·가족", "봉사·마을", "공부·자기계발", "기타"],
     "자유게시판": ["선택 안 함", "자유", "일상", "인사", "후기", "나눔", "고민"],
@@ -446,7 +452,7 @@ function toggleExtra() {
   document.getElementById("htype-field").style.display = v === "부동산" ? "block" : "none";
   var job = v === "구인구직";
   document.getElementById("addr-field").style.display = (v === "부동산" || job) ? "block" : "none";
-  document.getElementById("addr-label").textContent = job ? "근무지 주소" : "매물 주소";
+  document.getElementById("addr-label").textContent = job ? "근무지 주소 (구직 글이면 일하고 싶은 지역)" : "매물 주소";
   document.getElementById("addr").placeholder = job ? "예: 제주시 구좌읍 해맞이해안로 1234 (근무하는 곳)" : "예: 제주시 구좌읍 한동로1길 15 (동·리까지만 적어도 돼요)";
   document.getElementById("pay-row").style.display = job ? "flex" : "none";
   // 부동산: 공인중개사와 일반 회원은 다른 입력 칸
@@ -587,6 +593,7 @@ function submitPost() {
     }
     var btn = document.getElementById("submit-btn"); btn.disabled = true;
     extra.htype = htype; extra.addr = addr; extra.payType = payType; extra.pay = pay;
+    if (board === "구인구직") extra.deadline = document.getElementById("deadline").value || ""; else delete extra.deadline;
     if (board === "제주상점") { extra.hours = document.getElementById("s-hours").value.trim(); extra.tel = document.getElementById("s-tel").value.trim(); extra.menu = document.getElementById("s-menu").value.trim(); extra.benefit = document.getElementById("s-benefit").value.trim(); if (SHOP_POS) { extra.lat = SHOP_POS.lat; extra.lng = SHOP_POS.lng; } }
     if (board === "축제정보") { extra.start = fs; extra.end = fe; if (FEST_POS) { extra.lat = FEST_POS.lat; extra.lng = FEST_POS.lng; } } else { delete extra.start; delete extra.end; delete extra.lat; delete extra.lng; }
     extra.photos = PHOTOS.filter(function (p) { return p.url; }).map(function (p) { return p.url; });

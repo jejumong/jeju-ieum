@@ -12,7 +12,19 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261128a">
+<link rel="stylesheet" href="assets/style.css?v=20261128b">
+<style>
+.job-filter{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
+.jf-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.jf-l{font-size:13px;font-weight:800;color:var(--ink-3);min-width:52px}
+.jf-foot{display:flex;align-items:center;gap:8px;border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px}
+.jf-foot .spacer{flex:1}.jf-chk{display:flex;align-items:center;gap:6px;color:var(--ink-3);font-weight:600;cursor:pointer}
+.job-public{font-size:13.5px;color:var(--ink-3);background:var(--sea-50);border-radius:12px;padding:10px 14px;margin-bottom:16px}
+.job-public a{color:var(--sea-700);text-decoration:none}
+em.jd{font-style:normal;font-size:11.5px;font-weight:800;margin-left:6px;padding:2px 7px;border-radius:999px;background:var(--bg-2,#eef2f6);color:var(--ink-3);vertical-align:1px}
+em.jd.soon{background:#fff1ef;color:#c2410c}em.jd.end{background:#e5e7eb;color:#6b7280}
+@media (max-width:680px){.jf-l{min-width:100%;margin-bottom:-2px}}
+</style>
 </head>
 <body data-active="jobs">
 
@@ -20,45 +32,64 @@
   <div>
     <div class="crumb"><a href="index.html">홈</a> › 구인구직</div>
     <h1>구인구직</h1>
-    <p>제주 지역 일자리와 인재를 잇는 공간</p>
+    <p>제주에서 일할 사람과 일할 곳을 잇는 공간이에요. 일을 찾는 분은 '구직' 글을 올려 두셔도 돼요.</p>
   </div>
-  <a class="btn accent" href="write.html?board=구인구직">✏️ 공고 올리기</a>
+  <a class="btn accent" href="write.html?board=구인구직">✏️ 공고·구직 글 올리기</a>
 </div></div>
 
 <main class="wrap">
   <div id="pm-banner"></div>
 
-  <div class="filter-bar">
-    <button class="chip-btn on" data-filter="all" onclick="applyChip(this)">전체</button>
-    <button class="chip-btn" data-filter="제주시내" onclick="applyChip(this)">제주시내</button>
-    <button class="chip-btn" data-filter="동부" onclick="applyChip(this)">동부(구좌·조천·성산)</button>
-    <button class="chip-btn" data-filter="서부" onclick="applyChip(this)">서부(애월·한림·대정)</button>
-    <button class="chip-btn" data-filter="서귀포" onclick="applyChip(this)">서귀포</button>
-    <select id="kind-sel" onchange="render()">
-      <option value="all">구분 전체</option><option value="구인">구인</option><option value="알바">알바</option><option value="재택">재택</option><option value="채용완료">채용완료</option>
-    </select>
-    <span class="spacer"></span>
-    <span class="count">등록 공고 <b id="shown-count">0</b>건</span>
+  <div class="job-filter">
+    <div class="jf-row"><span class="jf-l">일 형태</span>
+      <button class="chip-btn on" data-kind="all">전체</button>
+      <button class="chip-btn" data-kind="구인">💼 구인</button>
+      <button class="chip-btn" data-kind="알바">⏰ 알바</button>
+      <button class="chip-btn" data-kind="단기·계절">🍊 단기·계절</button>
+      <button class="chip-btn" data-kind="재택">💻 재택</button>
+      <button class="chip-btn" data-kind="구직">🙋 구직</button>
+    </div>
+    <div class="jf-row"><span class="jf-l">지역</span>
+      <button class="chip-btn on" data-region="all">전체</button>
+      <button class="chip-btn" data-region="제주시내">제주시내</button>
+      <button class="chip-btn" data-region="동부">동부(구좌·조천·성산·표선)</button>
+      <button class="chip-btn" data-region="서부">서부(애월·한림·한경·대정)</button>
+      <button class="chip-btn" data-region="서귀포">서귀포</button>
+    </div>
+    <div class="jf-foot"><label class="jf-chk"><input type="checkbox" id="show-closed"> 마감·채용완료 글도 보기</label>
+      <span class="spacer"></span><span class="count">공고 <b id="shown-count">0</b>건</span></div>
   </div>
+  <div class="job-public">🏛️ 공공 일자리도 함께 보세요 — <a href="https://www.work24.go.kr" target="_blank" rel="noopener"><b>고용24</b> (정부 공식 구인·구직) ↗</a></div>
 
   <div id="job-wrap"></div>
 </main>
 
-<script src="assets/common.js?v=20261128a"></script>
-<script src="assets/db.js?v=20261128a"></script>
-<script src="assets/notify.js?v=20261128a"></script>
-<script src="assets/seed-trade.js?v=20261128a"></script>
-<script src="assets/seed-extra.js?v=20261128a"></script>
-<script src="assets/festivals-data.js?v=20261128a"></script>
-<script src="assets/seed-new.js?v=20261128a"></script>
-<script src="assets/seed-comments.js?v=20261128a"></script>
-<script src="assets/photos.js?v=20261128a"></script>
-<script src="assets/cards.js?v=20261128a"></script>
-<script src="assets/admin-data.js?v=20261128a"></script>
+<script src="assets/common.js?v=20261128b"></script>
+<script src="assets/db.js?v=20261128b"></script>
+<script src="assets/notify.js?v=20261128b"></script>
+<script src="assets/seed-trade.js?v=20261128b"></script>
+<script src="assets/seed-extra.js?v=20261128b"></script>
+<script src="assets/festivals-data.js?v=20261128b"></script>
+<script src="assets/seed-new.js?v=20261128b"></script>
+<script src="assets/seed-comments.js?v=20261128b"></script>
+<script src="assets/photos.js?v=20261128b"></script>
+<script src="assets/cards.js?v=20261128b"></script>
+<script src="assets/admin-data.js?v=20261128b"></script>
 <script>
 
 
-var REGION_MAP = { "함덕":"동부","성산":"동부","구좌":"동부","조천":"동부","제주시":"제주시내","노형동":"제주시내","대정":"서부","애월":"서부","한림":"서부","서귀포":"서귀포" };
+/* 지역: 주소·동네 이름에 들어 있는 말로 나눔 (예: '구좌읍' → 동부) */
+var REGION_WORDS = [
+  ["동부", ["구좌", "조천", "성산", "표선", "우도", "함덕", "세화", "김녕"]],
+  ["서부", ["애월", "한림", "한경", "대정", "협재", "곽지"]],
+  ["서귀포", ["서귀포", "남원", "안덕", "중문", "위미", "대륜", "동홍", "서홍", "효돈", "예래"]],
+  ["제주시내", ["제주시", "노형", "연동", "이도", "일도", "삼도", "아라", "오라", "화북", "삼양", "용담", "외도", "이호", "도두", "봉개", "건입"]]
+];
+function regionOf(p){
+  var s = (p.loc || "") + " " + (p.addr || "");
+  for (var i = 0; i < REGION_WORDS.length; i++) if (REGION_WORDS[i][1].some(function(w){ return s.indexOf(w) > -1; })) return REGION_WORDS[i][0];
+  return "";
+}
 var META = {
   "tj1":{e:"☕",job:"카페·요식",pay:"시급 11,000원"},
   "tj2":{e:"🏨",job:"숙박·관광",pay:"월 220만원 (숙식 제공)"},
@@ -73,33 +104,36 @@ var META = {
   "tj12":{e:"🍳",job:"카페·요식",pay:"급여 협의"},
   "tj13":{e:"🚗",job:"숙박·관광",pay:"월 230만원"}
 };
-var regionFilter = "all";
-
-function applyChip(el){
-  el.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.remove("on"); });
-  el.classList.add("on");
-  regionFilter = el.dataset.filter;
-  render();
-}
-
+var regionFilter = "all", kindFilter = "all";
+document.querySelectorAll(".job-filter [data-kind], .job-filter [data-region]").forEach(function(b){
+  b.onclick = function(){
+    var key = b.dataset.kind ? "kind" : "region";
+    b.parentElement.querySelectorAll(".chip-btn").forEach(function(c){ c.classList.toggle("on", c === b); });
+    if (key === "kind") kindFilter = b.dataset.kind; else regionFilter = b.dataset.region;
+    render();
+  };
+});
+document.getElementById("show-closed").onchange = function(){ render(); };
+function isClosed(p){ var d = jobDday(p); return (p.head || "") === "채용완료" || (d !== null && d < 0); }
 function jobCard(p, isPm){
   var m = META[p.id] || { job: p.job || "기타", pay: p.pay || "급여 협의" };
   var isUser = isUserPost(p), isMine = isMyPost(p);
   var kind = p.head || "구인";
   var pay = p.payType ? payText(p) : (isUser ? (p.price ? parseInt(String(p.price).replace(/[^0-9]/g,""),10).toLocaleString() + "원" : "급여 협의") : m.pay);
-  return photoCard(p, { pm: isPm, closed: kind === "채용완료", badge: { text: kind, cls: (kind === "구직" || kind === "채용완료") ? "dark" : "" },
-    info: '<b>' + escHtml(pay) + '</b><span>' + escHtml(m.job) + ' · ' + escHtml(p.loc || "지역 미기재") + '</span>',
+  var dd = jobDday(p), dl = kind === "구직" ? "" : jobDeadlineText(p);
+  var dlHtml = dl ? ' <em class="jd' + (dd < 0 ? " end" : dd <= 3 ? " soon" : "") + '">' + escHtml(dd > 0 && dd <= 3 ? "마감 임박 · D-" + dd : dl) + '</em>' : '';
+  return photoCard(p, { pm: isPm, closed: isClosed(p), badge: { text: kind, cls: (kind === "구직" || kind === "채용완료") ? "dark" : "" },
+    info: '<b>' + escHtml(kind === "구직" && !p.payType ? "희망 급여 협의" : pay) + dlHtml + '</b><span>' + escHtml(m.job) + ' · ' + escHtml(p.loc || "지역 미기재") + '</span>',
     mine: isMine ? "내 글" : "" });
 }
 
 function render(){
-  var kind = document.getElementById("kind-sel").value;
+  var showClosed = document.getElementById("show-closed").checked;
   var list = userPostsOf("구인구직").concat(TRADE_SEEDS.filter(function(p){ return p.board === "구인구직"; }));
   list = list.filter(function(p){
-    var rg = REGION_MAP[p.loc] || p.loc || "";
-    var okR = regionFilter === "all" || rg === regionFilter;
-    var okK = kind === "all" || (p.head || "구인") === kind;
-    return okR && okK;
+    var okR = regionFilter === "all" || regionOf(p) === regionFilter;
+    var okK = kindFilter === "all" || (p.head || "구인") === kindFilter;
+    return okR && okK && (showClosed || !isClosed(p));
   });
   document.getElementById("shown-count").textContent = list.length;
   renderSections({
