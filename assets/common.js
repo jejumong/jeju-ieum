@@ -486,12 +486,14 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
   }
 
   var menus = [
-    { id: "guide", label: "제주살이 가이드", href: "guide.html", match: ["guide", "article"],
+    { id: "guide", label: "제주살이 가이드", href: "guide.html", match: ["guide", "article", "tools", "tool"],
       dd: ddGroup("상황별로 보기", [["이주 고민 중", "guide.html?stage=고민"], ["한달살기 준비", "guide.html?stage=한달살기"],
             ["막 이사 왔어요", "guide.html?stage=정착"], ["제주 사는 도민", "guide.html?stage=도민"]]) +
           ddGroup("주제별로 보기", [["동네 고르기", "guide.html?cat=동네 고르기"], ["계절 생활", "guide.html?cat=계절 생활"],
             ["집·생활", "guide.html?cat=집·생활"], ["아이랑 제주", "guide.html?cat=아이랑 제주"],
-            ["일·돈", "guide.html?cat=일·돈"], ["마을·관계", "guide.html?cat=마을·관계"]]) },
+            ["일·돈", "guide.html?cat=일·돈"], ["마을·관계", "guide.html?cat=마을·관계"]]) +
+          ddGroup("생활도구", [["🗓️ 열두 달 달력", "tool.html?t=cal"], ["📍 내 근처 찾기", "tool.html?t=near"], ["🌊 물때 시간표", "tool.html?t=tide"],
+            ["🧺 오일장 달력", "jangnal.html"], ["🌧️ 비구름·태풍", "rain.html"], ["전체 도구 →", "tools.html"]]) },
     { id: "stay", label: "한달살기·이주", href: "stay.html" },
     { id: "school", label: "학교 연계 집", href: "school.html" },
     { id: "realestate", label: "부동산", href: "realestate.html",
@@ -503,21 +505,20 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
     { id: "community", label: "동네 커뮤니티", href: "community.html",
       dd: ddGroup("주제 게시판", boardLinks(["자유게시판", "질문하기", "최신뉴스", "생활정보", "취미·여행", "교육", "건강웰빙"])) +
           ddGroup("지역 게시판", boardLinks(["제주북쪽", "제주동쪽", "제주서쪽", "제주남쪽"])) },
-    { id: "tools", label: "생활도구", href: "tools.html" },
     { id: "contact", label: "문의·제보", href: "contact.html" }
   ];
 
-  /* 휴대폰 메뉴: PC와 같은 8개를 그림과 함께 4칸×2줄로 (스크롤하면 작게 접힘) */
+  /* 휴대폰 메뉴: PC와 같은 7개 + '전체 메뉴'를 그림과 함께 4칸×2줄로 (스크롤하면 작게 접힘) */
   function mi(d) { return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
   var M_MENU = [
-    ["제주살이<br>가이드", "guide.html", ["guide", "article"], mi('<path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7z"/>')],
+    ["제주살이<br>가이드", "guide.html", ["guide", "article", "tools", "tool"], mi('<path d="M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zM20 5h-7a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h7z"/>')],
     ["한달살기<br>·이주", "stay.html", ["stay"], mi('<rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 7V4h6v3"/>')],
     ["학교<br>연계 집", "school.html", ["school"], mi('<path d="M3 11l9-6 9 6M5 10v9h14v-9M10 19v-5h4v5"/>')],
     ["부동산", "realestate.html", ["realestate"], mi('<path d="M4 20V9l8-5 8 5v11zM9 20v-6h6v6"/>')],
     ["일자리<br>·장터", "trade.html", ["trade", "jobs", "market", "shops", "clubs", "deals", "festivals"], mi('<path d="M4 9h16l-1 11H5zM8 9V6a4 4 0 0 1 8 0v3"/>')],
     ["동네<br>커뮤니티", "community.html", ["community"], mi('<path d="M4 5h16v11H9l-5 4z"/>')],
-    ["생활도구", "tools.html", ["tools", "tool"], mi('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>')],
-    ["문의·제보", "contact.html", ["contact"], mi('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 8l9 6 9-6"/>')]
+    ["문의·제보", "contact.html", ["contact"], mi('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 8l9 6 9-6"/>')],
+    ["전체 메뉴", "#allmenu", [], mi('<path d="M4 6h16M4 12h16M4 18h16"/>')]
   ];
   var gnbMobile = '<nav class="gnb-m" aria-label="메뉴">' + M_MENU.map(function (m) {
     var on = m[2].indexOf(active) > -1;
@@ -548,6 +549,18 @@ var LOGOMARK = '<svg class="logomark" viewBox="0 0 120 100" fill="none" xmlns="h
       '<nav class="gnb"><div class="gnb-inner">' + gnbItems + '</div></nav>' +
       gnbMobile +
     '</header>';
+
+  /* 휴대폰 '전체 메뉴': 7개 메뉴와 그 안의 하위 메뉴(펼침 메뉴와 같은 내용)를 한 화면에 */
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest('a[href="#allmenu"]'); if (!t) return;
+    e.preventDefault();
+    var old = document.getElementById("allmenu"); if (old) { old.remove(); return; }
+    var box = document.createElement("div"); box.id = "allmenu"; box.className = "am-wrap";
+    box.innerHTML = '<div class="am-sheet" role="dialog" aria-label="전체 메뉴"><div class="am-head"><b>전체 메뉴</b><button type="button" class="am-x" aria-label="닫기">✕</button></div>' +
+      menus.map(function (m) { return '<section class="am-sec"><a class="am-top" href="' + m.href + '">' + m.label + ' <span>›</span></a>' + (m.dd || "") + '</section>'; }).join("") + '</div>';
+    document.body.appendChild(box); document.body.style.overflow = "hidden";
+    box.onclick = function (ev) { if (ev.target === box || ev.target.closest(".am-x")) { box.remove(); document.body.style.overflow = ""; } };
+  });
 
   var foot =
     '<footer class="site">' +

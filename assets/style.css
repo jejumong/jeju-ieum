@@ -2370,3 +2370,18 @@ main.wrap > section > ul.dots a:hover{background:var(--sea-50);color:var(--sea-7
 .job-side a span{display:block;font-size:12.5px;color:var(--ink-4);margin-top:2px;line-height:1.45}
 .job-side .btn{margin-top:auto}
 @media (max-width:960px){.job-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* 휴대폰 전체 메뉴 */
+.am-wrap{position:fixed;inset:0;z-index:1000;background:rgba(10,24,44,.45);display:flex;align-items:flex-end}
+.am-sheet{width:100%;max-height:86vh;overflow-y:auto;background:#fff;border-radius:20px 20px 0 0;padding:6px 18px 28px;-webkit-overflow-scrolling:touch}
+.am-head{position:sticky;top:0;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 0 10px;border-bottom:1px solid var(--line);z-index:1}
+.am-head b{font-size:17px;font-weight:800}
+.am-x{border:0;background:var(--bg-2);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer}
+.am-sec{padding:12px 0;border-bottom:1px solid #eef1f5}
+.am-sec:last-child{border-bottom:0}
+.am-top{display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--ink);text-decoration:none;padding:4px 0}
+.am-top span{color:var(--ink-4)}
+.am-sec .dd-group{margin-top:8px}
+.am-sec .dd-label{font-size:12px;font-weight:700;color:var(--ink-4);margin-bottom:6px}
+.am-sec .dd-grid{display:flex;flex-wrap:wrap;gap:6px}
+.am-sec .dd-grid a{padding:7px 11px;border-radius:999px;background:var(--bg-2);font-size:13.5px;font-weight:600;color:var(--ink-2);text-decoration:none}
