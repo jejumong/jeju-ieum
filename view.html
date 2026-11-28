@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="제주이음">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=2">
-<link rel="stylesheet" href="assets/style.css?v=20261128a">
+<link rel="stylesheet" href="assets/style.css?v=20261128b">
 <style>
 .post-view{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 34px;max-width:860px;margin:0 auto;box-shadow:var(--sh-2)}
 .pv-board{font-size:12px;font-weight:800;color:var(--sea-600);margin-bottom:9px;letter-spacing:.04em}
@@ -93,16 +93,16 @@
   </div>
 </main>
 
-<script src="assets/kmap.js?v=20261128a"></script>
-<script src="assets/common.js?v=20261128a"></script>
-<script src="assets/db.js?v=20261128a"></script>
-<script src="assets/notify.js?v=20261128a"></script>
-<script src="assets/seed-trade.js?v=20261128a"></script>
-<script src="assets/seed-extra.js?v=20261128a"></script>
-<script src="assets/festivals-data.js?v=20261128a"></script>
-<script src="assets/seed-new.js?v=20261128a"></script>
-<script src="assets/seed-comments.js?v=20261128a"></script>
-<script src="assets/admin-data.js?v=20261128a"></script>
+<script src="assets/kmap.js?v=20261128b"></script>
+<script src="assets/common.js?v=20261128b"></script>
+<script src="assets/db.js?v=20261128b"></script>
+<script src="assets/notify.js?v=20261128b"></script>
+<script src="assets/seed-trade.js?v=20261128b"></script>
+<script src="assets/seed-extra.js?v=20261128b"></script>
+<script src="assets/festivals-data.js?v=20261128b"></script>
+<script src="assets/seed-new.js?v=20261128b"></script>
+<script src="assets/seed-comments.js?v=20261128b"></script>
+<script src="assets/admin-data.js?v=20261128b"></script>
 <script>
 var id = new URLSearchParams(location.search).get("id");
 var post = findPost(id);
@@ -165,6 +165,7 @@ if (!post) {
     extra = '<div class="pv-extra">' +
       (post.payType ? '<span>급여 <b>' + esc(payText(post)) + '</b></span>' : '') +
       (post.addr ? '<span>근무지 <b>' + esc(post.addr) + '</b></span>' : '') +
+      (post.board === "구인구직" && post.head !== "구직" ? '<span>마감 <b>' + (post.deadline ? esc(post.deadline.slice(5).replace("-", ".")) + ' (' + esc(jobDeadlineText(post)) + ')' : "채용 시 마감") + '</b></span>' : '') +
       '</div>';
   } else if (post.board !== "제주상점" && (post.price || post.loc || post.period)) {
     extra = '<div class="pv-extra">' +
